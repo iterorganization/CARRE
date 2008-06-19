@@ -1,0 +1,20 @@
+#  VERSION : 25.10.2000 11:17
+
+# LINK_NCARG	  =-L$${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
+
+DEFINES 	= -DFortran_90
+
+FC		= f95f
+CPP		= /lib/cpp -C -traditional
+
+FFLAGS		= -O --tpp
+
+DBLPAD		= --dbl
+
+COMPILE 	= ${FC} -c ${FFLAGS}
+
+#NCAR	 	= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib -lX11 -lm ${NCARG_ROOT}/BD/*.o
+LDLIBS		= -L$(SOLPSTOP)/src/lib/$(OBJECTCODE) -L/usr/X11R6/lib
+#LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -lX11 -lm -lmscl ${NCARG_ROOT}/BD/*.o
+LDFLAGS 	= -lX11 -lm -lmscl 
+DUMMY           = $(OBJECTCODE)/bidon.o 
