@@ -6,8 +6,14 @@ c
 c======================================================================
 cank -- The comments are translated from French, sorry for errors!
 
+*..  Ce programme permet de trouver la localisation des points X
+*  pour un tokamak. Il parametrise ensuite les separatrices qui passent
+*  par ces points X et il les trace ainsi que les structures reelles.
+*  Une maille curviligne orthogonale alignee sur les surfaces de flux
+*  est alors construite.
+
 c*** This program builds an orthogonal curvilinear mesh aligned to the
-c*** flux surfaces.  It finds the localization of the X points,
+c*** flux surfaces.  It finds the localisation of the X-points,
 c*** parametrises the separatrices passing through them, and traces
 c*** them together with the real structures.
 c======================================================================
@@ -70,35 +76,34 @@ c.. strumx: maximum number of structures
 c.. npstmx: maximum number of points per structure
 c.. npnimx: maximum number of tracing points on a curve
 c.. nivmx : maximum number of limiting level lines
-c.. npmamx: maximum number of grin points in poloidal direction
-c.. nrmamx: maximum number of grin points in radial direction
+c.. npmamx: maximum number of grid points in poloidal direction
+c.. nrmamx: maximum number of grid points in radial direction
 c.. nregmx: maximum number of regions
-c.. cstlin: constante lineaire que l'on ajoute selon y pour avoir des
-c           point X deconnectes. Egal a 0 pour les nuls connectes.
+c.. cstlin: a linear constant added along y to artificially disconnect
+c           the X-points. Set to 0 for connected double-nulls
 c
-c.. nx,ny : number of data points in x and y.
+c.. nx,ny : number of data points in x and y
 c.. x,y   : tables of coordinates of the data points
 c.. psi   : psi values at each data point
 c.. psidx,psidy: values of psi derivatives in x and y
 c                at each data point
 c.. nstruc: number of structures
 c.. npstru: number of points per structure
-c.. xstruc,ystruc: co-ordinates of the structure points
+c.. xstruc,ystruc: coordinates of the structure points
 c                  (point index, structure index)
 c.. npxtot: number of the points where the gradient vanishes
-c.. pointx,pointy: co-ordinates of the points where the gradient
+c.. pointx,pointy: coordinates of the points where the gradient
 c                  vanishes
 c.. ii,jj : x and y indices of the cells where the gradient vanishes
 c.. npx   : number of the X-points
 c.. ptx,pty: X-point co-ordinates
 c.. iptx,jptx: x and y indices of the cells containing the X-points
-c.. xpto,ypto: co-ordinates of the O-point
+c.. xpto,ypto: coordinates of the O-point
 c.. racord: determines whether the X-points are connected
-c.. racord: determine si oui ou non les points X sont connectes.
 c.. fctpx: the psi values at each X- or O-point
-c.. separx,separy: co-ordinates of the points of the parametrised
+c.. separx,separy: coordinates of the points of the parametrised
 c               separatrices (point index, branch index, X-point index)
-c.. nptot : number of the parametrisation points per a separatrix
+c.. nptot : number of parametrisation points for each separatrix
 c           (separatrix index, point index)
 c.. ptsep : separatrix pointer, used as index
 c           (separatrix index, point index)
@@ -109,9 +114,9 @@ c.. inddef: table of indices of the divertor plates
 c.. indplq: table of the structure indices (0 means not a target)
 c           (separatrix index, X-point index)
 c.. nbniv : number of the limiting level lines
-c.. nivx,nivy: co-ordinates of the points of the parametrised
+c.. nivx,nivy: coordinates of the points of the parametrised
 c              limiting level lines (point index, curve index)
-c.. nivtot: number of points per a parametrised limiting level line
+c.. nivtot: number of points for each parametrised limiting level line
 c.. distnv: distance along a plate between the separatrix strike-point
 c           and a limiting level line
 c           (distance selector [1=real, 2=psi], curve index)
@@ -120,11 +125,11 @@ c.. np1   : numbers of the grid points in poloidal direction
 c           (region index)
 c.. npr   : numbers of the grid points in radial direction
 c           (region index)
-c.. xmail,ymail: grid point co-ordinates
+c.. xmail,ymail: grid point coordinates
 c                (poloidal, radial, region)
-c.. xn,yn : working array for co-ordinates along a parametrised curve
+c.. xn,yn : working array for coordinates along a parametrised curve
 c.. nrelax: maximum number of iterations in the relaxation procedure
-c           of construction of the orthogonal grig
+c           of construction of the orthogonal grid
 c.. relax : relaxation parameter
 c.. stpmin: minimum tolerable distance between any two grid points
 c           in the course of relaxation
@@ -133,7 +138,7 @@ c.. limcfg: indicates when a limiter configuration is considered (when
 c           non zero). This variable is assigned the index of the
 c           limiter
 c     N.B.: When the limiter configuration is selected, npx is set equal
-c           to 1 and the coordinates of the X point correspond to the
+c           to 1 and the coordinates of the X-point correspond to the
 c           innermost point of the limiter.
 c======================================================================
 *

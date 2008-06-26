@@ -5,14 +5,18 @@ c
 c=======================================================================
 c*** This subroutine orders the indices in the vector inddef such that 
 c*** the first element points to top right, second top left, third bottom
-c*** right, fourth bottom left. If there is only one x-point, then 1 is 
+c*** right, fourth bottom left. If there is only one X-point, then 1 is 
 c*** the right and 2 is the left.
-c***  	NB: the o-point co-ordinates are in  ptx(npx+1), pty(npx+1).
+c***  	NB: the O-point coordinates are in ptx(npx+1), pty(npx+1).
 c=======================================================================
       implicit none
 *  arguments
       integer nbdef, inddef(nbdef),npx
       real*8 xst(*),yst(*),ptx(npx+1),pty(npx+1)
+
+*  variables en common
+
+#include <COMLAN.F>
 
 *  variables locales
       integer n
@@ -28,11 +32,11 @@ c=======================================================================
 c=======================================================================
 c.. i,j: indices
 c.. n  : maximum number of targets considered in this routine
-c.. xt,yt: temporary arrays containing the x and y co-ordinates of the 
+c.. xt,yt: temporary arrays containing the x and y coordinates of the 
 c     	   first points of a divertor plate
-c.. ptx, pty: x-point co-ordinates
-c.. xx,xy: x-point co-ordinates ordered from top to bottom
-c.. npx: number of x-points
+c.. ptx, pty: X-point coordinates
+c.. xx,xy: X-point coordinates ordered from top to bottom
+c.. npx: number of X-points
 c=======================================================================
 c<<<
       write(0,*) 'Entering orddef: npx,nbdef= ',npx,nbdef
@@ -62,7 +66,11 @@ c*** Order the x-points from top to bottom if necessary
           xx(1)=ptx(1)
           xy(1)=pty(1)
       elseif(npx.gt.2) then !}{
-        write(6,*) 'npx=',npx,' too large in orddef'
+        if(sellan(1:7).eq.'english') then
+          write(6,*) 'npx=',npx,' too large in orddef'
+        elseif(sellan(1:8).eq.'francais') then
+          write(6,*)'npx=',npx,' trop grand dans orddef'
+        endif
         stop
       endif !}
 

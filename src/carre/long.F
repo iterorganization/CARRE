@@ -4,7 +4,7 @@
 ************************************************************************
       IMPLICIT NONE
 
-*..  Cette fonction calcule la distance totale que parcours une courbe v
+*..  Cette fonction calcule la distance totale que parcourt une courbe v
 *  de n points.
 
 *  arguments

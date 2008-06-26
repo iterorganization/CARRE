@@ -32,13 +32,13 @@ cank-970702: moved dimensions into a separate file
       INTEGER i, j, k, ipx, ipo, iptxtm, jptxtm
       REAL*8 ptxtmp,ptytmp,eps_hlp
       CHARACTER rep*1
-c*** Tolerance for co-insiding x-points
+c*** Tolerance for coinciding X-points
       parameter (eps_hlp=1.e-5)
 cank-970701 <<<
-c*** Automatic definition of the x- and o-points from dg data
+c*** Automatic definition of the X- and O-points from DG data
 c***
 c*** The code tries to identify the pre-selected points with those
-c*** provided by carre. If such an identification is unambiguous,
+c*** provided by Carre. If such an identification is unambiguous,
 c*** then the user is prompted to accept these points. Otherwise, or
 c*** if the user does not accept the selection, the old scheme works.
 c*** The pre-selected points should be specified in a file "selptx.inf"
@@ -51,13 +51,13 @@ c***  xptom,yptom
 c***
 c*** nptx =< 0 means a limiter configuration
 c***
-c***  nptxm         maximum number of the selected x-points ( =< 2 )
-c***  nptx          real number of the selected x-points
-c***  xptxm, yptxm  x-point co-ordinates read from the file
-c***  xptom, yptom  o-point co-ordinates read from the file
+c***  nptxm         maximum number of the selected X-points ( =< 2 )
+c***  nptx          real number of the selected X-points
+c***  xptxm, yptxm  X-point coordinates read from the file
+c***  xptom, yptom  O-point coordinates read from the file
 c***  xpttol        tolerance parameter - related to the distance
 c***                between the points
-c***  lconn         1: connect x-points, 0: don't, -1: ask user
+c***  lconn         1: connect X-points, 0: do not, -1: ask user
 c***  lun           unit number for the point specification file
 c
       integer nptxm,nptx,lun,lconn
@@ -146,7 +146,7 @@ c
                 k=i
               else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k))
      .      	      	      	      	      	      .gt.eps_hlp) then
-                write(*,*) 'Ambigouos definition of the o-point: ',
+                write(*,*) 'Ambiguous definition of the O-point: ',
      ,                         'points ',k,'  and ',i,'  are too close'
                 ex=.false.
                 go to 20
@@ -154,7 +154,7 @@ c
             end if
           end do
           if(k.eq.0) then
-            write(*,*) 'No o-point identified - ',
+            write(*,*) 'No O-point identified - ',
      ,                                       'check the specification!'
             ex=.false.
             go to 20
@@ -169,7 +169,7 @@ c
                   k=i
               else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k))
      .      	      	      	      	      	      .gt.eps_hlp) then
-                  write(*,*) 'Ambigouos definition of the x-point',
+                  write(*,*) 'Ambiguous definition of the X-point',
      ,                     j,': points ',k,'  and ',i,'  are too close'
                   ex=.false.
                   go to 20
@@ -177,21 +177,21 @@ c
               end if
             end do
             if(k.eq.0) then
-              write(*,*) 'No x-point ',j,' identified - ',
+              write(*,*) 'No X-point ',j,' identified - ',
      ,                                       'check the specification!'
               ex=.false.
               go to 20
             end if
             if(k.eq.ipo) then
-              write(*,*) 'Ambigouos definition of the x-point',
+              write(*,*) 'Ambiguous definition of the X-point',
      ,                              j,': the same as the plasma center'
               ex=.false.
               go to 20
             end if
             do i=1,j-1
               if(k.eq.kptx(j)) then
-                write(*,*) 'Ambigouos definition of the x-point',
-     ,                                  j,': the same as the x-point',i
+                write(*,*) 'Ambiguous definition of the X-point',
+     ,                                  j,': the same as the X-point',i
                 ex=.false.
                 go to 20
               end if
@@ -204,10 +204,10 @@ c*** Ask for confirmation.
 c
           write(*,*) 'Pre-selected points are identified.'
           write(*,'(1x,a9,1p,2e14.4)')
-     -                            'o-point: ',pointx(ipo),pointy(ipo)
+     -                            'O-point: ',pointx(ipo),pointy(ipo)
           if(nptx.gt.0) then
             write(*,'(1x,a9,1p,2e14.4/(10x,2e14.4))')
-     -           'x-point: ',(pointx(kptx(i)),pointy(kptx(i)),i=1,nptx)
+     -           'X-point: ',(pointx(kptx(i)),pointy(kptx(i)),i=1,nptx)
             if(nptx.gt.1) then
 	      if(lconn.gt.0) then
 	      	write(*,*) 'Connected double-null'
@@ -216,16 +216,16 @@ c
               end if
             end if
           else
-            write(*,*) 'No x-point - limiter configuration'
+            write(*,*) 'No X-point - limiter configuration'
           end if
 	  
           write(*,*)
           write(*,*) 'Do you accept the selection (y/n)?'
           read(*,'(a)') rep
-          ex=rep.eq.'y'
+          ex=rep.eq.'y'.or.rep.eq.'Y'
           if(.not.ex) go to 20
 c
-c*** The configuration is accepted. Set the carre variables
+c*** The configuration is accepted. Set the Carre variables
 c
           if(nptx.le.0) then
             npx=1
@@ -245,7 +245,7 @@ c
           ptx(npx+1)=xpto
           pty(npx+1)=ypto
         else
-          write(*,*) 'Too many x-points specified in selptx.inf: ',nptx
+          write(*,*) 'Too many X-points specified in selptx.inf: ',nptx
           write(*,*) 'Check the specification or the nptxm parameter ',
      ,                                                    'in selptx.F'
           ex=.false.
@@ -283,7 +283,7 @@ c       write(6,*)' Choisissez en donnant l''indice approprie.'
      .         (I3, T10, 1pe12.5, T25, 1pe12.5))
           write(6,*)'  0   to stop selection'
           write(6,*)' -1   for a limiter configuration'
-          write(6,*)' For a divertor configuration, select X point(s)'
+          write(6,*)' For a divertor configuration, select X-point(s)'
 c       write(6,*)' Choose option by typing the appropriate index.'
         end if
 
@@ -318,7 +318,7 @@ c      de contact avec un limiteur. Ce point est calcule dans limfnd.
           if(sellan(1:8).eq.'francais') then
            write(6,*)' Indiquez l''indice du point O.'
           elseif(sellan(1:7).eq.'english') then
-           write(6,*)' Select index for O point.'
+           write(6,*)' Select index for O-point.'
           end if
            READ(5,*) ipo
 
@@ -346,7 +346,7 @@ cank-970701
      .       ' Voulez-vous que les points X soient raccordes? (o/n)'
           else if(sellan(1:7).eq.'english') then
             write(6,*) 'Do you wish to force connection ',
-     .        	      	      	      	'of the two X points (y/n)?'
+     .        	      	      	      	'of the two X-points (y/n)?'
           end if
           read(5,35) rep
    35     format (a)

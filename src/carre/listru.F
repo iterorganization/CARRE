@@ -5,7 +5,7 @@ c  version : 05.04.97 16:19
 c
 c======================================================================
       implicit none
-c  read dada concerning structures
+c  read data concerning structures
 c
 c  arguments
 
@@ -13,19 +13,19 @@ c  arguments
       real*8 xstruc(npstmx,nstrmx),ystruc(npstmx,nstrmx)
       character nomstr(nstrmx)*80
 c
-c  iunit: unit of file containint structure data
+c  iunit: unit of file containing structure data
 c  nstr: number of structures
 c  npstru(i): number of points in structure i
 c             a positive (negative) number indicates a closed (open)
 c             structure. When this number is zero, the code counts
 c             the number of points and the structure must be closed.
-c             When -1, th code counts the number of points and the
+c             When -1, the code counts the number of points and the
 c             structure is understood to be closed.
 c  nomstr(i): name of structure i
 c  xstruc(j,i): j-th x coordinate of structure i
 c  ystruc(j,i): j-th y coordinate of structure i
 c  nstrmx: maximum number of structures allowed
-c  npstmx: maximum numper of coordinates per structure
+c  npstmx: maximum number of coordinates per structure
 c
 c  local variables
       integer i,ifail

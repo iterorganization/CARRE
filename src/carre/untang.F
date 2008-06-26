@@ -12,6 +12,10 @@
       INTEGER npni
       REAL*8 xn(npni), yn(npni), x, y, ux, uy,d,period
 
+*  variables en common
+
+#include <COMLAN.F>
+
 *  variables locales
       INTEGER indp1, ind, jnd, jndp, ipp
       REAL*8 unx1,uny1,unx2,uny2,z,w1,dmin
@@ -77,7 +81,11 @@ c  pas d'interpolation aux extremites
         jndp=ind+2
         jnd=indp1
       else
-        write(6,*)'Cas impossible dans untang: arret force'
+        if(sellan(1:8).eq.'francais') then
+          write(6,*)'Cas impossible dans untang: arret force'
+        elseif(sellan(1:7).eq.'english') then
+          write(6,*)'Impossible case in untang: forced stop'
+        endif
         call pltend
         stop
       endif

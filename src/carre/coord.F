@@ -4,8 +4,8 @@ c  version : 21.07.2000 16:18
 c=======================================================================
       implicit none
 
-c*** Calculate the x and y co-ordinates of a point located on a curve at
-c*** a distance d from the origin of the curve
+c*** Calculate the x and y coordinates of a point located on a curve v 
+c*** at a distance d from the origin of the curve
 
 *  arguments
       integer n
@@ -20,10 +20,12 @@ c*** a distance d from the origin of the curve
       intrinsic sqrt
 
 c========================
-c.. n   : number of the points in the curve.
-c.. vx,vy: co-ordinates of the points in the curve.
+c.. n   : number of points in the curve
+c.. vx,vy: coordinates of the points in the curve
 c.. d   : required distance along the curve
-c.. x,y : co-ordinates of the found point
+c.. x,y : coordinates of the found point
+c.. dist: distance between 2 consecutive points on the curve
+c.. distot: total distance covered
 c========================
 
 *..Initialisation.

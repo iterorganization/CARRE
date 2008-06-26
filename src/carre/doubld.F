@@ -20,7 +20,7 @@ c a faire:
 c  Definition of xmail, ymail before and after a call to doubld.
 c  Don't forget the guard!
 
-c  N.B. Here, the attempt to work with the relaxation scheme (everytinig
+c  N.B. Here, the attempt to work with the relaxation scheme (everything
 c       starting and ending with c---) has been abandoned. The approach
 c       presently used is considered to be the best one in practice.
 c       The code between c--- has also been commented with "crlx".
@@ -79,21 +79,21 @@ c..          separatrices
 c.. plaque : index of the leading target
 c.. [xy]ext: co-ordinates of the strike point of the outer separatrix
 c..            on the leading target
-c.. [xy]ptxex: co-ordinates of the outer X-point
-c.. [xy]pto: co-ordinates of the O-point
-c.. x,y    : ordinates of the grid on which the psi values are given
+c.. [xy]ptxex: coordinates of the outer X-point
+c.. [xy]pto: coordinates of the O-point
+c.. x,y    : coordinates of the grid on which the psi values are given
 c.. nx,ny  : their dimensions
 c.. psi    : psi values
 c.. nstruc : number of the structures
 c.. npstru : numbers of segments in the structures
-c.. [xy]struc: co-ordinates of the structure corners
+c.. [xy]struc: coordinates of the structure corners
 c.. a00..a11: interpolation coefficients for psi
 c.. repart : selector of the radial grid distribution (1=l, 2=psi)
 c.. [xy]crb2: points of parametrised outer separatrix
 c.. npcrb2 : number of these points
 
 c*** Output
-c.. boucl[xy]: co-ordinates of the splitting point on the separatrix
+c.. boucl[xy]: coordinates of the splitting point on the separatrix
 c..            loop (???)
 
 c*** Not used

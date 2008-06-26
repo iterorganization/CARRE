@@ -16,6 +16,10 @@ c======================================================================
       REAL*8 x1,y1,psi1,x2,y2,pas,xst(npst),yst(npst),x(nx),y(ny),
      .       a00(nm1,nm2,3),a10(nm1,nm2,3),a01(nm1,nm2,3),a11(nm1,nm2,3)
 
+*  variables en common
+
+#include <COMLAN.F>
+
 *  variables locales
       INTEGER n,ind1,ind2,ii,jj, compt
       REAL*8 zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
@@ -227,10 +231,15 @@ c---------------------------------------------------------------------}
 c            PRINT *,'On a fait le tour de la structure sans trouver'
 c     .                ,' la fonction dans SAUTE'
 
+            if(sellan(1:8).eq.'francais') then
+            write(*,*) 'On a fait le tour de la structure sans trouver'
+     .                ,' la fonction dans SAUTE'
+            else
             write(*,*) 'Error in saute: the psi value not found ',
      ,                                  'on the structure.  pas = ',pas
             write(*,*) '==> Check whether all four targets ',
      ,                                 'intersect the outer separatrix'
+            endif
             call trc_stk
             call pltend
             STOP

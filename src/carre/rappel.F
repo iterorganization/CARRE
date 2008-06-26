@@ -1,6 +1,6 @@
       SUBROUTINE RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,iusor)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,iusor,correct)
 c
 c  version : 07.07.97 18:37
 c
@@ -16,10 +16,11 @@ cank-970707: dimensions from the file
 #include <CARREDIM.F>
 
 *  arguments
-      INTEGER nptseg(*),repart,npr(*),nreg,nsep,iusor
+      INTEGER nptseg(*),repart,npr(*),nreg,nsep,npx,iusor
       REAL*8 deltp1(*),deltpn(*),deltr1(*),deltrn(*),pntrat,lg(*),
      .       distnv(5,*),difpsi,dpmin(*),dpmax(*),drmin(*),drmax(*),
      .       tgarde(4),distxo
+      LOGICAL correct
 
 *  variables en common
 
@@ -178,6 +179,129 @@ c  par relaxation
       endif
       write(iusor,164)nrelax,relax,pasmin,rlcept
  164  format(t2,i5,t15,f5.3,t30,1pe10.3,t45,1pe10.3)
+
+cxpb  Verifier que les valeurs presentees sont correctes
+
+      correct = .true.
+      do i = 1, nsep
+        if (dpmin(i)*dpmax(i).le.0.0 .or.
+     .      dpmin(i)*lg(i).le.0.0 .or.
+     .      dpmax(i)*lg(i).le.0.0) then
+          correct = .false.
+          if(sellan(1:8).eq.'francais') then
+            WRITE(6,281) i, dpmin(i), dpmax(i), lg(i)
+  281       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'//
+     .   T2,
+     .   'Les nombres dpmin, dpmax et lg doivent avoir le meme signe.'//
+     .   T2,'Modifiez deltp1 et deltpn en consequence.'//
+     .   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
+          elseif(sellan(1:7).eq.'english') then
+            WRITE(6,280) i, dpmin(i), dpmax(i), lg(i)
+  280       FORMAT(//T2,'Invalid data for segment',i2,'!'//
+     .   T2,'The numbers dpmin, dpmax and lg must have the same sign.'//
+     .   T2,'Modify deltp1 and deltpn accordingly.'//
+     .   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
+          endif
+        endif 
+        if (nptseg(i).le.2) then
+          correct=.false.
+          if(sellan(1:8).eq.'francais') then
+            write(6,2811) i
+ 2811       format(//T2,'Donnees invalides pour le segment',i2,'!'//
+     .        T2,'Il faut plus de deux points sur ce segment!')
+          elseif(sellan(1:7).eq.'english') then
+            write(6,2810) i
+ 2810       format(//T2,'Invalid data for segment',i2,'!'//
+     .        T2,'You need more than 2 points on this segment!')
+          endif
+        endif
+      enddo
+      do i = 1, nreg-1
+        if (drmin(i)*drmax(i).le.0.0 .or.
+     .      drmin(i)*distnv(repart,i).le.0.0 .or.
+     .      drmax(i)*distnv(repart,i).le.0.0) then
+          correct = .false.
+          if(sellan(1:8).eq.'francais') then
+            WRITE(6,291) i, drmin(i), drmax(i), distnv(repart,i)
+  291       FORMAT(//T2,'Donnees invalides pour la region',i2,'!'//
+     .   T2,'Les nombres drmin, drmax et difference doivent ',
+     .   'avoir le meme signe.'//
+     .   T2,'Modifiez deltr1 et deltrn en consequence.'//
+     .   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
+          elseif(sellan(1:7).eq.'english') then
+            WRITE(6,290) i, drmin(i), drmax(i), distnv(repart,i)
+  290       FORMAT(//T2,'Invalid data for region',i2,'!'//
+     .   T2,
+     .   'The numbers drmin, drmax and width must have the same sign.'//
+     .   T2,'Modify deltr1 and deltrn accordingly.'//
+     .   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
+          endif
+        endif
+      enddo
+      i = nreg
+      if (drmin(i)*drmax(i).le.0.0 .or.
+     .    drmin(i)*difpsi.le.0.0 .or.
+     .    drmax(i)*difpsi.le.0.0) then
+        correct = .false.
+        if(sellan(1:8).eq.'francais') then
+          WRITE(6,2911) i, drmin(i), drmax(i), difpsi
+ 2911     FORMAT(//T2,'Donnees invalides pour la region',i2,'!'//
+     .   T2,'Les nombres drmin, drmax et difference doivent ',
+     .   'avoir le meme signe.'//
+     .   T2,'Modifiez deltr1 et deltrn en consequence.'//
+     .   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
+        elseif(sellan(1:7).eq.'english') then
+          WRITE(6,2900) i, drmin(i), drmax(i), difpsi
+ 2900     FORMAT(//'Invalid data for region',i2,'!'//
+     .   T2,
+     .   'The numbers drmin, drmax and width must have the same sign.'//
+     .   T2,'Modify deltr1 and deltrn accordingly.'//
+     .   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
+        endif
+      endif
+      do i = 1, 2*max(1,npx)
+        if (tgarde(i).lt.0.0) then
+          correct = .false.
+          if(sellan(1:8).eq.'francais') then
+            WRITE(6,3011) i, tgarde(i)
+ 3011       FORMAT(//T2,'Donnees invalides pour la plaque',i2,'!'//
+     .     T2,'La longueur tgarde doit etre positive ou nulle.'//
+     .     T2,'Modifiez tgarde en consequence.'//
+     .     T2,'tgarde = ',1pe11.4)
+          elseif(sellan(1:7).eq.'english') then
+            WRITE(6,3000) i, tgarde(i)
+ 3000       FORMAT(//'Invalid data for plate',i2,'!'//
+     .     T2,'The length tgarde must be positive or zero.'//
+     .     T2,'Modify tgarde accordingly.'//
+     .     T2,'tgarde = ',1pe11.4)
+          endif
+        endif
+      enddo
+      if (nrelax.lt.1 .or. relax.le.0.0 .or. relax.gt.1.0 .or. 
+     &    pasmin.le.0.0 .or. rlcept.le.0.0) then
+        correct = .false.
+        if(sellan(1:8).eq.'francais') then
+          WRITE(6,3111) nrelax, relax, pasmin, rlcept
+ 3111     FORMAT(//
+     .   T2,'Donnees invalides pour l''algorithme de relaxation!'//
+     .   T2,'Il faut au moins une iteration.'//
+     .   T2,'Les parametres relax, pasmin, et rlcept ',
+     .      'doivent etre positifs.'//
+     .   T2,'Le parametre relax ne doit pas exceder 1.'//
+     .   T2,'Modifiez-les en consequence.'//
+     .   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
+        elseif(sellan(1:7).eq.'english') then
+          WRITE(6,3100) nrelax, relax, pasmin, rlcept
+ 3100     FORMAT(//T2,'Invalid data for relaxation algorithm!'//
+     .   T2,'The length tgarde must be positive or zero.'//
+     .   T2,'At least one iteration is needed.'//
+     .   T2,'The relax, pasmin, and rlcept parameters ',
+     .      'must be positive.'//
+     .   T2,'The relax parameter must not exceed 1.'//
+     .   T2,'Modify these accordingly.'//
+     .   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
+        endif
+      endif
 
       RETURN
       END

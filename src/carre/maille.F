@@ -62,10 +62,10 @@ cank-970707: dimensions from the file
       intrinsic max
 c=========================
 c.. npnimx: <=> npnimx
-c.. nreg  : number of the regions
-c.. xmail,ymail: co-ordinates of the grid points
+c.. nreg  : number of regions
+c.. xmail,ymail: coordinates of the grid points
 c                (poloidal index, radial index, region index)
-c.. xn,yn : working arrays for co-ordinates along a parametrised curve
+c.. xn,yn : working arrays for coordinates along a parametrised curve
 c.. nn    : number of points on the same curve
 c.. np1   : number of points in poloidal direction
 c.. npr   : number of points in radial direction
@@ -76,24 +76,24 @@ c.. ipx   : X-point index
 c.. ptxext: index of the outer X-point
 c.. sens  : direction of movement along a target:
 c           1=the same as the target points, 2=the opposite
-c.. idef  : indice de la plaque de dflecteur d'ou on debute.
+c.. idef  : index of the target from where the routine starts
 c.. a00,a10,a01,a11: coefficients.
 c.. repart: selector for the radial point distribution
 c           1=absolute distance, 2=difference in psi
 c.. nsep  : number of the separatrices per the configuration
-c.. nbcrb : number of the boundary lines
+c.. nbcrb : number of boundary lines
 c.. ii,jj : cell identification indices
-c.. npmamx: maximun number of the intervals
-c.. ient,isor: indice d'unite d'entree et de sortie.
+c.. npmamx: maximun number of intervals
+c.. ient,isor: input and output unit numbers
 c.. ifail : Check whether the data should be read from the keyboard
 c           because the file is incomplete
 c           (0=file is acceptable, 1=unacceptable)
-c.. x2,y2 : starting point for marche
+c.. x2,y2 : starting point for routine marche
 c.. pntrat: penetration value of the X-point relative to the O-point
 c.. lg    : length of each separatrix
 c.. deltp1,deltpn: values of the first and last intervals for each sep.
 c.. deltr1,deltrn: values of the first and last intervals for each reg.
-c.. dpmin,dpmax: tableaux des int
+c.. dpmin,dpmax: values of the minimal and maximal interval widths
 c..
 c.. xnlast,ynlast: dans le cas du double nul decon., derniere courbe de
 c                  niveau lorsqu'on maille la region entre les deux
@@ -240,131 +240,8 @@ c----------------------------------------------------------------------
          ENDIF
 
          CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,6)
-
-cxpb  Verifier que les valeurs presentees sont correctes
-
-         correct = .true.
-         do i = 1, nsep
-           if (dpmin(i)*dpmax(i).le.0.0 .or.
-     .         dpmin(i)*lg(i).le.0.0 .or.
-     .         dpmax(i)*lg(i).le.0.0) then
-             correct = .false.
-             if(sellan(1:8).eq.'francais') then
-               WRITE(6,281) i, dpmin(i), dpmax(i), lg(i)
-  281          FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'//
-     .   T2,
-     .   'Les nombres dpmin, dpmax et lg doivent avoir le meme signe.'//
-     .   T2,'Modifiez deltp1 et deltpn en consequence.'//
-     .   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
-             elseif(sellan(1:7).eq.'english') then
-               WRITE(6,280) i, dpmin(i), dpmax(i), lg(i)
-  280          FORMAT(//T2,'Invalid data for segment',i2,'!'//
-     .   T2,'The numbers dpmin, dpmax and lg must have the same sign.'//
-     .   T2,'Modify deltp1 and deltpn accordingly.'//
-     .   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
-             endif
-           endif 
-           if (nptseg(i).le.2) then
-             correct=.false.
-             if(sellan(1:8).eq.'francais') then
-               write(6,2811) i
- 2811          format(//T2,'Donnees invalides pour le segment',i2,'!'//
-     .          T2,'Il faut plus de deux points sur ce segment!')
-             elseif(sellan(1:7).eq.'english') then
-               write(6,2810) i
- 2810          format(//T2,'Invalid data for segment',i2,'!'//
-     .          T2,'You need more than 2 points on this segment!')
-             endif
-           endif
-         enddo
-         do i = 1, nreg-1
-           if (drmin(i)*drmax(i).le.0.0 .or.
-     .         drmin(i)*distnv(repart,i).le.0.0 .or.
-     .         drmax(i)*distnv(repart,i).le.0.0) then
-             correct = .false.
-             if(sellan(1:8).eq.'francais') then
-               WRITE(6,291) i, drmin(i), drmax(i), distnv(repart,i)
-  291          FORMAT(//T2,'Donnees invalides pour la region',i2,'!'//
-     .   T2,'Les nombres drmin, drmax et difference doivent ',
-     .   'avoir le meme signe.'//
-     .   T2,'Modifiez deltr1 et deltrn en consequence.'//
-     .   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
-             elseif(sellan(1:7).eq.'english') then
-               WRITE(6,290) i, drmin(i), drmax(i), distnv(repart,i)
-  290          FORMAT(//T2,'Invalid data for region',i2,'!'//
-     .   T2,
-     .   'The numbers drmin, drmax and width must have the same sign.'//
-     .   T2,'Modify deltr1 and deltrn accordingly.'//
-     .   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
-             endif
-           endif
-         enddo
-         i = nreg
-         if (drmin(i)*drmax(i).le.0.0 .or.
-     .       drmin(i)*difpsi.le.0.0 .or.
-     .       drmax(i)*difpsi.le.0.0) then
-           correct = .false.
-           if(sellan(1:8).eq.'francais') then
-             WRITE(6,2911) i, drmin(i), drmax(i), difpsi
- 2911        FORMAT(//T2,'Donnees invalides pour la region',i2,'!'//
-     .   T2,'Les nombres drmin, drmax et difference doivent ',
-     .   'avoir le meme signe.'//
-     .   T2,'Modifiez deltr1 et deltrn en consequence.'//
-     .   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
-           elseif(sellan(1:7).eq.'english') then
-             WRITE(6,2900) i, drmin(i), drmax(i), difpsi
- 2900        FORMAT(//'Invalid data for region',i2,'!'//
-     .   T2,
-     .   'The numbers drmin, drmax and width must have the same sign.'//
-     .   T2,'Modify deltr1 and deltrn accordingly.'//
-     .   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
-           endif
-         endif
-         do i = 1, 2*max(1,npx)
-           if (tgarde(i).lt.0.0) then
-             correct = .false.
-             if(sellan(1:8).eq.'francais') then
-               WRITE(6,3011) i, tgarde(i)
- 3011          FORMAT(//T2,'Donnees invalides pour la plaque',i2,'!'//
-     .     T2,'La longueur tgarde doit etre positive ou nulle.'//
-     .     T2,'Modifiez tgarde en consequence.'//
-     .     T2,'tgarde = ',1pe11.4)
-             elseif(sellan(1:7).eq.'english') then
-               WRITE(6,3000) i, tgarde(i)
- 3000          FORMAT(//'Invalid data for plate',i2,'!'//
-     .     T2,'The length tgarde must be positive or zero.'//
-     .     T2,'Modify tgarde accordingly.'//
-     .     T2,'tgarde = ',1pe11.4)
-             endif
-           endif
-         enddo
-         if (nrelax.lt.1 .or. relax.le.0.0 .or. relax.gt.1.0 .or. 
-     &       pasmin.le.0.0 .or. rlcept.le.0.0) then
-           correct = .false.
-           if(sellan(1:8).eq.'francais') then
-             WRITE(6,3111) nrelax, relax, pasmin, rlcept
- 3111        FORMAT(//
-     .   T2,'Donnees invalides pour l''algorithme de relaxation!'//
-     .   T2,'Il faut au moins une iteration.'//
-     .   T2,'Les parametres relax, pasmin, et rlcept ',
-     .      'doivent etre positifs.'//
-     .   T2,'Le parametre relax ne doit pas exceder 1.'//
-     .   T2,'Modifiez-les en consequence.'//
-     .   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
-           elseif(sellan(1:7).eq.'english') then
-             WRITE(6,3100) nrelax, relax, pasmin, rlcept
- 3100        FORMAT(//T2,'Invalid data for relaxation algorithm!'//
-     .   T2,'The length tgarde must be positive or zero.'//
-     .   T2,'At least one iteration is needed.'//
-     .   T2,'The relax, pasmin, and rlcept parameters ',
-     .      'must be positive.'//
-     .   T2,'The relax parameter must not exceed 1.'//
-     .   T2,'Modify these accordingly.'//
-     .   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
-           endif
-         endif
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
          if (correct) then
            if(sellan(1:8).eq.'francais') then
@@ -387,8 +264,8 @@ cxpb  Verifier que les valeurs presentees sont correctes
             GO TO 3
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,10)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,10,correct)
 
          ENDIF
 
@@ -769,17 +646,19 @@ c----------------------------------------------------------------------
          ENDIF
 
          CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,6)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
-         if(sellan(1:8).eq.'francais') then
-           WRITE(6,301)
-         elseif(sellan(1:7).eq.'english') then
-           WRITE(6,300)
+         if(correct) then
+           if(sellan(1:8).eq.'francais') then
+             WRITE(6,301)
+           elseif(sellan(1:7).eq.'english') then
+             WRITE(6,300)
+           endif
+           READ(5,302)rep
          endif
-         READ(5,302)rep
 
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N') then
+         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
 
             ient = 5
             isor = 6
@@ -788,8 +667,8 @@ c----------------------------------------------------------------------
             GO TO 43
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,10)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,10,correct)
 
          ENDIF
 
@@ -1539,17 +1418,19 @@ crm  augmenter ce test
      .               dpmin(4),dpmax(4))
 
          CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,6)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
-         if(sellan(1:8).eq.'francais') then
-           WRITE(6,301)
-         elseif(sellan(1:7).eq.'english') then
-           WRITE(6,300)
+         if (correct) then
+           if(sellan(1:8).eq.'francais') then
+             WRITE(6,301)
+           elseif(sellan(1:7).eq.'english') then
+             WRITE(6,300)
+           endif
+           READ(5,302)rep
          endif
-         READ(5,302)rep
 
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N') then
+         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
 
             ient = 5
             isor = 6
@@ -1558,8 +1439,8 @@ crm  augmenter ce test
             GO TO 105
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,10)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,10,correct)
 
          ENDIF
 
@@ -2363,17 +2244,19 @@ c----------------------------------------------------------------------
          ENDIF
 
          CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,6)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
-         if(sellan(1:8).eq.'francais') then
-           WRITE(6,301)
-         elseif(sellan(1:7).eq.'english') then
-           WRITE(6,300)
+         if(correct) then
+           if(sellan(1:8).eq.'francais') then
+             WRITE(6,301)
+           elseif(sellan(1:7).eq.'english') then
+             WRITE(6,300)
+           endif
+           READ(5,302)rep
          endif
-         READ(5,302)rep
 
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N') then
+         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
 
             ient = 5
             isor = 6
@@ -2382,8 +2265,8 @@ c----------------------------------------------------------------------
             GO TO 203
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,dpmin,dpmax,
-     .             drmin,drmax,distxo,10)
+     .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
+     .             dpmin,dpmax,drmin,drmax,distxo,10,correct)
 
          ENDIF
 

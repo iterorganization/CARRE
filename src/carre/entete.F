@@ -6,11 +6,11 @@ c  version : 04.04.97 21:21
 c
       implicit none
 c  cette routine lit jusqu'a la ligne qui contient la chaine de
-c  characteres specifiee dans chaine. si iflag =1 a l'entree, le fichier
+c  caracteres specifiee dans chaine. si iflag =1 a l'entree, le fichier
 c  est rembonine avant la lecture.
 c
 c  nin: unite de lecture
-c  chaine: chaine de characteres qu'il faut trouver
+c  chaine: chaine de caracteres qu'il faut trouver
 c  iflag:
 c    entree: 1 pour commencer la lecture a partir du debut du fichier
 c            2 comme 1, mais le programme arrete en cas d'echec

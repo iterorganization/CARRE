@@ -8,7 +8,7 @@
 *  n'est pas exactement sur le segment. Pour trouver le segment, on
 *  effectue (pour chaque segment) un produit scalaire entre les 2
 *  vecteurs suivants: 1) du point jusqu'a une des extremites du segment;
-*  2) du point vers l'autre extr.. Ainsi l'angle qu'on mesurera pour le
+*  2) du point vers l'autre extremite. Ainsi l'angle qu'on mesurera pour le
 *  segment de contact sera pres de 180 degrees et pour chaque autre on
 *  aura un angle moindre. Le segment de contact sera celui qui
 *  presentera l'angle le plus grand.
@@ -32,7 +32,7 @@ c.. xx,yy: point de contact sur un segment de structure.
 c.. ax,ay: vecteur allant du point de contact au debut d'un segment.
 c.. bx,by: vecteur allant du point de contact au debut du segment
 c          suivant.
-c.. mu, mumin: cos de l'angle et de l'angle maximum
+c.. mu, mumin: cosinus de l'angle et de l'angle maximum
 c=========================
 
 *..Initialisation.
@@ -78,12 +78,12 @@ c=========================
             ENDIF
          ELSE
 
-*..On trouve le cos de l'angle entre les 2 par un le produit scalaire.
+*..On trouve le cosinus de l'angle entre les 2 par le produit scalaire.
 
            mu = ((ax*bx) + (ay*by))
      .                  /SQRT(((ax**2)+(ay**2)) * ((bx**2)+(by**2)))
 
-*..L'indice de segment correspond au cos le plus petit
+*..L'indice de segment correspond au cosinus le plus petit
 
            IF (mu .lt. mumin) THEN
               indsgm = i

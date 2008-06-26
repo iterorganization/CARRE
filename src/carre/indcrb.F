@@ -4,10 +4,10 @@
 ************************************************************************
       IMPLICIT NONE
 
-*..  Cette fonction renvoit l'indice du point du debut du segment entre
+*..  Cette fonction renvoie l'indice du point du debut du segment entre
 *  2 points parametrises sur lequel se trouve le point x,y. On effectue
 *  un produit scalaire entre les vecteurs allant du point a chaque
-*  extremites du segment. Sur le segment de contact ou se trouve le
+*  extremite du segment. Sur le segment de contact ou se trouve le
 *  point, l'angle sera le plus grand. L'indice trouve est le plus grand
 *  tel que la distance parcourue jusqu'a cet indice est inferieure ou
 *  egale a la distance d
@@ -80,13 +80,13 @@ c=========================
             ENDIF
          ELSE
 
-*..On trouve le cos de l'angle entre les 2 vecteurs
+*..On trouve le cosinus de l'angle entre les 2 vecteurs
 
             mu = (((ax*bx) + (ay*by))
      .                /SQRT(((ax**2)+(ay**2)) * ((bx**2)+(by**2))))
 c
 
-*..L'indice de segment correspond au cos le plus petit
+*..L'indice de segment correspond au cosinus le plus petit
 
             IF (mu .lt. mumin) THEN
                indcrb = i

@@ -4,7 +4,7 @@
 ************************************************************************
       implicit none
 c  calcul des fonctions qui s'annulent quand deux series de points sont
-c  disposes de facon "orthogonale".
+c  disposees de facon "orthogonale".
 c
 c  arguments
       integer nppol

@@ -4,7 +4,7 @@
 ************************************************************************
       IMPLICIT NONE
 
-*..  Cette sous-routine repartie les points de facon non uniforme sur
+*..  Cette sous-routine repartit les points de facon non uniforme sur
 *  une courbe en faisant passer une parabole par le premier et le
 *  dernier intervalle donnee. Les intervalles intermediaires sont
 *  determinees par la parabole.
@@ -23,10 +23,10 @@
 c=========================
 c.. npoint: nombre de points de la courbe.
 c.. n  : nombre d'intervalles.
-c.. l  : longueur en metre de la courbe, ou difference en psi entre le
+c.. l  : longueur en metres de la courbe, ou difference en psi entre le
 c         premier et le dernier point.
-c.. d1 : grandeur du premier interval.
-c.. dn : grandeur du dernier interval.
+c.. d1 : grandeur du premier intervalle
+c.. dn : grandeur du dernier intervalle
 c.. dmin: intervalle minimum.
 c.. dmax: intervalle maximum.
 c.. interv: tableau contenant les intervalles de chaque point.
@@ -61,7 +61,7 @@ c       bb=dn-d1
         cc = (n-1)*(-d1/2. - dn/2. + l/n)/denom
       endif
 
-*..Calcul de l'interval.
+*..Calcul de l'intervalle
 
       dmin = aa + bb + cc
       dmax = aa + bb + cc

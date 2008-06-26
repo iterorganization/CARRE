@@ -57,7 +57,7 @@ c       Configuration limiteur
 
          write(6,205)lg(1)
   205    format(/'Limiter configuration.'//
-     .    'number of nodes on the separatrix:'/'segment length = ',f7.5)
+     .    'Number of nodes on the separatrix:'/'segment length = ',f7.5)
          READ(5,*)nptseg(1)
 
          write(6,201)
@@ -85,7 +85,7 @@ c       Configuration limiteur
          READ(5,*)deltrn(1)
 
          WRITE(6,222)distxo
-  222    format(/'number of nodes in region 2 (interior) and'
+  222    format(/'Number of nodes in region 2 (interior) and'
      .     ,' penetration:'/'maximum penetration =',f10.8)
          READ(5,*)npr(2),pntrat
 
@@ -130,21 +130,21 @@ c       simple nul
 
          write(6,200)lg(1)
   200    format(/'Single null geometry'//
-     .    'number of nodes on the segment which connects the X point',
+     .    'Number of nodes on the segment which connects the X-point',
      .    ' to the right plate:'/'segment length = ',f7.5)
          READ(5,*)nptseg(1)
 
          write(6,201)
-  201    format(/'spacing between first 2 nodes:')
+  201    format(/'Spacing between first 2 nodes:')
          READ(5,*)deltp1(1)
 
          write(6,202)
-  202    format(/'spacing between last 2 nodes:')
+  202    format(/'Spacing between last 2 nodes:')
          READ(5,*)deltpn(1)
 
          WRITE(6,203)lg(2)
-  203    format(/'number of nodes on the segment which connects the X',
-     .     ' point to the left plate:'/'segment length = ',f7.5)
+  203    format(/'Number of nodes on the segment which connects the X',
+     .     '-point to the left plate:'/'segment length = ',f7.5)
          READ(5,*)nptseg(2)
 
          WRITE(6,201)
@@ -154,7 +154,7 @@ c       simple nul
          READ(5,*)deltpn(2)
 
          write(6,206)lg(3)
-  206    format(/'number of nodes on the loop:'/'length = ',f7.5)
+  206    format(/'Number of nodes on the loop:'/'length = ',f7.5)
          READ(5,*)nptseg(3)
 
          WRITE(6,201)
@@ -174,8 +174,8 @@ c       simple nul
 *..1.3  Determination du nombre de points dans la direction "radiale"
 
          write(6,210)
-  210    format(//'number of nodes in the radial direction for',
-     .     ' region 1 (sol):')
+  210    format(//'Number of nodes in the radial direction for',
+     .     ' region 1 (SOL):')
          write(6,211)distnv(1,1)
   211    format('total distance =',f8.6)
          write(6,212)distnv(2,1)
@@ -183,17 +183,17 @@ c       simple nul
          READ(5,*)npr(1)
 
          WRITE(6,213)
-  213    format(/'spacing between first 2 nodes')
+  213    format(/'Spacing between first 2 nodes')
          READ(5,*)deltr1(1)
 
          WRITE(6,214)
-  214    format(/'spacing between last 2 nodes')
+  214    format(/'Spacing between last 2 nodes')
          READ(5,*)deltrn(1)
 
          WRITE(6,211)distnv(1,2)
          WRITE(6,212)distnv(2,2)
          WRITE(6,215)
-  215    format(/'number of nodes in region 2 (private region):')
+  215    format(/'Number of nodes in region 2 (private region):')
          write(6,211)distnv(1,2)
          WRITE(6,212)distnv(2,2)
          READ(5,*)npr(2)
@@ -205,7 +205,7 @@ c       simple nul
          READ(5,*)deltrn(2)
 
          WRITE(6,220)distxo
-  220    format(/'number of nodes in region 3 (interior) and'
+  220    format(/'Number of nodes in region 3 (interior) and'
      .     ,' penetration:'/'maximum penetration =',f10.8)
          READ(5,*)npr(3),pntrat
 
@@ -238,17 +238,15 @@ c       simple nul
 *..1.4  Determination de la longueur de garde pour chaque plaque.
 
          write(6,223)
-  223    format(/'guard length for plate 1')
+  223    format(/'Guard length for plate 1')
          READ(5,*)tgarde(1)
 
          WRITE(6,224)
-  224    format(/'guard length for plate 2')
+  224    format(/'Guard length for plate 2')
          READ(5,*)tgarde(2)
 
-  125    FORMAT(/'longueur de garde pour la plaque 3 ')
-  126    FORMAT(/'longueur de garde pour la plaque 4 ')
-  225    format(/'guard length for plate 3')
-  226    format(/'guard length for plate 4')
+  225    format(/'Guard length for plate 3')
+  226    format(/'Guard length for plate 4')
 
 *..2. Double nul connecte.
 
@@ -258,8 +256,8 @@ c       simple nul
 *       trice.
 
          WRITE(6,230)lg(1)
-  230    format(/'Connected double null geometry'//
-     .   'number of nodes on segment connecting X point to right plate:'
+  230    format(/'Connected double-null geometry'//
+     .   'Number of nodes on segment connecting X-point to right plate:'
      .   /'length = ',f7.5)
          READ(5,*)nptseg(1)
 
@@ -279,8 +277,8 @@ c       simple nul
          READ(5,*)deltpn(2)
 
          WRITE(6,233)lg(3)
-  233    format(/'number of nodes on segment which connects X points',
-     .   ' bt the right'/'length of segment = ',f7.5)
+  233    format(/'Number of nodes on segment which connects X-points',
+     .   ' by the right'/'length of segment = ',f7.5)
          READ(5,*)nptseg(3)
 
          WRITE(6,201)
@@ -290,8 +288,8 @@ c       simple nul
          READ(5,*)deltpn(3)
 
          WRITE(6,236)lg(4)
-  236    format(/'number of nodes on segment which connects X points',
-     .   ' bt the left'/'length of segment = ',f7.5)
+  236    format(/'Number of nodes on segment which connects X points',
+     .   ' by the left'/'length of segment = ',f7.5)
          READ(5,*)nptseg(4)
 
          WRITE(6,201)
@@ -301,8 +299,8 @@ c       simple nul
          READ(5,*)deltpn(4)
 
          WRITE(6,240)lg(5)
-  240    format(/'number of points on segment which connects second',
-     .   ' X point to lower right plate:'/'segment length = ',f7.5)
+  240    format(/'Number of points on segment which connects bottom',
+     .   ' X-point to lower right plate:'/'segment length = ',f7.5)
          READ(5,*)nptseg(5)
 
          WRITE(6,201)
@@ -312,8 +310,8 @@ c       simple nul
          READ(5,*)deltpn(5)
 
          WRITE(6,244)lg(6)
-  244    format(/'number of nodes on segment which connects second',
-     .   ' X point to lower left plate:'/'segment length = ',f7.5)
+  244    format(/'Number of nodes on segment which connects bottom',
+     .   ' X-point to lower left plate:'/'segment length = ',f7.5)
          READ(5,*)nptseg(6)
 
          WRITE(6,201)
@@ -330,8 +328,8 @@ c       simple nul
 *..2.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,250)
-  250    format(//'number of nodes in the radial direction in region',
-     .   ' 1 (right):')
+  250    format(//'Number of nodes in the radial direction in region',
+     .   ' 1 (right part of SOL):')
          WRITE(6,211)distnv(1,1)
          WRITE(6,212)distnv(2,1)
          READ(5,*)npr(1)
@@ -343,7 +341,7 @@ c       simple nul
          READ(5,*)deltrn(1)
 
          WRITE(6,254)
-  254    format(//'number of nodes in the radial direction in region 2',
+  254    format(//'Number of nodes in the radial direction in region 2',
      .   ' (upper private region):')
          WRITE(6,211)distnv(1,2)
          WRITE(6,212)distnv(2,2)
@@ -356,8 +354,8 @@ c       simple nul
          READ(5,*)deltrn(2)
 
          WRITE(6,258)
-  258    format(//'number of nodes in the radial direction in region',
-     .   ' 3 (left):')
+  258    format(//'Number of nodes in the radial direction in region',
+     .   ' 3 (left part of SOL):')
          WRITE(6,211)distnv(1,3)
          WRITE(6,212)distnv(2,3)
          READ(5,*)npr(3)
@@ -369,7 +367,7 @@ c       simple nul
          READ(5,*)deltrn(3)
 
          WRITE(6,262)
-  262    format(//'number of nodes in the radial direction in region 4',
+  262    format(//'Number of nodes in the radial direction in region 4',
      .   ' (lower private region):')
          WRITE(6,211)distnv(1,4)
          WRITE(6,212)distnv(2,4)
@@ -382,7 +380,7 @@ c       simple nul
          READ(5,*)deltrn(4)
 
          WRITE(6,264)distxo
-  264    format(/'number of nodes in region 5 (interior) and'
+  264    format(/'Number of nodes in region 5 (interior) and'
      .     ,' penetration:'/'maximum penetration = ',f10.8)
          READ(5,*)npr(5),pntrat
 
@@ -433,8 +431,8 @@ c       simple nul
 *       trice.
 
          WRITE(6,270)lg(1)
-  270    format(/'Disconnected double null geometry'//
-     .   'number of nodes on segment connecting upper X point to'/
+  270    format(/'Disconnected double-null geometry'//
+     .   'Number of nodes on segment connecting upper X-point to'/
      .   ' upper right plate:'/'segment length = ',f7.5)
          READ(5,*)nptseg(1)
 
@@ -472,7 +470,7 @@ c       simple nul
          READ(5,*)deltpn(6)
 
          WRITE(6,273)
-  273    format(/'number of nodes on right side of inner separatrix.')
+  273    format(/'Number of nodes on right side of inner separatrix.')
          READ(5,*)nptseg(3)
 
          WRITE(6,201)
@@ -482,7 +480,7 @@ c       simple nul
          READ(5,*)deltpn(3)
 
          WRITE(6,274)
-  274    format(/'number of nodes on left side of inner separatrix.')
+  274    format(/'Number of nodes on left side of inner separatrix.')
          READ(5,*)nptseg(4)
 
          WRITE(6,201)
@@ -499,7 +497,7 @@ c       simple nul
 *..3.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,280)
-  280    format(//'number of nodes in radial direction in region 1'/
+  280    format(//'Number of nodes in radial direction in region 1'/
      .   '(between separatrices):')
          WRITE(6,211)distnv(1,1)
          WRITE(6,212)distnv(2,1)
@@ -512,8 +510,8 @@ c       simple nul
          READ(5,*)deltrn(1)
 
          WRITE(6,282)
-  282    format(//'number of nodes in radial direction in region 2'/
-     .   '(right part of sol):')
+  282    format(//'Number of nodes in radial direction in region 2'/
+     .   '(right part of SOL):')
          WRITE(6,211)distnv(1,2)
          WRITE(6,212)distnv(2,2)
          READ(5,*)npr(2)
@@ -525,7 +523,7 @@ c       simple nul
          READ(5,*)deltrn(2)
 
          WRITE(6,284)
-  284    format(//'number of nodes in radial direction in region 3'/
+  284    format(//'Number of nodes in radial direction in region 3'/
      .   '(upper private region):')
          WRITE(6,211)distnv(1,3)
          WRITE(6,212)distnv(2,3)
@@ -538,8 +536,8 @@ c       simple nul
          READ(5,*)deltrn(3)
 
          WRITE(6,286)
-  286    format(//'number of nodes in radial direction in region 4'/
-     .   '(left part of sol):')
+  286    format(//'Number of nodes in radial direction in region 4'/
+     .   '(left part of SOL):')
          WRITE(6,211)distnv(1,4)
          WRITE(6,212)distnv(2,4)
          READ(5,*)npr(4)
@@ -551,7 +549,7 @@ c       simple nul
          READ(5,*)deltrn(4)
 
          WRITE(6,288)
-  288    format(//'number of nodes in radial direction in region 5'/
+  288    format(//'Number of nodes in radial direction in region 5'/
      .   '(lower private region):')
          WRITE(6,211)distnv(1,5)
          WRITE(6,212)distnv(2,5)
@@ -564,7 +562,7 @@ c       simple nul
          READ(5,*)deltrn(5)
 
          WRITE(6,289)distxo
-  289    format(//'number of nodes in radial direction in region 6'/
+  289    format(//'Number of nodes in radial direction in region 6'/
      .   '(interior):')
          READ(5,*)npr(6),pntrat
 

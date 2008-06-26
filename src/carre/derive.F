@@ -43,7 +43,7 @@ c=========================
 *.. 1  Calcul des derivees partielles par rapport a X.
 *
 
-*..Boucle sur toute les lignes.
+*..Boucle sur toutes les lignes.
 
       DO 10 j=1, ny
 
@@ -70,7 +70,7 @@ c=========================
 *.. 2  Calcul des derivees partielles par rapport a Y.
 *
 
-*..Boucle sur toute les colonnes.
+*..Boucle sur toutes les colonnes.
 
       DO 30 i=1, nx
 

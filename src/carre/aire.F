@@ -4,7 +4,7 @@ c
 c  VERSION: 03.08.99 12:12
 c=======================================================================
 c*** Calculate the area of a polygon with n-1 nodes (the n-th node 
-c*** coinsides with the 1-st one).
+c*** coincides with the 1st one).
 c*** The area is negative if the nodes are listed clockwise.
 c*** The area is calculated via decomposition of the polygon into a set
 c*** of triangles having a common node at the first node of the polygon. 

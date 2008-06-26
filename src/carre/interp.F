@@ -4,7 +4,7 @@
 ************************************************************************
       IMPLICIT NONE
 
-*    Cette fonction renvoit la valeur de l'interpolation lineaire entre
+*    Cette fonction renvoie la valeur de l'interpolation lineaire entre
 *  les points r1 et r2 de la valeur de la fonction f, en connaissant la
 *  valeur de la fonction en chaque point.
 

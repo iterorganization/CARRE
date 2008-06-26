@@ -60,7 +60,7 @@ c======================================================================
      .      t44,1pe15.8))
          elseif(sellan(1:7).eq.'english') then
           write(10,211)npx,(ptx(i),pty(i),fctpx(i),i=1,npx)
-211       format(//' Number of X points:',i3/
+211       format(//' Number of X-points:',i3/
      .      t5,'x',t25,'y',t45,'psi'/(t4,1pe15.8,t24,1pe15.8,
      .      t44,1pe15.8))
          endif
@@ -69,16 +69,16 @@ c======================================================================
          if(npx.gt.1) then
             if(racord) then
               if(sellan(1:8).eq.'francais') then
-                write(10,113)' les points X sont raccordes'
+                write(10,113)' Les points X sont raccordes.'
 113             format(a//)
               elseif(sellan(1:7).eq.'english') then
-                write(10,113)' X points are connected.'
+                write(10,113)' X-points are connected.'
               endif
             else
               if(sellan(1:8).eq.'francais') then
-                write(10,113)' les points X ne sont pas raccordes'
+                write(10,113)' Les points X ne sont pas raccordes.'
               elseif(sellan(1:7).eq.'english') then
-                write(10,113)' X points are not connected.'
+                write(10,113)' X-points are not connected.'
               endif
             endif
          endif

@@ -4,7 +4,7 @@
       IMPLICIT NONE
 
 *..   Cette sous-routine calcule les coefficients a00, a10, a01 et a11
-*  pour chaque carre de coordonnee (i,j) de l'equation :
+*  pour chaque carre de coordonnees (i,j) de l'equation :
 *         f(x,y) = a00 + a10*X + a01*Y + a11*XY.
 
 *  arguments

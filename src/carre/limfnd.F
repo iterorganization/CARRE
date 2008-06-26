@@ -8,7 +8,7 @@ c  version : 07.07.97 20:10
 c
 c======================================================================
 c  This routine finds the innermost point of the limitor. It defines
-c  (ptx,pty), the coordinates of the x point, to be the coordinates of
+c  (ptx,pty), the coordinates of the X-point, to be the coordinates of
 c  that point. Finally, it parametrises the separatrix (the flux surface
 c  which goes through (ptx,pty) in curve separx(*,1,1),separy(*,1,1).
 c======================================================================
@@ -211,7 +211,7 @@ c
 c  6.   Definition du nombre de courbes de niveau calculees.
       nbniv=2
 c
-c  7.   Calcul de psi aux point X et O.
+c  7.   Calcul de psi aux points X et O.
       ipx=npx
       ii=ifind(ptx(ipx),x,nx,1)
       jj=ifind(pty(ipx),y,ny,1)

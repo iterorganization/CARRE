@@ -5,7 +5,7 @@ c
 c======================================================================
       IMPLICIT NONE
 
-*..Determination de la direction antihoraire (dir=+1) ou horaire (-1)
+*..Determination de la direction anti-horaire (dir=+1) ou horaire (-1)
 *  qui correspond a un deplacement vers la droite ou vers la gauche
 *  le long d'une structure, a partir d'un point x,y
 
@@ -105,7 +105,7 @@ cank
   2     continue
 c        write(0,*)'on ne trouve pas de point interieur dans drctio'
         write(0,*) 'Interior point not found in drctio ',
-     ,                                  '- an internal error in carre?'
+     ,                                  '- an internal error in Carre?'
         write(0,*) '*2: n_call,x1,y1=',n_call,x1,y1
         write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
         write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
@@ -156,7 +156,7 @@ cank
   6     continue
 c        write(0,*)'on ne trouve pas de point interieur dans drctio'
         write(0,*) 'Interior point not found in drctio ',
-     ,                                  '- an internal error in carre?'
+     ,                                  '- an internal error in Carre?'
         write(0,*) '*6: n_call,x1,y1=',n_call,x1,y1
         write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
         write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst

@@ -73,7 +73,7 @@ c.. repart: variable necessaire pour signifier a "SAUTE" que l'on
 c           travaille en distance absolue.
 c.. ecart1,ecart2: distance entre un point et chaque extremitee du
 c                  segment sur lequel il se trouve.
-c.. rien: logique,si oui ou non on n'a pas encore rencontre une
+c.. rien: logique, si oui ou non on n'a pas encore rencontre une
 c         structure differente de fraplq.
 c.. echec: logique, si on doit considerer le debut de la courbe comme
 c          un echec ou non.
@@ -298,11 +298,11 @@ c***
 
 *..Si on est rendu a l'extremite du segment, on verifie si ce point est
 *  a l'interieur de la structure ou si le sens est change. Si on est pas
-*  a l'extr., on verifie si le point est a l'interieur ou si on a
+*  a l'extremite, on verifie si le point est a l'interieur ou si on a
 *  traverse un autre segment de la structure. Pour chaque fois, si c'est
 *  le cas, on doit inverser les directions, revenir d'un carre et on
 *  oublie le point que l'on vient de prendre. Sinon, on continue en
-*  conservant le point obtenu, la direction et les coord. du carre.
+*  conservant le point obtenu, la direction et les coordonnees du carre.
 cdps
 c  If one has reached the end of the segment, check to see if the point is
 c  inside the structure or if the direction has changed.  If not the latter,

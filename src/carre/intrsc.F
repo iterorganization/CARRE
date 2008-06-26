@@ -24,7 +24,7 @@ c.. vx,vy: tableaux des coordonees des points de la courbe.
 c.. n  : nombre de point de la courbe.
 c.. x1,y1,x2,y2: coordonnees des 2 points formant le segment.
 c   x,y: tableaux de coordonnees des points d'intersection
-c   iint: tanleau des indices de segment de la courbe v pour lesquels il
+c   iint: tableau des indices de segment de la courbe v pour lesquels il
 c         y a intersection
 c   nint: nombre d'intersections
 c   sens: sens du balayage
@@ -37,21 +37,21 @@ c=========================
       nint=0
       i2=1
       do 10 i=1, n-1
-      i1=i2
-      i2=tourne(i1,sens,n)
+         i1=i2
+         i2=tourne(i1,sens,n)
 *..calcul du determinant de la matrice.
          determ = (-(x2 - x1)) * (vy(i2) - vy(i1)) +
      .               (y2 - y1) * (vx(i2) - vx(i1))
 *..il y a solution seulement si le determinant n'est pas nul
          if (determ .ne. 0.) then
-*..facteur multiplicatif du segment avec la methode de cramer.
+*..facteur multiplicatif du segment avec la methode de Cramer.
             mult1 = (-(vx(i1)-x1) * (vy(i2)-vy(i1)) +
-     .                 (vy(i1)-y1) * (vx(i2)-vx(i1)))/determ
+     .                (vy(i1)-y1) * (vx(i2)-vx(i1)))/determ
 *..pour avoir intersection, il faut que mult1 soit entre 0 et 1
             if ((mult1.ge.zero).and.(mult1.le.un)) then
 *..fact. mult. du segment de la courbe v.
                mult2= ((x2-x1) * (vy(i1)-y1) -
-     .                   (y2-y1) * (vx(i1)-x1))/determ
+     .                 (y2-y1) * (vx(i1)-x1))/determ
 *..intersection si mult2 entre 0 et 1
                if ((mult2.ge.zero).and.(mult2.le.un)) then
 *..s'il y a intersection alors le segment traverse la courbe.

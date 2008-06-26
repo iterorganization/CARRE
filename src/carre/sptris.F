@@ -7,9 +7,9 @@ c  version : 21.07.2000 13:38
 c
 c=======================================================================
 c*** This subroutine finds first the second starting point for each 
-c*** separatrix branch (the first point is the x-point). 
+c*** separatrix branch (the first point is the X-point). 
 c*** Once such a point is found, a subroutine CRBNIV is called, which 
-c*** traces this branch until it strikes a target or comes to an x-point
+c*** traces this branch until it strikes a target or comes to an X-point
 c*** and stores the trace co-ordinates for plotting.
 c*** Finally, a subroutine ORDDEF is called to order the targets 
 c*** according to the CARRE conventions, i.e. from right to left, from 
@@ -84,12 +84,12 @@ c>>>
           separy(1,isep,ipx) = pty(ipx)
         end do !}
 
-*..Loop over the directions for each x-point
+*..Loop over the directions for each X-point
 
         isep = 0
 
 cank-20000720 { here we change the algorithm.
-c*** Originally, the perimeter of the cell containing the x-point was
+c*** Originally, the perimeter of the cell containing the X-point was
 c*** searched for the intersections with the separatrix branches - that
 c*** is, for the proper PSI value at each cell boundary. If at some 
 c*** boundary no intersection was found, then the adjacent cell was also
@@ -97,7 +97,7 @@ c*** examined in a similar way. Due to the numerical noise (?), this
 c*** often lead to a confusion when not all the separatrix branches 
 c*** could be identified properly.
 c*** Now we check the perimeter of the rim of cells (3x3) surrounding 
-c*** the one with x-point to reduce the effect of noise.
+c*** the one with X-point to reduce the effect of noise.
 
         i2=ix+2
         j2=jx-1
@@ -170,7 +170,7 @@ cank}
       end do !}
 c<<<
       write(0,*) 
-      write(0,*) 'after x-point loop: isep,npx,nbdef,nbdfav = ',
+      write(0,*) 'After X-point loop: isep,npx,nbdef,nbdfav = ',
      ,                                        isep,npx,nbdef,nbdfav !###
       if(nbdef.gt.0) then !{
         write(0,*) 'ixp_hlp :',(ixp_hlp(i),i=1,nbdef)
@@ -189,8 +189,8 @@ c<<<
       end if !}
 c>>>
 
-*   Calculation of psi at the o-point using the fact that the o-point 
-*  co-ordinates are at the end of ptx and pty (see routine SELPTX)
+*   Calculation of psi at the O-point using the fact that the O-point 
+*  coordinates are at the end of ptx and pty (see routine SELPTX)
 
       ipx=npx+1
       fctpx(ipx) = a00(ix,jx,1) + a10(ix,jx,1)*ptx(ipx)

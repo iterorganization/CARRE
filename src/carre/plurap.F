@@ -76,7 +76,7 @@ c***
         enddo
       enddo
 c
-c  2.   boucle sur tous les points de la structure et, pour chaque point
+c  2.   boucle sur tous les points de la structure et, pour chaque point,
 c       boucle sur chaque segment de la courbe parametrisee.
       do i1=1,n1
         x=tx1(i1)

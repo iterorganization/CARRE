@@ -36,7 +36,7 @@ c*** limiting curves.
 c=========================
 c.. f    :<=> psi.
 c.. ii,jj: x and y indices of the initial reference cell.
-c.. i,j  : x and y indices of the  reference cell.
+c.. i,j  : x and y indices of the reference cell.
 c.. k    : index of the point to be calculated.
 c.. idir : initial direction.
 c.. dir  : direction of search     2
@@ -44,17 +44,17 @@ c                                3   1
 c                                  4
 c.. indstr: index of intercepting structure, =0 means no intersection.
 c.. niv: the level for which the points should be found
-c.. crbx,crby: x and y co-ordinates of the points on the level line
-c.. xt,yt: co-ordinates along the limiting curves
+c.. crbx,crby: x and y coordinates of the points on the level line
+c.. xt,yt: coordinates along the limiting curves
 c..        (point index, curve index)
 c.. nt: number of points on the limiting curves
 c.. nbcrb: number of the limiting curves.
 c.. plaque: index of the target where the line stops.
 c.. ist,jst: indices for the structures.
-c.. determ: determinant de la matrice des 2 equations.
+c.. determ: matrix determinant for the 2 equations.
 c.. mult1: facteur multiplicatif du segment de courbe.
 c.. mult2: facteur multiplicatif du segment de structure.
-c.. x0 y0: co-ordinates of the starting point
+c.. x0 y0: coordinates of the starting point
 c=========================
 
 *..Copie des arguments en variables locales
@@ -69,17 +69,16 @@ c=========================
 
 *.. 1   Look for the next point.
 
-*..Inside a cell with the corners                3.  .4
+*..Inside a cell with the corners are            3.  .4
 *                                                1.  .2
 *  en connaissant la direction initiale, on regarde par quel cote
 *  ressort la ligne de niveau. On ajuste ainsi la rangee, la colonne et
 *  la direction a chaque fois. On verifie egalement que le nouveau
 *  segment forme des 2 derniers points ne traverse pas les courbes t.
 
-
-*  by knowing the initial direction, one looks by which dimension arises the datum line. One
-*  adjusts the rangee thus, the column and the direction has each time. Verifie also that the
-*  new segment forms of the last 2 points are not crossed the curves T
+*  by knowing the initial direction, one looks by which side exits the level line. One
+*  adjusts the row, the column and the direction each time. One verifies also that the
+*  new segment formed by the last 2 points does not cross the curves T
 
 *..If the level line passes between 2 and 4,
 
@@ -253,7 +252,6 @@ cdps-20051115 Part of the above change.
 *..Loop over the structures
 
       DO 60 jst=1, nstruc
-
 
 *.. Provided that the number of points in the curve already exceeds 2, 
 *   check whether the structure is different from the starting one.

@@ -4,7 +4,7 @@
 ************************************************************************
       implicit none
 c
-c  variation cyclique de periode n-1. ne 1-er point coincide avec le n-e
+c  variation cyclique de periode n-1. Le 1er point coincide avec le enieme.
 c
 c  arguments
       integer i,sens,n

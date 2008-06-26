@@ -46,8 +46,8 @@ c       Configuration limiteur
 
          WRITE(6,105)lg(1)
   105    FORMAT(/'Configuration limiteur.'//
-     .   'nombre de points sur la separatrice:'/'longueur = ',F9.5)
-c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
+     .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
+c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
@@ -75,7 +75,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(1)
 
          WRITE(6,122)distxo
-  122    FORMAT(/'nombre de points dans la region 2 (interieure) et'
+  122    FORMAT(/'Nombre de points dans la region 2 (interieure) et'
      .     ,' penetration:'/'penetration maximale =',F10.8)
          READ(5,*)npr(2),pntrat
 
@@ -119,21 +119,21 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,100)lg(1)
   100    FORMAT(/'Vous avez un simple nul'//
-     .   'nombre de points sur le segment qui va du point X a la',
-     .   ' plaque droite:'/'longueur = ',F7.5)
+     .   'Nombre de points sur le segment qui va du point X a la',
+     .   ' plaque de droite:'/'longueur = ',F7.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
-  101    FORMAT(/'distance entre les 2 premiers points:')
+  101    FORMAT(/'Distance entre les 2 premiers points:')
          READ(5,*)deltp1(1)
 
          WRITE(6,102)
-  102    FORMAT(/'distance entre les 2 derniers points:')
+  102    FORMAT(/'Distance entre les 2 derniers points:')
          READ(5,*)deltpn(1)
 
          WRITE(6,103)lg(2)
-  103    FORMAT(/'nombre de points sur le segment qui va a la plaque',
-     .   ' gauche:'/'longeur = ',F7.5)
+  103    FORMAT(/'Nombre de points sur le segment qui va a la plaque',
+     .   ' de gauche:'/'longeur = ',F7.5)
          READ(5,*)nptseg(2)
 
          WRITE(6,101)
@@ -144,7 +144,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(2)
 
          WRITE(6,106)lg(3)
-  106    FORMAT(/'nombre de points sur la boucle:'/'longueur = ',F7.5)
+  106    FORMAT(/'Nombre de points sur la boucle:'/'longueur = ',F7.5)
          READ(5,*)nptseg(3)
 
          WRITE(6,101)
@@ -165,28 +165,27 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
 *..1.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,110)
-  110    FORMAT(//'nombre de points dans la direction radiale pour la ',
-     .    'region 1 (sol):')
+  110    FORMAT(//'Nombre de points dans la direction radiale pour la ',
+     .    'region 1 (SOL):')
          WRITE(6,111)distnv(1,1)
-  111    FORMAT('distance totale =',F8.6)
+  111    FORMAT('Distance totale =',F8.6)
          WRITE(6,112)distnv(2,1)
-  112    FORMAT('difference totale de psi =',F9.5)
+  112    FORMAT('Difference totale de psi =',F9.5)
          READ(5,*)npr(1)
 
          WRITE(6,113)
-  113    FORMAT(/'distance ou difference entre les 2 premiers points:')
+  113    FORMAT(/'Distance ou difference entre les 2 premiers points:')
          READ(5,*)deltr1(1)
 
          WRITE(6,114)
-  114    FORMAT(/'distance ou difference entre les 2 derniers points:')
+  114    FORMAT(/'Distance ou difference entre les 2 derniers points:')
          READ(5,*)deltrn(1)
 
          WRITE(6,115)
-  115    FORMAT(/'nombre de points pour la region 2 (region privee):')
+  115    FORMAT(/'Nombre de points pour la region 2 (region privee):')
          WRITE(6,111)distnv(1,2)
          WRITE(6,112)distnv(2,2)
          WRITE(6,115)
-  215    format(/'number of nodes in region 2 (private region):')
          READ(5,*)npr(2)
 
          WRITE(6,113)
@@ -196,7 +195,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(2)
 
          WRITE(6,120)distxo
-  120    FORMAT(/'nombre de points dans la region 3 (interieure) et'
+  120    FORMAT(/'Nombre de points dans la region 3 (interieure) et'
      .     ,' penetration:'/'penetration maximale =',F10.8)
          READ(5,*)npr(3),pntrat
 
@@ -229,15 +228,15 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
 *..1.4  Determination de la longueur de garde pour chaque plaque.
 
          WRITE(6,123)
-  123    FORMAT(/'longueur de garde pour la plaque 1 ')
+  123    FORMAT(/'Longueur de garde pour la plaque 1 ')
          READ(5,*)tgarde(1)
 
          WRITE(6,124)
-  124    FORMAT(/'longueur de garde pour la plaque 2 ')
+  124    FORMAT(/'Longueur de garde pour la plaque 2 ')
          READ(5,*)tgarde(2)
 
-  125    FORMAT(/'longueur de garde pour la plaque 3 ')
-  126    FORMAT(/'longueur de garde pour la plaque 4 ')
+  125    FORMAT(/'Longueur de garde pour la plaque 3 ')
+  126    FORMAT(/'Longueur de garde pour la plaque 4 ')
 
 *..2. Double nul connecte.
 
@@ -248,8 +247,8 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,130)lg(1)
   130    FORMAT(/'Vous avez un double nul connecte'//
-     .   'nombre de points sur le segment qui va du point X a la',
-     .   ' plaque droite:'/'longueur = ',F7.5)
+     .   'Nombre de points sur le segment qui va du point X a la',
+     .   ' plaque de droite:'/'longueur = ',F7.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
@@ -268,7 +267,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(2)
 
          WRITE(6,133)lg(3)
-  133    FORMAT(/'nombre de points sur le segment qui relie les points',
+  133    FORMAT(/'Nombre de points sur le segment qui relie les points',
      .   ' X par la droite'/'longueur = ',F7.5)
          READ(5,*)nptseg(3)
 
@@ -279,7 +278,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(3)
 
          WRITE(6,136)lg(4)
-  136    FORMAT(/'nombre de points sur la boucle qui relie les points X'
+  136    FORMAT(/'Nombre de points sur la boucle qui relie les points X'
      .   ,' par la gauche'/'longueur = ',F7.5)
          READ(5,*)nptseg(4)
 
@@ -290,8 +289,9 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(4)
 
          WRITE(6,140)lg(5)
-  140    FORMAT(/'nombre de points sur le segment qui va du deuxieme',
-     .   ' point X a la plaque en bas a droite:'/'longueur = ',F7.5)
+  140    FORMAT(/'Nombre de points sur le segment qui va du',
+     .   ' point X inferieur a la plaque en bas a droite:'/
+     .   'longueur = ',F7.5)
          READ(5,*)nptseg(5)
 
          WRITE(6,101)
@@ -301,8 +301,9 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(5)
 
          WRITE(6,144)lg(6)
-  144    FORMAT(/'nombre de points sur le segment qui va du deuxieme',
-     .   ' point X a la plaque en bas a gauche:'/'longueur = ',F7.5)
+  144    FORMAT(/'Nombre de points sur le segment qui va du',
+     .   ' point X inferieur a la plaque en bas a gauche:'/
+     .   'longueur = ',F7.5)
          READ(5,*)nptseg(6)
 
          WRITE(6,101)
@@ -319,8 +320,8 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
 *..2.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,150)
-  150    FORMAT(//'nombre de points dans la direction radiale pour la ',
-     .    'region 1 (droite):')
+  150    FORMAT(//'Nombre de points dans la direction radiale pour la ',
+     .    'region 1 (SOL de droite):')
          WRITE(6,111)distnv(1,1)
          WRITE(6,112)distnv(2,1)
          READ(5,*)npr(1)
@@ -332,7 +333,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(1)
 
          WRITE(6,154)
-  154    FORMAT(/'pour la region 2 (region privee du haut):')
+  154    FORMAT(/'Pour la region 2 (region privee du haut):')
          WRITE(6,111)distnv(1,2)
          WRITE(6,112)distnv(2,2)
          READ(5,*)npr(2)
@@ -344,7 +345,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(2)
 
          WRITE(6,158)
-  158    FORMAT(/'pour la region 3 (gauche):')
+  158    FORMAT(/'Pour la region 3 (SOL de gauche):')
          WRITE(6,111)distnv(1,3)
          WRITE(6,112)distnv(2,3)
          READ(5,*)npr(3)
@@ -356,7 +357,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(3)
 
          WRITE(6,162)
-  162    FORMAT(/'pour la region 4 (region privee du bas):')
+  162    FORMAT(/'Pour la region 4 (region privee du bas):')
          WRITE(6,111)distnv(1,4)
          WRITE(6,112)distnv(2,4)
          READ(5,*)npr(4)
@@ -368,7 +369,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(4)
 
          WRITE(6,164)distxo
-  164    FORMAT(/'nombre de points dans la region 5 (interieure) et'
+  164    FORMAT(/'Nombre de points dans la region 5 (interieure) et'
      .     ,' penetration:'/'penetration totale =',F10.8)
          READ(5,*)npr(5),pntrat
 
@@ -420,7 +421,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,170)lg(1)
   170    FORMAT(/'Vous avez un double nul deconnecte'//
-     .   'nombre de points sur le segment qui va du point X du haut'/
+     .   'Nombre de points sur le segment qui va du point X du haut'/
      .   'a la plaque droite du haut:'/'longueur = ',F7.5)
          READ(5,*)nptseg(1)
 
@@ -458,7 +459,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(6)
 
          WRITE(6,173)
-  173    FORMAT(/'nombre de points sur la partie de la boucle de la',
+  173    FORMAT(/'Nombre de points sur la partie de la boucle de la',
      .    ' separatrice'/ ' interieure qui part de la droite.')
          READ(5,*)nptseg(3)
 
@@ -469,7 +470,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(3)
 
          WRITE(6,174)
-  174    FORMAT(/'nombre de points sur la partie de la boucle de la',
+  174    FORMAT(/'Nombre de points sur la partie de la boucle de la',
      .    ' separatrice'/ ' interieure qui part de la gauche.')
          READ(5,*)nptseg(4)
 
@@ -487,7 +488,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
 *..3.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,180)
-  180    FORMAT(//'nombre de points dans la direction radiale pour la '/
+  180    FORMAT(//'Nombre de points dans la direction radiale pour la '/
      .   'region 1 (entre les deux separatrices):')
          WRITE(6,111)distnv(1,1)
          WRITE(6,112)distnv(2,1)
@@ -500,7 +501,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(1)
 
          WRITE(6,182)
-  182    FORMAT(/'pour la region 2 (region de droite):')
+  182    FORMAT(/'Pour la region 2 (region de droite):')
          WRITE(6,111)distnv(1,2)
          WRITE(6,112)distnv(2,2)
          READ(5,*)npr(2)
@@ -512,7 +513,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(2)
 
          WRITE(6,184)
-  184    FORMAT(/'pour la region 3 (region privee du haut):')
+  184    FORMAT(/'Pour la region 3 (region privee du haut):')
          WRITE(6,111)distnv(1,3)
          WRITE(6,112)distnv(2,3)
          READ(5,*)npr(3)
@@ -524,7 +525,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(3)
 
          WRITE(6,186)
-  186    FORMAT(/'pour la region 4 (gauche):')
+  186    FORMAT(/'Pour la region 4 (region de gauche):')
          WRITE(6,111)distnv(1,4)
          WRITE(6,112)distnv(2,4)
          READ(5,*)npr(4)
@@ -536,7 +537,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(4)
 
          WRITE(6,188)
-  188    FORMAT(/'pour la region 5 (region privee du bas):')
+  188    FORMAT(/'Pour la region 5 (region privee du bas):')
          WRITE(6,111)distnv(1,5)
          WRITE(6,112)distnv(2,5)
          READ(5,*)npr(5)
@@ -548,7 +549,7 @@ c$   .   'nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltrn(5)
 
          WRITE(6,189)distxo
-  189    FORMAT(/'nombre de points dans la region 6 (interieure) et'
+  189    FORMAT(/'Nombre de points dans la region 6 (interieure) et'
      .     ,' penetration:'/'penetration totale =',F10.8)
          READ(5,*)npr(6),pntrat
 

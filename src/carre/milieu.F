@@ -11,7 +11,7 @@
       REAL*8 f1, f2, niv
 
 c=========================
-c.. f1,f2: valeur de la fonction aux points 1 et 2.
+c.. f1,f2: valeurs de la fonction aux points 1 et 2.
 c.. niv: fonction pour laquelle on doit verifier si elle est entre
 c         f1 et f2.
 c=========================

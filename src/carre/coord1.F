@@ -26,7 +26,7 @@ c.. d   : distance a laquelle il faut trouver x et y
 c.. x,y : coordonnees du point situe sur la courbe a une distance d du
 c         debut de celle-ci.
 c.. period: periode du circuit si non nul
-c.. dist: distance entre 2 point consecutif de la courbe.
+c.. dist: distance entre 2 points consecutifs de la courbe.
 c.. distot: distance totale parcourue.
 c========================
 

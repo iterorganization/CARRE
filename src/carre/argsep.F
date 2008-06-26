@@ -7,7 +7,7 @@ c======================================================================
 cank -- The comments are translated from French, sorry for errors!
 
 c*** This sub-routine arranges the separatrices in the required way
-c*** and indexes them in correct order (???)
+c*** and indexes them in correct order
 
 *..  Cette sous-routine arrange les separatrices de la facon demandee
 *  et les ordonnes selon un ordre precis.
@@ -39,24 +39,24 @@ c======================================================================
 c======================================================================
 c*** Input
 c.. npx   : number of the X-points
-c.. ptx,pty: x and y co-ordinates of the x-points
+c.. ptx,pty: x and y coordinates of the X-points
 c.. fctpx: the psi values at each X- or O-point
-c.. separx,separy: co-ordinates of the points of the parametrised
+c.. separx,separy: coordinates of the points of the parametrised
 c                  separatrices
-c                  (point index, separeatrix index, X-point index)
-c.. nptot : number of parametrisation points per a separatrix
+c                  (point index, separatrix index, X-point index)
+c.. nptot : number of parametrisation points for each separatrix
 c           (separatrix index, X-point index)
 c.. npnimx: maximum number of tracing points on a curve
-c.. racord: determines whether the x-points are connected
-c.. ypto  : vertical co-ordinate of the magnetic axis (the O-point)
+c.. racord: determines whether the X-points are connected
+c.. ypto  : vertical coordinate of the magnetic axis (the O-point)
 c.. nbdef : number of divertor targets
-c.. inddef: index of the structures being the targets
+c.. inddef: index of the target structures
 c
 c*** Output
 c.. ptsep : separatrix pointer, used for indexation
 c           (separatrix index, X-point index)
 c.. ptxint: index of the X-point which is inner with respect to the
-c           other in case of disconnected null double
+c           other in case of disconnected double-null
 c.. indplq: structure indices; 0 if it is not a divertor plate
 c           (separatrix index, X-point index)
 c
@@ -66,8 +66,8 @@ c.. k0    : counter
 c.. kkmax : maximum number which the counter can reach
 c.. kk    : pointers of separatrices having to be copied in ptsep
 c.. kkp   : separatrix pointer
-c.. k     : indice du point ou il y a coincidence entre 2 separatrices.
-c.. ipx,ipx2: indexs of each X-point
+c.. k     : index of the point where 2 separatrices coincide
+c.. ipx,ipx2: indices of each X-point
 c======================================================================
 cc<<<
 c      write(0,*) '=== Entering argsep. npx,racord=',npx,racord
@@ -174,7 +174,7 @@ cc<<<
 c      write(0,*) '** After 10 continue. npx = ',npx
 c      write(0,*) 'ptsep: ',ptsep
 cc>>>
-*..First case: one X-point
+*..First case: ONE X-point
       IF (npx .EQ. 1) then
 c----------------------------------------------------------------------
 cc<<<
@@ -220,7 +220,7 @@ cc>>>
          separx(1,ptsep(4,ipx),ipx) = separx(1,1,ipx)
          separy(1,ptsep(4,ipx),ipx) = separy(1,1,ipx)
 c----------------------------------------------------------------------
-*..Second case: two X-points
+*..Second case: TWO X-points
       else if (npx .EQ. 2) then
 *..If the X-points are connected...
          IF (racord) then
@@ -257,8 +257,7 @@ cc>>>
                  ptsep(4,ipx) = kk(2*(ipx-1)+1)
                end if
    40       CONTINUE
-*..Connection entre les points X.
-*..Connect the X-points (???)
+*..Connect the end of the separatrices to the other X-point
             ipx = 1
             do 50 ind=3, 4
                k = coinci(separx(1,ptsep(ind,ipx),ipx),
@@ -270,7 +269,8 @@ cc>>>
                separx(k,ptsep(ind,ipx),ipx) = separx(1,1,ipx+1)
                separy(k,ptsep(ind,ipx),ipx) = separy(1,1,ipx+1)
    50       CONTINUE
-*..Cancel the separatrix which is not used
+*..Cancel the separatrices which are not used (number of points
+*  equal to 1 means that the separatrix is not traced)
             ipx = 2
             nptot(ptsep(3,ipx),ipx) = 1
             separx(1,ptsep(3,ipx),ipx) = separx(1,1,ipx)
@@ -287,7 +287,7 @@ c        write(0,*) '-- Disconnected double null'
 cc>>>
 *..Determine the X-point which is inner to the other.
 *  Inner X-point is that which has the value of the psi closer to
-*  the of psi on the axis
+*  that of psi on the axis
             IF (abs(fctpx(1)-fctpx(npx+1)) .lt.
      .          abs(fctpx(2)-fctpx(npx+1))) then
                ptxint = 1
@@ -317,7 +317,7 @@ cc<<<
 c        write(0,*) '** after 60 continue. ptxint = ',ptxint
 c        write(0,*) 'ipx,k0,kk : ',ipx,k0,' ',kk
 cc>>>
-*..Index the inner separatrix
+*..Index the inner separatrices
             wx(1)=separx(1,kk(1),ipx)
             wy(1)=separy(1,kk(1),ipx)
             wx(2)=separx(2,kk(1),ipx)
@@ -346,7 +346,8 @@ cc>>>
             nptot(ptsep(3,ipx),ipx) = k
             separx(k,ptsep(3,ipx),ipx) = separx(1,1,ipx)
             separy(k,ptsep(3,ipx),ipx) = separy(1,1,ipx)
-*..Cancel the separatrix which is not used
+*..Cancel the separatrix which is not used (number of points
+*  equal to 1 means that the separatrix is not traced)
             ptsep(4,ipx) = kkp
             nptot(ptsep(4,ipx),ipx) = 1
             separx(1,ptsep(4,ipx),ipx) = separx(1,1,ipx)

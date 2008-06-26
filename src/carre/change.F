@@ -39,7 +39,7 @@ c.. ient: indice correspondant a l'unite d'entree.
 c.. isor: indice correspondant a l'unite de sortie.
 c.. ifail: test qui nous dit si le fichier contenant les donnees est
 c          acceptable, donc si on n'a pas besoin de demander d'entrer
-c          les donnees par clavier avec la routine LECCLE ou lecclf.
+c          les donnees par clavier avec la routine LECCLE ou LECCLF.
 c          (0= acceptable, 1= non acceptable)
 c.. vari: chaine de caracteres qui est lue.
 c.. ieg: position du signe "=" dans la chaine de caracteres lue.
@@ -59,7 +59,7 @@ c-langue
         elseif(sellan(1:7).eq.'english') then
           write(isor,*)'Type the name of the variable to be changed',
      .    ' followed by ''='', and its numerical value.'
-          write(isor,*)'For example, nptseg(2)=32 (return)'
+          write(isor,*)'For example: nptseg(2)=32 (return)'
           write(isor,*)'Type "end" to stop.'
         endif
       endif

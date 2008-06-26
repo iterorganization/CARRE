@@ -13,7 +13,7 @@ c*** This subroutine parametrises the outermost level lines which go
 c*** from one target to another not touching any other structure.
 c*** Starting from a separatrix strike-point, the routine sets the
 c*** direction of the search along the target and then calls MARCHE to
-c*** find and parametriser the limiting level line.
+c*** find and parametrise the limiting level line.
 c======================================================================
       IMPLICIT NONE
 
@@ -48,9 +48,9 @@ c.. distnv: distance along the target from the separatrix strike-point
 c           to the starting point of the limiting level line
 c           (distance selector [1=real, 2=psi], curve index)
 c.. nbniv : number of the limiting level lines
-c.. nivx,nivy: co-ordinates of the points of the parametrised
+c.. nivx,nivy: coordinates of the points of the parametrised
 c              limiting level lines (point index, curve index)
-c.. nivtot: number of points per a parametrised limiting level line
+c.. nivtot: number of points for each parametrised limiting level line
 c.. stp0  : initial step used for tracing the target
 c.. stpmin: minimum to which the step can be reduced
 c.. ipx   : X-point index
@@ -58,21 +58,19 @@ c.. idniv : level line index
 c.. indlim: index of the limiting structure which stops the expansion
 c           in the data region
 c.. idef  : target index
-c.. x0,y0 : co-ordinates of the separatrix strike-point
+c.. x0,y0 : coordinates of the separatrix strike-point
 c.. x2,y2 : starting point of the level line
-c.. psi0,psi2: psi values at the points 0 and 2.
+c.. psi0,psi2: psi values at the points 0 and 2
 c.. ii,jj : cell index
-c.. fraplq: index of the target to be intersected by the curve (???)
-c.. fraplq: indice de la plaque de deflecteur qui doit etre frappee par
-c           la courbe.
+c.. fraplq: index of the target to be intersected by the curve
 c.. sens  : direction of movement along the target - 1=the same as the
 c           target points, -1=opposite
-c.. ptxint,ptxext: in the case of a disconnected double null, indices
+c.. ptxint,ptxext: in the case of a disconnected double-null, indices
 c                  of the internal and external X-points
 c.. nbcrb : number of the limiting level lines separating the region
 c.. xt,yt : points of the separating curve
 c.. nt    : number of points in each curve
-c.. a00,a10,a01,a11: bi-linear interpolation coefficients
+c.. a00,a10,a01,a11: bilinear interpolation coefficients
 c          psi    = a00(,,1) + a10(,,1)*x + a01(,,1)*y + a11(,,1)*x*y
 c          dpsidx = a00(,,2) + a10(,,2)*x + a01(,,2)*y + a11(,,2)*x*y
 c          dpsidy = a00(,,3) + a10(,,3)*x + a01(,,3)*y + a11(,,3)*x*y
@@ -145,7 +143,7 @@ c======================================================================
      .                 npstru(inddef(idef)),x0,y0,'droite')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -223,7 +221,7 @@ c======================================================================
      .                 npstru(inddef(idef)),x0,y0,'gauche')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -322,6 +320,7 @@ cc>>>
          idef = 1
          fraplq = inddef(3)
 
+*..Parametrisation of the separating curve
 
          nt(1)=0
 	 nt(2)=0
@@ -336,9 +335,6 @@ cc>>>
    33    CONTINUE
 
          DO 34 i=2,nptot(ptsep(3,ipx),ipx)
-
-*..Parametrisation of the separating curve
-
             nt(1)=nt(1)+1
 	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
             xt(nt(1),1)=separx(i,ptsep(3,ipx),ipx)
@@ -367,7 +363,7 @@ cc>>>
      .                 npstru(inddef(idef)),x0,y0,'droite')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -448,7 +444,7 @@ cc>>>
      .                 npstru(inddef(idef)),x0,y0,'gauche')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -538,7 +534,7 @@ cc>>>
      .                 npstru(inddef(idef)),x0,y0,'gauche')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -619,7 +615,7 @@ cc>>>
      .                 npstru(inddef(idef)),x0,y0,'gauche')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -760,7 +756,7 @@ cank
      .                 npstru(inddef(idef)),x0,y0,'droite')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -839,7 +835,7 @@ cank
      .                 npstru(inddef(idef)),x0,y0,'gauche')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -922,7 +918,7 @@ cank
      .                 npstru(inddef(idef)),x0,y0,'gauche')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,
@@ -1001,7 +997,7 @@ cank
      .                 npstru(inddef(idef)),x0,y0,'gauche')
          call trc_stk_out
 
-*..Call a subroutine to find the limiting level line
+*..Call the subroutine to find the limiting level line
 
          CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv)
      .      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin,

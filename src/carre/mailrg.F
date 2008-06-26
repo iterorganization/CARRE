@@ -114,9 +114,9 @@ c  calcul des indices de garde
       ig1=2
       ig2=nppol-1
       do 12 ipol=2,nppol-1
-      d1=ruban(xn1,yn1,nn1,mailx(ipol,1),maily(ipol,1),d1)
-      if(d1.lt.garde1) ig1=ipol+1
-      if(ll-d1.ge.garde2) ig2=ipol
+        d1=ruban(xn1,yn1,nn1,mailx(ipol,1),maily(ipol,1),d1)
+        if(d1.lt.garde1) ig1=ipol+1
+        if(ll-d1.ge.garde2) ig2=ipol
 12    continue
 
       DO 25 ir=2, nprad

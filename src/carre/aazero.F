@@ -19,7 +19,7 @@ c  Input/output variables:
 c  x0: initial guess
 c  dx0: initial step
 c  dxmin: minimum acceptable step: aazero is accepted if dx.le.dxmin
-c  fmin: minmum acceptable function value: aazero is accepted if
+c  fmin: minimum acceptable function value: aazero is accepted if
 c        f.le.fmin*f1
 c  xmin: lower bound of the x interval in which to find the root
 c  xmax: upper bound of the x interval in which to find the root

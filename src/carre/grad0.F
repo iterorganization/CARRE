@@ -6,7 +6,7 @@
       IMPLICIT NONE
 
 *..  Cette sous-routine verifie pour chaque carre si il y a intersection
-*  entre les lignes de niveaux psidx=0 et psidy=0 et si oui elle garde
+*  entre les lignes de niveau psidx=0 et psidy=0 et si oui elle garde
 *  les coordonnees en memoire.
 
 *  arguments

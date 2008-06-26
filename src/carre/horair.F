@@ -3,10 +3,10 @@
       integer function horair(xpto,ypto,x0,y0,xstruc,ystruc,npst,sens)
 ************************************************************************
       implicit none
-c  Determination du sens de parcours "sens" sur une structure donne,
+c  Determination du sens de parcours "sens" sur une structure donnee,
 c  a partir d'un point de depart x0, y0, pour que le trajet initial
-c  soit dans le sens horaire (sens=-1) ou antihoraire (sens=1) tel que
-c  vu du point de refenence xpto, ypto.
+c  soit dans le sens horaire (sens=-1) ou anti-horaire (sens=1) tel que
+c  vu du point de reference xpto, ypto.
 c  N.B.: la structure est supposee fermee.
 c
 c  arguments
