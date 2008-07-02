@@ -75,6 +75,6 @@ C      write (33,*) i,bdzu,nxu,nyu,bdzo,nxo,nyo
        
       
       close(33)
- 120   FORMAT(X,F8.2,X,F8.2)
+ 120   FORMAT(1X,F8.2,1X,F8.2)
       RETURN
       END

@@ -24,8 +24,10 @@ c======================================================================
       INTEGER n,ind1,ind2,ii,jj, compt
       REAL*8 zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
       PARAMETER (psimin=1.E-08,psimi2=1.E-07)
-      logical l_dbg /.false./
-      integer n_call /0/
+      logical l_dbg
+      integer n_call
+      data l_dbg /.false./
+      data n_call /0/
 
 *  procedures
       INTEGER indsgm,ifind

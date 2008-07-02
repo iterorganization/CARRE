@@ -55,8 +55,10 @@ cank-970707: dimensions from the file
      ,                                       crbnmx=npnimx,nrmx=nrmamx)
       REAL*8 xcrb(crbnmx,2),ycrb(crbnmx,2),xbcl(nrmx),ybcl(nrmx),
      .       xint(2),yint(2)
-      logical lc,li,l_dbg /.false./
-      integer n_call /0/
+      logical lc,li,l_dbg
+      integer n_call
+      data l_dbg /.false./
+      data n_call /0/
 
 *  procedures
       INTEGER indsgm,ifind,drctio
