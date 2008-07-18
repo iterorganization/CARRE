@@ -34,7 +34,7 @@ equilibrium file, and the structures file) are saved in a directory
 Error messages and tracing data from carre (\"Grid\") and traduit (\"Convert\") can be found in
 the files carre.log and traduit.log, respectively.
 "
-[ -z "$1" ] && { echo "$Usage"; exit 4; }
+[ -z "$1" ] && { /bin/echo -e "$Usage"; exit 4; }
 
 # griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${Model_Class-iter}}
 griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${DEVICE-iter}}
@@ -42,10 +42,10 @@ indir=${CARRE_INPUTDIR-.}
 stordir=
 [ -n "$CARRE_STOREDIR" ] && stordir="$CARRE_STOREDIR/${DEVICE-iter}"
 grid_stem=carre_grid
-echo "griddir: $griddir\nindir: $indir\n"
+/bin/echo -e "griddir: $griddir\nindir: $indir\n"
 
 [ "$1" = '-' ] && {
-    echo "No linking - the input files are assumed to exist in \"$indir\""
+    /bin/echo -e "No linking - the input files are assumed to exist in \"$indir\""
     q=p
     qqs=c
 } || { \
@@ -58,18 +58,18 @@ echo "griddir: $griddir\nindir: $indir\n"
         q=g
         qqs=s
     } || {
-        echo "Files $u.vrq, $u.str, and $u.fld must be present!"
+        /bin/echo -e "Files $u.vrq, $u.str, and $u.fld must be present!"
         exit 8
     }
 }
 while true
 do {
-  echo "Help, Prepare, Grid, Save, Convert, sTore, Next, Remove, Input, Output, Quit ? ($q)\c"
+  /bin/echo -e "Help, Prepare, Grid, Save, Convert, sTore, Next, Remove, Input, Output, Quit ? ($q)\c"
   while true; do {
     read u
     { case "${u:-$q}" in
     ( h|H )                                               # help:
-            echo "
+            /bin/echo -e "
   Prepare (p)   apply fcrr to create Carre input files from DG output
   Grid    (g)   apply Carre to create a grid
   Save    (s)   save Carre output as the configuration file (carre.dat)
@@ -105,7 +105,7 @@ do {
             grid_stem=$class.carre
             [ -n "$CARRE_STOREDIR" ] && stordir="$CARRE_STOREDIR/$class"
 
-            echo "class = $class\ngriddir = $griddir\nindir = $indir\ngrid_stem = $grid_stem"
+            /bin/echo -e "class = $class\ngriddir = $griddir\nindir = $indir\ngrid_stem = $grid_stem"
             [ -n $class ] && {
               [ -r $class.aux ] && ln -sf $class.aux dg.aux
             }
@@ -117,19 +117,19 @@ do {
     ( s|S )                                               # save the control data:
             cp carre.out carre.dat; q=c; break;;
     ( c|C )                                               # convert:
-            echo "carre.out\n4" | $OBJECTCODE/traduit 2>traduit.log; q=t; break;;
+            /bin/echo -e "carre.out\n4" | $OBJECTCODE/traduit 2>traduit.log; q=t; break;;
     ( t|T )                                               # store the grid:
             [ -r traduit.out ] && {
                 [ -d "$griddir" ] || {
-                    echo "The directory \"$griddir\" does not exist. Create it (y/n)? \c"
+                    /bin/echo -e "The directory \"$griddir\" does not exist. Create it (y/n)? \c"
                     read u; case "$u" in
-                      ( y|Y )   echo mkdir "$griddir"
+                      ( y|Y )   /bin/echo -e mkdir "$griddir"
                       mkdir -p "$griddir" || break;;
-                      (  *  )   echo break
+                      (  *  )   /bin/echo -e break
                       break;;
                     esac
                 }
-                echo dir OK
+                /bin/echo -e dir OK
                 n=1
                 set -- $griddir/$grid_stem.[0-9][0-9][0-9]
                 [ -f $1 ] && {
@@ -140,18 +140,18 @@ do {
                 [ ${#n} -lt 2 ] && n=00$n || {
                     [ ${#n} -lt 3 ] && n=0$n
                 }
-                echo "$n"
+                /bin/echo -e "$n"
                 mv -f traduit.out $griddir/$grid_stem.$n && \
-                  echo "The grid is stored as $griddir/$grid_stem.$n"
+                  /bin/echo -e "The grid is stored as $griddir/$grid_stem.$n"
                 [ -n "$stordir" ] && {
                   [ -d "$stordir" ] || {
                     [ -a "$stordir" ] && {
-                      echo "Name collision: there is already a file named $stordir"
-                      echo "  ==> the directory cannot be created"
+                      /bin/echo -e "Name collision: there is already a file named $stordir"
+                      /bin/echo -e "  ==> the directory cannot be created"
                     } || {
-                      echo "The directory \"$stordir\" does not exist. Create it (y/n)? \c"
+                      /bin/echo -e "The directory \"$stordir\" does not exist. Create it (y/n)? \c"
                       read u; case "$u" in
-                        ( y|Y )   echo mkdir "$stordir"
+                        ( y|Y )   /bin/echo -e mkdir "$stordir"
                                   mkdir -p "$stordir";;
                         (  *  )   ;;
                       esac
@@ -161,7 +161,7 @@ do {
                     s="$stordir/$n"
                     u=y
                     [ -d "$s" ] && {
-                      echo "The directory \"$s\" already exists. Use it (y/n)? \c"
+                      /bin/echo -e "The directory \"$s\" already exists. Use it (y/n)? \c"
                       read u; case "$u" in
                         ( y|Y )   ;;
                         (  *  )   u=;;
@@ -170,15 +170,15 @@ do {
                     [ -n "$u" ] && {
                       [ -d "$s" ] || mkdir -p "$s"
                       cp carre.dat structure.dat rzpsi.dat btor.dat "$s" && \
-                              echo "carre.dat, structure.dat, rzpsi.dat, and btor.dat copied to $s"
+                              /bin/echo -e "carre.dat, structure.dat, rzpsi.dat, and btor.dat copied to $s"
                     }
                   }
                 }
                 q=q; true
-            } || { echo "No traduit.out. Convert the grid first."; q=c; }
+            } || { /bin/echo -e "No traduit.out. Convert the grid first."; q=c; }
             break;;
     ( n|N )                                               # next job:
-            echo "Input the new stem: \c"; read u
+            /bin/echo -e "Input the new stem: \c"; read u
             [ -n "$u" ] && { 
               [ "$u" = '-' ] && {
                 [ -r $indir/rzpsi.dat ] && [ -r $indir/structure.dat ] && [ -r $indir/btor.dat ] && {
@@ -204,19 +204,19 @@ do {
                   q=g
                   true
                 } || {
-                  echo "Files $u.vrq, $u.str, and $u.fld must be present in the input directory"
+                  /bin/echo -e "Files $u.vrq, $u.str, and $u.fld must be present in the input directory"
                 }
               }
             }; break;;
     ( r|R )                                               # remove the grid(s):
-            echo "Input the list of grid numbers to be REMOVED:"; read u
+            /bin/echo -e "Input the list of grid numbers to be REMOVED:"; read u
             [ -n "$u" ] && {
                 uu=
                 for n in $u; do
                   uu="$uu $griddir/$grid_stem.$n"
                 done
                 ls -l $uu
-                echo "Do you wish to remove this grid(s)? (y/n): \c"; read u
+                /bin/echo -e "Do you wish to remove this grid(s)? (y/n): \c"; read u
                 case "$u" in
                   ( y|Y ) rm -f $uu
                           for f in $uu; do {
@@ -227,9 +227,9 @@ do {
                 esac
             }; break;;
     ( i|I )                                               # input files:
-            echo "Specify the new input directory: \c"; read u
+            /bin/echo -e "Specify the new input directory: \c"; read u
             [ -n "$u" ] && {
-              indir="$u"; echo "$indir"
+              indir="$u"; /bin/echo -e "$indir"
               [ -d $u ] && {
                 indir="$u"
               } || {
@@ -242,25 +242,25 @@ do {
                 }
               }
               [ -n "$indir" ] && {
-                echo "The input directory is now `(cd $indir && pwd)`"; q=n; true
+                /bin/echo -e "The input directory is now `(cd $indir && pwd)`"; q=n; true
               } || {
-                echo "Cannot find directory: $u"; q=i
+                /bin/echo -e "Cannot find directory: $u"; q=i
               }
             }; break;;
     ( o|O )                                               # output directory:
-            echo "Specify the new grid directory: \c"; read u
+            /bin/echo -e "Specify the new grid directory: \c"; read u
             [ -n "$u" ] && {
               [ -d $u ] && {
-                griddir="$u"; echo "The grid directory is now $griddir"; q=t
+                griddir="$u"; /bin/echo -e "The grid directory is now $griddir"; q=t
               } || {
-                echo "No such directory: $u\nCreate it? (y/n) \c"; read uu
+                /bin/echo -e "No such directory: $u\nCreate it? (y/n) \c"; read uu
                 case "$uu" in
                   ( y|Y ) s=$u; ss=$u
                           while true; do
                             case "$s" in
                               ( */* ) w="${s%/*}"
                                       [ -z "$w" ] && {
-                                        echo "Wrong directory specification: no $s"
+                                        /bin/echo -e "Wrong directory specification: no $s"
                                         q=o; break 2
                                       }; s="$w"
                                       [ -d "$s" ] && break
@@ -268,13 +268,13 @@ do {
                               (  *  ) break;;
                             esac
                           done
-                          echo "Creating $ss"
+                          /bin/echo -e "Creating $ss"
                           mkdir -p $ss && {
                             griddir="$u"; q=t
-                            echo "The grid directory is now $griddir"
+                            /bin/echo -e "The grid directory is now $griddir"
                           } || {
-                            echo "Unable to create $u"; q=o
-                            echo "The grid directory is still $griddir"
+                            /bin/echo -e "Unable to create $u"; q=o
+                            /bin/echo -e "The grid directory is still $griddir"
                           };;
                   (  *  ) ;;
                 esac
@@ -283,8 +283,8 @@ do {
     ( q|Q )                                               # quit:
             break 2;;
     (  *  )
-            echo 'Illegal response.'
-            echo 'Please use letters capitalized in the list or press ENTER for default'
+            /bin/echo -e 'Illegal response.'
+            /bin/echo -e 'Please use letters capitalized in the list or press ENTER for default'
             continue;;
     esac;}
   }; done
