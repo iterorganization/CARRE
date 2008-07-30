@@ -38,7 +38,7 @@ ${OBJECTCODE}/traduit: ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a
 	rm -f ${OBJECTCODE}/traduit 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJECTCODE}/traduit ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJECTCODE}/fcrr: ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPSTOP}/src/lib/${OBJECTCODE}/libmscl.a Makefile
+${OBJECTCODE}/fcrr: ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a Makefile
 	rm -f ${OBJECTCODE}/fcrr 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
