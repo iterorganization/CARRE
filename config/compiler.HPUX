@@ -1,7 +1,6 @@
 #  VERSION : 10.07.98 10:14
 
-# LINK_NCARG	  =-Wl,-L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c
--lX11 -lm
+# LINK_NCARG	  = -Wl,-L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
 DEFINES 	= -DHPUX
 
@@ -11,16 +10,14 @@ CPP		= /lib/cpp
 ifdef SOLPS_DEBUG
 FFLAGS		= -g -C -R8 +FPOZV
 else
-FFLAGS	= +O3 -R8
+FFLAGS		= +O3 -R8
 endif
 
 DBLPAD		= 
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-# LDLIBS	= -Wl,-L${SOLPS_LIB}
--Wl,-L${SOLPSMASTER}/@sys/lib -Wl,-L/usr/local/lib
-LDLIBS		= -Wl,-L${SOLPS_LIB}
--Wl,-L$${NCARG_ROOT}/lib -Wl,-L/usr/lib/X11R5
+# LDLIBS	= -Wl,-L${SOLPS_LIB} -Wl,-L${SOLPSMASTER}/@sys/lib -Wl,-L/usr/local/lib
+LDLIBS		= -Wl,-L${SOLPS_LIB} -Wl,-L$${NCARG_ROOT}/lib -Wl,-L/usr/lib/X11R5
 LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -lncarg_loc -lmach -lX11 -lm
 LDEXTRA 	= 

@@ -1,6 +1,6 @@
 #  VERSION : 25.10.2000 11:17
 
-# LINK_NCARG	  =-L$${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
+# LINK_NCARG	  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
 DEFINES 	= -DFortran_90
 

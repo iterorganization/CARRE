@@ -11,6 +11,6 @@ DBLPAD		= -r8
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-LDLIBS		= -L$${NCARG_ROOT}/lib -L${SOLPS_LIB}
+LDLIBS		= -L${NCARG_ROOT}/lib -L${SOLPS_LIB}
 LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib -lX11 -lm -lmscl
 LDEXTRA 	= 
