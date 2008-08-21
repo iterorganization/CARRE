@@ -2,7 +2,7 @@
      .          npstru,xstruc,ystruc,inddef,nbdef,npx,separx,
      .          separy,nptot,ptsep,racord,nivx,nivy,nivtot,
      .          nbniv,stp0,stpmin,
-     .          distnv,ptxint,limcfg,a00,a10,a01,a11)
+     .          distnv,ptxint,a00,a10,a01,a11)
 c
 c  version : 17.11.99 20:55
 c
@@ -24,7 +24,7 @@ cank-970707: dimensions from the file
 *  arguments
       INTEGER nx,ny,nstruc,npstru(strumx),
      .        nbdef,inddef(nbdef),npx,nptot(4,npx),
-     .        ptsep(4,npx),nivtot(nivmx),nbniv,ptxint,limcfg
+     .        ptsep(4,npx),nivtot(nivmx),nbniv,ptxint
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx),
      .     ystruc(npstmx,strumx),separx(npnimx,4,npxmx),
      .     separy(npnimx,4,npxmx),nivx(npnimx,nivmx),nivy(npnimx,nivmx),

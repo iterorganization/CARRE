@@ -1,10 +1,10 @@
 #  VERSION : 27.07.97 22:41
 
-SHELL=/bin/sh
-CPP=/usr/lib/cpp
+SHELL	= /bin/sh
+CPPi	= /usr/lib/cpp
 
-VPATH	=	src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
-INCLUDE =	-Isrc/include
+VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
+INCLUDE = -Isrc/include
 
 include config/compiler.${OBJECTCODE}
 ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no ),yes)
@@ -84,7 +84,6 @@ ${OBJECTCODE}/dependencies.${OBJECTCODE}:
 	-mkdir ${OBJECTCODE}
 	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}
 	${MAKE} depend
-
 
 include ${OBJECTCODE}/dependencies.${OBJECTCODE}
 

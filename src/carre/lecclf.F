@@ -47,7 +47,7 @@ c       Configuration limiteur
          WRITE(6,105)lg(1)
   105    FORMAT(/'Configuration limiteur.'//
      .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
-c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
+c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
@@ -76,7 +76,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,122)distxo
   122    FORMAT(/'Nombre de points dans la region 2 (interieure) et'
-     .     ,' penetration:'/'penetration maximale =',F10.8)
+     .     ,' penetration:'/'penetration maximale =',F11.8)
          READ(5,*)npr(2),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -120,7 +120,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
          WRITE(6,100)lg(1)
   100    FORMAT(/'Vous avez un simple nul'//
      .   'Nombre de points sur le segment qui va du point X a la',
-     .   ' plaque de droite:'/'longueur = ',F7.5)
+     .   ' plaque de droite:'/'longueur = ',F8.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
@@ -133,7 +133,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,103)lg(2)
   103    FORMAT(/'Nombre de points sur le segment qui va a la plaque',
-     .   ' de gauche:'/'longeur = ',F7.5)
+     .   ' de gauche:'/'longeur = ',F8.5)
          READ(5,*)nptseg(2)
 
          WRITE(6,101)
@@ -144,7 +144,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
          READ(5,*)deltpn(2)
 
          WRITE(6,106)lg(3)
-  106    FORMAT(/'Nombre de points sur la boucle:'/'longueur = ',F7.5)
+  106    FORMAT(/'Nombre de points sur la boucle:'/'longueur = ',F8.5)
          READ(5,*)nptseg(3)
 
          WRITE(6,101)
@@ -168,7 +168,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
   110    FORMAT(//'Nombre de points dans la direction radiale pour la ',
      .    'region 1 (SOL):')
          WRITE(6,111)distnv(1,1)
-  111    FORMAT('Distance totale =',F8.6)
+  111    FORMAT('Distance totale =',F9.6)
          WRITE(6,112)distnv(2,1)
   112    FORMAT('Difference totale de psi =',F9.5)
          READ(5,*)npr(1)
@@ -196,7 +196,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,120)distxo
   120    FORMAT(/'Nombre de points dans la region 3 (interieure) et'
-     .     ,' penetration:'/'penetration maximale =',F10.8)
+     .     ,' penetration:'/'penetration maximale =',F11.8)
          READ(5,*)npr(3),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -215,7 +215,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
             difpsi = fctfin - fctini
 
             WRITE(6,121)difpsi
-  121       FORMAT(/'delta-psi =', F8.6)
+  121       FORMAT(/'delta-psi =', F9.6)
 
          ENDIF
 
@@ -248,7 +248,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
          WRITE(6,130)lg(1)
   130    FORMAT(/'Vous avez un double nul connecte'//
      .   'Nombre de points sur le segment qui va du point X a la',
-     .   ' plaque de droite:'/'longueur = ',F7.5)
+     .   ' plaque de droite:'/'longueur = ',F8.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
@@ -268,7 +268,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,133)lg(3)
   133    FORMAT(/'Nombre de points sur le segment qui relie les points',
-     .   ' X par la droite'/'longueur = ',F7.5)
+     .   ' X par la droite'/'longueur = ',F8.5)
          READ(5,*)nptseg(3)
 
          WRITE(6,101)
@@ -279,7 +279,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,136)lg(4)
   136    FORMAT(/'Nombre de points sur la boucle qui relie les points X'
-     .   ,' par la gauche'/'longueur = ',F7.5)
+     .   ,' par la gauche'/'longueur = ',F8.5)
          READ(5,*)nptseg(4)
 
          WRITE(6,101)
@@ -291,7 +291,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
          WRITE(6,140)lg(5)
   140    FORMAT(/'Nombre de points sur le segment qui va du',
      .   ' point X inferieur a la plaque en bas a droite:'/
-     .   'longueur = ',F7.5)
+     .   'longueur = ',F8.5)
          READ(5,*)nptseg(5)
 
          WRITE(6,101)
@@ -303,7 +303,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
          WRITE(6,144)lg(6)
   144    FORMAT(/'Nombre de points sur le segment qui va du',
      .   ' point X inferieur a la plaque en bas a gauche:'/
-     .   'longueur = ',F7.5)
+     .   'longueur = ',F8.5)
          READ(5,*)nptseg(6)
 
          WRITE(6,101)
@@ -370,7 +370,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,164)distxo
   164    FORMAT(/'Nombre de points dans la region 5 (interieure) et'
-     .     ,' penetration:'/'penetration totale =',F10.8)
+     .     ,' penetration:'/'penetration totale =',F11.8)
          READ(5,*)npr(5),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -422,7 +422,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
          WRITE(6,170)lg(1)
   170    FORMAT(/'Vous avez un double nul deconnecte'//
      .   'Nombre de points sur le segment qui va du point X du haut'/
-     .   'a la plaque droite du haut:'/'longueur = ',F7.5)
+     .   'a la plaque droite du haut:'/'longueur = ',F8.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
@@ -550,7 +550,7 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F7.5)
 
          WRITE(6,189)distxo
   189    FORMAT(/'Nombre de points dans la region 6 (interieure) et'
-     .     ,' penetration:'/'penetration totale =',F10.8)
+     .     ,' penetration:'/'penetration totale =',F11.8)
          READ(5,*)npr(6),pntrat
 
          pntrat = MIN(pntrat,distxo)

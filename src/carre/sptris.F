@@ -36,7 +36,7 @@ cank-970707: dimensions from the file
      .  indstr,plaque,nbdfav,nt(2),ixp_hlp(nbdmx),idirloop
       real*8 xsttmp(nbdmx),ysttmp(nbdmx)
       integer i,j     !!!
-      integer incri(4),incrj(4),incrir(4),incrjr(4),ii,ji,ic
+      integer incri(4),incrj(4),incrir(4),incrjr(4),ic
       data incri  /0, -1,  0,  1/,  incrj  / 1, 0, -1,  0/
       data incrir /0,  0, -1, -1/,  incrjr /-1, 0,  0, -1/
 
@@ -103,8 +103,6 @@ c*** the one with X-point to reduce the effect of noise.
         j2=jx-1
         do idirloop=1,4 !{
 	  idir=idirloop
-          ii=incri(idir)
-          ji=incrj(idir)
           nbdfav=nbdef
 c<<<
       write(0,*) 

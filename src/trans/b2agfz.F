@@ -1,5 +1,5 @@
       subroutine b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmax,nymax,
-     ,                  r,z,nreg,nppol,nprad,npolmx,nradmx,nregmx,
+     ,                  r,z,nreg,nppol,nprad,npolmx,nradmx,
      ,                  nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
      ,                  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
 c
@@ -25,7 +25,7 @@ c***  - data on grid size and cuts added to the grid header
 c======================================================================
       implicit none
 
-      integer npolmx,nradmx,nregmx,nxmax,nymax,ncutmx,nisomx
+      integer npolmx,nradmx,nxmax,nymax,ncutmx,nisomx
       integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10),
      ,  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx)
       real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
@@ -41,7 +41,7 @@ c***  r,z   : co-ordinates of the carre grid points
 c***  nreg  : actual number of regions in the carre grid
 c***  nppol,nprad : number of poloidal and radial grid points in each
 c***                region
-c***  nregmx,npolmx,nradmx: corresponding dimensions
+c***  npolmx,nradmx: corresponding dimensions
 c***  nptseg: number of the grid points on each part of the separatrix
 c***          as was used in carre
 c***  psi   : psi values at the points of the carre grid
@@ -187,7 +187,7 @@ c*** nominal magnetic field and major radius
         rewind(17)
         read(17,*,err=10) b0r0
         close(17)
-        ex= b0r0 .ne. 0.                                                   ! DPC
+        ex= b0r0 .ne. 0.                                                ! DPC
         if(.not.ex) write(6,*) 'Zero value of Btor*R "in btor.dat"'   	! }
       else    	! {
         write(*,*) 'No file btor.dat found.'  	  ! }
@@ -581,7 +581,7 @@ c*** Check them for consistency
           do i=1,2      ! {
             do j=1,3    	! {
               if(nqp(i,j,1).ne.nqp(i,j,2) .or.
-     .                                   nqp(i,j,1).ne.nqp(i,j,3)) then     ! {
+     .                                   nqp(i,j,1).ne.nqp(i,j,3)) then  ! {
                 kk=j
                 if(i.eq.2 .and. kk.ne.2) kk=4-kk
                 write(0,*) 'Inconsistent poloidal grid dimensions. ',
@@ -598,7 +598,7 @@ c*** Check them for consistency
   
             do k=1,3    	! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
-     .                                   nqr(i,1,k).ne.nqr(i,3,k)) then     ! {
+     .                                   nqr(i,1,k).ne.nqr(i,3,k)) then ! {
                 write(0,*) 'Inconsistent radidal grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
@@ -620,7 +620,7 @@ c*** Check them for consistency
             write(*,*) '==> Check the npr specification in carre. '
             stop
           end if
-c----------------------------------------------------------------------     ! }
+c----------------------------------------------------------------------  ! }
       	else if(index(equtype,'cdn-full').gt.0) then    	! {  #D
 c----------------------------------------------------------------------
   
@@ -817,7 +817,7 @@ c*** Check them for consistency
   
             do k=1,3    	! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
-     .                                   nqr(i,1,k).ne.nqr(i,3,k)) then     ! {
+     .                                   nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
                 write(0,*) 'Inconsistent radidal grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
@@ -994,9 +994,9 @@ c<<<
         write(0,*) 'nycut :  ',(nycut(i),i=1,ncut)
         write(0,*) 'nxiso :  ',(nxiso(i),i=1,niso)
 c>>>
-c----------------------------------------------------------------------     ! }
+c---------------------------------------------------------------------- ! }
       else if(index(equtype,'sn-down').gt.0 .or. 
-     .                                index(equtype,'sn-up').gt.0) then   ! {
+     .                                index(equtype,'sn-up').gt.0) then ! {
 c----------------------------------------------------------------------
 c  construct the mesh for the bottom single null geometry
 
@@ -1180,7 +1180,7 @@ c*** Specify the cuts
 	  nycut(2)=nycut(1)  ! }
 	end if
 c
-c----------------------------------------------------------------------     ! }
+c----------------------------------------------------------------------  ! }
       else if(index(equtype,'limiter').gt.0) then     ! {
 c----------------------------------------------------------------------
 c  construct the mesh for a limiter geometry
@@ -1273,7 +1273,7 @@ c  central region
         end do
 c  periphery
         call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
-c----------------------------------------------------------------------     ! }
+c----------------------------------------------------------------------  ! }
       else    	! {
 c----------------------------------------------------------------------
         write(6,*) 'fatal error in b2agfz: type not recognized.'
@@ -1285,7 +1285,7 @@ c*** Rearrange the mesh if needed, in order to have a right-handed
 c*** system of coordinates
 
       if( (crx(1,1,1)-crx(1,1,0))*(cry(1,1,2)-cry(1,1,0)) -
-     -    (crx(1,1,2)-crx(1,1,0))*(cry(1,1,1)-cry(1,1,0)).lt.zero) then     ! {
+     -    (crx(1,1,2)-crx(1,1,0))*(cry(1,1,1)-cry(1,1,0)).lt.zero) then ! {
 cc<<<
 c       write(0,*) 'changing the grid orientation...'
 cc>>>

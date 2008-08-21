@@ -13,6 +13,8 @@ c=======================================================================
       real*8 xst(nbdmx),yst(nbdmx),xtt(nbdmx),ytt(nbdmx)
 
 *  variables locales
+      integer npxmx4
+      parameter (npxmx4=4*npxmx)
       integer i,j,k,l,m,iipx(npxmx4),
      ,  ii(strumx),jj(nbdmx),kk(npxmx),ll(nbdmx),mm(npxmx)
       

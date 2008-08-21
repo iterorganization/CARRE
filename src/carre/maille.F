@@ -1395,8 +1395,8 @@ crm  augmenter ce test
   114       CONTINUE
 
             call trc_stk_in('maille','*114')
-            CALL DOUBLD(bouclx,boucly,xmail,ymail,xn,yn,nn,spacer(1,1),
-     .        np1(1),npr(1),inddef(idef),xext,yext,xptxex,yptxex,xpto,
+            CALL DOUBLD(bouclx,boucly,xn,yn,nn,spacer(1,1),
+     .        npr(1),inddef(idef),xext,yext,xptxex,yptxex,xpto,
      .        ypto,nx,ny,x,y,psi,nstruc,npstru,xstruc,
      .        ystruc,a00,a10,a01,a11,repart,
      .        xcrb2,ycrb2,npcrb2)

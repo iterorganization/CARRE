@@ -8,6 +8,10 @@ c======================================================================
       implicit none
       character ofile*(*)
 #include <FCRCOM.F>
+      integer*4 niscl,nrscl
+      parameter (niscl=2, nrscl=4)
+c*** niscl : number of integer scalar parameters in the Carre input
+c*** nrscl : number of real scalar parameters in the Carre input
       integer i,j
       integer iprmeq(niscl)
       real rprmeq(nrscl)

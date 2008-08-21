@@ -19,7 +19,8 @@ cank-970707: dimensions from the file
      .  x(nx),y(ny)
 
 *  variables locales
-      INTEGER i, j
+      INTEGER i, j, nxymax
+      parameter (nxymax=nymax)
       REAL*8 tmp(nxymax), tmpp(nxymax)
 
 *  procedures

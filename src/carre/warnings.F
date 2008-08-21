@@ -1,6 +1,6 @@
 
       SUBROUTINE WARNINGS(separx,separy,nivx,nivy,
-     &  distnv,xpto,ypto,npr1)
+     &  distnv,xpto,ypto)
 c****************************************************************
 C written by Heimo Buerbaumer December 1998
 C Calculation of the distance separatrix-outer border limit

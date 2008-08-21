@@ -18,8 +18,7 @@
 
 *  variables locales
       INTEGER indp1, ind, jnd, jndp, ipp
-      REAL*8 unx1,uny1,unx2,uny2,z,w1,dmin
-      PARAMETER(dmin=1.e-6)
+      REAL*8 unx1,uny1,unx2,uny2,z,w1
 
 *  procedures
       INTEGER indcrb

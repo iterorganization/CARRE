@@ -275,8 +275,7 @@ c
 *  13.   Identify the limiter
 *
         call limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot,
-     .      nbniv,nx,ny,x,y,psi,npx,ptx,pty,
-     .      iptx,jptx,fctpx,separx,separy,nptot,
+     .      nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx,
      .      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef,
      .      a00,a10,a01,a11)
 
@@ -308,7 +307,7 @@ c>>>
      .      npstru,xstruc,ystruc,inddef,nbdef,npx,separx,
      .      separy,nptot,ptsep,racord,nivx,nivy,nivtot,
      .      nbniv,stp0,stpmin,
-     .      distnv,ptxint,limcfg,a00,a10,a01,a11)
+     .      distnv,ptxint,a00,a10,a01,a11)
           call trc_stk_out
         endif
 
@@ -326,7 +325,7 @@ c*
 c* WARNINGS CALCULATION AND OUTPUT
 c*
 c        if (npx.EQ.1) CALL WARNINGS(separx,separy,nivx,nivy,
-c     &  distnv(1,2),xpto,ypto,npr(1))
+c     &  distnv(1,2),xpto,ypto)
 
 *
 *..12.0  Plot the structures, the separatrices, and the limiting level

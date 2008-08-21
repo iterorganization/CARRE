@@ -3,8 +3,6 @@ c
       integer nnstr,nmstr,nsgmx,nrgnx,ntrgx,ngpr,ngpz,nxptm
       parameter (nsgmx=6, nrgnx=6, ntrgx=4, nxptm=2)
       parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=1000)
-      integer*4 niscl,nrscl
-      parameter (niscl=2, nrscl=4)
       integer*4 repart,nrelax,nxpt,
      ,  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg,
      ,  nstr,lstr(nnstr),nclstr,
@@ -36,8 +34,6 @@ c*** ngpz  : maximum number of columns in pfm matrix
 c*** nxptm : maximum number of pre-defined x-points
 c*** nsgm  : actual number of "segments of separatrices" (Carre)
 c*** nrgn  : actual number of "regions" (Carre)
-c*** niscl : number of integer scalar parameters in the Carre input
-c*** nrscl : number of real scalar parameters in the Carre input
 c*** nptseg: number of "grid points" on each "segment of separatrices"
 c*** deltp : first and last steps in point distribution on "segment"
 c*** npr   : number of "flux surfaces" in each "region"

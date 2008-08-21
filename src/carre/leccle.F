@@ -57,7 +57,7 @@ c       Configuration limiteur
 
          write(6,205)lg(1)
   205    format(/'Limiter configuration.'//
-     .    'Number of nodes on the separatrix:'/'segment length = ',f7.5)
+     .    'Number of nodes on the separatrix:'/'segment length = ',f8.5)
          READ(5,*)nptseg(1)
 
          write(6,201)
@@ -86,7 +86,7 @@ c       Configuration limiteur
 
          WRITE(6,222)distxo
   222    format(/'Number of nodes in region 2 (interior) and'
-     .     ,' penetration:'/'maximum penetration =',f10.8)
+     .     ,' penetration:'/'maximum penetration =',f11.8)
          READ(5,*)npr(2),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -131,7 +131,7 @@ c       simple nul
          write(6,200)lg(1)
   200    format(/'Single null geometry'//
      .    'Number of nodes on the segment which connects the X-point',
-     .    ' to the right plate:'/'segment length = ',f7.5)
+     .    ' to the right plate:'/'segment length = ',f8.5)
          READ(5,*)nptseg(1)
 
          write(6,201)
@@ -144,7 +144,7 @@ c       simple nul
 
          WRITE(6,203)lg(2)
   203    format(/'Number of nodes on the segment which connects the X',
-     .     '-point to the left plate:'/'segment length = ',f7.5)
+     .     '-point to the left plate:'/'segment length = ',f8.5)
          READ(5,*)nptseg(2)
 
          WRITE(6,201)
@@ -154,7 +154,7 @@ c       simple nul
          READ(5,*)deltpn(2)
 
          write(6,206)lg(3)
-  206    format(/'Number of nodes on the loop:'/'length = ',f7.5)
+  206    format(/'Number of nodes on the loop:'/'length = ',f8.5)
          READ(5,*)nptseg(3)
 
          WRITE(6,201)
@@ -177,9 +177,9 @@ c       simple nul
   210    format(//'Number of nodes in the radial direction for',
      .     ' region 1 (SOL):')
          write(6,211)distnv(1,1)
-  211    format('total distance =',f8.6)
+  211    format('total distance =',f9.6)
          write(6,212)distnv(2,1)
-  212    format('total variation in psi',f8.6)
+  212    format('total variation in psi',f9.6)
          READ(5,*)npr(1)
 
          WRITE(6,213)
@@ -206,7 +206,7 @@ c       simple nul
 
          WRITE(6,220)distxo
   220    format(/'Number of nodes in region 3 (interior) and'
-     .     ,' penetration:'/'maximum penetration =',f10.8)
+     .     ,' penetration:'/'maximum penetration =',f11.8)
          READ(5,*)npr(3),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -225,7 +225,7 @@ c       simple nul
             difpsi = fctfin - fctini
 
             WRITE(6,121)difpsi
-  121       FORMAT(/'delta-psi =', F8.6)
+  121       FORMAT(/'delta-psi =', F9.6)
 
          ENDIF
 
@@ -258,7 +258,7 @@ c       simple nul
          WRITE(6,230)lg(1)
   230    format(/'Connected double-null geometry'//
      .   'Number of nodes on segment connecting X-point to right plate:'
-     .   /'length = ',f7.5)
+     .   /'length = ',f8.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,201)
@@ -278,7 +278,7 @@ c       simple nul
 
          WRITE(6,233)lg(3)
   233    format(/'Number of nodes on segment which connects X-points',
-     .   ' by the right'/'length of segment = ',f7.5)
+     .   ' by the right'/'length of segment = ',f8.5)
          READ(5,*)nptseg(3)
 
          WRITE(6,201)
@@ -289,7 +289,7 @@ c       simple nul
 
          WRITE(6,236)lg(4)
   236    format(/'Number of nodes on segment which connects X points',
-     .   ' by the left'/'length of segment = ',f7.5)
+     .   ' by the left'/'length of segment = ',f8.5)
          READ(5,*)nptseg(4)
 
          WRITE(6,201)
@@ -300,7 +300,7 @@ c       simple nul
 
          WRITE(6,240)lg(5)
   240    format(/'Number of points on segment which connects bottom',
-     .   ' X-point to lower right plate:'/'segment length = ',f7.5)
+     .   ' X-point to lower right plate:'/'segment length = ',f8.5)
          READ(5,*)nptseg(5)
 
          WRITE(6,201)
@@ -311,7 +311,7 @@ c       simple nul
 
          WRITE(6,244)lg(6)
   244    format(/'Number of nodes on segment which connects bottom',
-     .   ' X-point to lower left plate:'/'segment length = ',f7.5)
+     .   ' X-point to lower left plate:'/'segment length = ',f8.5)
          READ(5,*)nptseg(6)
 
          WRITE(6,201)
@@ -381,7 +381,7 @@ c       simple nul
 
          WRITE(6,264)distxo
   264    format(/'Number of nodes in region 5 (interior) and'
-     .     ,' penetration:'/'maximum penetration = ',f10.8)
+     .     ,' penetration:'/'maximum penetration = ',f11.8)
          READ(5,*)npr(5),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -433,7 +433,7 @@ c       simple nul
          WRITE(6,270)lg(1)
   270    format(/'Disconnected double-null geometry'//
      .   'Number of nodes on segment connecting upper X-point to'/
-     .   ' upper right plate:'/'segment length = ',f7.5)
+     .   ' upper right plate:'/'segment length = ',f8.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,201)

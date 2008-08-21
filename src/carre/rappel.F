@@ -100,11 +100,11 @@ c======================================================================
       if(sellan(1:8).eq.'francais') then
         write(iusor,134) nreg,distxo
   134   FORMAT(//T10,'REGION CENTRALE: region i=',T37,I1,T43,
-     .       'pntrat max.=',F10.8)
+     .       'pntrat max.=',F11.8)
       elseif(sellan(1:7).eq.'english') then
         write(iusor,234) nreg,distxo
   234   FORMAT(//T10,'CENTRAL REGION: region i=',T37,I1,T43,
-     .       'pntrat max.=',F10.8)
+     .       'pntrat max.=',F11.8)
       endif
 
       IF (repart .EQ. 1) THEN
@@ -159,7 +159,7 @@ c======================================================================
   158    FORMAT(/T2,A9,T16,A9,T31,A9,T46,A9/75('='))
 
          write(iusor,160) tgarde(1),tgarde(2),tgarde(3),tgarde(4)
-  160    FORMAT(T2,F7.5,T17,F7.5,T32,F7.5,T47,F7.5)
+  160    FORMAT(T2,F8.5,T17,F8.5,T32,F8.5,T47,F8.5)
       ENDIF
 
 c  Impression des parametres servant au calcul de la maille orthogonale
@@ -178,7 +178,7 @@ c  par relaxation
      .    'nrelax',t15,'relax',t30,'pasmin',t45,'rlcept')
       endif
       write(iusor,164)nrelax,relax,pasmin,rlcept
- 164  format(t2,i5,t15,f5.3,t30,1pe10.3,t45,1pe10.3)
+ 164  format(t2,i5,t15,f6.3,t30,1pe10.3,t45,1pe10.3)
 
 cxpb  Verifier que les valeurs presentees sont correctes
 

@@ -1,6 +1,5 @@
       subroutine limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot,
-     .    nbniv,nx,ny,x,y,psi,npx,ptx,pty,
-     .    iptx,jptx,fctpx,separx,separy,nptot,
+     .    nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx,
      .    nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef,
      .    a00,a10,a01,a11)
 c
@@ -10,7 +9,7 @@ c======================================================================
 c  This routine finds the innermost point of the limitor. It defines
 c  (ptx,pty), the coordinates of the X-point, to be the coordinates of
 c  that point. Finally, it parametrises the separatrix (the flux surface
-c  which goes through (ptx,pty) in curve separx(*,1,1),separy(*,1,1).
+c  which goes through (ptx,pty) in curve nivx(*,1,1),nivy(*,1,1).
 c======================================================================
       implicit none
 
@@ -20,15 +19,14 @@ cank-970707: dimensions from the file
 
 c  arguments
       INTEGER nivtot(*),nbniv,
-     .  nx,ny,npx,iptx(npx),jptx(npx),
-     .  nptot(4,npxmx),nstruc,npstru(strumx),
+     .  nx,ny,npx,
+     .  nstruc,npstru(strumx),
      .  indplq(4,npxmx),inddef(nbdmx),nbdef
       REAL*8 xpto,ypto,nivx(npnimx,*),nivy(npnimx,*),stp0,stpmin,
      .  distnv(5,*),a00(nxmax,nymax,3),a10(nxmax,nymax,3),
      .  a01(nxmax,nymax,3),a11(nxmax,nymax,3),
      .  x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx),
-     .  fctpx(npxmx),separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
-     .  xstruc(npstmx,strumx),ystruc(npstmx,strumx)
+     .  fctpx(npxmx),xstruc(npstmx,strumx),ystruc(npstmx,strumx)
 c
 c  local variables
       real*8 zero

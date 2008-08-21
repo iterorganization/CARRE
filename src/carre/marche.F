@@ -34,8 +34,8 @@ cank-970707: dimensions from the file
 
 *  variables locales
       INTEGER ii,jj,dir,k,j,repart,ind1,ind2,ind3,indstr
-      REAL*8 const1,un
-      PARAMETER (const1=1.E-08,un=1.)
+      REAL*8 const1
+      PARAMETER (const1=1.E-08)
       REAL*8 pas,x1,y1,x2,y2,psi1,psi2,pastmp,ecart1,ecart2,
      .       niv1x(npnimx),niv1y(npnimx)
       LOGICAL echec,coin,ouvert

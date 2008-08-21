@@ -95,7 +95,7 @@ c* 5.   Write the translated mesh to the output file
      .  nrmamx)
       elseif(isel.eq.2) then
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
-     .    r,z,nreg,nppol,nprad,npmamx,nrmamx,nregmx,
+     .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
      ,	  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb,
@@ -103,7 +103,7 @@ c* 5.   Write the translated mesh to the output file
         call ecrim2(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
       elseif(isel.eq.3) then
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
-     .    r,z,nreg,nppol,nprad,npmamx,nrmamx,nregmx,
+     .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
      ,	  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb,
@@ -114,7 +114,7 @@ c* 5.   Write the translated mesh to the output file
 c*** B2-Sonnet-DG format
 
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
-     .    r,z,nreg,nppol,nprad,npmamx,nrmamx,nregmx,
+     .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
      ,	  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
 c<<<

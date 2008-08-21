@@ -1,4 +1,4 @@
-      SUBROUTINE DOUBLD(bouclx,boucly,mailx,maily,xn1,yn1,nn1,pas,nppol,
+      SUBROUTINE DOUBLD(bouclx,boucly,xn1,yn1,nn1,pas,
      .  nprad,plaque,xext,yext,xptxex,yptxex,xpto,ypto,nx,ny,x,y,
      .  psi,nstruc,npstru,xstruc,ystruc,a00,a10,a01,
      .  a11,repart,xcrb2,ycrb2,npcrb2)
@@ -32,14 +32,14 @@ cank-970707: dimensions from the file
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),
-     .        nn1,nppol,nprad,plaque,repart,npcrb2
+     .        nn1,nprad,plaque,repart,npcrb2
 
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
      .     ystruc(npstmx,nstruc),bouclx,boucly,xptxex,yptxex,xn1(nn1),
      .     yn1(nn1),pas(nrmamx),xext,yext,a00(nxmax,nymax,3),
      .     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3),
      .     xcrb2(npcrb2),ycrb2(npcrb2),
-     .     mailx(npmamx,nprad),maily(npmamx,nprad),xpto,ypto
+     .     xpto,ypto
 
 *  variables en common
 
@@ -98,8 +98,6 @@ c*** Output
 c.. boucl[xy]: coordinates of the splitting point on the separatrix
 c..            loop (???)
 
-c*** Not used
-c.. mailx, maily
 c======================================================================
 *
 *..calculs
@@ -109,10 +107,10 @@ cc<<<
 c      l_dbg=n_call.le.4
 c      if(l_dbg) then
 c        write(0,*) '===> Entering doubld. n_call = ',n_call
-c        write(0,'(1x,2a5,7a7,a9,3a12)') 'nx','ny','nstruc','nn1',
-c     ,        'nppol','nprad','plaque','npcrb2','repart',
+c        write(0,'(1x,2a5,6a7,a9,3a12)') 'nx','ny','nstruc','nn1',
+c     ,        'nprad','plaque','npcrb2','repart',
 c     ,        'xext','yext','xptxex','yptxex'
-c        write(0,'(1x,2i5,7i7,1p,4e12.4)') nx,ny,nstruc,nn1,nppol,nprad,
+c        write(0,'(1x,2i5,6i7,1p,4e12.4)') nx,ny,nstruc,nn1,nprad,
 c     ,                     plaque,npcrb2,repart,xext,yext,xptxex,yptxex
 c        write(0,'(1x,a6,1p,8e12.4/(7x,8e12.4))') 'pas: ',
 c     ,                                               (pas(i),i=1,nprad)
