@@ -114,7 +114,7 @@ c======================================================================
 
          write(iusor,140)pntrat,npr(nreg),deltr1(i),deltrn(i),drmin(i),
      .            drmax(i)
-  140    FORMAT(/T2,F6.4,T9,I3,T15,1p4E12.4)
+  140    FORMAT(/T2,F6.3,T9,I3,T15,1p4E12.4)
 
       ELSE IF (repart .EQ. 2) THEN
 
@@ -130,7 +130,7 @@ c======================================================================
 
          write(iusor,150)pntrat,npr(nreg),difpsi,deltr1(nreg),
      .      deltrn(nreg),drmin(nreg),drmax(nreg)
-  150    FORMAT(T2,F6.4,T9,I3,T15,1p5E12.4)
+  150    FORMAT(T2,F6.3,T9,I3,T15,1p5E12.4)
 
       ENDIF
 
@@ -151,7 +151,7 @@ c======================================================================
   154    FORMAT(/T2,A9,T16,A9/75('='))
 
          write(iusor,156) tgarde(1),tgarde(2)
-  156    FORMAT(T2,F7.5,T17,F7.5)
+  156    FORMAT(T2,F8.5,T17,F8.5)
 
       ELSE
 

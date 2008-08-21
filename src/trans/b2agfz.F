@@ -187,7 +187,7 @@ c*** nominal magnetic field and major radius
         rewind(17)
         read(17,*,err=10) b0r0
         close(17)
-        ex= b0r0 .ne. 0.                                                ! DPC
+        ex= b0r0 .ne. 0.                                   ! DPC
         if(.not.ex) write(6,*) 'Zero value of Btor*R "in btor.dat"'   	! }
       else    	! {
         write(*,*) 'No file btor.dat found.'  	  ! }
@@ -581,7 +581,7 @@ c*** Check them for consistency
           do i=1,2      ! {
             do j=1,3    	! {
               if(nqp(i,j,1).ne.nqp(i,j,2) .or.
-     .                                   nqp(i,j,1).ne.nqp(i,j,3)) then  ! {
+     .           nqp(i,j,1).ne.nqp(i,j,3)) then  ! {
                 kk=j
                 if(i.eq.2 .and. kk.ne.2) kk=4-kk
                 write(0,*) 'Inconsistent poloidal grid dimensions. ',
@@ -598,7 +598,7 @@ c*** Check them for consistency
   
             do k=1,3    	! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
-     .                                   nqr(i,1,k).ne.nqr(i,3,k)) then ! {
+     .           nqr(i,1,k).ne.nqr(i,3,k)) then ! {
                 write(0,*) 'Inconsistent radidal grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
@@ -817,7 +817,7 @@ c*** Check them for consistency
   
             do k=1,3    	! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
-     .                                   nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
+     .           nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
                 write(0,*) 'Inconsistent radidal grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
@@ -996,7 +996,7 @@ c<<<
 c>>>
 c---------------------------------------------------------------------- ! }
       else if(index(equtype,'sn-down').gt.0 .or. 
-     .                                index(equtype,'sn-up').gt.0) then ! {
+     .        index(equtype,'sn-up').gt.0) then ! {
 c----------------------------------------------------------------------
 c  construct the mesh for the bottom single null geometry
 
