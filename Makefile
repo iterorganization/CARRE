@@ -1,7 +1,7 @@
 #  VERSION : 27.07.97 22:41
 
 SHELL	= /bin/sh
-CPPi	= /usr/lib/cpp
+CPP	= /usr/lib/cpp
 
 VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
 INCLUDE = -Isrc/include
