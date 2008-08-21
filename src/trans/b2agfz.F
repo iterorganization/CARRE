@@ -1284,8 +1284,9 @@ c======================================================================
 c*** Rearrange the mesh if needed, in order to have a right-handed
 c*** system of coordinates
 
-      if( (crx(1,1,1)-crx(1,1,0))*(cry(1,1,2)-cry(1,1,0)) -
-     -    (crx(1,1,2)-crx(1,1,0))*(cry(1,1,1)-cry(1,1,0)).lt.zero) then ! {
+      if( 
+     . (crx(1,1,1)-crx(1,1,0))*(cry(1,1,2)-cry(1,1,0)) -
+     - (crx(1,1,2)-crx(1,1,0))*(cry(1,1,1)-cry(1,1,0)).lt.zero) then ! {
 cc<<<
 c       write(0,*) 'changing the grid orientation...'
 cc>>>

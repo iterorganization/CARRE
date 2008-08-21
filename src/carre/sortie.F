@@ -93,10 +93,10 @@ c
   100    FORMAT('repart =',I2)
 
          WRITE(10,1015)distxo
- 1015    FORMAT('distxo =',F10.8)
+ 1015    FORMAT('distxo =',F11.8)
 
          WRITE(10,101)pntrat
-  101    FORMAT('pntrat =',F10.8)
+  101    FORMAT('pntrat =',F11.8)
 
          DO 10 isep=1, nsep
             WRITE(10,102)isep,nptseg(isep),isep,deltp1(isep),isep,
@@ -114,7 +114,7 @@ c
 
          DO 25 i=1, 2
             WRITE(10,104)i,tgarde(i)
-  104       FORMAT('tgarde(',I1,') =',F7.5)
+  104       FORMAT('tgarde(',I1,') =',F8.5)
    25    CONTINUE
 
          IF (nsep .GT. 3) THEN
