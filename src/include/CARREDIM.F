@@ -4,7 +4,7 @@ c
      .        nbdmx, gradmx, npmamx, nrmamx, nregmx
       parameter (nxmax=1025,  nymax=1025, npstmx=120, npnimx=3000,
      .           npxmx=4   , strumx=60  ,  nivmx=8  , nbdmx=8  ,
-     .          gradmx=50  , npmamx=500 , nrmamx=200, nregmx=6)
+     .          gradmx=100  , npmamx=500 , nrmamx=200, nregmx=6)
 c
 c======================================================================
 c***  gradmx      : max. number of points whith zero gradients (x/o)
