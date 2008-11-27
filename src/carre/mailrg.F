@@ -222,6 +222,8 @@ c***
 
 *..Il faut s'assurer que la ligne de niveau part dans la bonne
 *  direction.
+*  We must ensure that stepping along the contour line starts 
+*  in the right direction
 
          ecart1=SQRT((x2 - xstruc(ind,plaque))**2 +
      .               (y2 - ystruc(ind,plaque))**2)
