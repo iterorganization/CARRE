@@ -133,7 +133,8 @@ do {
                 n=1
                 set -- $griddir/$grid_stem.[0-9][0-9][0-9]
                 [ -f $1 ] && {
-                    n=`ls $griddir/$grid_stem.[0-9][0-9][0-9] | tail -1`
+#                    n=`ls $griddir/$grid_stem.[0-9][0-9][0-9] | tail -1`
+		    n=`echo $griddir/$grid_stem.[0-9][0-9][0-9] | awk '{print $NF}'`
                     n=${n#*/$grid_stem.}
                     let "n = n + 1"
                 }
@@ -143,6 +144,10 @@ do {
                 /bin/echo -e "$n"
                 mv -f traduit.out $griddir/$grid_stem.$n && \
                   /bin/echo -e "The grid is stored as $griddir/$grid_stem.$n"
+                touch CARRE.HISTORY
+		echo $user `date +%Y-%m-%d_%H:%M:%S` >> CARRE.HISTORY
+		ls -ls dg.??? | cut -d ' ' -f 9- >> CARRE.HISTORY
+		/bin/echo -e echo "The grid is stored as $griddir/$grid_stem.$n" >> CARRE.HISTORY
                 [ -n "$stordir" ] && {
                   [ -d "$stordir" ] || {
                     [ -a "$stordir" ] && {
@@ -170,12 +175,14 @@ do {
                     [ -n "$u" ] && {
                       [ -d "$s" ] || mkdir -p "$s"
                       cp carre.dat structure.dat rzpsi.dat btor.dat "$s" && \
-                              /bin/echo -e "carre.dat, structure.dat, rzpsi.dat, and btor.dat copied to $s"
+                              /bin/echo -e "carre.dat, structure.dat, rzpsi.dat, and btor.dat copied to $s" && \
+                              /bin/echo -e "carre.dat, structure.dat, rzpsi.dat, and btor.dat copied to $s" >> CARRE.HISTORY
                     }
                   }
                 }
                 q=q; true
             } || { /bin/echo -e "No traduit.out. Convert the grid first."; q=c; }
+                echo "=======================================================================================" >> CARRE.HISTORY
             break;;
     ( n|N )                                               # next job:
             /bin/echo -e "Input the new stem: \c"; read u
