@@ -291,8 +291,8 @@ c
 *
 c<<<
 	write(0,*) '=== carre *..10.0 - before frtier'
-	write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') ptx(1:npx)
-	write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') pty(1:npx)
+	write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') (ptx(i),i=1,npx)
+	write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') (pty(i),i=1,npx)
         if(limcfg.eq.0) then
 	  write(0,*) 'nptot(4,nxpoints)'
 	  write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
