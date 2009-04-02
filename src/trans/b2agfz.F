@@ -1015,10 +1015,10 @@ c***
 c
 c  test values of nprad compared to nx and ny
         if(npol1.ne.nx) then  	! {
-          write(6,*)'error in b2agfs: npol1=',npol1,' nx=',nx
+          write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
           stop	    ! }
         else if(nprad(2).ne.nprad(3)) then    	! {
-          write(6,*)'error in b2agfs: nprad(2)=',nprad(2),
+          write(6,*)'error in b2agfz: nprad(2)=',nprad(2),
      .      ' .ne. nprad(3)=',nprad(3)
           stop	    ! }
         end if
@@ -1197,7 +1197,7 @@ c***
 c
 c  test values of nprad compared to nx and ny
         if(npol1.ne.nx) then  	  ! {
-          write(6,*)'error in b2agfs: npol1=',npol1,' nx=',nx
+          write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
           stop	    ! }
         end if
 

@@ -38,11 +38,14 @@ the files carre.log and traduit.log, respectively.
 
 # griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${Model_Class-iter}}
 griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${DEVICE-iter}}
+class=$DEVICE
 indir=${CARRE_INPUTDIR-.}
 stordir=
 [ -n "$CARRE_STOREDIR" ] && stordir="$CARRE_STOREDIR/${DEVICE-iter}"
-grid_stem=carre_grid
-/bin/echo -e "griddir: $griddir\nindir: $indir\n"
+grid_stem=$class.carre
+/bin/echo -e "Store directory=" $stordir
+/bin/echo -e "Grid directory: $griddir"
+/bin/echo -e "Input directory: $indir\n"
 
 [ "$1" = '-' ] && {
     /bin/echo -e "No linking - the input files are assumed to exist in \"$indir\""
@@ -94,15 +97,12 @@ do {
   Quit    (q)   quit $script
 "; break;;
     ( p|P )                                               # prepare input from DG output:
-            class=$DEVICE
             [ -L dg.trg ] && { \
                 class=`lln dg.trg`
                 class=${class%/*}
                 class=${class##*/}
             }
             griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/$class}
-            indir=.
-            grid_stem=$class.carre
             [ -n "$CARRE_STOREDIR" ] && stordir="$CARRE_STOREDIR/$class"
 
             /bin/echo -e "class = $class\ngriddir = $griddir\nindir = $indir\ngrid_stem = $grid_stem"
@@ -296,3 +296,5 @@ do {
     esac;}
   }; done
 }; done
+stty sane
+

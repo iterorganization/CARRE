@@ -106,7 +106,13 @@ c
       call cprect(y,nxmax,n1,n2,rwrk,5000,iwrk,1000)
       call cpcldr(y,rwrk,iwrk)
 c
-      call endpag
+cnba  The 'endpag' call below is moved to the end of the 'selptx' routine
+cnba  for simultaneous visualization of the dpsi/d. = 0 lines and the
+cnba  selection of X- and O-points.
+cnba  L'appel a 'endpag' est deplace a la fin de la routine 'selptx' de
+cnba  facon a ce qu'on puisse voir les lignes de derivee nulle en meme
+cnba  temps que l'utilisateur chiosit les points X et O.
+cnba  call endpag
 c
       return
       end

@@ -85,15 +85,24 @@ c* 4.   Select the output format
       write(6,*) '2: format B2.5'
       write(6,*) '3: format SONNET-DIVIMP'
       write(6,*) '4: format DG-SONNET-B2-EIRENE'
+      write(6,*) '5: revised DIVIMP with'//
+     > ' grid parameters and PSI values'
       read(5,*) isel
       write(6,*) 'The format chosen is :',isel
 
 c* 5.   Write the translated mesh to the output file
-
+c
+c Mailtri format
+c
       if(isel.eq.1) then
+c
         call ecrim1(nout,nfin,r,z,nptseg,nreg,nppol,nprad,npmamx,
      .  nrmamx)
+c
+c B2.5 Format
+c
       elseif(isel.eq.2) then
+c
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
      .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
@@ -101,7 +110,11 @@ c* 5.   Write the translated mesh to the output file
         call b2agbb (nx,ny,fpsi,ffbz,bb,
      .    crx,cry,psidx,psidy,nxmx,nymx)
         call ecrim2(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
+c
+c Original SONNET/DIVIMP format
+c
       elseif(isel.eq.3) then
+c
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
      .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
@@ -109,10 +122,11 @@ c* 5.   Write the translated mesh to the output file
         call b2agbb (nx,ny,fpsi,ffbz,bb,
      .    crx,cry,psidx,psidy,nxmx,nymx)
         call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
-      elseif(isel.eq.4) then
-
+c
 c*** B2-Sonnet-DG format
-
+c
+      elseif(isel.eq.4) then
+c
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
      .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
@@ -130,8 +144,22 @@ c>>>
 c<<<
 c        write(0,*) 'after ecrim4'
 c>>>
+c
+c Revised DIVIMP format with additional grid information and PSI values
+c
+      elseif(isel.eq.5) then
+c
+        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
+     .   r,z,nreg,nppol,nprad,npmamx,nrmamx,
+     .   nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
+     ,   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+        call b2agbb (nx,ny,fpsi,ffbz,bb,
+     .   crx,cry,psidx,psidy,nxmx,nymx)
+c jdemod - added fpsi to call to ecrim5
+        call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
+c
       else
-        write(6,*) 'Wrong value (must be 1 to 4): isel=',isel
+        write(6,*) 'Wrong value (must be 1 to 5): isel=',isel
         stop
       endif
 c======================================================================

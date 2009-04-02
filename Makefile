@@ -23,8 +23,8 @@ $(OBJECTCODE)/%.o : %.F
 	- /bin/rm -f ${OBJECTCODE}/$*.f
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f; \
 	case $< in \
-		src/trans/* ) $(COMPILE) $(DBLPAD) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
-		       *    ) $(COMPILE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
+		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
+		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 

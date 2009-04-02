@@ -384,5 +384,10 @@ cank-970701
          racord = .FALSE.
       end if
 
+cnba  The 'endpag' call below closes the graphics window opened by 'cntour'.
+cnba  L'appel a 'endpag' ci-dessous ferme la fenetre graphique ouverte par 
+cnba  'cntour'.
+      call endpag
+
       RETURN
       END
