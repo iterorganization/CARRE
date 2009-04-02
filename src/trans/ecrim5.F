@@ -54,13 +54,17 @@ c       of the polygon on which these cuts occur
       enddo
 c
       write(6,*)'warning in ecrim5: unable to find two cuts'
-      write(6,*)'cut1, cut2=',cut1,cut2
+      write(6,*)'cut1, cut2=',cut1,cut2+1
 c
  10   continue
       cutrgn=iy+1
 c
 c  2.   print grid characteristics
-      write(0,104)ny,nx,cutrgn,cut1,cut2
+c
+cjde   DIVIMP expects cut1 and cut2 as polygon indices of the cells in the PFZ
+cjde  - past the cuts - thus add one to cut2
+c
+      write(0,104)ny,nx,cutrgn,cut1,cut2+1
  104  format('''DIV  - grid characteristics: Number of Rings     ''',i7/
      .       '''                             Number of Knots     ''',i7/
      .       '''                             Cut ring            ''',i7/
@@ -78,8 +82,10 @@ c  3.   print mesh parameters
  100  format(3x,'Element output:'///
      .  3x,'=================================================='
      .    ,'======================================')
-      do iy=0,ny-1
-      do ix=0,nx-1
+cjde  We wish to include boundary cells
+cjde  thus the indices run from -1 to nx and -1 to ny
+      do iy=-1,ny
+      do ix=-1,nx
         icell=icell+1
 c  2.1  calculate coordinates of cell centre
         x0=0.25*(crx(ix,iy,0)+crx(ix,iy,1)+crx(ix,iy,2)+crx(ix,iy,3))
