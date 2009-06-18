@@ -1,8 +1,8 @@
-FC		= f95i -v 9.1
+FC		= f95i
 CPP		= /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -O -C -d10
+FFLAGS		= -g -O -C
 else
 FFLAGS		= -O3 -tpp7
 endif
