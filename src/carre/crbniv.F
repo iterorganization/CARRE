@@ -192,13 +192,13 @@ cdps-20051115 Part of the above change.
      .                 yt(1,1),nt(1)))  THEN
                k=k-1
                write(6,*)'Erreur dans crbniv, travers.',
-     .           ' Pas sense traverser de courbe'
+     .           ' Pas cense traverser de courbe'
                call pltend
                STOP
             ELSE IF (trvers2) THEN 
                 k=k-1
                 write(6,*)'Erreur dans crbniv, travers.',
-     .            ' Pas sense traverser de courbe'
+     .            ' Pas cense traverser de courbe'
                 call pltend
                 STOP
             ELSE
