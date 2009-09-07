@@ -23,6 +23,7 @@ c======================================================================
 *  variables locales
       INTEGER n,ind1,ind2,ii,jj, compt
       REAL*8 zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
+      REAL*8 fracx,fracy
       PARAMETER (psimin=1.E-08,psimi2=1.E-07)
       logical l_dbg
       integer n_call
@@ -153,9 +154,83 @@ cc>>>
 c---------------------------------------------------------------------{
    10   CONTINUE
 
-        x3 = MIN(MAX(xst(ind2),x(1)),x(nx))
-        y3 = MIN(MAX(yst(ind2),y(1)),y(ny))
-
+cxpb  We make sure that the end of the structure lies within the 
+cxpb  rectangle where the psi function is defined. Otherwise we
+cxpb  must find the point where the structure exits this rectangle.
+        if (xst(ind2).ge.x(1) .and. xst(ind2).le.x(nx)) then
+          if (yst(ind2).ge.y(1) .and. yst(ind2).le.y(ny)) then
+            x3 = xst(ind2)
+            y3 = yst(ind2)
+          else if (yst(ind2).lt.y(1)) then
+            x3 = x1+(xst(ind2)-x1)*(y1-y(1))/(y1-yst(ind2))
+            y3 = y(1)
+          else if (yst(ind2).gt.y(ny)) then
+            x3 = x1+(xst(ind2)-x1)*(y(ny)-y1)/(yst(ind2)-y1)
+            y3 = y(ny)
+          endif
+        else if (xst(ind2).lt.x(1)) then
+          if (yst(ind2).ge.y(1) .and. yst(ind2).le.y(ny)) then
+            x3 = x(1)
+            y3 = y1+(yst(ind2)-y1)*(x1-x(1))/(x1-xst(ind2))
+          else if (yst(ind2).lt.y(1)) then
+            fracx = (x1-x(1))/(x1-xst(ind2))
+            fracy = (y1-y(1))/(y1-yst(ind2))
+            if (fracx.lt.fracy) then
+              x3 = x(1)
+              y3 = y1+(yst(ind2)-y1)*fracx
+            else if (fracx.eq.fracy) then
+              x3 = x(1)
+              y3 = y(1)
+            else if (fracx.gt.fracy) then
+              x3 = x1+(xst(ind2)-x1)*fracy
+              y3 = y(1)
+            endif
+          else if (yst(ind2).gt.y(ny)) then
+            fracx = (x1-x(1))/(x1-xst(ind2))
+            fracy = (y(ny)-y1)/(yst(ind2)-y1)
+            if (fracx.lt.fracy) then
+              x3 = x(1)
+              y3 = y1+(yst(ind2)-y1)*fracx
+            else if (fracx.eq.fracy) then
+              x3 = x(1)
+              y3 = y(ny)
+            else if (fracx.gt.fracy) then
+              x3 = x1+(x1-x(1))*fracy
+              y3 = y(ny)
+            endif
+          endif
+        else if (xst(ind2).gt.x(nx)) then
+          if (yst(ind2).ge.y(1) .and. yst(ind2).le.y(ny)) then
+            x3 = x(nx)
+            y3 = y1+(yst(ind2)-y1)*(x(nx)-x1)/(xst(ind2)-x1)
+          else if (yst(ind2).lt.y(1)) then
+            fracx = (x(nx)-x1)/(xst(ind2)-x1)
+            fracy = (y1-y(1))/(y1-yst(ind2))
+            if (fracx.lt.fracy) then
+              x3 = x(nx)
+              y3 = y1+(y1-yst(ind2))*fracx
+            else if (fracx.eq.fracy) then
+              x3 = x(nx)
+              y3 = y(1)
+            else if (fracx.gt.fracy) then
+              x3 = x1+(x(nx)-x1)*fracy
+              y3 = y(1)
+            endif
+          else if (yst(ind2).gt.y(ny)) then
+            fracx = (x(nx)-x1)/(xst(ind2)-x1)
+            fracy = (y(ny)-y1)/(yst(ind2)-y1)
+            if (fracx.lt.fracy) then
+              x3 = x(nx)
+              y3 = y1+(yst(ind2)-y1)*fracx
+            else if (fracx.eq.fracy) then
+              x3 = x(nx)
+              y3 = y(ny)
+            else if (fracx.gt.fracy) then
+              x3 = x1+(x(nx)-x1)*fracy
+              y3 = y(ny)
+            endif
+          endif
+        endif            
 
         ii = ifind(x3,x,nx,1)
         jj = ifind(y3,y,ny,1)
