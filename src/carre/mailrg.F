@@ -413,8 +413,8 @@ c       meilleure orthogonalite possible
      .          '4) Un critere d''orthogonalite moins strict, '//
      .           'actuellement rlcept = ',rlcept
                print*,
-     .          '5) Des longueurs de garde plus importantes, '//
-     .           'actuellement tgarde = ',garde1,garde2
+     .          '5) Des longueurs de garde plus importantes '//
+     .           '(ou nulles), actuellement tgarde = ',garde1,garde2
                print*,
      .          'Voulez-vous continuer (o/n) ?'
              elseif(sellan(1:7).eq.'english') then
@@ -436,7 +436,7 @@ c       meilleure orthogonalite possible
      .          '4) A less stringent orthogonality criterion, '//
      .           'currently rlcept = ',rlcept
                print*,
-     .          '5) Longer guard lengths, '//
+     .          '5) Longer (or zero) guard lengths, '//
      .           'currently tgarde = ',garde1,garde2
                print*,
      .          'Do you wish to continue (y/n) ?'

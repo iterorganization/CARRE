@@ -215,6 +215,26 @@ cxpb  Verifier que les valeurs presentees sont correctes
      .        T2,'You need more than 2 points on this segment!')
           endif
         endif
+        if (abs(dpmin(i)).lt.pasmin .or.
+     .      abs(dpmax(i)).lt.pasmin) then
+          correct = .false.
+          if(sellan(1:8).eq.'francais') then
+            WRITE(6,2821) i, dpmin(i), dpmax(i), pasmin
+ 2821       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'//
+     .   T2,
+     .   'Les nombres dpmin et dpmax doivent etre superieurs a pasmin'//
+     .   ' en valeur absolue.'//
+     .   T2,'Modifiez deltp1, deltpn or pasmin en consequence.'//
+     .   T2,'dpmin,dpmax,pasmin = ',1p,3(1e11.4,1x))
+          elseif(sellan(1:7).eq.'english') then
+            WRITE(6,2820) i, dpmin(i), dpmax(i), pasmin
+ 2820       FORMAT(//T2,'Invalid data for segment',i2,'!'//
+     .   T2,'The numbers dpmin and dpmax must be larger than pasmin'//
+     .      ' in absolute value.'//
+     .   T2,'Modify deltp1, deltpn or pasmin accordingly.'//
+     .   T2,'dpmin,dpmax,pasmin = ',1p,3(1e11.4,1x))
+          endif
+        endif
       enddo
       do i = 1, nreg-1
         if (drmin(i)*drmax(i).le.0.0 .or.
