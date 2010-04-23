@@ -13,8 +13,8 @@ DBLPAD		= --dbl
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-#NCAR	 	= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib -lX11 -lm ${NCARG_ROOT}/BD/*.o
+#NCAR	 	= ${NCARG} ${NCARG_ROOT}/BD/*.o
 LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib
-#LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -lX11 -lm -lmscl ${NCARG_ROOT}/BD/*.o
+#LDFLAGS 	= ${NCARG} -lmscl ${NCARG_ROOT}/BD/*.o
 LDFLAGS 	= -lX11 -lm -lmscl 
 DUMMY           = $(OBJECTCODE)/bidon.o 

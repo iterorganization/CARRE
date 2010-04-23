@@ -19,5 +19,6 @@ COMPILE 	= ${FC} -c ${FFLAGS}
 
 # LDLIBS	= -Wl,-L${SOLPS_LIB} -Wl,-L${SOLPSMASTER}/@sys/lib -Wl,-L/usr/local/lib
 LDLIBS		= -Wl,-L${SOLPS_LIB} -Wl,-L${NCARG_ROOT}/lib -Wl,-L/usr/lib/X11R5
-LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -lncarg_loc -lmach -lX11 -lm
+#LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -lncarg_loc -lmach -lX11 -lm
+LDFLAGS 	= ${NCARG} -lmach
 LDEXTRA 	= 
