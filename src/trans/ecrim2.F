@@ -10,12 +10,12 @@ c======================================================================
 c
 c  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  bb(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
       integer ix,iy
-      real x0,y0
+      real*8 x0,y0
 c
 c  procedures
 c======================================================================

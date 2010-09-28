@@ -5,7 +5,7 @@ c
 c======================================================================
 c*** Converts the dg data into the input files for Carre
 c======================================================================
-c      implicit none
+      implicit none
 #include <impcon.inc>
       logical ex
       character*14 chtrg,chstr,chequ,chaux,chdgo,

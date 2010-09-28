@@ -13,15 +13,15 @@ c
 c
 c  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  bb(-1:nxmax,-1:nymax,0:3),b0r0
-      real fpsi(-1:nxmax,-1:nymax,0:3)
+      real*8 fpsi(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real x0,y0,brat
-      real psitarg
-      real psimin_carre
+      real*8 x0,y0,brat
+      real*8 psitarg
+      real*8 psimin_carre
 c
 c     Read in the rzpsi.dat file to get the reference PSI values - in particular
 c     the minimum value of PSI on the grid. 
@@ -163,7 +163,7 @@ c
       subroutine get_psimin_carre(psimin_carre)
       implicit none
       include 'CARREDIM.F'
-      real psimin_carre
+      real*8 psimin_carre
       
       character lign80*80
       integer nx,ny,i,j

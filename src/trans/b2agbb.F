@@ -9,11 +9,11 @@ c======================================================================
 c======================================================================
 *   ..input arguments (unchanged on exit)
       integer nx, ny,nxmax,nymax
-      real fpsi(-1:nxmax,-1:nymax,0:3), ffbz(-1:nxmax,-1:nymax,0:3)
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real*8 fpsi(-1:nxmax,-1:nymax,0:3), ffbz(-1:nxmax,-1:nymax,0:3)
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3)
 *   ..output arguments (unspecified on entry)
-      real bb(-1:nxmax,-1:nymax,0:3)
+      real*8 bb(-1:nxmax,-1:nymax,0:3)
 
 *-----------------------------------------------------------------------
 *.documentation

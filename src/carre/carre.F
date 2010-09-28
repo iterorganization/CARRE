@@ -263,10 +263,10 @@ c
      .      iptx,jptx,fctpx,separx,separy,nptot,
      .      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef,
      .      a00,a10,a01,a11)
+
 *
 *..9.0  Arrange the separatrices
 *
-
         CALL ARGSEP(npx,ptx,pty,fctpx,separx,separy,indplq,nptot,npnimx,
      .            ptsep,racord,ptxint,ypto,nbdef,inddef)
 
@@ -298,9 +298,9 @@ c<<<
 	  write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
 	  write(0,*) 'Strike points (presumably)'
 	  write(0,'(3h x:,1p,8e12.4/(3x,8e12.4))')
-     -	   ((separx(nptot(i,j),i,j),i=1,4),j=1,npx)
+     -     ((separx(nptot(i,j),i,j),i=1,4),j=1,npx)
 	  write(0,'(3h y:,1p,8e12.4/(3x,8e12.4))')
-     -	   ((separy(nptot(i,j),i,j),i=1,4),j=1,npx)
+     -     ((separy(nptot(i,j),i,j),i=1,4),j=1,npx)
 c>>>
           call trc_stk_in('carre','*..10.0')
           CALL FRTIER(nx,ny,x,y,psi,nstruc,
@@ -311,8 +311,25 @@ c>>>
           call trc_stk_out
         endif
 
+*..10.0  Set up the virtual structure
+
+*..10.1  Set up virtual targets
+
+        CALL VIRTUALTARGETS(nx,ny,x,y,psi,npx,ptx,pty,
+     .      fctpx,separx,separy,nptot,
+     .      nstruc,npstru,xstruc,ystruc,indplq,nbdef,
+     .      a00,a10,a01,a11)
+
+*..10.2  Set up virtual limiters
+
+        call VIRTUALLIMITERS(
+
+*..10.3  Redo steps 
+
+
+
 *
-*..11.0  Grid the regions
+*..12.0  Grid the regions
 *
 
         CALL MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord,
@@ -328,7 +345,7 @@ c        if (npx.EQ.1) CALL WARNINGS(separx,separy,nivx,nivy,
 c     &  distnv(1,2),xpto,ypto)
 
 *
-*..12.0  Plot the structures, the separatrices, and the limiting level
+*..13.0  Plot the structures, the separatrices, and the limiting level
 *        lines for each region, together with the resulting grid
 *
 

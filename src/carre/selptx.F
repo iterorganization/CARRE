@@ -109,10 +109,10 @@ c*** Check whether the point specification file is present
  10     continue
         open(lun,file='selptx.inf',err=12)
         rewind(lun)
-        read(lun,*,err=14) xpttol
-        read(lun,*,err=14) nptx
+        read(lun,*,err=14) xpttol ! x-point identification tolerance
+        read(lun,*,err=14) nptx   ! number of x-points specified in file
         ex=nptx.le.nptxm
-        if(ex) then
+        if(ex) then               ! if at most nptxm x-points given in file continue, else error
           nptx=max0(nptx,0)
           do i=1,nptx
             read(lun,*,err=14) xptxm(i),yptxm(i)

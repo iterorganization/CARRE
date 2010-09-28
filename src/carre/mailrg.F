@@ -308,7 +308,7 @@ c***
 
    17    CONTINUE
 
-*..Definition de xn2 et yn2 pour le bloc common comort.
+*..Definition de xn2 et yn2 pour le bloc common comfort.
 
          DO 18 ipas=1,nn(inouv)
             xn2(ipas)=xn(ipas,inouv)

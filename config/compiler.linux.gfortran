@@ -1,0 +1,16 @@
+FC		= gfortran
+CPP		= /lib/cpp -C -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS		= -g -O -C
+else
+FFLAGS		= -O3 
+endif
+
+DBLPAD		= -Ad 
+
+COMPILE 	= ${FC} -c ${FFLAGS}
+
+LDLIBS		= -L${SOLPS_LIB}
+LDFLAGS 	= ${NCARG} -lmscl
+LDEXTRA 	= 

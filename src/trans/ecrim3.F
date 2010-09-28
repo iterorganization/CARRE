@@ -8,12 +8,12 @@ c              is kept !
 c
 c  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  bb(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real x0,y0,brat
+      real*8 x0,y0,brat
 c
 c  procedures
 c

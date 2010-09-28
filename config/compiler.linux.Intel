@@ -1,11 +1,14 @@
-FC		= f95i
+FC		= /afs/ipp-garching.mpg.de/i386_sles9/bin/f95i
 CPP		= /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -O -C
+FFLAGS = -g -check all -check noarg_temp_created -warn all -warn interfaces -warn notruncated_source -warn nounused -gen-interfaces -debug all -p -C
+#FFLAGS		= -g -O -C
 else
-FFLAGS		= -O3 -tpp7
+FFLAGS		= -O3 
 endif
+
+FFLAGS += -module ${OBJECTCODE}
 
 DBLPAD		= -Ad 
 

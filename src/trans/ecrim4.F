@@ -15,12 +15,12 @@ c
 c  arguments
       integer i,nfin,nx,ny,nxmax,nymax,ncut,nxcut(ncut),nycut(ncut),
      ,	      niso,nxiso(niso+1)
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  bb(-1:nxmax,-1:nymax,0:3),b0r0
 c
 c  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real x0,y0,brat
+      real*8 x0,y0,brat
 c
 c  procedures
 c======================================================================

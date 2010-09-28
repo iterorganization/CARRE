@@ -6,7 +6,7 @@ c  point d'indice i2
 c
 c  arguments
       integer nelem,v(3,nelem),ncoord,i1,i2
-      real xmail(ncoord),ymail(ncoord)
+      real*8 xmail(ncoord),ymail(ncoord)
 c
 c  variables locales
       integer i,j,ielem

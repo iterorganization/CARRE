@@ -28,7 +28,7 @@ c======================================================================
       integer npolmx,nradmx,nxmax,nymax,ncutmx,nisomx
       integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10),
      ,  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx)
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3),
      .  r(npolmx,nradmx,nreg),z(npolmx,nradmx,nreg),
      .  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3),
@@ -65,7 +65,7 @@ c======================================================================
 
       integer ipol,irad,npol2g,npol2d,
      .  ireg,ix,iy,npol1,npol2,npol3,i
-      real twopi,del,zero,one,tempo
+      real*8 twopi,del,zero,one,tempo
       parameter(del=1.e-2,zero=0.,one=1.)
       logical ex
       character equtype*20

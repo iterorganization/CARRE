@@ -18,7 +18,7 @@ c  nramax: dimention declaree dans la direction radiale
 c
 c  arguments
       integer nrid,nreg,nppol(*),nprad(*),npomax,nramax
-      real r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*),
+      real*8 r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*),
      .     psidxm(npomax,nramax,*),psidym(npomax,nramax,*)
 c
 c  variables locales
