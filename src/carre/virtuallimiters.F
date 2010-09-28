@@ -1,12 +1,16 @@
-      subroutine virtuallimiters(nx,ny,x,y,psi,npx,ptx,pty,
-     .           fctpx,separx,separy,nptot,
-     .           nstruc,npstru,xstruc,ystruc,indplq,nbdef,
-     .           a00,a10,a01,a11)
+      subroutine virtuallimiters(nivx,nivy,nivtot,
+     .      nbniv)
 c
 c  version : 21.07.2000 13:38
 c
 c=======================================================================
-c*** This routine creates virtual target plates for every divertor plate
+c*** This routine creates virtual limiters.
+
+c*** One virtual limiter is created for every limiting curve.
+c*** The virtual limiters are triangles, the tip of which is placed 
+c*** in the middle of the limiting curve (measured
+c*** in physical length along the curve) and the triangle is oriented
+c*** away from the O-point
 c=======================================================================
 
       implicit none
@@ -18,13 +22,19 @@ c=======================================================================
       
 *  procedures
 
+c.. nbniv : number of the limiting level lines
+c.. nivx,nivy: coordinates of the points of the parametrised
+c              limiting level lines (point index, curve index)
+c.. nivtot: number of points for each parametrised limiting level line
+
+
 c=======================================================================
 
-* We create one virtual limiter for every limiting curve
-* The virtual limiters are triangles, the tip of which is placed 
-* in the middle of the limiting curve (measured
-* in physical length along the curve) and the triangle is oriented
-* away from the O-point
+
+
+      do iniv = 1, nbniv
 
 
 
+
+      enddo
