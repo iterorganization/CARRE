@@ -197,6 +197,9 @@ c  Look for the next point.
       CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque),
      .           x1,y1,psi1,x2,y2,pas,sens,repart,nx,ny,x,y,
      .           a00,a10,a01,a11,nxmax,nymax)
+
+!     TODO: check that we are inside the given psi range
+
 c***
 c     print*,' '
 c     print*,'pas=',pas

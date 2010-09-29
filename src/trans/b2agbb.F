@@ -68,7 +68,7 @@ c======================================================================
 
 *   ..local variables
       integer ix, iy
-      real t0,psdx,psdy,babs,pi,r0,b0
+      real*8 t0,psdx,psdy,babs,pi,r0,b0
 *   ..procedures
       intrinsic sqrt,sign
 *-----------------------------------------------------------------------

@@ -1,12 +1,10 @@
       subroutine virtualtargets(nx,ny,x,y,psi,npx,ptx,pty,
      .           fctpx,separx,separy,nptot,
-     .           nstruc,npstru,xstruc,ystruc,indplq,nbdef,
-     .           a00,a10,a01,a11)
-c
-c  version : 21.07.2000 13:38
-c
+     .           rnstruc,rnpstru,rxstruc,rystruc,indplq,inddef,nbdef,
+     .           a00,a10,a01,a11,nstruc,npstru,xstruc,ystruc)
+
 c=======================================================================
-c*** This routine creates virtual target plates for every divertor plate
+c*** This routine creates virtual target plates
 c=======================================================================
 
       implicit none
@@ -16,13 +14,15 @@ cank-970707: dimensions from the file
 
 *  arguments
       integer nx,ny,npx,
-     .     nptot(4,npxmx),nstruc,npstru(strumx),
-     .     indplq(4,npxmx),nbdef
+     .     nptot(4,npxmx),rnstruc,rnpstru(strumx),
+     .     indplq(4,npxmx),nbdef,nstruc,npstru(strumx),
+     $     inddef(nbdmx)
       real*8 x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx),
      .     fctpx(npxmx),separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
-     .     xstruc(npstmx,strumx),ystruc(npstmx,strumx),
+     .     rxstruc(npstmx,strumx),rystruc(npstmx,strumx),
      .     a00(nxmax,nymax,3),a10(nxmax,nymax,3),
-     .     a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+     .     a01(nxmax,nymax,3),a11(nxmax,nymax,3),
+     .     xstruc(npstmx,strumx),ystruc(npstmx,strumx)
 
 ! nx, ny : size of 2d eqilibrium arrays
 ! x(nxmax), y(nymax), psi(nxmax,nymax) : equilibrium arrays
@@ -46,19 +46,26 @@ c.. nbdef : number of the divertor plates
 
 
 *  variables locales
-      integer :: ipx, isep, istru
+      integer :: ipx, isep, istru, i
       integer :: ip, itarget, istep
-      real*8 :: minpsi, maxpsi, ppsi, dir, tol
+      real*8 :: minpsitot, maxpsitot,
+     $     minpsi(rnstruc), maxpsi(rnstruc), vtminpsi, vtmaxpsi,
+     $     dir, tol
       real*8 :: tx, ty, tpsi, gx, gy, dx, dxmax, pi, alpha, p
 
-      real*8 :: seppx(nstruc), seppy(nstruc)
+      real*8 :: seppx(npstmx,rnstruc), seppy(npstmx,rnstruc)
+      real*8 :: vtstartx(nbdef), vtstarty(nbdef)
+      real*8 :: ppsi(npstmx,rnstruc)
       real*8 :: tmpx(npstmx,2), tmpy(npstmx,2)
-      real*8 :: vtx(npstmx,nbdef), vty(npstmx,nbdef)
       real*8 :: vtmp1, vtmp2
-      integer :: nvtarget, idir, vtargetipx(nbdef)
+      integer :: nvtarget, idir, vtargetipx(nbdef), vtistruc(nbdef)
       integer :: nptmp(2), npvtarget(nbdef), npvtmp
       parameter(pi=3.141592654)
+      logical :: istarget
       
+      integer, parameter :: MODE_TARGET = 1
+      integer, parameter :: MODE_VESSEL = 2      
+      integer :: mode = MODE_VESSEL
 
 *  procedures
       real*8 feval2d, angle, dist
@@ -68,9 +75,99 @@ c=======================================================================
 * we create one virtual target for every separatrix segment intersecting
 * a target
 
-      ! min/maxpsi hold range of psi contours to be covered by the grid
-      minpsi = huge(minpsi)
-      maxpsi = -minpsi
+      ! First figure out psi range(s) to be covered by grid
+      ! and project structure points to separatrix
+
+      ! min/maxpsi: range of psi contours to be covered by the grid
+      minpsitot = huge(minpsitot)
+      maxpsitot = -minpsitot
+
+      do istru = 1, rnstruc
+
+         ! if in target mode, only consider points of target structures
+         if ( mode == MODE_TARGET ) then
+            istarget = .false.
+            do i = 1, nbdef
+               if ( inddef(i) == istru ) then
+                  istarget = .true.
+                  exit
+               endif
+            enddo
+            if ( .not. istarget ) cycle
+         endif
+
+         minpsi(istru) = huge(minpsi)
+         maxpsi(istru) = -huge(minpsi)
+
+         ! loop over all points in structure
+         do ip = 1, rnpstru(istru)
+               
+            tx = rxstruc( ip, istru )
+            ty = rystruc( ip, istru )
+            
+            ! compute psi at point
+            ppsi(ip,istru) = feval2d( nx, ny, x, y,
+     $           a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1),
+     $           tx, ty )
+
+            ! update min/max psi values 
+            minpsi(istru) = min( minpsi(istru), ppsi(ip,istru) )
+            maxpsi(istru) = max( maxpsi(istru), ppsi(ip,istru) )
+            minpsitot = min( minpsitot, ppsi(ip,istru) )
+            maxpsitot = max( maxpsitot, ppsi(ip,istru) )
+
+            ! find projection on separatrix for this point               
+               
+            ! stepping loop towards separatrix psi value
+            tpsi = ppsi(ip,istru)
+            tol = 1e-2
+            istep = 0
+            do
+               ! TODO: step towards psi value of closest separatrix, 
+               ! i.e. the x-point psi value closest to the current psi value
+               ipx = 1
+               ! check distance (in psi) to separatrix
+c$$$               write (0,*) 'rel. diff psi ',
+c$$$     $              abs( tpsi - fctpx(ipx) ) / abs( fctpx(ipx) ) 
+               if ( abs( tpsi - fctpx(ipx) )
+     $              / abs( fctpx(ipx) ) < tol ) then
+               ! close enough: stop and store
+c$$$                  write (0,*) 'Separatrix projection for point ', ip,
+c$$$     $                 ': ', tx, ty
+                  seppx(ip,istru) = tx
+                  seppy(ip,istru) = ty
+                  exit
+               end if
+
+               ! not close enough: step along grad psi towards separatrix
+               ! compute grad psi at current position
+               gx = feval2d( nx, ny, x, y,
+     $              a00(:,:,2), a10(:,:,2), a01(:,:,2), a11(:,:,2),
+     $              tx, ty )
+               gy = feval2d( nx, ny, x, y,
+     $              a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3),
+     $              tx, ty )
+               ! take a step, including a security factor
+               dx = 0.02 * (tpsi - fctpx(ipx))
+     $              / sqrt( gx**2 + gy**2 );
+               tx = tx - dx * gx
+               ty = ty - dx * gy                  
+               ! compute psi at new position
+               tpsi = feval2d( nx, ny, x, y,
+     $              a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1),
+     $              tx, ty )
+               ! TODO: if psi not moving in the right direction, 
+               ! decrease step size and try again
+               istep = istep + 1
+               if ( istep > 1000 ) then
+                  write(0,*) 'Did not find separatrix'
+                  exit
+               endif
+            enddo ! separatrix projection loop
+         enddo ! structure point loop
+      enddo ! structure loop
+
+      ! Find starting points for the virtual targets on the separatrix
 
       ! counter for number of targets to create
       nvtarget = 0
@@ -81,131 +178,105 @@ c=======================================================================
          ! loop over separatrix segments     
          do isep = 1, 4           
 
-            istru = indplq(isep,ipx)
+            itarget = indplq(isep,ipx)
+
             ! if separatrix segment does not intersect target, skip
-            if ( istru == 0 ) cycle
+            if ( itarget == 0 ) cycle
 
             write (0,*) 'x-point : ', ipx, ', separatrix segment: ',
-     $           isep, ', structure no. ', istru
+     $           isep, ', structure no. ', itarget
 
-            ! loop over all points in the associated structure to find
-            ! starting point for virtual target on separatrix
             nvtarget = nvtarget + 1
-            ! vtargetipx stores x-point associated with this target
+            ! vtargetipx stores index of x-point associated with this target
             vtargetipx(nvtarget) = ipx
-            seppx(nvtarget) = ptx(ipx)
-            seppy(nvtarget) = pty(ipx)
+            ! vtistruc stores index of structure associated w.t. target
+            vtistruc(nvtarget) = itarget
+            vtstartx(nvtarget) = ptx(ipx)
+            vtstarty(nvtarget) = pty(ipx)
+
             dxmax = 0
 
-            do ip = 1, npstru(istru)
-               
-               tx = xstruc( ip, istru )
-               ty = ystruc( ip, istru )
+            ! find the starting point for the target
 
-               ! compute psi at point
-               ppsi = feval2d( nx, ny, x, y,
-     $              a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1),
-     $              tx, ty )
+            do istru = 1, rnstruc
 
-               ! update min/max psi (covering all structures)
-               minpsi = min( minpsi, ppsi )
-               maxpsi = max( maxpsi, ppsi )
+               ! In target mode, loop over all points in only the associated 
+               ! structure to find starting point for virtual target
+               ! on the separatrix.
+               ! In vessel mode, loop over all points of all structures.
 
-               ! find projection on separatrix for this point               
-               
-               ! stepping loop towards separatrix psi value
-               tpsi = ppsi
-               tol = 1e-2
-               istep = 0
-               do
-                  ! check distance (in psi) to separatrix
-                  write (0,*) 'rel. diff psi ',
-     $                  abs( tpsi - fctpx(ipx) ) / abs( fctpx(ipx) ) 
-                  if ( abs( tpsi - fctpx(ipx) )
-     $                 / abs( fctpx(ipx) ) < tol ) then
-                     ! close enough: stop
+               if ( ( mode == MODE_TARGET )
+     $              .and. .not. ( istru == itarget ) ) cycle
 
-                     write (0,*) 'Separatrix projection for point ', ip,
-     $                    ': ', tx, ty
+               ! loop over points in structure
+               do ip = 1, rnpstru(istru)
 
-                     ! Check whether the point is located on the separatrix
-                     ! branch associated with the target
-                     ! Quick fix: check whether it lies roughly in the 
-                     ! same direction as the strike point. This should work ok.
+                  ! Check whether the point is located on the separatrix
+                  ! branch associated with the target
+                  ! Quick fix: check whether it lies roughly in the 
+                  ! same direction as the strike point. This should work ok.
 
-                     ! TODO: To do this properly, one has to 
-                     ! check whether the point is on the sep. branch.
-                     ! However, the separatrix is at the moment
-                     ! only stored up to the strike point, so it would have
-                     ! to be retraced up to the equilibrium boundary
+                  ! TODO: To do this properly, one has to 
+                  ! check whether the point is on the sep. branch.
+                  ! However, the separatrix is at the moment
+                  ! only stored up to the strike point, so it would have
+                  ! to be retraced up to the equilibrium boundary
 
-                     alpha = angle( ptx(ipx), pty(ipx),
-     $                    separx( nptot( isep, ipx ), isep, ipx ), 
-     $                    separy( nptot( isep, ipx ), isep, ipx ),
-     $                    tx, ty )
+                  tx = seppx(ip,istru)
+                  ty = seppy(ip,istru)
 
-                     write (0,*) 'X/Strike point angle is ', alpha
-
-                     ! if angle to big, skip this point
-                     if ( alpha > (pi / 4) ) then
-                        write (0,*) 'X/Strike point angle too big, skip'
-                        exit
-                     endif
-
-                     ! Point on correct sep. branch. Check distance to x-point
-                     dx = dist( ptx(ipx), pty(ipx), tx, ty )
-                     ! if further away than previous projections, keep
-                     if (  dx > dxmax ) then
-                        seppx(nvtarget) = tx
-                        seppy(nvtarget) = ty
-                        dxmax = dx
-                     endif
-
-                     exit
-                  end if
-
-                  ! not close enough: step along grad psi towards separatrix
-                  ! compute grad psi at current position
-                  gx = feval2d( nx, ny, x, y,
-     $                 a00(:,:,2), a10(:,:,2), a01(:,:,2), a11(:,:,2),
+                  alpha = angle( ptx(ipx), pty(ipx),
+     $                 separx( nptot( isep, ipx ), isep, ipx ), 
+     $                 separy( nptot( isep, ipx ), isep, ipx ),
      $                 tx, ty )
-                  gy = feval2d( nx, ny, x, y,
-     $                 a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3),
-     $                 tx, ty )
-                  ! take a step, including a security factor
-                  dx = 0.02 * (tpsi - fctpx(ipx))
-     $                 / sqrt( gx**2 + gy**2 );
-                  tx = tx - dx * gx
-                  ty = ty - dx * gy                  
-                  ! compute psi at new position
-                  tpsi = feval2d( nx, ny, x, y,
-     $                 a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1),
-     $                 tx, ty )
-                  ! TODO: if psi not moving in the right direction, 
-                  ! decrease step size and try again
-                  istep = istep + 1
-                  if ( istep > 1000 ) then
-                     write(0,*) 'Did not find separatrix'
-                     exit
+
+                  !write (0,*) 'X/Strike point angle is ', alpha
+                  ! if angle to big, skip this point
+                  if ( alpha > (pi / 4) ) then
+                     write (0,*) 'X/Strike point angle too big, skip'
+                     cycle
                   endif
-               enddo ! separatrix projection loop
 
-            enddo ! structure point loop
+                  ! Point on correct sep. branch. Check distance to x-point
+                  dx = dist( ptx(ipx), pty(ipx), tx, ty )
+                  ! if further away than previous projections, keep
+                  if (  dx > dxmax ) then
+                     vtstartx(nvtarget) = tx
+                     vtstarty(nvtarget) = ty
+                     dxmax = dx
+                  endif
+               enddo
 
+            enddo ! structure loop
          enddo ! separatrix segment loop
-      enddo ! 
+      enddo ! x-point loop
 
-
-      write (0,*) 'Psi range for all targets:'
-      write (0,*) 'min psi: ', minpsi, ', max psi: ', maxpsi            
+      write (0,*) 'Global psi range'
+      write (0,*) 'min psi: ', minpsitot, ', max psi: ', maxpsitot
 
       ! TODO: refactor building the virtual targets out into subroutine
+
+      ! Figure out the psi range for this target.
+      ! In target mode, a contour line connecting two targets
+      ! has to end on both targets. The easiest is to just select the
+      ! biggest range over all targets
+      ! TODO: this can be improved
+      select case ( mode )
+      case ( MODE_TARGET )
+         vtminpsi = huge(vtminpsi)
+         vtmaxpsi = -huge(vtminpsi)
+         do itarget = 1, nvtarget
+            vtminpsi = min( vtminpsi, minpsi( vtistruc(itarget) ) )
+            vtmaxpsi = max( vtmaxpsi, maxpsi( vtistruc(itarget) ) )
+         enddo
+      case ( MODE_VESSEL )
+         vtminpsi = minpsitot
+         vtmaxpsi = maxpsitot
+      end select
 
       ! build the virtual targets
       do itarget = 1, nvtarget
 
-         write (100,*) 'Start'
-         
          ! build virtual structure starting from the given points on the sep.
          ! step in both directions away from the separatrix
          do idir = 1, 2
@@ -217,8 +288,8 @@ c=======================================================================
             endif
 
 !           build virtual structure starting from the given points on the sep.
-            tx = seppx(itarget)
-            ty = seppy(itarget)
+            tx = vtstartx(itarget)
+            ty = vtstarty(itarget)
 
             do 
 !              compute grad psi
@@ -241,8 +312,8 @@ c=======================================================================
                tmpx(istep,idir) = tx
                tmpy(istep,idir) = ty
 
-               if ( tpsi > maxpsi ) exit
-               if ( tpsi < minpsi ) exit
+               if ( tpsi > vtmaxpsi ) exit
+               if ( tpsi < vtminpsi ) exit
 
                istep = istep + 1
                if ( istep > npstmx ) then
@@ -254,8 +325,8 @@ c=======================================================================
          enddo ! direction loop
 
          ! arrange points according to orientation
-         tx = seppx(itarget)
-         ty = seppy(itarget)
+         tx = vtstartx(itarget)
+         ty = vtstarty(itarget)
 
          ! compute grad psi at starting point (again)
          gx = feval2d( nx, ny, x, y,
@@ -264,6 +335,7 @@ c=======================================================================
          gy = feval2d( nx, ny, x, y,
      $        a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3),
      $        tx, ty )
+
             
          ! check in which direction the associated x-point is
          p = gx * ( pty( vtargetipx( itarget ) ) - ty )
@@ -280,61 +352,53 @@ c=======================================================================
             idir = 1
          endif
 
+         nstruc = nstruc + 1
+
          npvtmp = 0
          do istep = nptmp(idir), 1, -1
             npvtmp = npvtmp + 1
-            vtx(npvtmp, itarget) = tmpx(istep,idir)
-            vty(npvtmp, itarget) = tmpy(istep,idir)
+            xstruc(npvtmp, nstruc) = tmpx(istep,idir)
+            ystruc(npvtmp, nstruc) = tmpy(istep,idir)
          enddo
 
          ! insert starting point into middle
          npvtmp = npvtmp + 1
-         vtx(npvtmp, itarget) = seppx(itarget)
-         vty(npvtmp, itarget) = seppy(itarget)
+         xstruc(npvtmp, nstruc) = vtstartx(itarget)
+         ystruc(npvtmp, nstruc) = vtstarty(itarget)
 
          idir = idir + 1
          if ( idir > 2 ) idir = 1 
          do istep = 1, nptmp(idir)
             npvtmp = npvtmp + 1
-            vtx(npvtmp, itarget) = tmpx(istep,idir)
-            vty(npvtmp, itarget) = tmpy(istep,idir)
+            xstruc(npvtmp, nstruc) = tmpx(istep,idir)
+            ystruc(npvtmp, nstruc) = tmpy(istep,idir)
          enddo
          
          ! close target by wrapping it around
         
-         vtmp1 = vtx(npvtmp, itarget) - vtx(npvtmp - 1, itarget)
-         vtmp2 = vty(npvtmp, itarget) - vty(npvtmp - 1, itarget)
+         vtmp1 = xstruc(npvtmp, itarget) - xstruc(npvtmp - 1, itarget)
+         vtmp2 = ystruc(npvtmp, itarget) - ystruc(npvtmp - 1, itarget)
          call rotate( vtmp1, vtmp2, pi * 1.25 )
 
          npvtmp = npvtmp + 1
-         vtx(npvtmp, itarget) = vtx(npvtmp - 1, itarget) + vtmp1
-         vty(npvtmp, itarget) = vty(npvtmp - 1, itarget) + vtmp2
+         xstruc(npvtmp, itarget) = xstruc(npvtmp - 1, itarget) + vtmp1
+         ystruc(npvtmp, itarget) = ystruc(npvtmp - 1, itarget) + vtmp2
 
-         vtmp1 = vtx(2, itarget) - vtx(1, itarget)
-         vtmp2 = vty(2, itarget) - vty(1, itarget)
+         vtmp1 = xstruc(2, itarget) - xstruc(1, itarget)
+         vtmp2 = ystruc(2, itarget) - ystruc(1, itarget)
          call rotate( vtmp1, vtmp2, pi * 1.75 )
 
          npvtmp = npvtmp + 1
-         vtx(npvtmp, itarget) = vtx(1, itarget) + vtmp1
-         vty(npvtmp, itarget) = vty(1, itarget) + vtmp2
+         xstruc(npvtmp, itarget) = xstruc(1, itarget) + vtmp1
+         ystruc(npvtmp, itarget) = ystruc(1, itarget) + vtmp2
 
          ! close structure
          npvtmp = npvtmp + 1
-         vtx(npvtmp, itarget) = vtx(1, itarget)
-         vty(npvtmp, itarget) = vty(1, itarget)
+         xstruc(npvtmp, itarget) = xstruc(1, itarget)
+         ystruc(npvtmp, itarget) = ystruc(1, itarget)
 
-         npvtarget( itarget ) = npvtmp
+         npstru( nstruc ) = npvtmp
 
       enddo ! virtual target loop
-
-      open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
-      do itarget = 1, nvtarget
-         do istep = 1, npvtarget( itarget )
-            write (100,*) vtx(istep,itarget)*1000,
-     $           vty(istep,itarget)*1000
-         enddo
-         write (100,*) ''
-      enddo
-      close(UNIT=100)
 
       end

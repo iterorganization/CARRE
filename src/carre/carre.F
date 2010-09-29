@@ -42,7 +42,7 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx),
      .   nbdef, nivtot(nivmx), nbniv,ptxint,nreg,
      .   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,
-     .   itmp
+     .   itmp, is, ip
 
       REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax),
      .   psidx(nxmax,nymax), psidy(nxmax,nymax),
@@ -55,18 +55,28 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3),
      .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3)
 
+!     arrays to hold copies of structures (r for "real")
+!     (if virtual structures are used)
+      integer :: rnstruc, rnpstru(strumx)
+      REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
+
       LOGICAL racord
       character lign80*80,nomstr(strumx)*80
 
       REAL*8 stp0, stpmin
       PARAMETER (stp0=0.01,stpmin=0.001)
 
+      integer :: isetup
+      logical dovirtualtargets
+      parameter (dovirtualtargets=.true.)
+
 *..Procedures
 *
       INTRINSIC ABS,MIN,index
       EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0,
-     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,entete
-     ,        ,trc_stk_in,trc_stk_out
+     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,entete,
+     ,     trc_stk_in,trc_stk_out,
+     $     virtualtargets,virtuallimiters
 c======================================================================
 c.. nxmax,nymax: maximum number of the data points in x and y
 c.. gradmx: maximum number of points where the gradient vanishes
@@ -254,6 +264,10 @@ cank-970702: moved dimensions to the included file
       CALL SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx,
      .            pty,iptx,jptx,xpto,ypto,racord,limcfg)
 
+!     when using virtual targets, needs two passes through the setup
+!     steps 8 to 10
+
+      do isetup = 1, 2
 *
 *..8.0  Parametrise the separatrices
 *
@@ -311,26 +325,51 @@ c>>>
           call trc_stk_out
         endif
 
+        if ( .not. dovirtualtargets ) exit
+        if ( isetup == 2 ) exit
+
 *..10.0  Set up the virtual structure
 
-*..10.1  Set up virtual targets
+*..      Save current structures
+        rnstruc = nstruc
+        rnpstru = npstru
+        rxstruc = xstruc
+        rystruc = ystruc
+        
+        nstruc = 0
+
+*..   10.1  Set up virtual targets        
 
         CALL VIRTUALTARGETS(nx,ny,x,y,psi,npx,ptx,pty,
-     .      fctpx,separx,separy,nptot,
-     .      nstruc,npstru,xstruc,ystruc,indplq,nbdef,
-     .      a00,a10,a01,a11)
-
-*..10.2  Set up virtual limiters
-
-        call VIRTUALLIMITERS(
-
-*..10.3  Redo steps 
-
-
+     .       fctpx,separx,separy,nptot,
+     .       rnstruc,rnpstru,rxstruc,rystruc,indplq,inddef,nbdef,
+     .       a00,a10,a01,a11,nstruc,npstru,xstruc,ystruc)
+        
+*..   10.2  Set up virtual limiters
+        
+        call VIRTUALLIMITERS(nivx,nivy,nivtot,nbniv,npx,ptx,pty,
+     $       nstruc,npstru,xstruc,ystruc)
+        
+*..   10.2.1 Write out resulting structures
+        
+        open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
+        do is = 1, nstruc
+           do ip = 1, npstru( is )
+              write (100,*) xstruc(ip,is)*1000,
+     $             ystruc(ip,is)*1000
+           enddo
+           write (100,*) ''
+        enddo
+        close(UNIT=100)
+        
+      endif                     ! npx.gt.0
+      
+      enddo                     ! end setup loop
 
 *
 *..12.0  Grid the regions
 *
+      if(npx.gt.0) then
 
         CALL MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord,
      .    separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru,
@@ -353,8 +392,7 @@ c     &  distnv(1,2),xpto,ypto)
      .           nstruc,npstru,xstruc,ystruc,
      .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg)
 
-
-      ENDIF
+      endif ! nptx.gt.0
 
 *
 *.. Close the graphics
