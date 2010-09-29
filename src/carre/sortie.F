@@ -1,7 +1,11 @@
       SUBROUTINE SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,
      .    deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,
      .    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero,
-     .    fctpx)
+     .    fctpx,gdpsi,racpsi,a,gdr,r,ra,rho,nprad,somort,ir,ipol,
+     .    somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .    sompropo,
+     .    sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .    somtot,somtotp,gdsomtotp,segt)
 c
 c  version : 07.07.97 19:08
 c
@@ -13,22 +17,38 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
-#include <CARREDIM.F>
+      include "../include/CARREDIM.F"
+      
 
 *  arguments
       INTEGER nsep,nreg,repart,nptseg(nsep),npr(nreg),np1(nreg),
-     .        nx,ny,npx,numero
+     .        nx,ny,npx,numero,ir(nreg),nprad,ipol,nppol
       REAL*8 pntrat,deltp1(nsep),deltpn(nsep),deltr1(nreg),deltrn(nreg),
      .     xmail(npmamx,nrmamx,nreg),ymail(npmamx,nrmamx,nreg),
      .     tgarde(4),distxo,x(nxmax),y(nymax),
      .     a00(nxmax,nymax,3),a10(nxmax,nymax,3),
      .     a01(nxmax,nymax,3),a11(nxmax,nymax,3),
-     .     ptx(npx+1),pty(npx+1),fctpx(npx+1)
+     .     ptx(npx+1),pty(npx+1),fctpx(npx+1),gdpsi(nrmamx,nreg),
+     .     racpsi(nrmamx,nregmx),a(nregmx),
+     .     gdr(nrmamx,nregmx),
+     .     r(nrmamx,nregmx),ra(nrmamx,nregmx),rho(nrmamx,nregmx),
+     .     somort(nrmamx,nregmx),somortp(nrmamx,nregmx),
+     .     gdsomortp(nregmx),somortpur(nrmamx,nregmx),
+     .     somortpurp(nrmamx,nregmx),
+     .     gdsomortpurp(nregmx), sompropo(nrmamx,nregmx),
+     .     sompropop(nrmamx,nregmx),
+     .     gdsompropop(nregmx),
+     .     somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx),
+     .     gdsomvarrp(nregmx),
+     .     somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
+     .     gdsomtotp(nregmx),segt(nrmamx,nregmx)
+    
+     
       logical racord
 
 *  variables en common
-#include <COMRLX.F>
-#include <COMLAN.F>
+      include "../include/COMRLX.F"
+      include "../include/COMLAN.F"
 
 *  variables locales
       INTEGER i,j,isep,ireg,ii,jj
@@ -83,7 +103,7 @@ c======================================================================
             endif
          endif
 c
-*..Ecriture des parametres qui pouront servir au le prochain essai.
+*..Ecriture des parametres qui pouront servir au prochain essai.
          if(sellan(1:8).eq.'francais') then
            write(10,*)'$parametres'
          elseif(sellan(1:7).eq.'english') then
@@ -136,7 +156,7 @@ c
 
 *..Ecriture des points de mailles.
 
-      ELSE IF (numero .EQ. 2) THEN
+       ELSEIF (numero .EQ. 2) THEN
          write(10,114)
 114      format(t2,'x(m)',t18,'y(m)',t34,'psi(SI)',t50,'dpsi/dx',t66,
      .     'dpsi/dy')
@@ -180,7 +200,174 @@ c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
   210      format('$end')
          endif
 
+      DO ireg=1, nreg
+* par chance, quelque soit la configuration, si la région
+* a un indice impair, elle coupe l'axe horizontal ypto.
+* On peut séparer ainsi les régions dont on ne peut pas
+* connaitre les rayons.
+	if (ireg.EQ.1 .or. ireg.EQ.3  .or. ireg.EQ.5) then
+      write(10,*) 
+      write(10,*)'$gdpsi'
+      ! write(10,*)'ireg=1, nreg'
+      write(10,*)(gdpsi(i,ireg),i=1,npr(ireg))
+      write(10,*)'$fin'
+      write(10,*)
+      write(10,*)'$racpsi'
+      write(10,*)
+      write(10,*)(racpsi(i,ireg),i=1,npr(ireg))
+	write(10,*) '$fin'
+      write(10,*) 
+      write(10,*)'$a '
+      write(10,*)
+	write(10,*)(a(ireg)) 
+      write(10,*)'$fin'
+      write(10,*) 
+      write(10,*)'$gdr' 
+      write(10,*)
+      write(10,*)(gdr(i,ireg),i=1,npr(ireg))
+      write(10,*)'$fin' 
+      write(10,*) 
+      write(10,*)'$r' 
+      write(10,*)
+      write(10,*)(r(i,ireg),i=1,npr(ireg)) 
+      write(10,*)'$fin'
+      write(10,*) 
+      write(10,*)'$rho' 
+      write(10,*) 
+      write(10,*)(rho(i,ireg),i=1,npr(ireg)) 
+      write(10,*)'$fin'
+      write(10,*) 
+      write(10,*)'$ra' 
+      write(10,*)
+      write(10,*)(ra(i,ireg),i=1,npr(ireg))
+      write(10,*)'$fin'
+	
+
+	else 
+      write(10,*)'$calcul impossible pour cette region'
+	write(10,*)
+     
+	endif
+	enddo
+
+	DO ireg=1,nreg
+      write(10,*)'$région'
+	write(10,*)(ireg)
+	write(10,*)
+	write(10,*)
+	write(10,*)'$somort'
+      write(10,*)
+      write(10,*)(somort(i,ireg),i=2,npr(ireg))
+
+	write(10,*)'$somortp'
+      write(10,*)
+      write(10,*)(somortp(i,ireg),i=2,npr(ireg))
+    
+    
+
+      write(10,*)'$gdsomortp'
+      write(10,*)
+      write(10,*)(gdsomortp(ireg))
+      write(10,*)'$fin'
+
+      write(10,*)'$somortpur'
+      write(10,*)
+      write(10,*)(somortpur(i,ireg),i=2,npr(ireg))
+
+	write(10,*)'$somortpurp'
+      write(10,*)
+      write(10,*)(somortpurp(i,ireg),i=2,npr(ireg))
+     
+    
+
+      write(10,*)'$gdsomortpurp'
+      write(10,*)
+      write(10,*)(gdsomortpurp(ireg))
+      write(10,*)'$fin' 
+ 
+
+      write(10,*)'$sompropo'
+      write(10,*)
+      write(10,*)(sompropo(i,ireg),i=2,npr(ireg))
+
+	write(10,*)'$sompropop'
+      write(10,*)
+      write(10,*)(sompropop(i,ireg),i=2,npr(ireg))
+ 
+      write(10,*)'$gdsompropop'
+      write(10,*)
+      write(10,*)(gdsompropop(ireg))
+      write(10,*)'$fin' 
+
+
+
+
+
+
+
+
+      write(10,*)'$somvarr'
+      write(10,*)
+      write(10,*)(somvarr(i,ireg),i=2,npr(ireg))
+
+	write(10,*)'$somvarrp'
+      write(10,*)
+      write(10,*)(somvarrp(i,ireg),i=2,npr(ireg))
+  
+      write(10,*)'$gdsomvarrp'
+      write(10,*)
+      write(10,*)(gdsomvarrp(ireg))
+      write(10,*)'$fin' 
+
+
+
+
+
+
+
+      write(10,*)'$somtot'
+      write(10,*)
+      write(10,*)(somtot(i,ireg),i=2,npr(ireg))
+
+	write(10,*)'$somtotp'
+      write(10,*)
+      write(10,*)(somtotp(i,ireg),i=2,npr(ireg))
+   
+    
+
+      write(10,*)'$gdsomtotp'
+      write(10,*)
+      write(10,*)(gdsomtotp(ireg))
+      write(10,*)'$fin' 
+ 
+      write(10,*)'$segt'
+      write(10,*)
+      write(10,*)(segt(i,ireg),i=2,npr(ireg))
+      write(10,*)'$fin' 
+ 
+ 
+      enddo
+      
+cDO  ireg=1,nreg
+c	   DO      i=2,npr(ireg)
+C Cireg=1
+C C          DO      i=2,npr(ireg)
+C           DO       ipol=2,nppol
+C      write(10,*)'$ortpur2'C
+C
+C	write(10,*)
+C	write(10,*)(ortpur2(ipol))
+
+c	   ENDDO
+c        ENDDO
+	 
+	
       ENDIF
 
+	
+
+      
+
+	
       RETURN
       END

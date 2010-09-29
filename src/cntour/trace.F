@@ -1,6 +1,6 @@
       subroutine trace(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot,
      .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .        nivtot,nbniv,np1,npr,xmail,ymail,nreg)
+     .        nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
 c======================================================================
 c
 c  version : 07.07.97 20:15
@@ -9,7 +9,7 @@ c
 
 cank-970707: dimensions from the file
 *  dimensions
-#include <CARREDIM.F>
+      include "../include/CARREDIM.F"
 
 c
 c  arguments
@@ -25,7 +25,9 @@ c
 c  variables locales
       integer i,j,k,nin
       real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
+	real deltax,deltay
       character echx*3,echy*3
+	logical last
 c
 c  procedures
       external agcurv,newpag,endpag
@@ -41,10 +43,12 @@ c     xmin=0.5
 c     xmax=1.2
 c     ymin =-0.3
 c     ymax=0.5
-      xmin=x1
-      xmax=x2
-      ymin=y1
-      ymax=y2
+      deltax=x2-x1
+	deltay=y2-y1
+      xmin=(x1+x2)/2-max(deltax,deltay)/2
+      xmax=(x1+x2)/2+max(deltax,deltay)/2
+      ymin=(y1+y2)/2-max(deltax,deltay)/2
+      ymax=(y1+y2)/2+max(deltax,deltay)/2
 c***
 c     xmin=0.6
 c     xmax=0.8
@@ -125,11 +129,12 @@ c  57    continue
 c        CALL agcurv(x,1,y,1,ny,nin)
 c  58    continue
 
-
       CALL endpag
 
       CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ',
      +     echx, echy)
+
+      
       CALL struct(x1,x2,y1,y2,nstruc,xstruc,ystruc,npstru)
 
       DO 60 i=1, nreg
@@ -161,7 +166,7 @@ c     call agcurv(x,1,y,1,2,2)
 c***
 c
 
-      CALL endpag
+      if (last) CALL endpag
 
       return
       end

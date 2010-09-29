@@ -2,7 +2,14 @@
      .     separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru,
      .     xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail,
      .     np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv,
-     .     a00,a10,a01,a11,fctpx,limcfg)
+     .     a00,a10,a01,a11,fctpx,limcfg,gdpsi,racpsi,
+     .     a,gdr,r,ra,rho,sol,somort,ir,nprad,ipol,somortp,nppol,
+     .     gdsomortp,somortpur,somortpurp,gdsomortpurp,sompropo,
+     .     sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .     somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
+  
+
 c
 c  version : 23.06.98 19:53
 c
@@ -17,12 +24,15 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
-#include <CARREDIM.F>
+      include "../include/CARREDIM.F"
+      
 
 *  arguments
       INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint,
      .        nstruc,npstru(nstruc),nreg,inddef(4),
-     .        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg
+     .        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg,nn1,
+     .        sol,ir,nprad,ipol,nppol,ireg,modif,re,nprsb(nregmx)
+     
       LOGICAL racord
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),
      .  xpto,ypto,separx(npnimx,4,npx),
@@ -31,21 +41,38 @@ cank-970707: dimensions from the file
      .  xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*),distnv(5,5),
      .  nivx(npnimx,nivmx),nivy(npnimx,nivmx),fctpx(npx+1),
      .  a00(nxmax,nymax,3),a10(nxmax,nymax,3),
-     .  a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+     .  a01(nxmax,nymax,3),a11(nxmax,nymax,3),
+     .  gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),xrad(nrmamx),
+     .  yrad(nrmamx),
+     .  fctrad(nrmamx),
+     .  a(nregmx),
+     .  gdr(nrmamx,nregmx),
+     .  r(nrmamx,nregmx),ra(nrmamx,nregmx),
+     .  rho(nrmamx,nregmx),somort(nrmamx,nregmx),somortp(nrmamx,nregmx),
+     .  gdsomortp(nregmx),somortpur(nrmamx,nregmx),
+     .  somortpurp(nrmamx,nregmx),gdsomortpurp(nregmx),
+     .     sompropo(nrmamx,nregmx),sompropop(nrmamx,nregmx),
+     .     gdsompropop(nregmx),
+     .     somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx),
+     .     gdsomvarrp(nregmx),
+     .     somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
+     .     gdsomtotp(nregmx),segt(nrmamx,nregmx),
+     .     xmini,xmaxi,ymini,ymaxi,distxo,pntrat,tgarde(4)
+
 
 *  variables en common
-#include <COMLAN.F>
-#include <COMRLX.F>
+      include "../include/COMLAN.F"
+      include "../include/COMRLX.F"
 
 *  variables locales
-      INTEGER nptseg(10),isep,ipas,ireg,ipx,sens,nn,idef,
+      INTEGER nptseg(10),isep,ipas,ipx,sens,nn,idef,
      .  repart,nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2
      .  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
-      REAL*8 dist,x2,y2,pntrat,lg(10),deltp1(10),deltpn(10),
+      REAL*8 dist,x2,y2,lg(10),deltp1(10),deltpn(10),
      .  deltr1(10),deltrn(10),xx,yy,fctini,fctfin,difpsi,dpmin(10),
-     .  dpmax(10),drmin(10),drmax(10),xfin,yfin,tgarde(4),gardd1,
-     .  gardd2,xptxo,yptxo,distxo,xint,yint,xext,yext,psiint,
-     .  psiext,xptxex,yptxex,bouclx,boucly,ll
+     .  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1,
+     .  gardd2,xptxo,yptxo,xint,yint,xext,yext,psiint,
+     .  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
       REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10),
      .  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx)
      .  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx),
@@ -57,7 +84,7 @@ cank-970707: dimensions from the file
       INTEGER drctio,horair,ifind
       REAL*8 long,plqdst,ruban
       EXTERNAL long,COORD,drctio,horair,ifind,LECCLE,lecclf,DOUBLD,
-     .         ruban,plqdst
+     .         ruban,plqdst,trace3
      ,        ,trc_stk_in,trc_stk_out
       intrinsic max
 c=========================
@@ -243,6 +270,26 @@ c----------------------------------------------------------------------
      .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
      .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
+*..Initialise the primary level line
+
+         nn1=0
+
+         DO 361 ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+  361    CONTINUE
+* on colle la dernière ligne de niveau sur trace2 pour avoir 
+* la pénétration.
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+     _	       ptsep,npx,nptot,
+     _	       nstruc,npstru,xstruc,ystruc,
+     _		   nivx,nivy,nivtot,nbniv,
+     _           pntrat,distxo,xn,yn,nn1,
+     .           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
+     .           a00,a01,a10,a11,psi,nx,ny,x,y)
+
          if (correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -258,14 +305,32 @@ c----------------------------------------------------------------------
          if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
 
             ient = 5
-            isor = 6
+	      isor = 6
+
+            pntrat_old = pntrat        
+            
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
+
+            if (pntrat.ne.pntrat_old) then
+              call endpag
+
+	        call trace2(x(1),x(nx),y(1),y(ny),
+     .  		 separx,separy,ptsep,npx,nptot,
+     .         nstruc,npstru,xstruc,ystruc,nivx,nivy,
+     .         nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+            
+            endif
+
+
             GO TO 3
+
+       
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
      .             dpmin,dpmax,drmin,drmax,distxo,10,correct)
+      
 
          ENDIF
 
@@ -273,7 +338,15 @@ c----------------------------------------------------------------------
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,
      .     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny,
-     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,
+     .     gdpsi,racpsi,
+     .     a,gdr,r,
+     .     ra,rho,
+     .     nprad,somort,ir,ipol,somortp,
+     .     nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .     somtot,somtotp,gdsomtotp,segt)
+     
 
 *..1.2  Distribute the points along separatrices
 
@@ -287,7 +360,7 @@ c----------------------------------------------------------------------
               dist=dist + spacep(ipas-1,isep)
               CALL COORD(separx(1,ptsep(isep,ipx),ipx),
      .          separy(1,ptsep(isep,ipx),ipx),nptot(ptsep(isep,ipx),ipx)
-     .          ,dist,sepmax(ipas,isep),sepmay(ipas,isep))
+     .         ,dist,sepmax(ipas,isep),sepmay(ipas,isep))
     5      CONTINUE
 
            sepmax(nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx),
@@ -301,8 +374,13 @@ c----------------------------------------------------------------------
 *..1.3.1  Region 1
 
 *.. Define the primary curve and the grid points
-
          ireg=1
+         print*, 'ireg=', ireg
+    8    write(6,*)'Avec ou sans modifications?'
+	   write(6,*)'Répondez 1 avec modif et 0 sans modif'
+	   read(5,*,end=9,err=8) modif
+    9	   continue
+         
          np1(ireg) = 0
 
          DO 10 ipas=nptseg(1), 1, -1
@@ -374,21 +452,41 @@ c----------------------------------------------------------------------
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+        
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .              x,y,psi,nstruc,npstru,xstruc,ystruc,
      .              a00,a10,a01,a11,repart,
      .              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .              ynlast,nnlast,nuldec)
+     .              ynlast,nnlast,nuldec,1,xpto,ypto,gdpsi(1,ireg),
+     .              racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .              rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .              gdsomortp(ireg),somortpur(1,ireg),
+     .              somortpurp(1,ireg),gdsomortpurp(ireg),
+     .              sompropo(1,ireg),sompropop(1,ireg),
+     .              gdsompropop(ireg),
+     .              somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .              somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .              segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .              ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .              nivx,nivy,
+     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .              distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,
+     .              nprsb,ipx)
 
 c
 c  1.3.2  region 2
 
 *..Define the primary curve and the grid points
-
          ireg=2
+         print*, 'ireg=', ireg
+         modif=0
+   18    write(6,*)'Avec ou sans modifications?'
+	   write(6,*)'Répondez 1 avec modif et 0 sans modif'
+	   read(5,*,end=19,err=18) modif
+   19	   continue
+         
          np1(ireg) = 0
 
          DO 20 ipas=nptseg(1), 1, -1
@@ -447,14 +545,28 @@ c  1.3.2  region 2
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+         
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .              x,y,psi,nstruc,npstru,xstruc,ystruc,
      .              a00,a10,a01,a11,repart,
      .              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .              ynlast,nnlast,nuldec)
+     .              ynlast,nnlast,nuldec,0,xpto,ypto,gdpsi(1,ireg),
+     .              racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .              rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .             gdsomortp(ireg),somortpur(1,ireg),somortpurp(1,ireg),
+     .              gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
+      modif=0
 c
 c  1.3.3  region 3
 
@@ -499,9 +611,27 @@ c---
      .       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
      .       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .       a00,a10,a01,a11,repart,
-     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
-c----------------------------------------------------------------------
+     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
+     .       gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .       a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
+     .       somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
+     .       somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
+     .       sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .       somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .       somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .       segt(1,ireg))
 
+                   
+
+
+
+c----------------------------------------------------------------------
+c  Impression des autres paramètres.
+      
+	write(3,166) gdpsi, racpsi
+ 166  format (T2,F8.5,T17,F8.5)
+  
+      
       ELSE IF ((npx.EQ.2) .AND. (racord)) THEN
 
 *..2.   Connected double null
@@ -649,6 +779,24 @@ c----------------------------------------------------------------------
      .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
      .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
+*..Initialise the primary level line
+
+         nn1=0
+
+         DO 371 ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+  371    CONTINUE
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+     _	       ptsep,npx,nptot,
+     _	       nstruc,npstru,xstruc,ystruc,
+     _		   nivx,nivy,nivtot,nbniv,
+     _           pntrat,distxo,xn,yn,nn1,
+     .           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
+     .           a00,a01,a10,a11,psi,nx,ny,x,y)
+
          if(correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -664,6 +812,17 @@ c----------------------------------------------------------------------
             isor = 6
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
+            if (pntrat.ne.pntrat_old) then
+	      call endpag
+
+	 call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
+     .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
+     .        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+           
+
+
+            endif
+
             GO TO 43
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
@@ -676,7 +835,16 @@ c----------------------------------------------------------------------
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,
      .     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny,
-     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,
+     .     gdpsi,racpsi,a,
+     .     gdr,r,ra,
+     .     rho,nprad,somort,ir,ipol,
+     .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .     somtot,somtotp,gdsomtotp,segt)
+     
+
+
 
 *..2.2  Distribute the points along separatrices
 
@@ -725,9 +893,15 @@ c----------------------------------------------------------------------
 
 *..2.3.1 Region 1: right
 
-*..Define the primary curve and the grid points
 
-         ireg=1
+*..Define the primary curve and the grid points
+       ireg=1
+        print*, 'ireg=', ireg
+   48   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=49,err=48) modif
+   49	continue
+         
          np1(ireg) = 0
 
          DO 50 ipas=nptseg(1), 1, -1
@@ -803,21 +977,40 @@ c----------------------------------------------------------------------
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+        
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,1,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .               rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .               gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
+      modif=0
 
 *
 *..2.3.2 Region 2: top PFR
 
 *..Define the primary curve and the grid points
-
          ireg=2
+        print*, 'ireg=', ireg
+   58   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=59,err=58) modif
+   59	continue  
+        
          np1(ireg) = 0
 
          DO 60 ipas=nptseg(1), 1, -1
@@ -878,21 +1071,41 @@ c---
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+        
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,0,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),
+     .               ra(1,ireg),rho(1,ireg),somort(1,ireg),
+     .               somortp(1,ireg),gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
+     
+      modif=0
 
 *
 *..2.3.3 Region 3: left
 
 *..Define the primary curve and the grid points
-
          ireg=3
+        print*, 'ireg=', ireg
+   68   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=69,err=68) modif
+   69	continue
+       
          np1(ireg) = 0
 
          DO 70 ipas=nptseg(2), 1, -1
@@ -967,21 +1180,42 @@ c---
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+        
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,1,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .               rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .               gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),
+     .               gdsomortpurp(ireg),
+     .     sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
+      modif=0
 
 
 *..2.3.4 Region 4: bottom PFR
 
 *..Define the primary curve and the grid points
 
-         ireg=4
+       ireg=4
+       print*, 'ireg=', ireg
+   78   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=79,err=78) modif
+   79	continue
+	   
          np1(ireg) = 0
 
          DO 80 ipas=nptseg(5), 1, -1
@@ -1043,15 +1277,29 @@ c---
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+        
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,0,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .               rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .               gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),
+     .               gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .           nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
 
+      modif=0
 *
 *..2.3.5  Region 5: central region
 
@@ -1109,7 +1357,19 @@ c---
      .       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
      .       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .       a00,a10,a01,a11,repart,
-     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
+     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
+     .       gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .       a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
+     .       somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
+     .       somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg))
+
+
+
+     
 c----------------------------------------------------------------------
 
       ELSE IF ((npx.EQ.2) .AND. (.NOT.(racord))) THEN
@@ -1421,6 +1681,24 @@ crm  augmenter ce test
      .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
      .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
+*..Initialise the primary level line
+
+         nn1=0
+
+         DO 381 ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+  381    CONTINUE
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+     _	       ptsep,npx,nptot,
+     _	       nstruc,npstru,xstruc,ystruc,
+     _		   nivx,nivy,nivtot,nbniv,
+     _           pntrat,distxo,xn,yn,nn1,
+     .           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
+     .           a00,a01,a10,a11,psi,nx,ny,x,y)
+
          if (correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -1436,6 +1714,17 @@ crm  augmenter ce test
             isor = 6
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
+            if (pntrat.ne.pntrat_old) then
+	      call endpag
+
+
+
+	call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
+     .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
+     .        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+            
+
+            endif
             GO TO 105
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
@@ -1448,7 +1737,18 @@ crm  augmenter ce test
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,
      .     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny,
-     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,
+     .     gdpsi,racpsi,a,
+     .     gdr,r,ra,
+     .     rho,nprad,somort,ir,ipol,
+     .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .     somtot,somtotp,gdsomtotp,segt)
+     
+
+
+
+
 
 *..3.2  Distribute the points along separatrices
 
@@ -1562,10 +1862,15 @@ crm  augmenter ce test
 
 *..3.3. Grid region by region
 
+
 *..3.3.1 Region 1: between the separatrices
-
+        ireg=1
+       print*, 'ireg=', ireg
          nbcrb = 2
-
+  128   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=129,err=128) modif
+  129	continue
 *.. The second boundary
 
          npcrb2=0
@@ -1584,8 +1889,8 @@ crm  augmenter ce test
   131    CONTINUE
 
 *..Define the primary curve and the grid points
-
-         ireg=1
+      
+        
          np1(ireg) = 0
 
          IF (ptxint .EQ. 1) THEN
@@ -1710,14 +2015,29 @@ crm  augmenter ce test
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+         
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,1,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),
+     .               ra(1,ireg),rho(1,ireg),somort(1,ireg),
+     .               somortp(1,ireg),gdsomortp(ireg),
+     .               somortpur(1,ireg),somortpurp(1,ireg),
+     .               gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
+      modif=0
 
 *..Arangement of the mesh point which must coinside with outer X-point
 
@@ -1736,12 +2056,17 @@ c---
          nuldec = .FALSE.
 
 *..3.3.2 Region 2: right
-
+         ireg=2
+         print*, 'ireg=', ireg
+  148   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=149,err=148) modif
+  149	continue
          nbcrb = 1
 
 *..Define the primary curve and the grid points
 
-         ireg=2
+        
          np1(ireg) = 0
 
          IF (ptxint .EQ. 1) THEN
@@ -1823,22 +2148,43 @@ c---
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+        
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,1,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .               rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .               gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),
+     .               gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
+
+      modif=0
 
 *..3.3.3 Region 3: top PFR
 
          nbcrb = 1
 
 *..Define the primary curve and the grid points
-
          ireg=3
+        print*, 'ireg=', ireg
+  158   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=159,err=158) modif
+  159	continue
+        
          np1(ireg) = 0
 
          DO 160 ipas=nptseg(1),1,-1
@@ -1898,23 +2244,42 @@ c---
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+         
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,0,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .               rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .               gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),
+     .               gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .           nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .             distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
 
+      modif=0
 
 *..3.3.4 Region 4: left
-
+         ireg=4
+        print*, 'ireg=', ireg
+  168   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=169,err=168) modif
+  169	continue
          nbcrb = 1
 
 *..Define the primary curve and the grid points
 
-         ireg=4
+        
          np1(ireg) = 0
 
          IF (ptxint .EQ. 1) THEN
@@ -1998,22 +2363,42 @@ c---
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+         
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,1,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .               rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .               gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),
+     .               gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
+     .        distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
+      modif=0
 
 *..3.3.5 Region 5: bottom PFR
-
+        ireg=5
+        print*, 'ireg=', ireg
+  178   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=179,err=178) modif
+  179	continue
          nbcrb = 1
 
 *..Define the primary curve and the grid points
 
-         ireg=5
+         
          np1(ireg) = 0
 
          DO 180 ipas=nptseg(5), 1, -1
@@ -2072,14 +2457,29 @@ c---
 *..Call the routine which grids this region
 
 c---
-         print*, 'ireg=', ireg
+         
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .               x,y,psi,nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,
      .               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .               ynlast,nnlast,nuldec)
+     .               ynlast,nnlast,nuldec,0,xpto,ypto,gdpsi(1,ireg),
+     .               racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .               rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .               gdsomortp(ireg),somortpur(1,ireg),
+     .               somortpurp(1,ireg),
+     .               gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
+     .             xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ptxint)
+ 
+      modif=0
 
 *..3.3.6  Region 6: central region
 
@@ -2132,13 +2532,26 @@ c---
      .      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
      .      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .      a00,a10,a01,a11,repart,
-     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
+     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
+     .      gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .      a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
+     .      somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
+     .      somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg))
+
+
+
+     
 c----------------------------------------------------------------------
 
       ELSE IF (limcfg.eq.1) THEN
 
 c----------------------------------------------------------------------
 *..4.   Limiter configuration
+
 
          nbcrb = 1
          nreg = 2
@@ -2247,6 +2660,23 @@ c----------------------------------------------------------------------
      .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
      .             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
+*..Initialise the primary level line
+
+         nn1=0
+
+         DO 391 ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+  391    CONTINUE
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+     _	       ptsep,npx,nptot,
+     _	       nstruc,npstru,xstruc,ystruc,
+     _		   nivx,nivy,nivtot,nbniv,
+     _           pntrat,distxo,xn,yn,nn1,
+     .           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
+     .           a00,a01,a10,a11,psi,nx,ny,x,y)
          if(correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -2262,6 +2692,16 @@ c----------------------------------------------------------------------
             isor = 6
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
+            if (pntrat.ne.pntrat_old) then
+	      call endpag
+
+
+	call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
+     .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
+     .        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+            
+
+            endif
             GO TO 203
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
@@ -2274,7 +2714,15 @@ c----------------------------------------------------------------------
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,
      .     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny,
-     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,
+     .     gdpsi,racpsi,a,
+     .     gdr,r,ra,
+     .     rho,nprad,somort,ir,ipol,
+     .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .     somtot,somtotp,gdsomtotp,segt)
+     
+
 
 *..4.2  Distribute the points along separatrices
 
@@ -2299,8 +2747,13 @@ c----------------------------------------------------------------------
 *..4.3.1  Region 1
 
 *..Define the primary curve and the grid points
-
-         ireg=1
+        ireg=1
+       print*, 'ireg=', ireg
+378   write(6,*)'Avec ou sans modifications?'
+	write(6,*)'répondez 1 avec modif et 0 sans modif'
+	read(5,*,end=379,err=378) modif
+  379	continue
+        
          np1(ireg) = 0
 
          DO ipas=1, nptseg(1)
@@ -2360,14 +2813,28 @@ c        print*,'ireg, idef, inddef=',ireg,idef,inddef(idef)
 c        print*,'np1, npr=',np1(ireg),npr(ireg)
 c***
 c---
-         print*, 'ireg=', ireg
+         
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
      .              x,y,psi,nstruc,npstru,xstruc,ystruc,
      .              a00,a10,a01,a11,repart,
      .              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .              ynlast,nnlast,nuldec)
+     .              ynlast,nnlast,nuldec,0,xpto,ypto,gdpsi(1,ireg),
+     .              racpsi(1,ireg),a,gdr(1,ireg),r(1,ireg),ra(1,ireg),
+     .              rho(1,ireg),somort(1,ireg),somortp(1,ireg),
+     .              gdsomortp(ireg),somortpur(1,ireg),
+     .              somortpurp(1,ireg),
+     .              gdsomortpurp(ireg), 
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg),ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
+     .          xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+
 
 *..4.3.2  Region 2
 
@@ -2415,7 +2882,16 @@ c---
      .      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
      .      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .      a00,a10,a01,a11,repart,
-     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
+     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
+     .      gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .      a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
+     .      somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
+     .      somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
+     .      sompropo(1,ireg),sompropop(1,ireg),gdsompropop(ireg),
+     .      somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
+     .      somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
+     .      segt(1,ireg))
+
 
 c       ...
       ENDIF
@@ -2425,7 +2901,15 @@ c======================================================================
 
       CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,deltrn,
      .  pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny,
-     .  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx)
+     .  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx,
+     .  gdpsi,
+     .  racpsi,a,
+     .  gdr,r,ra,
+     .  rho,nprad,somort,ir,ipol,
+     .  somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .  sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .  somtot,somtotp,gdsomtotp,segt)
+     
 
 cc<<<
 c      write(0,*) '<=== Leaving maille'

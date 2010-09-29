@@ -32,7 +32,8 @@ c        1. permettre l'imposition de points fixes ou de coins
 *  variables.
 
 cank-970702: moved dimensions to the CARREDIM.F
-#include <CARREDIM.F>
+      include "../include/CARREDIM.F"
+
       REAL*8 cstlin,zero,eps_Xpt,rmax,zmax
       common /geom/ eps_Xpt
       PARAMETER (cstlin=0.00, zero=0.)
@@ -42,8 +43,10 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx),
      .   nbdef, nivtot(nivmx), nbniv,ptxint,nreg,
      .   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,
-     .   itmp
-
+     .   itmp,nn1,sol,ir,nprad,ipol,nppol,mini,maxi,re,rp,rz,ireg,ro,rv,
+     .   ry,modif,reb,rzb,rpb,chgt,nprsb(nregmx),
+     .   rg,ipx,ig,ireg1,ireg2,idep,iarr,idp2,iar2,n
+    
       REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax),
      .   psidx(nxmax,nymax), psidy(nxmax,nymax),
      .   xstruc(npstmx,strumx), ystruc(npstmx,strumx),
@@ -53,9 +56,24 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx),
      .   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx),
      .   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3),
-     .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+     .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), 
+     .   pntrat,distxo,gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),
+     .   a(nregmx),
+     .   gdr(nrmamx,nregmx),
+     .   r(nrmamx,nregmx),ra(nrmamx,nregmx),rho(nrmamx,nregmx),
+     .   somort(nrmamx,nregmx),somortp(nrmamx,nregmx),
+     .   gdsomortp(nregmx),xmini,
+     .   xmaxi,ymini,ymaxi,somortpur(nrmamx,nregmx),
+     .   somortpurp(nrmamx,nregmx),gdsomortpurp(nregmx),
+     .   sompropo(nrmamx,nregmx),sompropop(nrmamx,nregmx),
+     .   gdsompropop(nregmx),
+     .   somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx),
+     .   gdsomvarrp(nregmx),
+     .   somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
+     .   gdsomtotp(nregmx),segt(nrmamx,nregmx),
+     .   vx(npmamx),vy(npmamx),ls,tgarde(4)
 
-      LOGICAL racord
+      LOGICAL racord, last
       character lign80*80,nomstr(strumx)*80
 
       REAL*8 stp0, stpmin
@@ -64,9 +82,10 @@ cank-970702: moved dimensions to the CARREDIM.F
 *..Procedures
 *
       INTRINSIC ABS,MIN,index
+	REAL*8 long
       EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0,
-     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,entete
-     ,        ,trc_stk_in,trc_stk_out
+     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete
+     ,        ,trc_stk_in,trc_stk_out,long
 c======================================================================
 c.. nxmax,nymax: maximum number of the data points in x and y
 c.. gradmx: maximum number of points where the gradient vanishes
@@ -140,6 +159,104 @@ c           limiter
 c     N.B.: When the limiter configuration is selected, npx is set equal
 c           to 1 and the coordinates of the X-point correspond to the
 c           innermost point of the limiter.
+
+c      GRAND ET PETIT RAYON
+c      sol: variable utilisée dans le cadre du maillage des régions 
+c           périphériques. Si cette valeur=1 alors la région contient 
+c           des courbes de niveau passant par ypto. On peut alors déterminer 
+c           les grandeurs gdpsi,racpsi,gdr,r,a,rho.
+C      gdr: grand rayon (lecture des surfaces poloidales sur l'axe radial)
+c        r: petit rayon
+c        a: petit rayon de la séparatrice
+c       ra: différence entre la petit rayon de la séparatrice et le petit
+c           rayon d'une ligne de niveau.
+c      rho: rapport entre le ptit rayon de la séparatrice et le petit rayon
+c           d'une ligne de niveau.       
+c  sensspe: sens correspondant à la fausse plaque pour le calcul des rayons.
+c
+
+C      QUALITE DE LA MAILLE GLOBALE
+* les variables servent verifier la manière dont est quantifier la qualité de
+*  la maille (mailrg)
+c    somort:(somme des orthogonalités avec ort1) valeur qui prend en compte 
+c           l'orthogonalité, l'espace et la taille de deux cellules consecutives
+c           ainsi que la répartition des points nppol entre une ligne de niveau 
+c           et celle qui la précède.
+c  somortp:(somme des orthogonalités poussée)  cette valeur correspond au somort
+c           à la fin des itérations avec l'utilisation de ort2, le tout divisé par nppol.
+* les itérations fonctionnent correctement meme avec la deuxième ligne de niveau
+* donc non seulement l'instruction fonctionne car la fonction se rapproche de zéro
+* mais en plus elle n'est pas à l'origine de la déformation en zig-zag
+*(de toute facon si c était le cas, on le constaterait systematiquement donc c'est 
+* plutot la géométrie, la géographie ainsi que la longueur des plaques et des lignes
+* de niveau qui deviennent les principaux suspects)
+C
+c   gdsomortp:(grande somme des orthogonalités poussée) cette valeur correspond
+c             à l'ensemble des somortp sur une meme ligne de niveau que l'on
+c             divise par nppol (le but est d'avoir un indice de qualité de la région)
+* gdsomortp n'a pas grande signification et peut tromper sur la qualité de la ligne 
+* de niveau. Il peut être utilisé pour comparer l'influence de chaque composante 
+* de la fonction ort.
+
+C
+C     INFLUENCE DE LA VRAIE ORTHOGONALITE SUR CLORT
+c     ortpur:(orthoganilité pur) cette valeur ne tient compte que de l'orthogonalité
+* ortpur peut prendre des valeur un million de fois plus élévé que la somme des trois 
+* critères donc il doit y avoir une atténuation dans le calcul de ort.
+c     propo: (proportionalité) cette valeur ne tient compte que de la proportionalité
+c     varr: (variance) cette valeur ne tient compte que de la variation de longueur 
+c     des cellules de la maille pour trois cellules qui se suivent et sur une même ligne de niveau.
+c     tot:(total) correspond à la somme de ortpur, propo et varr. on verifie juste que tot = ort
+c     somortpur, sompropo, somvarr, somtot : correspondent aux sommes de ortpur, propo,
+c      varr et tot pour une ligne de niveau lors du premier déplacement des noeuds.
+c      somortpurp, sompropop, somvarrp, somtotp : correspondent aux sommes de ortpur,
+c      propo, varr et tot pour une ligne de niveau après les itérations.
+c     gdsomortpurp, gdsompropop, gdsomvarr et gdsomtotp: correspondent à la somme,
+c     sur toutes les lignes de niveau de la région de somortpur, sompropo, somvarr et somtotpt.
+
+c
+c     CORRECTION DES DEFORMATIONS
+c     segt: (segment) cette variable devait servir pour le suivi automatique du grossissement,
+c     elle coreespond la longueur totale de la ligne de niveau (l(nppol))  
+c     modif: interrupteur qui permet de sauter l'étape de modification de déplacement
+c     des noeuds (choix de l'utilisateur)
+c     rr : reponse à la redefinition (si choix = 1)
+c     pra : premiere reponse 
+c     sra: seconde réponse
+c     tra: troisieme réponse
+c     la troisième lettre indique la position du segemnt: a le premier, b le deuxième,
+c     c le troisième,...
+c     coefa,coefb,...: coefficient de l'itération qui permet de multiplier un segment
+c     de longueur ipol(1)-ipol(2) par une valeur généralement comprise entre 1 et 1.03
+c     (à l'utilisateur de choisir) 
+c     choix:correspond au choix de l'utilisateur pour la correction des déformations
+c     =1 si tous les points sont déplacés simultanément, =2 si c'est par fragmentation,
+c     =3 si les coefficients sont ceux entrés dans le programme, =4 si par fragmentation
+c     assisté d'un grossissment
+c     deci:décision de l'utilisateur    
+
+c     GROSSISSEMENT AUTOMATIQUE
+c     lsp : longueur du segment parfait. correspond à la taille et la partie du 
+c      fragment de la ligne de niveau qui doit être représenté dans le zoom, elle
+c      sert de réference dans l'instruction de calcul.
+c     ls : longueur du segment. correspond à la taille du segment de la ligne de
+c     niveau pour chaque indice nppol calculé. 
+C     idep: point de départ
+c     iarr: point d'arrivée
+c     tpr: valeur temporaire. conserve la valeur du point d'arrivée du segment
+c     précédent pour en faire le point de départ du segment suivant.  
+c      deltay: difference entre ymaxi et ymini
+c      deltax: difference entre xmaxi et xmini
+c      deldelta(x ou y): difference entre les deux delta
+c      disdelta(x ou y): dispersion de delta, correspond à l'agrandissement des
+c      des bords sur le plus petit axe
+c      rpt(rapport): nombre de points dans le segment de séparatrice (=npimx)
+c      rptd(rapport par deux): première moitié des points du segment de separatrice
+c      rptt(rapport par trois): premier tiers des points du segment de separatrice
+c      rptq: premier quart des points du segment de separatrice
+c    
+c     
+
 c======================================================================
 *
 *..1.0  Initialisation des variables par defaut et de la bibliotheque
@@ -163,12 +280,17 @@ c  2.1  specify output format
 
 *
 *..3.0  Read the data
-*
-
+101   CONTINUE
+  
 *..Read the values of x
-
+      
 100   format(a)
+     
       iflag=-1
+      rewind(7)
+	rewind(8)
+	rewind(9)
+	rewind(10)
       call entete(7,'$r',iflag)
       read(7,100)lign80
       i=index(lign80,'=')
@@ -220,7 +342,7 @@ c---
 
 *
 *..3.1  Read the structures.
-*
+
       nstruc=0
       call listru(8,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,strumx)
 
@@ -254,7 +376,9 @@ cank-970702: moved dimensions to the included file
       CALL SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx,
      .            pty,iptx,jptx,xpto,ypto,racord,limcfg)
 
-*
+
+*  
+         
 *..8.0  Parametrise the separatrices
 *
       IF (npx.GT.0 .and. limcfg.eq.0) THEN
@@ -263,6 +387,9 @@ c
      .      iptx,jptx,fctpx,separx,separy,nptot,
      .      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef,
      .      a00,a10,a01,a11)
+        
+	  
+        
 *
 *..9.0  Arrange the separatrices
 *
@@ -285,14 +412,19 @@ c
 
       ENDIF
 
+*
+*  9.1  Vérification des séparatrices et régions
+*
+                   
+
       if(npx.gt.0) then
 *
 *..10.0  Find the level lines in more detail
 *
 c<<<
-	write(0,*) '=== carre *..10.0 - before frtier'
-	write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') (ptx(i),i=1,npx)
-	write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') (pty(i),i=1,npx)
+	  write(0,*) '=== carre *..10.0 - before frtier'
+	  write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') ptx(1:npx)
+	  write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') pty(1:npx)
         if(limcfg.eq.0) then
 	  write(0,*) 'nptot(4,nxpoints)'
 	  write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
@@ -310,16 +442,38 @@ c>>>
      .      distnv,ptxint,a00,a10,a01,a11)
           call trc_stk_out
         endif
+      
+		call trace2(x(1),x(nx),y(1),y(ny),separx,separy,
+     _	       ptsep,npx,nptot,
+     _	       nstruc,npstru,xstruc,ystruc,
+     _		   nivx,nivy,nivtot,nbniv,pntrat,
+     _           distxo,xn,yn,nn1)
+
+
+
+c      if (modif.eq.1) then
+c	go to 878
+c	endif
 
 *
 *..11.0  Grid the regions
 *
-
+        modif=0
         CALL MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord,
      .    separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru,
      .    xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail,
      .    np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv,
-     .    a00,a10,a01,a11,fctpx,limcfg)
+     .    a00,a10,a01,a11,fctpx,limcfg,gdpsi,racpsi,
+     .    a,gdr,r,ra,rho,sol,somort,ir,nprad,ipol,somortp,
+     .    nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .    sompropo,
+     .    sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .    somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
+     .    ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
+
+
+
+
 
 c*
 c* WARNINGS CALCULATION AND OUTPUT
@@ -332,17 +486,373 @@ c     &  distnv(1,2),xpto,ypto)
 *        lines for each region, together with the resulting grid
 *
 
+        if (modif.eq.0) call endpag
         call trace(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
-     .           nstruc,npstru,xstruc,ystruc,
-     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg)
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.false.)
 
+*  13.0 on propose à l utilisateur dans le cas simple N. si il souhaite
+*       observer quelques agrandissements le long de la séparatrice.
+* les valeurs ci-dessous correspondent aux positions des segments de séparatrice dans 
+* un cas de réacteurs et ont selectionné parmis plusieurs dizaines de clichés effectué 
+* manuellement. Pour adapter les grossissements suivants à tous les cas de figure, il 
+* faut utiliser les coordoonées de la séparatrice en xmini, xmaxi, ymini et ymaxi.
+* Une des possibilités consisterait à fragmenter la séparatrice à prendre la longueur de 
+* chaque segment en fonction du nombre de point total de la séparatrice. Toutefois, 
+* comme avec les lignes de niveau, les grossissements peuvent être de mauvaise qualité.
+* Il est probable que le delta x et le delta y soient trop different, ce qui ecraserait
+* le dessin. Pour éviter ce genre de problème, l'un des quatre bords du cadre devra 
+* des trois autres. 1) faire la difference en x et la difference en y (xmaxi-xmini et 
+* ymaxi-ymini). 2) faire la dirence des deux (delta x - delta y)
+* 2 bis) penser à faire une étude sur la limite de qualité du grossissement, c'est
+* à dire voir à partir de quand la difference entre les deux delta écrase le dessin.
+* 3) si la difference entre les deux delta est trop grande alors le delta le plus
+* grand entre delta x et delta y devient la référence et la difference entre les
+* deux delta est distribué equitablement sur les bords de l autre delta.
+
+  555   write(6,*)'Souhaitez-vous effectuer un suivi automatique?'
+   88   write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+	  read(5,*,end=31, err=88) re
+
+        if (re.eq.1) then
+           last = re.eq.1
+           call endpag
+
+	     xmini= 2.44
+	     xmaxi= 2.60
+	     ymini= -1.48
+	     ymaxi= -1.32
+           write(6,*) 'Région 2 près de la plaque 1'
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+       
+           write(6,*) 'Observation du point X'
+           xmini= 2.36
+	     xmaxi= 2.56
+	     ymini= -1.60
+	     ymaxi= -1.40
+
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Frontière 1/3 près du point X par la gauche'
+           xmini= 2.35
+	     xmaxi= 2.55
+	     ymini= -1.40
+	     ymaxi= -1.20
+
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*)'Frontière 1/3 à gauche'
+           xmini= 1.95
+	     xmaxi= 2.15
+	     ymini= -0.20
+	     ymaxi= 0.00
+
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Frontière 1/3 proche du sommet'
+           xmini= 2.00
+	     xmaxi= 2.20
+	     ymini= 0.94
+	     ymaxi= 1.14
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Frontière 1/3 au sommet'
+           xmini= 2.60
+	     xmaxi= 2.80
+	     ymini= 1.60
+	     ymaxi= 1.80
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Frontière 1/3 proche du sommet à droite'
+           xmini= 3.30
+	     xmaxi= 3.50
+	     ymini= 1.20
+	     ymaxi= 1.40
+
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Frontiére 1/3 à droite'
+           xmini= 3.70
+	     xmaxi= 3.90
+	     ymini= 0.00
+	     ymaxi= 0.20
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Frontière1/3 proche du point X par la droite'
+           xmini= 2.70
+	     xmaxi= 2.90
+	     ymini= -1.30
+	     ymaxi= -1.10
+
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Région 2 près du point X'
+           xmini= 2.50
+	     xmaxi= 2.70
+	     ymini= -1.60
+	     ymaxi= -1.40
+
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+
+           write(6,*) 'Région 2 près de la plaque 2'
+           xmini= 2.60
+	     xmaxi= 2.80
+	     ymini= -1.70
+	     ymaxi= -1.50
+        
+           call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.not.last)
+       
+        endif
+
+         
+  987	  write(6,*) 'Voir la région 2?'
+        write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+	  read(5,*,end=39, err=987) ro
+
+   39   if (ro.eq.1) then
+          call endpag
+          xmini= 2.40
+	    xmaxi= 2.70
+	    ymini= -1.70
+	    ymaxi= -1.40
+          call trace(xmini,xmaxi,ymini,ymaxi,
+     .           separx,separy,ptsep,npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.false.)
+        endif
+
+ 986	  write(6,*) 'Voir la séparatrice à la frontière 1/2 ?'
+        write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+	  read(5,*,end=36, err=986) ry
+
+   36   if (ry.eq.1) then
+          call endpag
+          xmini= 2.55
+	    xmaxi= 2.60
+	    ymini= -1.52
+	    ymaxi= -1.47
+          call trace(xmini,xmaxi,ymini,ymaxi,
+     .           separx,separy,ptsep,npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
+
+          xmini= 2.58
+	    xmaxi= 2.63
+	    ymini= -1.58
+	    ymaxi= -1.53
+          call trace(xmini,xmaxi,ymini,ymaxi,
+     .		   separx,separy,ptsep,npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
+
+          xmini= 2.6
+	    xmaxi= 2.65
+	    ymini= -1.6
+	    ymaxi= -1.55
+          call trace(xmini,xmaxi,ymini,ymaxi,
+     .		   separx,separy,ptsep,npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
+
+          xmini= 2.63
+	    xmaxi= 2.68
+	    ymini= -1.63
+	    ymaxi= -1.58
+          call trace(xmini,xmaxi,ymini,ymaxi,
+     .		   separx,separy,ptsep,npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,
+     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
+
+          xmini= 2.65
+	    xmaxi= 2.7
+	    ymini= -1.65
+	    ymaxi= -1.6
+          call trace(xmini,xmaxi,ymini,ymaxi,
+     .           separx,separy,ptsep,npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.false.)
+
+        endif
+
+
+        write(6,*) 'Souhaitez-vous revoir la séparatrice?'
+   76   write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+	  read(5,*,end=31, err=76) rv
+        if (rv.eq.1) go to 36
+
+  666   write(6,*) 'Souhaitez-vous effectuer un agrandissement?'
+   77   write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+	  read(5,*,end=31, err=77) re
+
+   31   if (re.eq.2) then
+          GO TO 119
+	  endif
+	
+    9	  write(6,*) 'Définissez les bords.'
+   10	  write(6,*) 'Limite inférieure en R'
+	  read(5,*,end=11, err=10) xmini
+   11	  write(6,*) 'Limite supérieure en R'
+	  read(5,*,end=12,err=11) xmaxi
+   12	  write(6,*) 'Limite inferieure en Z'
+	  read (5,*,end=13,err=12) ymini
+   13	  write(6,*) 'Limite superieure en Z'
+	  read(5,*,end=14,err=13) ymaxi
+ 
+   14   call endpag
+        call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.false.)
+         
+        rp = 1
+        do while (rp.eq.1)
+ 913	    write(6,*) 'Voulez-vous faire un autre agrandissement?'
+	    write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+          read(5,*,end=69, err=913) rp
+   69     continue 
+          if (rp.eq.1) then
+            write(6,*) 'Définissez les bords.'
+   70	      write(6,*) 'Limite inférieure en R'
+	      read(5,*,end=71, err=70) xmini
+   71	      write(6,*) 'Limite supérieure en R'
+	      read(5,*,end=72,err=71) xmaxi
+   72	      write(6,*) 'Limite inférieure en Z'
+	      read (5,*,end=73,err=72) ymini
+   73	      write(6,*) 'Limite supérieure en Z'
+	      read(5,*,end=74,err=73) ymaxi
+ 
+   74       call endpag
+            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.false.)
+
+	    endif
+	  enddo
+  119   continue
+
+	  write(6,*) 'Souhaitez-vous voir les gardes?'
+   78   write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+	  read(5,*,end=1119, err=78) rg
+
+	  if (rg.eq.1) then
+
+	    do ipx = 1, npx
+
+	      do ig = 1, 2
+
+              if (npx.eq.1) then
+	          ireg1 = 1
+	          ireg2 = 2
+	        else if (racord) then
+	          ireg1 = (ig-1)*2+1
+	          ireg2 = 2*ipx
+	        else ! non raccorde
+	          ireg2 = 2*ipx+1
+	          if (ipx.eq.ptxint) then
+	            ireg1 = 1
+	          else
+	            ireg1 = 2*ig
+                endif
+	        end if
+	          
+		    if (tgarde((ipx-1)*2+ig).gt.0.) then
+	          
+	          if (ig.eq.1) then
+                  idep = 1
+	            iarr = 1
+	            idp2 = 1
+	            iar2 = 1
+	          else if (ig.eq.2) then
+	            idep = np1(ireg1)
+	            iarr = np1(ireg1)
+	            idp2 = np1(ireg2)
+	            iar2 = np1(ireg2)
+	          endif
+
+		      vx(1)=xmail(idep,1,ireg1)
+	          vy(1)=ymail(idep,1,ireg1)
+	          ls = 0
+	          n = 0
+			  do while (ls.lt.tgarde((ipx-1)*2+1)
+     .              .and. n.lt.np1(ireg1)) 
+	            if (ig.eq.1) then
+	              iarr=iarr+1
+	              iar2=iar2+1
+	              vx(iarr-idep+1)=xmail(iarr,1,ireg1)
+                    vy(iarr-idep+1)=ymail(iarr,1,ireg1)
+	            else if (ig.eq.2) then
+	              idep=idep-1
+	              idp2=idp2-1
+	              vx(iarr-idep+1)=xmail(idep,1,ireg1)
+                    vy(iarr-idep+1)=ymail(idep,1,ireg1)
+	            endif
+	            n=iarr-idep+1
+	            ls=long(vx,vy,n)
+                enddo
+	          
+	          xmini= min(minval(xmail(idep:iarr,1:npr(ireg1),ireg1)),
+     .                     minval(xmail(idp2:iar2,1:npr(ireg2),ireg2)))
+	          xmaxi= max(maxval(xmail(idep:iarr,1:npr(ireg1),ireg1)),
+     .                     maxval(xmail(idp2:iar2,1:npr(ireg2),ireg2)))
+	          ymini= min(minval(ymail(idep:iarr,1:npr(ireg1),ireg1)),
+     .                     minval(ymail(idp2:iar2,1:npr(ireg2),ireg2)))
+	          ymaxi= max(maxval(ymail(idep:iarr,1:npr(ireg1),ireg1)),
+     .                     maxval(ymail(idp2:iar2,1:npr(ireg2),ireg2)))
+
+                call endpag
+                call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
+     .           npx,nptot,
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.false.)
+	        end if
+	      end do
+
+          end do
+        end if
+
+ 1119   continue
+        call endpag
 
       ENDIF
-
+    
 *
 *.. Close the graphics
 *
-      CALL pltend
+  111  CALL pltend
 
       STOP
       END

@@ -1,6 +1,7 @@
 
 ************************************************************************
-      subroutine clort(x1,y1,x2,y2,ort,nppol,pasmin,g1,g2,l0,l2)
+      subroutine clort(x1,y1,x2,y2,ort,nppol,pasmin,g1,g2,l0,l2,
+     .        	ortpur,propo,varr,tot)
 ************************************************************************
       implicit none
 c  calcul des fonctions qui s'annulent quand deux series de points sont
@@ -9,7 +10,9 @@ c
 c  arguments
       integer nppol
       real*8 x1(nppol),y1(nppol),x2(nppol),y2(nppol),ort(nppol),pasmin,
-     .  g1,g2,l0(nppol),l2(nppol)
+     .  g1,g2,l0(nppol),l2(nppol),ortpur(nppol),propo(nppol),
+     .  varr(nppol),
+     .  tot(nppol)
 c
 c  x1, y1: coordonnees des points de maille de reference (sur la courbe
 c          precedente
@@ -23,7 +26,7 @@ c
 c  variables locales
       integer i
       real*8 cs1,cs2,cs3,cs4,l1m,l1p,l2m,l2p,l12,zero,fac1,fac2,fac,
-     .  l12t,un
+     .  l12t,un,ftan
       parameter(zero=0.,un=1.)
 c
 c  procedures
@@ -43,6 +46,8 @@ c  valeur de l12 constante.
           fac=fac1*(un-fac2)+fac2
           l12=fac*l0(nppol)+(1.-fac)*l12t
 c
+          ftan= ((1-tanh(pasmin/(l2(i)-l2(i-1))))+
+     .     	   (1-tanh(pasmin/(l2(i-1)-l2(i)))))
           l1m=l1p
           l2m=l2p
           l1p=sqrt((x1(i)-x1(i+1))**2+(y1(i)-y1(i+1))**2)
@@ -55,6 +60,7 @@ c
      .       +(y2(i)-y1(i))*(y1(i-1)-y1(i))
           cs4=(x2(i)-x1(i))*(x1(i+1)-x1(i))
      .       +(y2(i)-y1(i))*(y1(i+1)-y1(i))
+	    
           cs1=cs1/(l2m*l12)
           cs2=cs2/(l2p*l12)
           cs3=cs3/(l1m*l12)
@@ -64,7 +70,12 @@ c
      .      -((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2)
      .      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
      .      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
-
+     .      +(ftan/100 000 000)
+	    ortpur=cs2+cs3-cs1-cs4
+		propo(i)= - ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2)
+     .      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
+        varr(i)= (pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
+	   tot(i)= ortpur(i) + propo(i) + varr(i)
         enddo
       else
         do i=2,nppol-1
@@ -82,6 +93,7 @@ c
      .       +(y2(i)-y1(i))*(y1(i-1)-y1(i))
           cs4=(x2(i)-x1(i))*(x1(i+1)-x1(i))
      .       +(y2(i)-y1(i))*(y1(i+1)-y1(i))
+          
           cs1=cs1/(l2m*l12)
           cs2=cs2/(l2p*l12)
           cs3=cs3/(l1m*l12)
@@ -89,7 +101,12 @@ c
           ort(i)=
      .       cs2+cs3-cs1-cs4
      .      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
-
+     .      +(ftan/ 100 000 000)
+	   ortpur=cs2+cs3-cs1-cs4
+         propo(i)=  ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2)
+     .      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
+        varr(i)= (pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
+	   tot(i)= ortpur(i)- propo(i) + varr(i)
         enddo
       endif
 c
