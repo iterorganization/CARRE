@@ -18,7 +18,6 @@ c======================================================================
 cank-970707: dimensions from the file
 *  dimensions
 #include <CARREDIM.F>
-      
 
 *  arguments
       INTEGER nsep,nreg,repart,nptseg(nsep),npr(nreg),np1(nreg),
@@ -144,7 +143,7 @@ c
          ENDIF
          write(10,115)'nrelax=',nrelax,'relax=',relax,'pasmin=',pasmin,
      .     'rlcept=',rlcept
- 115     format(a,i5/(a,1pe11.4))
+  115    format(a,i5/(a,1pe11.4))
 
          if(sellan(1:8).eq.'francais') then
            WRITE(10,105)
@@ -158,7 +157,7 @@ c
 
        ELSEIF (numero .EQ. 2) THEN
          write(10,114)
-114      format(t2,'x(m)',t18,'y(m)',t34,'psi(SI)',t50,'dpsi/dx',t66,
+  114    format(t2,'x(m)',t18,'y(m)',t34,'psi(SI)',t50,'dpsi/dx',t66,
      .     'dpsi/dy')
          write(10,*)'$maille'
          WRITE(10,106)nreg
@@ -200,113 +199,102 @@ c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
   210      format('$end')
          endif
 
-        DO ireg=1, nreg
-* par chance, quelque soit la configuration, si la région
-* a un indice impair, elle coupe l'axe horizontal ypto.
-* On peut séparer ainsi les régions dont on ne peut pas
-* connaitre les rayons.
-	  if (ireg.EQ.1 .or. ireg.EQ.3  .or. ireg.EQ.5) then
-            write(10,*) 
-            write(10,*)'$gdpsi'
-      ! write(10,*)'ireg=1, nreg'
-            write(10,*)(gdpsi(i,ireg),i=1,npr(ireg))
-            write(10,*)'$fin'
-            write(10,*)
-            write(10,*)'$racpsi'
-            write(10,*)
-            write(10,*)(racpsi(i,ireg),i=1,npr(ireg))
-	    write(10,*) '$fin'
-            write(10,*) 
-            write(10,*)'$a '
-            write(10,*)
-	    write(10,*)(a(ireg)) 
-            write(10,*)'$fin'
-            write(10,*) 
-            write(10,*)'$gdr' 
-            write(10,*)
-            write(10,*)(gdr(i,ireg),i=1,npr(ireg))
-            write(10,*)'$fin' 
-            write(10,*) 
-            write(10,*)'$r' 
-            write(10,*)
-            write(10,*)(r(i,ireg),i=1,npr(ireg)) 
-            write(10,*)'$fin'
-            write(10,*) 
-            write(10,*)'$rho' 
-            write(10,*) 
-            write(10,*)(rho(i,ireg),i=1,npr(ireg)) 
-            write(10,*)'$fin'
-            write(10,*) 
-            write(10,*)'$ra' 
-            write(10,*)
-            write(10,*)(ra(i,ireg),i=1,npr(ireg))
-            write(10,*)'$fin'
-	  else 
-            write(10,*)'$calcul impossible pour cette region'
-	    write(10,*)
-	  endif
-        enddo
+         write(10,*) 
+         write(10,*) 'a= ',a(1)
+         write(10,124) 
+  124    format(t2,'ir',t8,'gdpsi',t24,'racpsi',t40,'gdr',
+     .          t56,'r',t72,'rho',t88,'ra')
+         if(sellan(1:8).eq.'francais') then
+           write(10,*) '$Coordonnees'
+         elseif(sellan(1:7).eq.'english') then
+           write(10,*) '$Flux surface labels'
+         endif
 
-        DO ireg=1,nreg
-          write(10,*)'$region'
-	  write(10,*)(ireg)
-	  write(10,*)
-	  write(10,*)
-	  write(10,*)'$somort'
-          write(10,*)
-          write(10,*)(somort(i,ireg),i=2,npr(ireg))
-	  write(10,*)'$somortp'
-          write(10,*)
-          write(10,*)(somortp(i,ireg),i=2,npr(ireg))
-          write(10,*)'$gdsomortp'
-          write(10,*)
-          write(10,*)(gdsomortp(ireg))
-          write(10,*)'$fin'
-          write(10,*)'$somortpur'
-          write(10,*)
-          write(10,*)(somortpur(i,ireg),i=2,npr(ireg))
-	  write(10,*)'$somortpurp'
-          write(10,*)
-          write(10,*)(somortpurp(i,ireg),i=2,npr(ireg))
-          write(10,*)'$gdsomortpurp'
-          write(10,*)
-          write(10,*)(gdsomortpurp(ireg))
-          write(10,*)'$fin' 
-          write(10,*)'$sompropo'
-          write(10,*)
-          write(10,*)(sompropo(i,ireg),i=2,npr(ireg))
-	  write(10,*)'$sompropop'
-          write(10,*)
-          write(10,*)(sompropop(i,ireg),i=2,npr(ireg))
-          write(10,*)'$gdsompropop'
-          write(10,*)
-          write(10,*)(gdsompropop(ireg))
-          write(10,*)'$fin' 
-          write(10,*)'$somvarr'
-          write(10,*)
-          write(10,*)(somvarr(i,ireg),i=2,npr(ireg))
-	  write(10,*)'$somvarrp'
-          write(10,*)
-          write(10,*)(somvarrp(i,ireg),i=2,npr(ireg))
-          write(10,*)'$gdsomvarrp'
-          write(10,*)
-          write(10,*)(gdsomvarrp(ireg))
-          write(10,*)'$fin' 
-          write(10,*)'$somtot'
-          write(10,*)
-          write(10,*)(somtot(i,ireg),i=2,npr(ireg))
-	  write(10,*)'$somtotp'
-          write(10,*)
-          write(10,*)(somtotp(i,ireg),i=2,npr(ireg))
-          write(10,*)'$gdsomtotp'
-          write(10,*)
-          write(10,*)(gdsomtotp(ireg))
-          write(10,*)'$fin' 
-          write(10,*)'$segt'
-          write(10,*)
-          write(10,*)(segt(i,ireg),i=2,npr(ireg))
-          write(10,*)'$fin' 
-        enddo
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+              WRITE(10,129) i,gdpsi(i,ireg),racpsi(i,ireg),
+     .         gdr(i,ireg),r(i,ireg),rho(i,ireg),ra(i,ireg)
+           enddo
+         enddo
+  129    FORMAT(i2,1p6E16.8)
+
+         if(sellan(1:8).eq.'francais') then
+           WRITE(10,110)
+         elseif(sellan(1:7).eq.'english') then
+           write(10,210)
+         endif
+
+         write(10,*) 
+         write(10,164) 
+  164    format(t2,'ir',t8,'somort',t24,'somortp',t40,'somortpur',
+     .          t56,'somortpurp')
+         if(sellan(1:8).eq.'francais') then
+           write(10,*) '$Qualite des surfaces de maille'
+         elseif(sellan(1:7).eq.'english') then
+           write(10,*) '$Flux surface quality indices'
+         endif
+
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+              WRITE(10,139) i,somort(i,ireg),somortp(i,ireg),
+     .         somortpur(i,ireg),somortpurp(i,ireg)
+            enddo
+         enddo
+  139    FORMAT(i2,1p4E16.8)
+
+         write(10,*)
+         write(10,134) 
+  134    format(t2,'ir',t8,'sompropo',t24,'sompropop',t40,'somvarr',
+     .          t56,'somvarrp')
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+              WRITE(10,139) i,sompropo(i,ireg),sompropop(i,ireg),
+     .         somvarr(i,ireg),somvarrp(i,ireg)
+            enddo
+         enddo
+
+         write(10,*)
+         write(10,144) 
+  144    format(t2,'ir',t8,'somtot',t24,'somtotp',t40,'segt')
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+              WRITE(10,149) i,somtot(i,ireg),somtotp(i,ireg),
+     .         segt(i,ireg)
+            enddo
+         enddo
+  149    FORMAT(i2,1p3E16.8)
+
+         if(sellan(1:8).eq.'francais') then
+           WRITE(10,110)
+         elseif(sellan(1:7).eq.'english') then
+           write(10,210)
+         endif
+
+         write(10,*) 
+         write(10,154) 
+  154    format(t2,'ireg',t8,'gdsomortp',t24,'gdsomortpurp',
+     .          t40,'gdsompropop',t56,'gdsomvarrp',t72,'gdsomtotp')
+         if(sellan(1:8).eq.'francais') then
+           write(10,*) '$Totaux par region'
+         elseif(sellan(1:7).eq.'english') then
+           write(10,*) '$Totals per region'
+         endif
+
+         DO ireg=1, nreg
+            WRITE(10,169) ireg,gdsomortp(ireg),gdsomortpurp(ireg),
+     .        gdsompropop(ireg),gdsomvarrp(ireg),gdsomtotp(ireg)
+         enddo
+  169    FORMAT(i4,1p5E16.8)
+
+         if(sellan(1:8).eq.'francais') then
+           WRITE(10,110)
+         elseif(sellan(1:7).eq.'english') then
+           write(10,210)
+         endif
       
       ENDIF
 

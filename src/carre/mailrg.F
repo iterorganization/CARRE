@@ -29,7 +29,7 @@ cank-970707: dimensions from the file
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad,
      .        plaque,repart,nbcrb,npcrb2,nnlast,sol,ireg,modif,
-     .          npx,nptot(4,npxmx),nbniv,
+     .        npx,nptot(4,npxmx),nbniv,
      .        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg,re,
      .        nprsb(nregmx),ipx
 
@@ -77,6 +77,7 @@ cank-970707: dimensions from the file
      .      vx(nrmamx),vy(nrmamx),lsd
       LOGICAL interval
       CHARACTER*1 reponse
+      save valfct,fctini,fctxo,fctanc
 
 *  procedures
       INTEGER indsgm,ifind,drctio
@@ -212,6 +213,11 @@ c  calcul des indices de garde
 
          fctanc=valfct
 
+      else
+
+         gdpsi(1)=1.0
+	 racpsi(1)=1.0
+         
       endif
 
       DO 25 ir=2, nprad
@@ -399,25 +405,25 @@ c***
      .            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1,
      .            plaque,x2,y2)
 
-       if (sol.EQ.1) then
-	 
 *.. Calcul de grand psi
-	 gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
+         gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
          racpsi(ir)= sqrt(gdpsi(ir))
+       
+         if (sol.EQ.1) then 
 
-	 x1 = gdr(ir-1)
-	 y1=ypto	  
-	 sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
-         CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe,
-     .              repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+	   x1 = gdr(ir-1)
+	   y1=ypto	  
+	   sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
+           CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe,
+     .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
 *..Calcul des longueurs
 
-	 gdr(ir)=x23
-         r(ir)=x23-xpto
-	 ra(ir)= r(ir)-a
-         rho(ir)=r(ir)/a
-       endif
+	   gdr(ir)=x23
+           r(ir)=x23-xpto
+	   ra(ir)= r(ir)-a
+           rho(ir)=r(ir)/a
+         endif
 
 *..Definition de xn2 et yn2 pour le bloc common comort.
 
