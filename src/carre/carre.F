@@ -68,7 +68,7 @@ cank-970702: moved dimensions to the CARREDIM.F
 
       integer :: isetup
       logical dovirtualtargets
-      parameter (dovirtualtargets=.true.)
+      parameter (dovirtualtargets=.false.)
 
 *..Procedures
 *
@@ -354,7 +354,7 @@ c>>>
         
         open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
         do is = 1, nstruc
-           do ip = 1, npstru( is )
+           do ip = 1, abs(npstru( is ))
               write (100,*) xstruc(ip,is)*1000,
      $             ystruc(ip,is)*1000
            enddo

@@ -57,6 +57,7 @@ c.. nbdef : number of the divertor plates
       real*8 :: vtstartx(nbdef), vtstarty(nbdef)
       real*8 :: ppsi(npstmx,rnstruc)
       real*8 :: tmpx(npstmx,2), tmpy(npstmx,2)
+      real*8 :: rx(2), ry(2)
       real*8 :: vtmp1, vtmp2
       integer :: nvtarget, idir, vtargetipx(nbdef), vtistruc(nbdef)
       integer :: nptmp(2), npvtarget(nbdef), npvtmp
@@ -65,11 +66,11 @@ c.. nbdef : number of the divertor plates
       
       integer, parameter :: MODE_TARGET = 1
       integer, parameter :: MODE_VESSEL = 2      
-      integer :: mode = MODE_VESSEL
+      integer :: mode = MODE_TARGET
 
 *  procedures
-      real*8 feval2d, angle, dist
-      external feval2d, angle, dist, rotate
+      real*8 feval2d, angle, dist, norm
+      external feval2d, angle, dist, rotate, norm
 c=======================================================================
 
 * we create one virtual target for every separatrix segment intersecting
@@ -99,8 +100,10 @@ c=======================================================================
          minpsi(istru) = huge(minpsi)
          maxpsi(istru) = -huge(minpsi)
 
+         write (0,*) 'Structure ', istru,
+     $        ': ', rnpstru(istru), ' points'
          ! loop over all points in structure
-         do ip = 1, rnpstru(istru)
+         do ip = 1, abs(rnpstru(istru))
                
             tx = rxstruc( ip, istru )
             ty = rystruc( ip, istru )
@@ -109,6 +112,7 @@ c=======================================================================
             ppsi(ip,istru) = feval2d( nx, ny, x, y,
      $           a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1),
      $           tx, ty )
+            write (0,*) 'Point', ip, ', psi:', ppsi(ip,istru)
 
             ! update min/max psi values 
             minpsi(istru) = min( minpsi(istru), ppsi(ip,istru) )
@@ -165,6 +169,10 @@ c$$$     $                 ': ', tx, ty
                endif
             enddo ! separatrix projection loop
          enddo ! structure point loop
+
+         write(0,*) 'Structure:', istru, ', psi range:',
+     $        minpsi(istru),  maxpsi(istru)
+
       enddo ! structure loop
 
       ! Find starting points for the virtual targets on the separatrix
@@ -209,7 +217,7 @@ c$$$     $                 ': ', tx, ty
      $              .and. .not. ( istru == itarget ) ) cycle
 
                ! loop over points in structure
-               do ip = 1, rnpstru(istru)
+               do ip = 1, abs(rnpstru(istru))
 
                   ! Check whether the point is located on the separatrix
                   ! branch associated with the target
@@ -233,7 +241,7 @@ c$$$     $                 ': ', tx, ty
                   !write (0,*) 'X/Strike point angle is ', alpha
                   ! if angle to big, skip this point
                   if ( alpha > (pi / 4) ) then
-                     write (0,*) 'X/Strike point angle too big, skip'
+                     !write (0,*) 'X/Strike point angle too big, skip'
                      cycle
                   endif
 
@@ -275,7 +283,49 @@ c$$$     $                 ': ', tx, ty
       end select
 
       ! build the virtual targets
+
+
+      ! build individual targets
       do itarget = 1, nvtarget
+
+         ! track the target extent to get a reference length
+         rx(1) = huge(rx)
+         ry(1) = huge(rx)
+         rx(2) = -huge(rx)
+         ry(2) = -huge(rx)
+
+         ! compute grad psi at starting point (again)
+         tx = vtstartx(itarget)
+         ty = vtstarty(itarget)
+         gx = feval2d( nx, ny, x, y,
+     $        a00(:,:,2), a10(:,:,2), a01(:,:,2), a11(:,:,2),
+     $        tx, ty )
+         gy = feval2d( nx, ny, x, y,
+     $        a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3),
+     $        tx, ty )
+         ! check in which direction the associated x-point is
+         p = gx * ( pty( vtargetipx( itarget ) ) - ty )
+     $        - gy * ( ptx( vtargetipx( itarget ) ) - tx )
+
+         ! take a step along the separatrix away from the x-point
+
+         ! choose a stepsize
+         dx = 1 / norm( gx, gy ) *
+     $        norm( ptx( vtargetipx( itarget ) ) - tx,
+     $              pty( vtargetipx( itarget ) ) - ty ) * 0.1
+
+         if ( p == 0 ) stop 'Grad psi pointing towards x-point'
+         if ( p > 0 ) then
+            ! x-point to the left of grad psi
+            ! step in clockwise right angle to grad psi
+            vtstartx(itarget) = vtstartx(itarget) + dx * gy
+            vtstarty(itarget) = vtstarty(itarget) - dx * gx            
+         else 
+            ! x-point to the right of grad psi
+            ! step in anti-clockwise right angle to grad psi
+            vtstartx(itarget) = vtstartx(itarget) - dx * gy
+            vtstarty(itarget) = vtstarty(itarget) + dx * gx            
+         endif
 
          ! build virtual structure starting from the given points on the sep.
          ! step in both directions away from the separatrix
@@ -300,7 +350,7 @@ c$$$     $                 ': ', tx, ty
      $              a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3),
      $              tx, ty )
                
-               dx = 1e-4;
+               dx = 1e-3;
                tx = tx + dir * dx * gx
                ty = ty + dir * dx * gy                  
                               
@@ -311,6 +361,11 @@ c$$$     $                 ': ', tx, ty
                nptmp(idir) = istep
                tmpx(istep,idir) = tx
                tmpy(istep,idir) = ty
+
+               rx(1) = min( rx(1), tx )
+               ry(1) = min( ry(1), ty )
+               rx(2) = max( rx(2), tx )
+               ry(2) = max( ry(2), ty )
 
                if ( tpsi > vtmaxpsi ) exit
                if ( tpsi < vtminpsi ) exit
@@ -328,19 +383,7 @@ c$$$     $                 ': ', tx, ty
          tx = vtstartx(itarget)
          ty = vtstarty(itarget)
 
-         ! compute grad psi at starting point (again)
-         gx = feval2d( nx, ny, x, y,
-     $        a00(:,:,2), a10(:,:,2), a01(:,:,2), a11(:,:,2),
-     $        tx, ty )
-         gy = feval2d( nx, ny, x, y,
-     $        a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3),
-     $        tx, ty )
-
-            
-         ! check in which direction the associated x-point is
-         p = gx * ( pty( vtargetipx( itarget ) ) - ty )
-     $        - gy * ( ptx( vtargetipx( itarget ) ) - tx )
-         
+                     
          if ( p == 0 ) stop 'Grad psi pointing towards x-point'
          if ( p > 0 ) then
             ! x-point to the left of grad psi
@@ -375,10 +418,13 @@ c$$$     $                 ': ', tx, ty
          enddo
          
          ! close target by wrapping it around
-        
+
          vtmp1 = xstruc(npvtmp, itarget) - xstruc(npvtmp - 1, itarget)
          vtmp2 = ystruc(npvtmp, itarget) - ystruc(npvtmp - 1, itarget)
          call rotate( vtmp1, vtmp2, pi * 1.25 )
+         dx = 1 / norm( vtmp1, vtmp2 ) * ( ( rx(2) - rx(1) ) * 0.3 )
+         vtmp1 = vtmp1 * dx 
+         vtmp2 = vtmp2 * dx 
 
          npvtmp = npvtmp + 1
          xstruc(npvtmp, itarget) = xstruc(npvtmp - 1, itarget) + vtmp1
@@ -387,6 +433,9 @@ c$$$     $                 ': ', tx, ty
          vtmp1 = xstruc(2, itarget) - xstruc(1, itarget)
          vtmp2 = ystruc(2, itarget) - ystruc(1, itarget)
          call rotate( vtmp1, vtmp2, pi * 1.75 )
+         dx = 1 / norm( vtmp1, vtmp2 ) * ( ( rx(2) - rx(1) ) * 0.3 )
+         vtmp1 = vtmp1 * dx 
+         vtmp2 = vtmp2 * dx 
 
          npvtmp = npvtmp + 1
          xstruc(npvtmp, itarget) = xstruc(1, itarget) + vtmp1

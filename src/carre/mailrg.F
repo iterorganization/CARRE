@@ -441,10 +441,12 @@ c       meilleure orthogonalite possible
                print*,
      .          'Do you wish to continue (y/n) ?'
              endif
-             read(5,*) reponse
-             if(reponse(1:1).eq.'n' .or. reponse(1:1).eq.'N') then
-               call pltend
-               stop
+             if ( .not. AUTOCONTINUE ) then
+                read(5,*) reponse
+                if(reponse(1:1).eq.'n' .or. reponse(1:1).eq.'N') then
+                   call pltend
+                   stop
+                endif
              endif
              if(sellan(1:8).eq.'francais') then
                print*,
