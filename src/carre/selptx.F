@@ -15,7 +15,7 @@ c======================================================================
 
 cank-970702: moved dimensions into a separate file
 *  dimensions
-      include "../include/CARREDIM.F"
+#include <CARREDIM.F>
 
 *  arguments
       INTEGER npxtot,npx,ii(gradmx),jj(gradmx),iptx(npxmx),
@@ -25,8 +25,7 @@ cank-970702: moved dimensions into a separate file
       LOGICAL racord
 
 *  variables en common
-
-      include "../include/COMLAN.F"
+#include <COMLAN.F>
 
 *  variables locales
       INTEGER i, j, k, ipx, ipo, iptxtm, jptxtm
@@ -292,27 +291,25 @@ c       write(6,*)' Choose option by typing the appropriate index.'
 
    30   CONTINUE
       
-      READ (5,*, end=31, err=666) ipx
+        READ (5,*, end=31, err=666) ipx
+        GO TO 31
+  666   if(sellan(1:8).eq.'francais') then
+          PRINT *, "Erreur de lecture. Veuillez recommencer."
+        elseif(sellan(1:7).eq.'english') then
+          PRINT *, "Invalid input. Please try again."
+        end if
+        go to 2
+   31	continue
+        if (ipx.lt.-1 .or. ipx.gt.npxtot) goto 666 
 
-	
-	
-      GO TO 31
-  666 PRINT *, "erreur de lecture, veuillez recommencez"
-      go to 2
-	
-
-     
-
-   31	  continue 
-
-           IF (ipx.GT.0) THEN
-              npx = npx + 1
-              ptx(npx) = pointx(ipx)
-              pty(npx) = pointy(ipx)
-              iptx(npx) = ii(ipx)
-              jptx(npx) = jj(ipx)
-              if(npx.lt.2) GO TO 30
-           end if
+        IF (ipx.GT.0) THEN
+          npx = npx + 1
+          ptx(npx) = pointx(ipx)
+          pty(npx) = pointy(ipx)
+          iptx(npx) = ii(ipx)
+          jptx(npx) = jj(ipx)
+          if(npx.lt.2) GO TO 30
+        end if
 
 c
         if(npx.eq.0 .and. ipx.eq.-1) then
@@ -328,11 +325,11 @@ c      de contact avec un limiteur. Ce point est calcule dans limfnd.
 
         IF (npx.GT.0 .or. limcfg.ne.0) THEN
 
-          if(sellan(1:8).eq.'francais') then
-           write(6,*)' Indiquez l''indice du point O.'
-          elseif(sellan(1:7).eq.'english') then
-           write(6,*)' Select index for O-point.'
-          end if
+           if(sellan(1:8).eq.'francais') then
+             write(6,*)' Indiquez l''indice du point O.'
+           elseif(sellan(1:7).eq.'english') then
+             write(6,*)' Select index for O-point.'
+           end if
            READ(5,*) ipo
 
            xpto = pointx(ipo)

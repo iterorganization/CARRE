@@ -9,7 +9,7 @@ c
 
 cank-970707: dimensions from the file
 *  dimensions
-      include "../include/CARREDIM.F"
+#include <CARREDIM.F>
 
 c
 c  arguments
@@ -25,9 +25,9 @@ c
 c  variables locales
       integer i,j,k,nin
       real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
-	real deltax,deltay
+      real deltax,deltay
       character echx*3,echy*3
-	logical last
+      logical last
 c
 c  procedures
       external agcurv,newpag,endpag
@@ -44,11 +44,11 @@ c     xmax=1.2
 c     ymin =-0.3
 c     ymax=0.5
       deltax=x2-x1
-	deltay=y2-y1
-      xmin=(x1+x2)/2-max(deltax,deltay)/2
-      xmax=(x1+x2)/2+max(deltax,deltay)/2
-      ymin=(y1+y2)/2-max(deltax,deltay)/2
-      ymax=(y1+y2)/2+max(deltax,deltay)/2
+      deltay=y2-y1
+      xmin=(x1+x2)/2.-max(deltax,deltay)/2.
+      xmax=(x1+x2)/2.+max(deltax,deltay)/2.
+      ymin=(y1+y2)/2.-max(deltax,deltay)/2.
+      ymax=(y1+y2)/2.+max(deltax,deltay)/2.
 c***
 c     xmin=0.6
 c     xmax=0.8

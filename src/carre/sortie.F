@@ -17,7 +17,7 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
-      include "../include/CARREDIM.F"
+#include <CARREDIM.F>
       
 
 *  arguments
@@ -47,8 +47,8 @@ cank-970707: dimensions from the file
       logical racord
 
 *  variables en common
-      include "../include/COMRLX.F"
-      include "../include/COMLAN.F"
+#include <COMRLX.F>
+#include <COMLAN.F>
 
 *  variables locales
       INTEGER i,j,isep,ireg,ii,jj
@@ -200,174 +200,115 @@ c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
   210      format('$end')
          endif
 
-      DO ireg=1, nreg
+        DO ireg=1, nreg
 * par chance, quelque soit la configuration, si la région
 * a un indice impair, elle coupe l'axe horizontal ypto.
 * On peut séparer ainsi les régions dont on ne peut pas
 * connaitre les rayons.
-	if (ireg.EQ.1 .or. ireg.EQ.3  .or. ireg.EQ.5) then
-      write(10,*) 
-      write(10,*)'$gdpsi'
+	  if (ireg.EQ.1 .or. ireg.EQ.3  .or. ireg.EQ.5) then
+            write(10,*) 
+            write(10,*)'$gdpsi'
       ! write(10,*)'ireg=1, nreg'
-      write(10,*)(gdpsi(i,ireg),i=1,npr(ireg))
-      write(10,*)'$fin'
-      write(10,*)
-      write(10,*)'$racpsi'
-      write(10,*)
-      write(10,*)(racpsi(i,ireg),i=1,npr(ireg))
-	write(10,*) '$fin'
-      write(10,*) 
-      write(10,*)'$a '
-      write(10,*)
-	write(10,*)(a(ireg)) 
-      write(10,*)'$fin'
-      write(10,*) 
-      write(10,*)'$gdr' 
-      write(10,*)
-      write(10,*)(gdr(i,ireg),i=1,npr(ireg))
-      write(10,*)'$fin' 
-      write(10,*) 
-      write(10,*)'$r' 
-      write(10,*)
-      write(10,*)(r(i,ireg),i=1,npr(ireg)) 
-      write(10,*)'$fin'
-      write(10,*) 
-      write(10,*)'$rho' 
-      write(10,*) 
-      write(10,*)(rho(i,ireg),i=1,npr(ireg)) 
-      write(10,*)'$fin'
-      write(10,*) 
-      write(10,*)'$ra' 
-      write(10,*)
-      write(10,*)(ra(i,ireg),i=1,npr(ireg))
-      write(10,*)'$fin'
-	
+            write(10,*)(gdpsi(i,ireg),i=1,npr(ireg))
+            write(10,*)'$fin'
+            write(10,*)
+            write(10,*)'$racpsi'
+            write(10,*)
+            write(10,*)(racpsi(i,ireg),i=1,npr(ireg))
+	    write(10,*) '$fin'
+            write(10,*) 
+            write(10,*)'$a '
+            write(10,*)
+	    write(10,*)(a(ireg)) 
+            write(10,*)'$fin'
+            write(10,*) 
+            write(10,*)'$gdr' 
+            write(10,*)
+            write(10,*)(gdr(i,ireg),i=1,npr(ireg))
+            write(10,*)'$fin' 
+            write(10,*) 
+            write(10,*)'$r' 
+            write(10,*)
+            write(10,*)(r(i,ireg),i=1,npr(ireg)) 
+            write(10,*)'$fin'
+            write(10,*) 
+            write(10,*)'$rho' 
+            write(10,*) 
+            write(10,*)(rho(i,ireg),i=1,npr(ireg)) 
+            write(10,*)'$fin'
+            write(10,*) 
+            write(10,*)'$ra' 
+            write(10,*)
+            write(10,*)(ra(i,ireg),i=1,npr(ireg))
+            write(10,*)'$fin'
+	  else 
+            write(10,*)'$calcul impossible pour cette region'
+	    write(10,*)
+	  endif
+        enddo
 
-	else 
-      write(10,*)'$calcul impossible pour cette region'
-	write(10,*)
-     
-	endif
-	enddo
-
-	DO ireg=1,nreg
-      write(10,*)'$région'
-	write(10,*)(ireg)
-	write(10,*)
-	write(10,*)
-	write(10,*)'$somort'
-      write(10,*)
-      write(10,*)(somort(i,ireg),i=2,npr(ireg))
-
-	write(10,*)'$somortp'
-      write(10,*)
-      write(10,*)(somortp(i,ireg),i=2,npr(ireg))
-    
-    
-
-      write(10,*)'$gdsomortp'
-      write(10,*)
-      write(10,*)(gdsomortp(ireg))
-      write(10,*)'$fin'
-
-      write(10,*)'$somortpur'
-      write(10,*)
-      write(10,*)(somortpur(i,ireg),i=2,npr(ireg))
-
-	write(10,*)'$somortpurp'
-      write(10,*)
-      write(10,*)(somortpurp(i,ireg),i=2,npr(ireg))
-     
-    
-
-      write(10,*)'$gdsomortpurp'
-      write(10,*)
-      write(10,*)(gdsomortpurp(ireg))
-      write(10,*)'$fin' 
- 
-
-      write(10,*)'$sompropo'
-      write(10,*)
-      write(10,*)(sompropo(i,ireg),i=2,npr(ireg))
-
-	write(10,*)'$sompropop'
-      write(10,*)
-      write(10,*)(sompropop(i,ireg),i=2,npr(ireg))
- 
-      write(10,*)'$gdsompropop'
-      write(10,*)
-      write(10,*)(gdsompropop(ireg))
-      write(10,*)'$fin' 
-
-
-
-
-
-
-
-
-      write(10,*)'$somvarr'
-      write(10,*)
-      write(10,*)(somvarr(i,ireg),i=2,npr(ireg))
-
-	write(10,*)'$somvarrp'
-      write(10,*)
-      write(10,*)(somvarrp(i,ireg),i=2,npr(ireg))
-  
-      write(10,*)'$gdsomvarrp'
-      write(10,*)
-      write(10,*)(gdsomvarrp(ireg))
-      write(10,*)'$fin' 
-
-
-
-
-
-
-
-      write(10,*)'$somtot'
-      write(10,*)
-      write(10,*)(somtot(i,ireg),i=2,npr(ireg))
-
-	write(10,*)'$somtotp'
-      write(10,*)
-      write(10,*)(somtotp(i,ireg),i=2,npr(ireg))
-   
-    
-
-      write(10,*)'$gdsomtotp'
-      write(10,*)
-      write(10,*)(gdsomtotp(ireg))
-      write(10,*)'$fin' 
- 
-      write(10,*)'$segt'
-      write(10,*)
-      write(10,*)(segt(i,ireg),i=2,npr(ireg))
-      write(10,*)'$fin' 
- 
- 
-      enddo
+        DO ireg=1,nreg
+          write(10,*)'$region'
+	  write(10,*)(ireg)
+	  write(10,*)
+	  write(10,*)
+	  write(10,*)'$somort'
+          write(10,*)
+          write(10,*)(somort(i,ireg),i=2,npr(ireg))
+	  write(10,*)'$somortp'
+          write(10,*)
+          write(10,*)(somortp(i,ireg),i=2,npr(ireg))
+          write(10,*)'$gdsomortp'
+          write(10,*)
+          write(10,*)(gdsomortp(ireg))
+          write(10,*)'$fin'
+          write(10,*)'$somortpur'
+          write(10,*)
+          write(10,*)(somortpur(i,ireg),i=2,npr(ireg))
+	  write(10,*)'$somortpurp'
+          write(10,*)
+          write(10,*)(somortpurp(i,ireg),i=2,npr(ireg))
+          write(10,*)'$gdsomortpurp'
+          write(10,*)
+          write(10,*)(gdsomortpurp(ireg))
+          write(10,*)'$fin' 
+          write(10,*)'$sompropo'
+          write(10,*)
+          write(10,*)(sompropo(i,ireg),i=2,npr(ireg))
+	  write(10,*)'$sompropop'
+          write(10,*)
+          write(10,*)(sompropop(i,ireg),i=2,npr(ireg))
+          write(10,*)'$gdsompropop'
+          write(10,*)
+          write(10,*)(gdsompropop(ireg))
+          write(10,*)'$fin' 
+          write(10,*)'$somvarr'
+          write(10,*)
+          write(10,*)(somvarr(i,ireg),i=2,npr(ireg))
+	  write(10,*)'$somvarrp'
+          write(10,*)
+          write(10,*)(somvarrp(i,ireg),i=2,npr(ireg))
+          write(10,*)'$gdsomvarrp'
+          write(10,*)
+          write(10,*)(gdsomvarrp(ireg))
+          write(10,*)'$fin' 
+          write(10,*)'$somtot'
+          write(10,*)
+          write(10,*)(somtot(i,ireg),i=2,npr(ireg))
+	  write(10,*)'$somtotp'
+          write(10,*)
+          write(10,*)(somtotp(i,ireg),i=2,npr(ireg))
+          write(10,*)'$gdsomtotp'
+          write(10,*)
+          write(10,*)(gdsomtotp(ireg))
+          write(10,*)'$fin' 
+          write(10,*)'$segt'
+          write(10,*)
+          write(10,*)(segt(i,ireg),i=2,npr(ireg))
+          write(10,*)'$fin' 
+        enddo
       
-cDO  ireg=1,nreg
-c	   DO      i=2,npr(ireg)
-C Cireg=1
-C C          DO      i=2,npr(ireg)
-C           DO       ipol=2,nppol
-C      write(10,*)'$ortpur2'C
-C
-C	write(10,*)
-C	write(10,*)(ortpur2(ipol))
-
-c	   ENDDO
-c        ENDDO
-	 
-	
       ENDIF
 
-	
-
-      
-
-	
       RETURN
       END

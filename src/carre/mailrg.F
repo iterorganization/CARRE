@@ -9,8 +9,8 @@
      .            somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
      .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .            nivx,nivy,
-     .             nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .             xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+     .            nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
+     .            xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
 c
 c
 c  version : 07.07.97 19:11
@@ -24,7 +24,7 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
-      include "../include/CARREDIM.F"
+#include <CARREDIM.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad,
@@ -57,9 +57,9 @@ cank-970707: dimensions from the file
 
 *  variables en common
 
-      include "../include/COMORT.F"
-      include "../include/COMLAN.F"
-      include "../include/COMRLX.F"
+#include <COMORT.F>
+#include <COMLAN.F>
+#include <COMRLX.F>
 
 *  variables locales
       INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,ipol,i,nn(2),
@@ -93,22 +93,22 @@ c======================================================================
 
       garde1=gardd1
       garde2=gardd2
-      somort=0
-	somortp=0
-	gdsomortp=0
-      somortpur=0
-      somortpurp=0
-      gdsomortpurp=0
-	sompropo=0
-	sompropop=0
-	gdsompropop=0
-	somvarr=0
-	somvarrp=0
-	gdsomvarrp=0
-	somtot=0
-	somtotp=0
-      gdsomtotp=0
-      segt=0
+      somort=0.0
+      somortp=0.0
+      gdsomortp=0.0
+      somortpur=0.0
+      somortpurp=0.0
+      gdsomortpurp=0.0
+      sompropo=0.0
+      sompropop=0.0
+      gdsompropop=0.0
+      somvarr=0.0
+      somvarrp=0.0
+      gdsomvarrp=0.0
+      somtot=0.0
+      somtotp=0.0
+      gdsomtotp=0.0
+      segt=0.0
 
 *..S'il y a deux courbes a ne pas traverser alors on definit la deuxieme
 
@@ -176,47 +176,42 @@ c  calcul des indices de garde
 	enddo
    
 * la valeur du sol est précisé dans 'maille' selon l'indice de région et la configuration
-* sol = 1 si la région la droite ypto
+* sol = 1 indicates an SOL region
        if (sol.EQ.1) then
 
-        ii = ifind(xpto,x,nx,1)
-	  jj = ifind(ypto,y,ny,1)
-        fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
-     .            a11(ii,jj,1)*xpto*ypto
+         ii = ifind(xpto,x,nx,1)
+	 jj = ifind(ypto,y,ny,1)
+         fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
+     .          a11(ii,jj,1)*xpto*ypto
 
 * on place un faux segment qui sert d'appui à saute
          xtt(1)= xpto-0.1
          ytt(1)= ypto
          xtt(2)= x(nx)
-	   ytt(2)= ypto
-   	   xtt(3)= xtt(1)
-	   ytt(3)= ytt(1)
+	 ytt(2)= ypto
+   	 xtt(3)= xtt(1)
+	 ytt(3)= ytt(1)
          ntt=3
 
-* la variable de sens est dedoublé pour ne pas pertuber la valeur du sens qui
+* la variable de sens est dedoublée pour ne pas pertuber la valeur du sens qui
 * correspond à la plaque
 
-	  sensspe=1
-
-         
-	
-        CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sensspe,
-     .            2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+	 sensspe=1
+         CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sensspe,
+     .              2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
        
 *..Calcul des longueurs
 
-        gdpsi(1)=1
-	  racpsi(1)=1
-	  gdr(1)=x22
-        r(1)=x22-xpto
-	  a=r(1)
-	  ra(1)= r(1)-a
-	  rho(1)=r(1)/a
+         gdpsi(1)=1.0
+	 racpsi(1)=1.0
+	 gdr(1)=x22
+         r(1)=x22-xpto
+	 a=r(1)
+	 ra(1)= r(1)-a
+	 rho(1)=r(1)/a
 
-        fctanc=valfct
+         fctanc=valfct
 
-        write(6,*) x22,y22
-	  pause
       endif
 
       DO 25 ir=2, nprad
@@ -252,8 +247,6 @@ c---
             mailx(1,ir)=xnlast(1)
             maily(1,ir)=ynlast(1)
 
-        
-
          ENDIF
 
          IF (repart .EQ. 1) THEN
@@ -284,7 +277,7 @@ c***
          nn(inouv)=1
 
          ind=indsgm(xstruc(1,plaque),ystruc(1,plaque),
-     .                  npstru(plaque),x2,y2)
+     .              npstru(plaque),x2,y2)
 
 *..Parametrisation de la ligne de niveau qui passe par ce point.
 
@@ -406,36 +399,26 @@ c***
      .            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1,
      .            plaque,x2,y2)
 
-       if   (sol.EQ.1) then
+       if (sol.EQ.1) then
 	 
 *.. Calcul de grand psi
-        
-	  
-	 
-	        gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
-              racpsi(ir)= sqrt(gdpsi(ir))
-	 
-      
-	  x1 = gdr(ir-1)
-	  y1=ypto	  
+	 gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
+         racpsi(ir)= sqrt(gdpsi(ir))
 
-
-	  sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
-         
-
-       CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe,
-     .               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+	 x1 = gdr(ir-1)
+	 y1=ypto	  
+	 sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
+         CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe,
+     .              repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
 *..Calcul des longueurs
 
-	  gdr(ir)=x23
-        r(ir)=x23-xpto
-	  ra(ir)= r(ir)-a
-	  rho(ir)=r(ir)/a
-        write(6,*) x23,y23
-	  pause
-
+	 gdr(ir)=x23
+         r(ir)=x23-xpto
+	 ra(ir)= r(ir)-a
+         rho(ir)=r(ir)/a
        endif
+
 *..Definition de xn2 et yn2 pour le bloc common comort.
 
          DO 18 ipas=1,nn(inouv)
@@ -498,9 +481,9 @@ c  3.   on procede a un premier deplacement des noeuds
 	       
 	        somort(ir)= somort(ir)+ (ort1(ipol)/nppol)
 	        somortpur(ir)= somortpur (ir)+ (ortpur1(ipol)/nppol)
-              sompropo(ir)= sompropo(ir)+ (propo1(ipol)/nppol)
-              somvarr(ir)= somvarr(ir)+ (varr1(ipol)/nppol)
-              somtot(ir)= somtot(ir)+ (tot1(ipol)/nppol)
+                sompropo(ir)= sompropo(ir)+ (propo1(ipol)/nppol)
+                somvarr(ir)= somvarr(ir)+ (varr1(ipol)/nppol)
+                somtot(ir)= somtot(ir)+ (tot1(ipol)/nppol)
       
                enddo
 c
@@ -531,14 +514,10 @@ c       meilleure orthogonalite possible
                  ortmax=max(ortmax,abs(ort2(ipol)))
                enddo
 
-
                if(ortmax.le.rlcept) go to 19
- 
-	   
 
              enddo
 
-              
              if(sellan(1:8).eq.'francais') then
                print*,
      .          'L''algorithme adaptatif d''optimisation de '//
@@ -601,14 +580,13 @@ c       meilleure orthogonalite possible
      .          'carefully upon completion !'
              endif
  19          continue
-              do ipol=ipol1,ipoln
+             do ipol=ipol1,ipoln
 	        somortp(ir)= somortp(ir)+ (ort2(ipol)/nppol)
-              somortpurp(ir)= somortpurp(ir)+ (ortpur2(ipol)/nppol)
-              sompropop(ir)= sompropop(ir)+ (propo2(ipol)/nppol)
-              somvarrp(ir)= somvarrp(ir)+ (varr2(ipol)/nppol)
-              somtotp(ir)= somtotp(ir)+ (tot2(ipol)/nppol)
-	       
-		    enddo
+                somortpurp(ir)= somortpurp(ir)+ (ortpur2(ipol)/nppol)
+                sompropop(ir)= sompropop(ir)+ (propo2(ipol)/nppol)
+                somvarrp(ir)= somvarrp(ir)+ (varr2(ipol)/nppol)
+                somtotp(ir)= somtotp(ir)+ (tot2(ipol)/nppol)
+              enddo
              
            endif
 
@@ -661,6 +639,7 @@ c---
          endif
 
          nprsb(ireg)=ir
+#ifdef MODIF
 1000     if (modif.eq.1) then
          	 if (ir.eq.2) then
              write(6,*) 
@@ -1466,7 +1445,7 @@ c         IF (ir.lt.nprad/2) then
 	  if (pri.eq.1) goto 1000
 
 	endif  ! modif
-
+#endif
 c---
    25 CONTINUE
       
@@ -1477,7 +1456,9 @@ c---
 	 gdsompropop= gdsompropop+ (sompropop(ir)/(nprad-1))
 	 gdsomvarrp= gdsomvarrp+ (somvarrp(ir)/(nprad-1))
 	 gdsomtotp= gdsomtotp+ (somtotp(ir)/(nprad-1)) 
-       enddo
+
+      enddo
+
   888 CONTINUE
       RETURN
       END

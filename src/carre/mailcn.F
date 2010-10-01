@@ -24,11 +24,11 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
-      include "../include/CARREDIM.F"
+#include <CARREDIM.F>
 
-      include "../include/COMORT.F"
-      include "../include/COMLAN.F"
-      include "../include/COMRLX.F"
+#include <COMORT.F>
+#include <COMLAN.F>
+#include <COMRLX.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),
@@ -47,9 +47,9 @@ cank-970707: dimensions from the file
      .  rho(nrmamx), gdpsi(nrmamx),racpsi(nrmamx),somort(nrmamx),
      .  somortp(nrmamx),gdsomortp,somortpur(nrmamx),
      .  somortpurp(nrmamx),gdsomortpurp,
-     .     sompropo(nrmamx),sompropop(nrmamx),gdsompropop,
-     .     somvarr(nrmamx),somvarrp(nrmamx),gdsomvarrp,
-     .     somtot(nrmamx),somtotp(nrmamx),gdsomtotp,segt(nrmamx)
+     .  sompropo(nrmamx),sompropop(nrmamx),gdsompropop,
+     .  somvarr(nrmamx),somvarrp(nrmamx),gdsomvarrp,
+     .  somtot(nrmamx),somtotp(nrmamx),gdsomtotp,segt(nrmamx)
 
 *  variables locales
       INTEGER ipas,indstr,ianc,inouv,ii,jj,ir,dir,ipol,i,nn(2),nt,sens
@@ -86,22 +86,21 @@ c     print*,'npnimx=',npnimx
 c***
 
 *..Initialisation.
-      somort=0
-	somortp=0
-	gdsomortp=0
-      somortpur=0
-      somortpurp=0
-      gdsomortpurp=0
-	sompropo=0
-	sompropop=0
-	gdsompropop=0
-	somvarr=0
-	somvarrp=0
-	gdsomvarrp=0
-	somtot=0
-	somtotp=0
-      gdsomtotp=0
-
+      somort=0.0
+      somortp=0.0
+      gdsomortp=0.0
+      somortpur=0.0
+      somortpurp=0.0
+      gdsomortpurp=0.0
+      sompropo=0.0
+      sompropop=0.0
+      gdsompropop=0.0
+      somvarr=0.0
+      somvarrp=0.0
+      gdsomvarrp=0.0
+      somtot=0.0
+      somtotp=0.0
+      gdsomtotp=0.0
 
       plaque=0
 
@@ -111,6 +110,10 @@ c***
    10 CONTINUE
 
       nn(1)=nn1
+
+*.. On prepare une structure artificielle pour trouver la distance
+*.. horizontale vers l'exterieur entre le point O et la separatrice
+*.. soit le petit rayon a du plasma
 
       IF (repart .EQ. 2) THEN
 
@@ -126,38 +129,30 @@ c***
 
       ENDIF
 
-        ii = ifind(xpto,x,nx,1)
-	  jj = ifind(ypto,y,ny,1)
-        fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
-     .            a11(ii,jj,1)*xpto*ypto
-
-         xtt(1)= xpto-0.1
-         ytt(1)= ypto
-         xtt(2)= x(nx)
-	   ytt(2)=ypto
-	   xtt(3)=xtt(1)
-	   ytt(3)=ytt(1)
-         ntt=3
-
-
-	  sens=1
-
-         
-	
+      ii = ifind(xpto,x,nx,1)
+      jj = ifind(ypto,y,ny,1)
+      fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
+     .       a11(ii,jj,1)*xpto*ypto
+      xtt(1)= xpto-0.1
+      ytt(1)= ypto
+      xtt(2)= x(nx)
+      ytt(2)=ypto
+      xtt(3)=xtt(1)
+      ytt(3)=ytt(1)
+      ntt=3
+      sens=1
       CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sens,
      .            2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
 *..Calcul des longueurs
 
-        gdpsi(1)=1
-	  racpsi(1)=1
-	  gdr(1)=x22
-        r(1)=x22-xpto
-	  a=r(1)
-	  ra(1)= r(1)-a
-	  rho(1)=r(1)/a
-        
-	 
+      gdpsi(1)=1.0
+      racpsi(1)=1.0
+      gdr(1)=x22
+      r(1)=x22-xpto
+      a=r(1)
+      ra(1)=r(1)-a
+      rho(1)=r(1)/a
 
       DO 25 ir=2, nprad
         
@@ -252,28 +247,20 @@ c***
 
 *.. Calcul de grand psi
         
-	  
-	 
-	        gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
-              racpsi(ir)= sqrt(gdpsi(ir))
-	 
-      
-	  
-
-
-	  sens=2
-         
-	x1 = gdr(ir-1)
-	y1=ypto
-      CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens,
+          gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
+          racpsi(ir)= sqrt(gdpsi(ir))
+          sens=2
+	  x1 = gdr(ir-1)
+	  y1=ypto
+          CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens,
      .               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
 *..Calcul des longueurs
 
-	  gdr(ir)=x23
-        r(ir)=x23-xpto
-	  ra(ir)= r(ir)-a
-	  rho(ir)=r(ir)/a
+          gdr(ir)=x23
+          r(ir)=x23-xpto
+          ra(ir)=r(ir)-a
+          rho(ir)=r(ir)/a
 
 *..Le dernier point de la courbe est egal au premier.
 
@@ -347,11 +334,11 @@ c  3.   on procede a un premier deplacement des noeuds
                 endif
                 call coord1(xn(1,inouv),yn(1,inouv),nn(inouv),
      .            l2(ipol),mailx(ipol,ir),maily(ipol,ir),period)
-	        
               
-	        somort (ir)= somort(ir)+ (ort1(ipol)/nppol)
+              
+              somort (ir)= somort(ir)+ (ort1(ipol)/nppol)
               somortpur(ir)= somortpur(ir)+ (ortpur1(ipol)/nppol)
-	        sompropo(ir)= sompropo(ir)+ (propo1(ipol)/nppol)
+              sompropo(ir)= sompropo(ir)+ (propo1(ipol)/nppol)
               somvarr(ir)= somvarr(ir)+ (varr1(ipol)/nppol)
               somtot(ir)= somtot(ir)+ (tot1(ipol)/nppol)
               enddo
@@ -384,11 +371,6 @@ c       meilleure orthogonalite possible
      .               l2(ipol),mailx(ipol,ir),maily(ipol,ir),period)
                   endif
                   ortmax=max(ortmax,abs(ort2(ipol)))
-
-
-	   
-	         
-	        
                 enddo
                 if(ortmax.le.rlcept) go to 19
 c***
@@ -463,17 +445,15 @@ c***
               endif
 c***
  19           continue
-            do ipol=ipol1,ipoln
-            somortp (ir)= somortp(ir)+ (ort2(ipol)/nppol)
-            somortpurp(ir)= somortpurp(ir)+ (ortpur2(ipol)/nppol)
-            sompropop(ir)= sompropop(ir)+ (propo2(ipol)/nppol)
-            somvarrp(ir)= somvarrp(ir)+ (varr2(ipol)/nppol)
-            somtotp(ir)= somtotp(ir)+ (tot2(ipol)/nppol)
-            enddo
+              do ipol=ipol1,ipoln
+                somortp(ir)= somortp(ir)+ (ort2(ipol)/nppol)
+                somortpurp(ir)= somortpurp(ir)+ (ortpur2(ipol)/nppol)
+                sompropop(ir)= sompropop(ir)+ (propo2(ipol)/nppol)
+                somvarrp(ir)= somvarrp(ir)+ (varr2(ipol)/nppol)
+                somtotp(ir)= somtotp(ir)+ (tot2(ipol)/nppol)
+              enddo
 c             print*,'apres 19 continue'
 c***    
-          
-            
             endif
 
           else
@@ -499,8 +479,6 @@ c---
 c---
           endif
 c---
-
-
          
 *..Les premier et dernier points de la maille coincident.
 
@@ -515,34 +493,26 @@ c***
 c
 c  on definit la frontiere interieure
       
-
-
 *..On remet la periode a zero.   
       
-	if(pntrat.lt.distxo) then
-         nbniv=nbniv+1
-         nivtot(nbniv)=nn(inouv)
-         do 30 i=1,nn(inouv)
-         nivx(i,nbniv)=xn(i,inouv)
-         nivy(i,nbniv)=yn(i,inouv)
-   30    continue
+      if(pntrat.lt.distxo) then
+        nbniv=nbniv+1
+        nivtot(nbniv)=nn(inouv)
+        do 30 i=1,nn(inouv)
+          nivx(i,nbniv)=xn(i,inouv)
+          nivy(i,nbniv)=yn(i,inouv)
+   30   continue
       endif
-      
-
-
-
 
       period=zero
       
-	 do ir=2,nprad
-	 
-	 gdsomortp= gdsomortp + (somortp(ir)/(nprad-1))  
-	 gdsomortpurp= gdsomortpurp+ (somortpurp(ir)/(nprad-1))  
-       gdsompropop= gdsompropop+ (sompropop(ir)/(nprad-1))
-	 gdsomvarrp= gdsomvarrp+ (somvarrp(ir)/(nprad-1))
-	 gdsomtotp= gdsomtotp+ (somtotp(ir)/(nprad-1)) 
-       enddo
- 
+      do ir=2,nprad 
+        gdsomortp= gdsomortp + (somortp(ir)/(nprad-1))  
+        gdsomortpurp= gdsomortpurp+ (somortpurp(ir)/(nprad-1))  
+        gdsompropop= gdsompropop+ (sompropop(ir)/(nprad-1))
+        gdsomvarrp= gdsomvarrp+ (somvarrp(ir)/(nprad-1))
+        gdsomtotp= gdsomtotp+ (somtotp(ir)/(nprad-1)) 
+      enddo
       
       RETURN
       END
