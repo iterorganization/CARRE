@@ -1,0 +1,13 @@
+Conversion rules:
+
+If first character indicates a comment line, change to !
+
+If line continuation, replace with & and insert
+& at end of previous line (taking comments into account)
+
+Rest is pass-through -> manual fix
+
+Conversion command:
+
+( cd convert ; ./converttree.sh ../../src_xpb/ ../../src_test/ ) ; ( cd ../src/common/ ; cp -r ../../src_f90/common/* . )
+

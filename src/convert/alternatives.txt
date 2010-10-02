@@ -1,0 +1,158 @@
+b2stbc conversion variants
+
+A fix is to change in line 4876 the IF( to if(. 
+
+        IF(BCCHAR(IB).EQ.'N') THEN
+
+        if(BCCHAR(IB).EQ.'N') THEN
+
+The detection of the if statement then fails (if blank treatment is disabled, i.e. F F option)
+and the converter does not try to do fancy stuff.
+
+The blank treatment of convert.f90 (i.e. modification of whitespace during the conversion)
+breaks down in our case because of the F90 keywords in the B2 source (USE, MODULE, ...).
+This can be fixed.
+
+Original:
+
+cxpb code segment analog to b2tfhi
+            if(ncall.eq.0) then
+             do is = 0, ns-1
+              if(.not.is_neutral(is)) then
+               vadia(ix,bcpos(ib),1,is) = 
+     .          ti(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)))*
+     .          bb(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),2)
+     &          /(qe*
+     &            rza(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),is)*
+     *            hx(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib))))
+     &          *(2.0_R8/
+     &          bb(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3)**3)
+     &          *(wbbr(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3)
+     &          -wbbl(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3))
+     &          *facdrift(ix,bcpos(ib))
+               vaecrb(ix,bcpos(ib),1,is) = 1.0_R8/hx(ix,bcpos(ib))*
+     1          bb(ix,bcpos(ib),2)/bb(ix,bcpos(ib),3)**2*0.5_R8*
+     2         (po(rightix(ix,bcpos(ib)),rightiy(ix,bcpos(ib)))+
+     2          po( leftix(ix,bcpos(ib)), leftiy(ix,bcpos(ib))))*
+     &         fac_ExB(ix,bcpos(ib))
+              else
+               vadia(ix,bcpos(ib),1,is)=0.0_R8
+               vaecrb(ix,bcpos(ib),1,is)=0.0_R8
+              endif
+             enddo
+            endif
+
+IF(, no blank handling: broken indentation
+
+!xpb code segment analog to b2tfhi                                      
+         if(ncall.eq.0) then 
+         do is = 0, ns-1 
+         if(.not.is_neutral(is)) then 
+         vadia(ix,bcpos(ib),1,is) = ti(bottomix(ix,bcpos(ib)),bottomiy( &
+         ix,bcpos(ib)))* bb(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)&
+         ),2) /(qe* rza(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),  &
+         is)* hx(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib))))        &
+         *(2.0_R8/ bb(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3)**&
+         3) *(wbbr(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3)     &
+         -wbbl(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3))        &
+         *facdrift(ix,bcpos(ib))                                        
+         vaecrb(ix,bcpos(ib),1,is) = 1.0_R8/hx(ix,bcpos(ib))* bb(ix,    &
+         bcpos(ib),2)/bb(ix,bcpos(ib),3)**2*0.5_R8* (po(rightix(ix,     &
+         bcpos(ib)),rightiy(ix,bcpos(ib)))+ po( leftix(ix,bcpos(ib)),   &
+         leftiy(ix,bcpos(ib))))* fac_ExB(ix,bcpos(ib))                  
+         else 
+         vadia(ix,bcpos(ib),1,is)=0.0_R8 
+         vaecrb(ix,bcpos(ib),1,is)=0.0_R8 
+         endif 
+         enddo 
+         endif 
+
+
+IF(, blank handling: rearranged code
+
+!xpb code segment analog to b2tfhi                                      
+         IF (ncall.eq.0) then 
+            DO is = 0, ns - 1 
+            IF (.not.is_neutral (is) ) then 
+               vadia (ix, bcpos (ib), 1, is) = ti (bottomix (ix, bcpos (&
+               ib) ), bottomiy (ix, bcpos (ib) ) ) * bb (bottomix (ix,  &
+               bcpos (ib) ), bottomiy (ix, bcpos (ib) ), 2) / (qe * rza &
+               (bottomix (ix, bcpos (ib) ), bottomiy (ix, bcpos (ib) ), &
+               is) * hx (bottomix (ix, bcpos (ib) ), bottomiy (ix,      &
+               bcpos (ib) ) ) ) * (2.0_R8 / bb (bottomix (ix, bcpos (ib)&
+               ), bottomiy (ix, bcpos (ib) ), 3) **3) * (wbbr (bottomix &
+               (ix, bcpos (ib) ), bottomiy (ix, bcpos (ib) ), 3)        &
+               - wbbl (bottomix (ix, bcpos (ib) ), bottomiy (ix, bcpos (&
+               ib) ), 3) ) * facdrift (ix, bcpos (ib) )                 
+               vaecrb (ix, bcpos (ib), 1, is) = 1.0_R8 / hx (ix, bcpos (&
+               ib) ) * bb (ix, bcpos (ib), 2) / bb (ix, bcpos (ib),     &
+               3) **2 * 0.5_R8 * (po (rightix (ix, bcpos (ib) ),        &
+               rightiy (ix, bcpos (ib) ) ) + po (leftix (ix, bcpos (ib) &
+               ), leftiy (ix, bcpos (ib) ) ) ) * fac_ExB (ix, bcpos (ib)&
+               )                                                        
+            ELSE 
+               vadia (ix, bcpos (ib), 1, is) = 0.0_R8 
+               vaecrb (ix, bcpos (ib), 1, is) = 0.0_R8 
+            ENDIF 
+            enddo 
+         ENDIF 
+
+
+if( (workaround), no blank handling: ok 
+
+!xpb code segment analog to b2tfhi                                      
+            if(ncall.eq.0) then 
+             do is = 0, ns-1 
+              if(.not.is_neutral(is)) then 
+               vadia(ix,bcpos(ib),1,is) =                               &
+     &          ti(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)))*      &
+     &          bb(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),2)     &
+     &          /(qe*                                                   &
+     &            rza(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),is)*&
+     &            hx(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib))))    &
+     &          *(2.0_R8/                                               &
+     &          bb(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3)**3) &
+     &          *(wbbr(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3) &
+     &          -wbbl(bottomix(ix,bcpos(ib)),bottomiy(ix,bcpos(ib)),3)) &
+     &          *facdrift(ix,bcpos(ib))                                 
+               vaecrb(ix,bcpos(ib),1,is) = 1.0_R8/hx(ix,bcpos(ib))*     &
+     &          bb(ix,bcpos(ib),2)/bb(ix,bcpos(ib),3)**2*0.5_R8*        &
+     &         (po(rightix(ix,bcpos(ib)),rightiy(ix,bcpos(ib)))+        &
+     &          po( leftix(ix,bcpos(ib)), leftiy(ix,bcpos(ib))))*       &
+     &         fac_ExB(ix,bcpos(ib))                                    
+              else 
+               vadia(ix,bcpos(ib),1,is)=0.0_R8 
+               vaecrb(ix,bcpos(ib),1,is)=0.0_R8 
+              endif 
+             enddo 
+            endif 
+
+
+if( (workaround), blank handling: rearranged code
+
+!xpb code segment analog to b2tfhi                                      
+         IF (ncall.eq.0) then 
+            DO is = 0, ns - 1 
+            IF (.not.is_neutral (is) ) then 
+               vadia (ix, bcpos (ib), 1, is) = ti (bottomix (ix, bcpos (&
+               ib) ), bottomiy (ix, bcpos (ib) ) ) * bb (bottomix (ix,  &
+               bcpos (ib) ), bottomiy (ix, bcpos (ib) ), 2) / (qe * rza &
+               (bottomix (ix, bcpos (ib) ), bottomiy (ix, bcpos (ib) ), &
+               is) * hx (bottomix (ix, bcpos (ib) ), bottomiy (ix,      &
+               bcpos (ib) ) ) ) * (2.0_R8 / bb (bottomix (ix, bcpos (ib)&
+               ), bottomiy (ix, bcpos (ib) ), 3) **3) * (wbbr (bottomix &
+               (ix, bcpos (ib) ), bottomiy (ix, bcpos (ib) ), 3)        &
+               - wbbl (bottomix (ix, bcpos (ib) ), bottomiy (ix, bcpos (&
+               ib) ), 3) ) * facdrift (ix, bcpos (ib) )                 
+               vaecrb (ix, bcpos (ib), 1, is) = 1.0_R8 / hx (ix, bcpos (&
+               ib) ) * bb (ix, bcpos (ib), 2) / bb (ix, bcpos (ib),     &
+               3) **2 * 0.5_R8 * (po (rightix (ix, bcpos (ib) ),        &
+               rightiy (ix, bcpos (ib) ) ) + po (leftix (ix, bcpos (ib) &
+               ), leftiy (ix, bcpos (ib) ) ) ) * fac_ExB (ix, bcpos (ib)&
+               )                                                        
+            ELSE 
+               vadia (ix, bcpos (ib), 1, is) = 0.0_R8 
+               vaecrb (ix, bcpos (ib), 1, is) = 0.0_R8 
+            ENDIF 
+            enddo 
+         ENDIF 
