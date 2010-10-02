@@ -1,0 +1,192 @@
+<html><head><title>sortie.F</title></head><body link="blue" vlink="blue"><h3>File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/sortie.F</h3>
+<SCRIPT>
+ defaultStatus = "File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/sortie.F";
+top.document.title  = "sortie.F";
+</SCRIPT>
+<pre><font color="black"></font><a name="1"><font  size=-1>1     </font></a><font color="black">      <b>SUBROUTINE</b> <a href="dictionary_S.html#1041">SORTIE</a>(<a href="dictionary_N.html#1601">nsep</a>,<a href="dictionary_N.html#1598">nreg</a>,<a href="dictionary_N.html#1596">nptseg</a>,<a href="dictionary_N.html#1595">npr</a>,<a href="dictionary_N.html#1593">np1</a>,<a href="dictionary_D.html#1581">deltp1</a>,<a href="dictionary_D.html#1582">deltpn</a>,<a href="dictionary_D.html#1583">deltr1</a>,</font>
+<a name="2"><font  size=-1>2     </font></a><font color="black">     .    <a href="dictionary_D.html#1584">deltrn</a>,<a href="dictionary_P.html#1608">pntrat</a>,<a href="dictionary_T.html#1618">tgarde</a>,<a href="dictionary_D.html#1585">distxo</a>,<a href="dictionary_R.html#1616">repart</a>,<a href="dictionary_X.html#1620">xmail</a>,<a href="dictionary_Y.html#1623">ymail</a>,</font>
+<a name="3"><font  size=-1>3     </font></a><font color="black">     .    <a href="dictionary_N.html#1603">nx</a>,<a href="dictionary_N.html#1605">ny</a>,<a href="dictionary_X.html#1619">x</a>,<a href="dictionary_Y.html#1622">y</a>,<a href="dictionary_A.html#1577">a00</a>,<a href="dictionary_A.html#1579">a10</a>,<a href="dictionary_A.html#1578">a01</a>,<a href="dictionary_A.html#1580">a11</a>,<a href="dictionary_P.html#1612">ptx</a>,<a href="dictionary_P.html#1613">pty</a>,<a href="dictionary_N.html#1597">npx</a>,<a href="dictionary_R.html#1614">racord</a>,<a href="dictionary_N.html#1602">numero</a>,</font>
+<a name="4"><font  size=-1>4     </font></a><font color="black">     .    <a href="dictionary_F.html#1586">fctpx</a>)</font>
+<a name="5"><font  size=-1>5     </font></a><font color="black"></font><font color="red">c</font>
+<a name="6"><font  size=-1>6     </font></a><font color="red">c  version : 07.07.97 19:08</font>
+<a name="7"><font  size=-1>7     </font></a><font color="red">c</font>
+<a name="8"><font  size=-1>8     </font></a><font color="red">c======================================================================</font>
+<a name="9"><font  size=-1>9     </font></a><font color="red">      </font><font color="black"><b>IMPLICIT</b> <b>NONE</b></font>
+<a name="10"><font  size=-1>10     </font></a><font color="black"></font>
+<a name="11"><font  size=-1>11     </font></a><font color="black"></font><font color="red">*..  Cette sous-routine imprime les resultats dans un fichier de sortie:</font>
+<a name="12"><font  size=-1>12     </font></a><font color="red">*  maille.sor</font>
+<a name="13"><font  size=-1>13     </font></a><font color="red"></font>
+<a name="14"><font  size=-1>14     </font></a><font color="red">cank-970707: dimensions from the file</font>
+<a name="15"><font  size=-1>15     </font></a><font color="red">*  dimensions</font>
+<a name="16"><font  size=-1>16     </font></a><font color="red"></font><font color="green">#include </font><font color="black">&lt;CARREDIM.F&gt;</font>
+<a name="17"><font  size=-1>17     </font></a><font color="black"></font>
+<a name="18"><font  size=-1>18     </font></a><font color="black"></font><font color="red">*  arguments</font>
+<a name="19"><font  size=-1>19     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_N.html#1601">nsep</a>,<a href="dictionary_N.html#1598">nreg</a>,<a href="dictionary_R.html#1616">repart</a>,<a href="dictionary_N.html#1596">nptseg</a>(<a href="dictionary_N.html#1601">nsep</a>),<a href="dictionary_N.html#1595">npr</a>(<a href="dictionary_N.html#1598">nreg</a>),<a href="dictionary_N.html#1593">np1</a>(<a href="dictionary_N.html#1598">nreg</a>),</font>
+<a name="20"><font  size=-1>20     </font></a><font color="black">     .        <a href="dictionary_N.html#1603">nx</a>,<a href="dictionary_N.html#1605">ny</a>,<a href="dictionary_N.html#1597">npx</a>,<a href="dictionary_N.html#1602">numero</a></font>
+<a name="21"><font  size=-1>21     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_P.html#1608">pntrat</a>,<a href="dictionary_D.html#1581">deltp1</a>(<a href="dictionary_N.html#1601">nsep</a>),<a href="dictionary_D.html#1582">deltpn</a>(<a href="dictionary_N.html#1601">nsep</a>),<a href="dictionary_D.html#1583">deltr1</a>(<a href="dictionary_N.html#1598">nreg</a>),<a href="dictionary_D.html#1584">deltrn</a>(<a href="dictionary_N.html#1598">nreg</a>),</font>
+<a name="22"><font  size=-1>22     </font></a><font color="black">     .     <a href="dictionary_X.html#1620">xmail</a>(<a href="dictionary_N.html#1594">npmamx</a>,<a href="dictionary_N.html#1600">nrmamx</a>,<a href="dictionary_N.html#1598">nreg</a>),<a href="dictionary_Y.html#1623">ymail</a>(<a href="dictionary_N.html#1594">npmamx</a>,<a href="dictionary_N.html#1600">nrmamx</a>,<a href="dictionary_N.html#1598">nreg</a>),</font>
+<a name="23"><font  size=-1>23     </font></a><font color="black">     .     <a href="dictionary_T.html#1618">tgarde</a>(4),<a href="dictionary_D.html#1585">distxo</a>,<a href="dictionary_X.html#1619">x</a>(<a href="dictionary_N.html#1604">nxmax</a>),<a href="dictionary_Y.html#1622">y</a>(<a href="dictionary_N.html#1606">nymax</a>),</font>
+<a name="24"><font  size=-1>24     </font></a><font color="black">     .     <a href="dictionary_A.html#1577">a00</a>(<a href="dictionary_N.html#1604">nxmax</a>,<a href="dictionary_N.html#1606">nymax</a>,3),<a href="dictionary_A.html#1579">a10</a>(<a href="dictionary_N.html#1604">nxmax</a>,<a href="dictionary_N.html#1606">nymax</a>,3),</font>
+<a name="25"><font  size=-1>25     </font></a><font color="black">     .     <a href="dictionary_A.html#1578">a01</a>(<a href="dictionary_N.html#1604">nxmax</a>,<a href="dictionary_N.html#1606">nymax</a>,3),<a href="dictionary_A.html#1580">a11</a>(<a href="dictionary_N.html#1604">nxmax</a>,<a href="dictionary_N.html#1606">nymax</a>,3),</font>
+<a name="26"><font  size=-1>26     </font></a><font color="black">     .     <a href="dictionary_P.html#1612">ptx</a>(<a href="dictionary_N.html#1597">npx</a>+1),<a href="dictionary_P.html#1613">pty</a>(<a href="dictionary_N.html#1597">npx</a>+1),<a href="dictionary_F.html#1586">fctpx</a>(<a href="dictionary_N.html#1597">npx</a>+1)</font>
+<a name="27"><font  size=-1>27     </font></a><font color="black">      <b>logical</b> <a href="dictionary_R.html#1614">racord</a></font>
+<a name="28"><font  size=-1>28     </font></a><font color="black"></font>
+<a name="29"><font  size=-1>29     </font></a><font color="black"></font><font color="red">*  variables en common</font>
+<a name="30"><font  size=-1>30     </font></a><font color="red"></font><font color="green">#include </font><font color="black">&lt;COMRLX.F&gt;</font>
+<a name="31"><font  size=-1>31     </font></a><font color="black"></font><font color="green">#include </font><font color="black">&lt;COMLAN.F&gt;</font>
+<a name="32"><font  size=-1>32     </font></a><font color="black"></font>
+<a name="33"><font  size=-1>33     </font></a><font color="black"></font><font color="red">*  variables locales</font>
+<a name="34"><font  size=-1>34     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#1587">i</a>,<a href="dictionary_J.html#1591">j</a>,<a href="dictionary_I.html#1590">isep</a>,<a href="dictionary_I.html#1589">ireg</a>,<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a></font>
+<a name="35"><font  size=-1>35     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_X.html#1621">xx</a>,<a href="dictionary_Y.html#1624">yy</a>,<a href="dictionary_P.html#1611">psimai</a>,<a href="dictionary_P.html#1609">psidx</a>,<a href="dictionary_P.html#1610">psidy</a></font>
+<a name="36"><font  size=-1>36     </font></a><font color="black"></font>
+<a name="37"><font  size=-1>37     </font></a><font color="black"></font><font color="red">*  procedures</font>
+<a name="38"><font  size=-1>38     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#411">ifind</a></font>
+<a name="39"><font  size=-1>39     </font></a><font color="black">      <b>EXTERNAL</b> <a href="dictionary_I.html#411">ifind</a></font>
+<a name="40"><font  size=-1>40     </font></a><font color="black"></font><font color="red">c======================================================================</font>
+<a name="41"><font  size=-1>41     </font></a><font color="red">c.. i,j: indices</font>
+<a name="42"><font  size=-1>42     </font></a><font color="red">c.. isep: indice de separatrice.</font>
+<a name="43"><font  size=-1>43     </font></a><font color="red">c.. ireg: indice de region.</font>
+<a name="44"><font  size=-1>44     </font></a><font color="red">c.. ii,jj: indices d'identification en x et y du carre.</font>
+<a name="45"><font  size=-1>45     </font></a><font color="red">c.. numero: 1= impression des parametres pouvant servir a un essai</font>
+<a name="46"><font  size=-1>46     </font></a><font color="red">c           ulterieur. 2= impression des donnees de la maille.</font>
+<a name="47"><font  size=-1>47     </font></a><font color="red">c.. xx,yy: coordonnees du premier point d'une courbe de niveau.</font>
+<a name="48"><font  size=-1>48     </font></a><font color="red">c.. psimai: valeur de la fonction pour cette courbe de niveau.</font>
+<a name="49"><font  size=-1>49     </font></a><font color="red">c======================================================================</font>
+<a name="50"><font  size=-1>50     </font></a><font color="red">*..Creation du nouveau fichier.</font>
+<a name="51"><font  size=-1>51     </font></a><font color="red"></font>
+<a name="52"><font  size=-1>52     </font></a><font color="red">      </font><font color="black"><b>IF</b> (<a href="dictionary_N.html#1602">numero</a> .EQ. 1) <b>THEN</b></font>
+<a name="53"><font  size=-1>53     </font></a><font color="black"></font>
+<a name="54"><font  size=-1>54     </font></a><font color="black"></font><font color="red">*..Impression des points X et O.</font>
+<a name="55"><font  size=-1>55     </font></a><font color="red"></font>
+<a name="56"><font  size=-1>56     </font></a><font color="red">        </font><font color="black"><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:8).eq.</font><font color="magenta">'francais'</font><font color="black">) <b>then</b></font>
+<a name="57"><font  size=-1>57     </font></a><font color="black">          <b>write</b>(10,111)<a href="dictionary_N.html#1597">npx</a>,(<a href="dictionary_P.html#1612">ptx</a>(<a href="dictionary_I.html#1587">i</a>),<a href="dictionary_P.html#1613">pty</a>(<a href="dictionary_I.html#1587">i</a>),<a href="dictionary_F.html#1586">fctpx</a>(<a href="dictionary_I.html#1587">i</a>),<a href="dictionary_I.html#1587">i</a>=1,<a href="dictionary_N.html#1597">npx</a>)</font>
+<a name="58"><font  size=-1>58     </font></a><font color="black">111       <b>format</b>(//</font><font color="magenta">' Nombre de points X:'</font><font color="black">,i3/</font>
+<a name="59"><font  size=-1>59     </font></a><font color="black">     .      t5,</font><font color="magenta">'x'</font><font color="black">,t25,</font><font color="magenta">'y'</font><font color="black">,t45,</font><font color="magenta">'psi'</font><font color="black">/(t4,1pe15.8,t24,1pe15.8,</font>
+<a name="60"><font  size=-1>60     </font></a><font color="black">     .      t44,1pe15.8))</font>
+<a name="61"><font  size=-1>61     </font></a><font color="black">         <b>else</b><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:7).eq.</font><font color="magenta">'english'</font><font color="black">) <b>then</b></font>
+<a name="62"><font  size=-1>62     </font></a><font color="black">          <b>write</b>(10,211)<a href="dictionary_N.html#1597">npx</a>,(<a href="dictionary_P.html#1612">ptx</a>(<a href="dictionary_I.html#1587">i</a>),<a href="dictionary_P.html#1613">pty</a>(<a href="dictionary_I.html#1587">i</a>),<a href="dictionary_F.html#1586">fctpx</a>(<a href="dictionary_I.html#1587">i</a>),<a href="dictionary_I.html#1587">i</a>=1,<a href="dictionary_N.html#1597">npx</a>)</font>
+<a name="63"><font  size=-1>63     </font></a><font color="black">211       <b>format</b>(//</font><font color="magenta">' Number of X-points:'</font><font color="black">,i3/</font>
+<a name="64"><font  size=-1>64     </font></a><font color="black">     .      t5,</font><font color="magenta">'x'</font><font color="black">,t25,</font><font color="magenta">'y'</font><font color="black">,t45,</font><font color="magenta">'psi'</font><font color="black">/(t4,1pe15.8,t24,1pe15.8,</font>
+<a name="65"><font  size=-1>65     </font></a><font color="black">     .      t44,1pe15.8))</font>
+<a name="66"><font  size=-1>66     </font></a><font color="black">         <b>end</b><b>if</b></font>
+<a name="67"><font  size=-1>67     </font></a><font color="black">         <b>write</b>(10,112)<a href="dictionary_P.html#1612">ptx</a>(<a href="dictionary_N.html#1597">npx</a>+1),<a href="dictionary_P.html#1613">pty</a>(<a href="dictionary_N.html#1597">npx</a>+1),<a href="dictionary_F.html#1586">fctpx</a>(<a href="dictionary_N.html#1597">npx</a>+1)</font>
+<a name="68"><font  size=-1>68     </font></a><font color="black">112      <b>format</b>(/</font><font color="magenta">' Point O:'</font><font color="black">/(t4,1pe15.8,t24,1pe15.8,t44,1pe15.8))</font>
+<a name="69"><font  size=-1>69     </font></a><font color="black">         <b>if</b>(<a href="dictionary_N.html#1597">npx</a>.gt.1) <b>then</b></font>
+<a name="70"><font  size=-1>70     </font></a><font color="black">            <b>if</b>(<a href="dictionary_R.html#1614">racord</a>) <b>then</b></font>
+<a name="71"><font  size=-1>71     </font></a><font color="black">              <b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:8).eq.</font><font color="magenta">'francais'</font><font color="black">) <b>then</b></font>
+<a name="72"><font  size=-1>72     </font></a><font color="black">                <b>write</b>(10,113)</font><font color="magenta">' Les points X sont raccordes.'</font>
+<a name="73"><font  size=-1>73     </font></a><font color="magenta">113             </font><font color="black"><b>format</b>(a//)</font>
+<a name="74"><font  size=-1>74     </font></a><font color="black">              <b>else</b><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:7).eq.</font><font color="magenta">'english'</font><font color="black">) <b>then</b></font>
+<a name="75"><font  size=-1>75     </font></a><font color="black">                <b>write</b>(10,113)</font><font color="magenta">' X-points are connected.'</font>
+<a name="76"><font  size=-1>76     </font></a><font color="magenta">              </font><font color="black"><b>end</b><b>if</b></font>
+<a name="77"><font  size=-1>77     </font></a><font color="black">            <b>else</b></font>
+<a name="78"><font  size=-1>78     </font></a><font color="black">              <b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:8).eq.</font><font color="magenta">'francais'</font><font color="black">) <b>then</b></font>
+<a name="79"><font  size=-1>79     </font></a><font color="black">                <b>write</b>(10,113)</font><font color="magenta">' Les points X ne sont pas raccordes.'</font>
+<a name="80"><font  size=-1>80     </font></a><font color="magenta">              </font><font color="black"><b>else</b><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:7).eq.</font><font color="magenta">'english'</font><font color="black">) <b>then</b></font>
+<a name="81"><font  size=-1>81     </font></a><font color="black">                <b>write</b>(10,113)</font><font color="magenta">' X-points are not connected.'</font>
+<a name="82"><font  size=-1>82     </font></a><font color="magenta">              </font><font color="black"><b>end</b><b>if</b></font>
+<a name="83"><font  size=-1>83     </font></a><font color="black">            <b>end</b><b>if</b></font>
+<a name="84"><font  size=-1>84     </font></a><font color="black">         <b>end</b><b>if</b></font>
+<a name="85"><font  size=-1>85     </font></a><font color="black"></font><font color="red">c</font>
+<a name="86"><font  size=-1>86     </font></a><font color="red">*..Ecriture des parametres qui pouront servir au le prochain essai.</font>
+<a name="87"><font  size=-1>87     </font></a><font color="red">         </font><font color="black"><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:8).eq.</font><font color="magenta">'francais'</font><font color="black">) <b>then</b></font>
+<a name="88"><font  size=-1>88     </font></a><font color="black">           <b>write</b>(10,*)</font><font color="magenta">'$parametres'</font>
+<a name="89"><font  size=-1>89     </font></a><font color="magenta">         </font><font color="black"><b>else</b><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:7).eq.</font><font color="magenta">'english'</font><font color="black">) <b>then</b></font>
+<a name="90"><font  size=-1>90     </font></a><font color="black">           <b>write</b>(10,*)</font><font color="magenta">'$parameters'</font>
+<a name="91"><font  size=-1>91     </font></a><font color="magenta">         </font><font color="black"><b>end</b><b>if</b></font>
+<a name="92"><font  size=-1>92     </font></a><font color="black">         <b>WRITE</b>(10,100)<a href="dictionary_R.html#1616">repart</a></font>
+<a name="93"><font  size=-1>93     </font></a><font color="black">  100    <b>FORMAT</b>(</font><font color="magenta">'repart ='</font><font color="black">,I2)</font>
+<a name="94"><font  size=-1>94     </font></a><font color="black"></font>
+<a name="95"><font  size=-1>95     </font></a><font color="black">         <b>WRITE</b>(10,1015)<a href="dictionary_D.html#1585">distxo</a></font>
+<a name="96"><font  size=-1>96     </font></a><font color="black"> 1015    <b>FORMAT</b>(</font><font color="magenta">'distxo ='</font><font color="black">,F11.8)</font>
+<a name="97"><font  size=-1>97     </font></a><font color="black"></font>
+<a name="98"><font  size=-1>98     </font></a><font color="black">         <b>WRITE</b>(10,101)<a href="dictionary_P.html#1608">pntrat</a></font>
+<a name="99"><font  size=-1>99     </font></a><font color="black">  101    <b>FORMAT</b>(</font><font color="magenta">'pntrat ='</font><font color="black">,F11.8)</font>
+<a name="100"><font  size=-1>100     </font></a><font color="black"></font>
+<a name="101"><font  size=-1>101     </font></a><font color="black">         <b>DO</b> 10 <a href="dictionary_I.html#1590">isep</a>=1, <a href="dictionary_N.html#1601">nsep</a></font>
+<a name="102"><font  size=-1>102     </font></a><font color="black">            <b>WRITE</b>(10,102)<a href="dictionary_I.html#1590">isep</a>,<a href="dictionary_N.html#1596">nptseg</a>(<a href="dictionary_I.html#1590">isep</a>),<a href="dictionary_I.html#1590">isep</a>,<a href="dictionary_D.html#1581">deltp1</a>(<a href="dictionary_I.html#1590">isep</a>),<a href="dictionary_I.html#1590">isep</a>,</font>
+<a name="103"><font  size=-1>103     </font></a><font color="black">     .                <a href="dictionary_D.html#1582">deltpn</a>(<a href="dictionary_I.html#1590">isep</a>)</font>
+<a name="104"><font  size=-1>104     </font></a><font color="black">  102       <b>FORMAT</b>(</font><font color="magenta">'nptseg('</font><font color="black">,I1,</font><font color="magenta">') ='</font><font color="black">,I3/</font><font color="magenta">'deltp1('</font><font color="black">,I1,</font><font color="magenta">') ='</font><font color="black">,F10.7/</font>
+<a name="105"><font  size=-1>105     </font></a><font color="black">     .          </font><font color="magenta">'deltpn('</font><font color="black">,I1,</font><font color="magenta">') ='</font><font color="black">,F10.7)</font>
+<a name="106"><font  size=-1>106     </font></a><font color="black">   10    <b>CONTINUE</b></font>
+<a name="107"><font  size=-1>107     </font></a><font color="black"></font>
+<a name="108"><font  size=-1>108     </font></a><font color="black">         <b>DO</b> 20 <a href="dictionary_I.html#1589">ireg</a>=1, <a href="dictionary_N.html#1598">nreg</a></font>
+<a name="109"><font  size=-1>109     </font></a><font color="black">            <b>WRITE</b>(10,103)<a href="dictionary_I.html#1589">ireg</a>,<a href="dictionary_N.html#1595">npr</a>(<a href="dictionary_I.html#1589">ireg</a>),<a href="dictionary_I.html#1589">ireg</a>,<a href="dictionary_D.html#1583">deltr1</a>(<a href="dictionary_I.html#1589">ireg</a>),<a href="dictionary_I.html#1589">ireg</a>,</font>
+<a name="110"><font  size=-1>110     </font></a><font color="black">     .                <a href="dictionary_D.html#1584">deltrn</a>(<a href="dictionary_I.html#1589">ireg</a>)</font>
+<a name="111"><font  size=-1>111     </font></a><font color="black">  103       <b>FORMAT</b>(</font><font color="magenta">'npr('</font><font color="black">,I1,</font><font color="magenta">') ='</font><font color="black">,I3/</font><font color="magenta">'deltr1('</font><font color="black">,I1,</font><font color="magenta">') ='</font><font color="black">,F10.7/</font>
+<a name="112"><font  size=-1>112     </font></a><font color="black">     .          </font><font color="magenta">'deltrn('</font><font color="black">,I1,</font><font color="magenta">') ='</font><font color="black">,F10.7)</font>
+<a name="113"><font  size=-1>113     </font></a><font color="black">   20    <b>CONTINUE</b></font>
+<a name="114"><font  size=-1>114     </font></a><font color="black"></font>
+<a name="115"><font  size=-1>115     </font></a><font color="black">         <b>DO</b> 25 <a href="dictionary_I.html#1587">i</a>=1, 2</font>
+<a name="116"><font  size=-1>116     </font></a><font color="black">            <b>WRITE</b>(10,104)<a href="dictionary_I.html#1587">i</a>,<a href="dictionary_T.html#1618">tgarde</a>(<a href="dictionary_I.html#1587">i</a>)</font>
+<a name="117"><font  size=-1>117     </font></a><font color="black">  104       <b>FORMAT</b>(</font><font color="magenta">'tgarde('</font><font color="black">,I1,</font><font color="magenta">') ='</font><font color="black">,F8.5)</font>
+<a name="118"><font  size=-1>118     </font></a><font color="black">   25    <b>CONTINUE</b></font>
+<a name="119"><font  size=-1>119     </font></a><font color="black"></font>
+<a name="120"><font  size=-1>120     </font></a><font color="black">         <b>IF</b> (<a href="dictionary_N.html#1601">nsep</a> .GT. 3) <b>THEN</b></font>
+<a name="121"><font  size=-1>121     </font></a><font color="black">            <b>DO</b> 26 <a href="dictionary_I.html#1587">i</a>=3, 4</font>
+<a name="122"><font  size=-1>122     </font></a><font color="black">               <b>WRITE</b>(10,104)<a href="dictionary_I.html#1587">i</a>,<a href="dictionary_T.html#1618">tgarde</a>(<a href="dictionary_I.html#1587">i</a>)</font>
+<a name="123"><font  size=-1>123     </font></a><font color="black">   26       <b>CONTINUE</b></font>
+<a name="124"><font  size=-1>124     </font></a><font color="black">         <b>END</b><b>IF</b></font>
+<a name="125"><font  size=-1>125     </font></a><font color="black">         <b>write</b>(10,115)</font><font color="magenta">'nrelax='</font><font color="black">,<a href="dictionary_N.html#1599">nrelax</a>,</font><font color="magenta">'relax='</font><font color="black">,<a href="dictionary_R.html#1615">relax</a>,</font><font color="magenta">'pasmin='</font><font color="black">,<a href="dictionary_P.html#1607">pasmin</a>,</font>
+<a name="126"><font  size=-1>126     </font></a><font color="black">     .     </font><font color="magenta">'rlcept='</font><font color="black">,<a href="dictionary_R.html#1617">rlcept</a></font>
+<a name="127"><font  size=-1>127     </font></a><font color="black"> 115     <b>format</b>(a,i5/(a,1pe11.4))</font>
+<a name="128"><font  size=-1>128     </font></a><font color="black"></font>
+<a name="129"><font  size=-1>129     </font></a><font color="black">         <b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:8).eq.</font><font color="magenta">'francais'</font><font color="black">) <b>then</b></font>
+<a name="130"><font  size=-1>130     </font></a><font color="black">           <b>WRITE</b>(10,105)</font>
+<a name="131"><font  size=-1>131     </font></a><font color="black">  105      <b>FORMAT</b>(</font><font color="magenta">'$fin'</font><font color="black">)</font>
+<a name="132"><font  size=-1>132     </font></a><font color="black">         <b>else</b><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:7).eq.</font><font color="magenta">'english'</font><font color="black">) <b>then</b></font>
+<a name="133"><font  size=-1>133     </font></a><font color="black">           <b>write</b>(10,205)</font>
+<a name="134"><font  size=-1>134     </font></a><font color="black">  205      <b>format</b>(</font><font color="magenta">'$end'</font><font color="black">)</font>
+<a name="135"><font  size=-1>135     </font></a><font color="black">         <b>end</b><b>if</b></font>
+<a name="136"><font  size=-1>136     </font></a><font color="black"></font>
+<a name="137"><font  size=-1>137     </font></a><font color="black"></font><font color="red">*..Ecriture des points de mailles.</font>
+<a name="138"><font  size=-1>138     </font></a><font color="red"></font>
+<a name="139"><font  size=-1>139     </font></a><font color="red">      </font><font color="black"><b>ELSE</b> <b>IF</b> (<a href="dictionary_N.html#1602">numero</a> .EQ. 2) <b>THEN</b></font>
+<a name="140"><font  size=-1>140     </font></a><font color="black">         <b>write</b>(10,114)</font>
+<a name="141"><font  size=-1>141     </font></a><font color="black">114      <b>format</b>(t2,</font><font color="magenta">'x(m)'</font><font color="black">,t18,</font><font color="magenta">'y(m)'</font><font color="black">,t34,</font><font color="magenta">'psi(SI)'</font><font color="black">,t50,</font><font color="magenta">'dpsi/dx'</font><font color="black">,t66,</font>
+<a name="142"><font  size=-1>142     </font></a><font color="black">     .     </font><font color="magenta">'dpsi/dy'</font><font color="black">)</font>
+<a name="143"><font  size=-1>143     </font></a><font color="black">         <b>write</b>(10,*)</font><font color="magenta">'$maille'</font>
+<a name="144"><font  size=-1>144     </font></a><font color="magenta">         </font><font color="black"><b>WRITE</b>(10,106)<a href="dictionary_N.html#1598">nreg</a></font>
+<a name="145"><font  size=-1>145     </font></a><font color="black">  106    <b>FORMAT</b>(</font><font color="magenta">'''nreg='''</font><font color="black">,I5)</font>
+<a name="146"><font  size=-1>146     </font></a><font color="black"></font>
+<a name="147"><font  size=-1>147     </font></a><font color="black">         <b>DO</b> 30 <a href="dictionary_I.html#1589">ireg</a>=1, <a href="dictionary_N.html#1598">nreg</a></font>
+<a name="148"><font  size=-1>148     </font></a><font color="black">            <b>WRITE</b>(10,107)<a href="dictionary_I.html#1589">ireg</a></font>
+<a name="149"><font  size=-1>149     </font></a><font color="black">  107       <b>FORMAT</b>(</font><font color="magenta">'''region:'''</font><font color="black">,I5)</font>
+<a name="150"><font  size=-1>150     </font></a><font color="black">            <b>WRITE</b>(10,108)<a href="dictionary_N.html#1593">np1</a>(<a href="dictionary_I.html#1589">ireg</a>),<a href="dictionary_N.html#1595">npr</a>(<a href="dictionary_I.html#1589">ireg</a>)</font>
+<a name="151"><font  size=-1>151     </font></a><font color="black">  108       <b>FORMAT</b>(</font><font color="magenta">'''nppol='''</font><font color="black">,I5,</font><font color="magenta">'  ''nprad='''</font><font color="black">,I5)</font>
+<a name="152"><font  size=-1>152     </font></a><font color="black"></font>
+<a name="153"><font  size=-1>153     </font></a><font color="black">            <b>DO</b> 32 <a href="dictionary_J.html#1591">j</a>=1, <a href="dictionary_N.html#1595">npr</a>(<a href="dictionary_I.html#1589">ireg</a>)</font>
+<a name="154"><font  size=-1>154     </font></a><font color="black">            <b>do</b> 31 <a href="dictionary_I.html#1587">i</a>=1,<a href="dictionary_N.html#1593">np1</a>(<a href="dictionary_I.html#1589">ireg</a>)</font>
+<a name="155"><font  size=-1>155     </font></a><font color="black">               <a href="dictionary_X.html#1621">xx</a> = <a href="dictionary_X.html#1620">xmail</a>(<a href="dictionary_I.html#1587">i</a>,<a href="dictionary_J.html#1591">j</a>,<a href="dictionary_I.html#1589">ireg</a>)</font>
+<a name="156"><font  size=-1>156     </font></a><font color="black">               <a href="dictionary_Y.html#1624">yy</a> = <a href="dictionary_Y.html#1623">ymail</a>(<a href="dictionary_I.html#1587">i</a>,<a href="dictionary_J.html#1591">j</a>,<a href="dictionary_I.html#1589">ireg</a>)</font>
+<a name="157"><font  size=-1>157     </font></a><font color="black">               <a href="dictionary_I.html#1588">ii</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_X.html#1621">xx</a>,<a href="dictionary_X.html#1619">x</a>,<a href="dictionary_N.html#1603">nx</a>,1)</font>
+<a name="158"><font  size=-1>158     </font></a><font color="black">               <a href="dictionary_J.html#1592">jj</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_Y.html#1624">yy</a>,<a href="dictionary_Y.html#1622">y</a>,<a href="dictionary_N.html#1605">ny</a>,1)</font>
+<a name="159"><font  size=-1>159     </font></a><font color="black">               <a href="dictionary_P.html#1611">psimai</a> = <a href="dictionary_A.html#1577">a00</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,1)+<a href="dictionary_A.html#1579">a10</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,1)*<a href="dictionary_X.html#1621">xx</a>+<a href="dictionary_A.html#1578">a01</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,1)*<a href="dictionary_Y.html#1624">yy</a></font>
+<a name="160"><font  size=-1>160     </font></a><font color="black">     .                + <a href="dictionary_A.html#1580">a11</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,1)*<a href="dictionary_X.html#1621">xx</a>*<a href="dictionary_Y.html#1624">yy</a></font>
+<a name="161"><font  size=-1>161     </font></a><font color="black">               <a href="dictionary_P.html#1609">psidx</a> = <a href="dictionary_A.html#1577">a00</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,2)+<a href="dictionary_A.html#1579">a10</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,2)*<a href="dictionary_X.html#1621">xx</a>+<a href="dictionary_A.html#1578">a01</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,2)*<a href="dictionary_Y.html#1624">yy</a></font>
+<a name="162"><font  size=-1>162     </font></a><font color="black">     .                + <a href="dictionary_A.html#1580">a11</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,2)*<a href="dictionary_X.html#1621">xx</a>*<a href="dictionary_Y.html#1624">yy</a></font>
+<a name="163"><font  size=-1>163     </font></a><font color="black">               <a href="dictionary_P.html#1610">psidy</a> = <a href="dictionary_A.html#1577">a00</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,3)+<a href="dictionary_A.html#1579">a10</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,3)*<a href="dictionary_X.html#1621">xx</a>+<a href="dictionary_A.html#1578">a01</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,3)*<a href="dictionary_Y.html#1624">yy</a></font>
+<a name="164"><font  size=-1>164     </font></a><font color="black">     .                + <a href="dictionary_A.html#1580">a11</a>(<a href="dictionary_I.html#1588">ii</a>,<a href="dictionary_J.html#1592">jj</a>,3)*<a href="dictionary_X.html#1621">xx</a>*<a href="dictionary_Y.html#1624">yy</a></font>
+<a name="165"><font  size=-1>165     </font></a><font color="black"></font>
+<a name="166"><font  size=-1>166     </font></a><font color="black">               <b>WRITE</b>(10,109)<a href="dictionary_X.html#1620">xmail</a>(<a href="dictionary_I.html#1587">i</a>,<a href="dictionary_J.html#1591">j</a>,<a href="dictionary_I.html#1589">ireg</a>),<a href="dictionary_Y.html#1623">ymail</a>(<a href="dictionary_I.html#1587">i</a>,<a href="dictionary_J.html#1591">j</a>,<a href="dictionary_I.html#1589">ireg</a>),<a href="dictionary_P.html#1611">psimai</a>,</font>
+<a name="167"><font  size=-1>167     </font></a><font color="black">     .           <a href="dictionary_P.html#1609">psidx</a>,<a href="dictionary_P.html#1610">psidy</a></font>
+<a name="168"><font  size=-1>168     </font></a><font color="black"></font><font color="red">c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994</font>
+<a name="169"><font  size=-1>169     </font></a><font color="red">  109          </font><font color="black"><b>FORMAT</b>(1p5E16.8)</font>
+<a name="170"><font  size=-1>170     </font></a><font color="black"></font>
+<a name="171"><font  size=-1>171     </font></a><font color="black">   31       <b>continue</b></font>
+<a name="172"><font  size=-1>172     </font></a><font color="black">   32       <b>CONTINUE</b></font>
+<a name="173"><font  size=-1>173     </font></a><font color="black">   30    <b>CONTINUE</b></font>
+<a name="174"><font  size=-1>174     </font></a><font color="black"></font>
+<a name="175"><font  size=-1>175     </font></a><font color="black">         <b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:8).eq.</font><font color="magenta">'francais'</font><font color="black">) <b>then</b></font>
+<a name="176"><font  size=-1>176     </font></a><font color="black">           <b>WRITE</b>(10,110)</font>
+<a name="177"><font  size=-1>177     </font></a><font color="black">  110      <b>FORMAT</b>(</font><font color="magenta">'$fin'</font><font color="black">)</font>
+<a name="178"><font  size=-1>178     </font></a><font color="black">         <b>else</b><b>if</b>(<a href="dictionary_S.html#939">sellan</a>(1:7).eq.</font><font color="magenta">'english'</font><font color="black">) <b>then</b></font>
+<a name="179"><font  size=-1>179     </font></a><font color="black">           <b>write</b>(10,210)</font>
+<a name="180"><font  size=-1>180     </font></a><font color="black">  210      <b>format</b>(</font><font color="magenta">'$end'</font><font color="black">)</font>
+<a name="181"><font  size=-1>181     </font></a><font color="black">         <b>end</b><b>if</b></font>
+<a name="182"><font  size=-1>182     </font></a><font color="black"></font>
+<a name="183"><font  size=-1>183     </font></a><font color="black">      <b>END</b><b>IF</b></font>
+<a name="184"><font  size=-1>184     </font></a><font color="black"></font>
+<a name="185"><font  size=-1>185     </font></a><font color="black">      RETURN</font>
+<a name="186"><font  size=-1>186     </font></a><font color="black">      <b>END</b></font>
+<a name="187"><font  size=-1>187     </font></a><font color="black"></font></pre></body></html>

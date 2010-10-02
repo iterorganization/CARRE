@@ -2,9 +2,9 @@ FC		= gfortran
 CPP		= /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -O -C
+FFLAGS		= -g -O -C -ffree-form
 else
-FFLAGS		= -O3 
+FFLAGS		= -O3 -ffree-form
 endif
 
 DBLPAD		= -Ad 

@@ -1,0 +1,617 @@
+<html><head><title>leccle.F</title></head><body link="blue" vlink="blue"><h3>File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/leccle.F</h3>
+<SCRIPT>
+ defaultStatus = "File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/leccle.F";
+top.document.title  = "leccle.F";
+</SCRIPT>
+<pre><font color="black"></font><a name="1"><font  size=-1>1     </font></a><font color="black">      <b>SUBROUTINE</b> <a href="dictionary_L.html#782">LECCLE</a>(<a href="dictionary_N.html#803">nptseg</a>,<a href="dictionary_N.html#802">npr</a>,<a href="dictionary_L.html#798">lg</a>,<a href="dictionary_D.html#787">deltp1</a>,<a href="dictionary_D.html#788">deltpn</a>,<a href="dictionary_D.html#789">deltr1</a>,<a href="dictionary_L.html#799">limcfg</a>,</font>
+<a name="2"><font  size=-1>2     </font></a><font color="black">     .              <a href="dictionary_D.html#790">deltrn</a>,<a href="dictionary_R.html#809">repart</a>,<a href="dictionary_P.html#807">pntrat</a>,<a href="dictionary_T.html#810">tgarde</a>,<a href="dictionary_D.html#792">distnv</a>,<a href="dictionary_X.html#813">xptxo</a>,<a href="dictionary_Y.html#817">yptxo</a>,</font>
+<a name="3"><font  size=-1>3     </font></a><font color="black">     .              <a href="dictionary_D.html#793">distxo</a>,<a href="dictionary_X.html#814">xx</a>,<a href="dictionary_Y.html#818">yy</a>,<a href="dictionary_F.html#795">fctini</a>,<a href="dictionary_D.html#791">difpsi</a>,<a href="dictionary_A.html#783">a00</a>,<a href="dictionary_A.html#785">a10</a>,<a href="dictionary_A.html#784">a01</a>,<a href="dictionary_A.html#786">a11</a>,<a href="dictionary_N.html#800">nm1</a>,<a href="dictionary_N.html#801">nm2</a>,</font>
+<a name="4"><font  size=-1>4     </font></a><font color="black">     .              <a href="dictionary_N.html#804">npx</a>,<a href="dictionary_R.html#808">racord</a>,<a href="dictionary_X.html#811">x</a>,<a href="dictionary_Y.html#815">y</a>,<a href="dictionary_N.html#805">nx</a>,<a href="dictionary_N.html#806">ny</a>)</font>
+<a name="5"><font  size=-1>5     </font></a><font color="black"></font><font color="red">c</font>
+<a name="6"><font  size=-1>6     </font></a><font color="red">c  version : 05.04.97 16:31</font>
+<a name="7"><font  size=-1>7     </font></a><font color="red">c</font>
+<a name="8"><font  size=-1>8     </font></a><font color="red">c======================================================================</font>
+<a name="9"><font  size=-1>9     </font></a><font color="red">      </font><font color="black"><b>IMPLICIT</b> <b>NONE</b></font>
+<a name="10"><font  size=-1>10     </font></a><font color="black"></font>
+<a name="11"><font  size=-1>11     </font></a><font color="black"></font><font color="red">*..  Cette sous-routine permet a l'utilisateur d'entrer tous les parame-</font>
+<a name="12"><font  size=-1>12     </font></a><font color="red">*  tres au clavier, en considerant chaque configuration.</font>
+<a name="13"><font  size=-1>13     </font></a><font color="red"></font>
+<a name="14"><font  size=-1>14     </font></a><font color="red">*  arguments</font>
+<a name="15"><font  size=-1>15     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_N.html#805">nx</a>,<a href="dictionary_N.html#806">ny</a>,<a href="dictionary_N.html#804">npx</a>,<a href="dictionary_N.html#803">nptseg</a>(*),<a href="dictionary_N.html#802">npr</a>(*),<a href="dictionary_R.html#809">repart</a>,<a href="dictionary_N.html#800">nm1</a>,<a href="dictionary_N.html#801">nm2</a>,<a href="dictionary_L.html#799">limcfg</a></font>
+<a name="16"><font  size=-1>16     </font></a><font color="black">      <b>LOGICAL</b> <a href="dictionary_R.html#808">racord</a></font>
+<a name="17"><font  size=-1>17     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_X.html#811">x</a>(<a href="dictionary_N.html#805">nx</a>),<a href="dictionary_Y.html#815">y</a>(<a href="dictionary_N.html#806">ny</a>),<a href="dictionary_X.html#814">xx</a>,<a href="dictionary_Y.html#818">yy</a>,<a href="dictionary_D.html#792">distnv</a>(5,*),<a href="dictionary_L.html#798">lg</a>(*),<a href="dictionary_P.html#807">pntrat</a>,</font>
+<a name="18"><font  size=-1>18     </font></a><font color="black">     .       <a href="dictionary_D.html#787">deltp1</a>(10),<a href="dictionary_D.html#788">deltpn</a>(10),<a href="dictionary_D.html#789">deltr1</a>(10),<a href="dictionary_D.html#790">deltrn</a>(10),<a href="dictionary_F.html#795">fctini</a>,<a href="dictionary_D.html#791">difpsi</a>,</font>
+<a name="19"><font  size=-1>19     </font></a><font color="black">     .       <a href="dictionary_A.html#783">a00</a>(<a href="dictionary_N.html#800">nm1</a>,<a href="dictionary_N.html#801">nm2</a>,3),<a href="dictionary_A.html#785">a10</a>(<a href="dictionary_N.html#800">nm1</a>,<a href="dictionary_N.html#801">nm2</a>,3),</font>
+<a name="20"><font  size=-1>20     </font></a><font color="black">     .       <a href="dictionary_A.html#784">a01</a>(<a href="dictionary_N.html#800">nm1</a>,<a href="dictionary_N.html#801">nm2</a>,3),<a href="dictionary_A.html#786">a11</a>(<a href="dictionary_N.html#800">nm1</a>,<a href="dictionary_N.html#801">nm2</a>,3),</font>
+<a name="21"><font  size=-1>21     </font></a><font color="black">     .       <a href="dictionary_T.html#810">tgarde</a>(4),<a href="dictionary_X.html#813">xptxo</a>,<a href="dictionary_Y.html#817">yptxo</a>,<a href="dictionary_D.html#793">distxo</a></font>
+<a name="22"><font  size=-1>22     </font></a><font color="black"></font>
+<a name="23"><font  size=-1>23     </font></a><font color="black"></font><font color="red">*  variables locales</font>
+<a name="24"><font  size=-1>24     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a></font>
+<a name="25"><font  size=-1>25     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_F.html#794">fctfin</a>,<a href="dictionary_X.html#812">xfin</a>,<a href="dictionary_Y.html#816">yfin</a></font>
+<a name="26"><font  size=-1>26     </font></a><font color="black"></font>
+<a name="27"><font  size=-1>27     </font></a><font color="black"></font><font color="red">*  procedures</font>
+<a name="28"><font  size=-1>28     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#411">ifind</a></font>
+<a name="29"><font  size=-1>29     </font></a><font color="black">      <b>INTRINSIC</b> <a href="dictionary_M.html#16">MIN</a></font>
+<a name="30"><font  size=-1>30     </font></a><font color="black">      <b>EXTERNAL</b> <a href="dictionary_I.html#411">ifind</a></font>
+<a name="31"><font  size=-1>31     </font></a><font color="black"></font><font color="red">c======================================================================</font>
+<a name="32"><font  size=-1>32     </font></a><font color="red">c.. ii,jj: tableaux des indices en x et en y des carres ou le gradient</font>
+<a name="33"><font  size=-1>33     </font></a><font color="red">c          est nul.</font>
+<a name="34"><font  size=-1>34     </font></a><font color="red">c.. xfin,yfin: coordonnees du point le plus interieur en suivant la</font>
+<a name="35"><font  size=-1>35     </font></a><font color="red">c              ligne de penetration.</font>
+<a name="36"><font  size=-1>36     </font></a><font color="red">c.. fctfin: valeur de la fonction a ce point.</font>
+<a name="37"><font  size=-1>37     </font></a><font color="red">c======================================================================</font>
+<a name="38"><font  size=-1>38     </font></a><font color="red"></font>
+<a name="39"><font  size=-1>39     </font></a><font color="red">      </font><font color="black"><b>write</b>(6,*)</font>
+<a name="40"><font  size=-1>40     </font></a><font color="black">      <b>write</b>(6,*) </font><font color="magenta">'There is no valid configuration file '</font><font color="black">,</font>
+<a name="41"><font  size=-1>41     </font></a><font color="black">     ,                           </font><font color="magenta">'&quot;carre.dat&quot; in the current directory'</font>
+<a name="42"><font  size=-1>42     </font></a><font color="magenta">      </font><font color="black"><b>write</b>(6,*) </font><font color="magenta">'You are therefore requested to input '</font><font color="black">,</font>
+<a name="43"><font  size=-1>43     </font></a><font color="black">     ,                              </font><font color="magenta">'the necessary parameters manually'</font>
+<a name="44"><font  size=-1>44     </font></a><font color="magenta">      </font><font color="black"><b>write</b>(6,*) </font><font color="magenta">'Note that you will be given an opportunity '</font><font color="black">,</font>
+<a name="45"><font  size=-1>45     </font></a><font color="black">     ,                         </font><font color="magenta">'to edit the data you have to input now'</font>
+<a name="46"><font  size=-1>46     </font></a><font color="magenta">      </font><font color="black"><b>write</b>(6,*)</font>
+<a name="47"><font  size=-1>47     </font></a><font color="black">      <b>write</b>(6,*) </font><font color="magenta">'Please read the prompts and give your answers'</font>
+<a name="48"><font  size=-1>48     </font></a><font color="magenta">      </font><font color="black"><b>write</b>(6,*)</font>
+<a name="49"><font  size=-1>49     </font></a><font color="black"></font>
+<a name="50"><font  size=-1>50     </font></a><font color="black"></font><font color="red">*..1. Un seul point X.</font>
+<a name="51"><font  size=-1>51     </font></a><font color="red"></font>
+<a name="52"><font  size=-1>52     </font></a><font color="red">      </font><font color="black"><b>if</b> (<a href="dictionary_N.html#804">npx</a>.eq.1 .and. <a href="dictionary_L.html#799">limcfg</a>.gt.0) <b>then</b></font>
+<a name="53"><font  size=-1>53     </font></a><font color="black"></font><font color="red">c       Configuration limiteur</font>
+<a name="54"><font  size=-1>54     </font></a><font color="red"></font>
+<a name="55"><font  size=-1>55     </font></a><font color="red">*..1.1  On determine le nombre de points sur chaque segment de separa-</font>
+<a name="56"><font  size=-1>56     </font></a><font color="red">*       trice.</font>
+<a name="57"><font  size=-1>57     </font></a><font color="red"></font>
+<a name="58"><font  size=-1>58     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,205)<a href="dictionary_L.html#798">lg</a>(1)</font>
+<a name="59"><font  size=-1>59     </font></a><font color="black">  205    <b>format</b>(/</font><font color="magenta">'Limiter configuration.'</font><font color="black">//</font>
+<a name="60"><font  size=-1>60     </font></a><font color="black">     .    </font><font color="magenta">'Number of nodes on the separatrix:'</font><font color="black">/</font><font color="magenta">'segment length = '</font><font color="black">,f8.5)</font>
+<a name="61"><font  size=-1>61     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(1)</font>
+<a name="62"><font  size=-1>62     </font></a><font color="black"></font>
+<a name="63"><font  size=-1>63     </font></a><font color="black">         <b>write</b>(6,201)</font>
+<a name="64"><font  size=-1>64     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(1)</font>
+<a name="65"><font  size=-1>65     </font></a><font color="black"></font>
+<a name="66"><font  size=-1>66     </font></a><font color="black">         <b>write</b>(6,202)</font>
+<a name="67"><font  size=-1>67     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(1)</font>
+<a name="68"><font  size=-1>68     </font></a><font color="black"></font>
+<a name="69"><font  size=-1>69     </font></a><font color="black"></font><font color="red">*..1.2  Determination de la facon de repartir les points radialement.</font>
+<a name="70"><font  size=-1>70     </font></a><font color="red"></font>
+<a name="71"><font  size=-1>71     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,209)</font>
+<a name="72"><font  size=-1>72     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_R.html#809">repart</a></font>
+<a name="73"><font  size=-1>73     </font></a><font color="black"></font>
+<a name="74"><font  size=-1>74     </font></a><font color="black"></font><font color="red">*..1.3  Determination du nombre de points dans la direction &quot;radiale&quot;</font>
+<a name="75"><font  size=-1>75     </font></a><font color="red"></font>
+<a name="76"><font  size=-1>76     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,210)</font>
+<a name="77"><font  size=-1>77     </font></a><font color="black">         <b>write</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,1)</font>
+<a name="78"><font  size=-1>78     </font></a><font color="black">         <b>write</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,1)</font>
+<a name="79"><font  size=-1>79     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(1)</font>
+<a name="80"><font  size=-1>80     </font></a><font color="black"></font>
+<a name="81"><font  size=-1>81     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="82"><font  size=-1>82     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(1)</font>
+<a name="83"><font  size=-1>83     </font></a><font color="black"></font>
+<a name="84"><font  size=-1>84     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="85"><font  size=-1>85     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(1)</font>
+<a name="86"><font  size=-1>86     </font></a><font color="black"></font>
+<a name="87"><font  size=-1>87     </font></a><font color="black">         <b>WRITE</b>(6,222)<a href="dictionary_D.html#793">distxo</a></font>
+<a name="88"><font  size=-1>88     </font></a><font color="black">  222    <b>format</b>(/</font><font color="magenta">'Number of nodes in region 2 (interior) and'</font>
+<a name="89"><font  size=-1>89     </font></a><font color="magenta">     .     </font><font color="black">,</font><font color="magenta">' penetration:'</font><font color="black">/</font><font color="magenta">'maximum penetration ='</font><font color="black">,f11.8)</font>
+<a name="90"><font  size=-1>90     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(2),<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="91"><font  size=-1>91     </font></a><font color="black"></font>
+<a name="92"><font  size=-1>92     </font></a><font color="black">         <a href="dictionary_P.html#807">pntrat</a> = <a href="dictionary_M.html#16">MIN</a>(<a href="dictionary_P.html#807">pntrat</a>,<a href="dictionary_D.html#793">distxo</a>)</font>
+<a name="93"><font  size=-1>93     </font></a><font color="black"></font>
+<a name="94"><font  size=-1>94     </font></a><font color="black">         <b>IF</b> (<a href="dictionary_R.html#809">repart</a> .EQ. 2) <b>THEN</b></font>
+<a name="95"><font  size=-1>95     </font></a><font color="black"></font>
+<a name="96"><font  size=-1>96     </font></a><font color="black">            <a href="dictionary_X.html#812">xfin</a> = <a href="dictionary_X.html#814">xx</a> + <a href="dictionary_X.html#813">xptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="97"><font  size=-1>97     </font></a><font color="black">            <a href="dictionary_Y.html#816">yfin</a> = <a href="dictionary_Y.html#818">yy</a> + <a href="dictionary_Y.html#817">yptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="98"><font  size=-1>98     </font></a><font color="black"></font>
+<a name="99"><font  size=-1>99     </font></a><font color="black">            <a href="dictionary_I.html#796">ii</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_X.html#812">xfin</a>,<a href="dictionary_X.html#811">x</a>,<a href="dictionary_N.html#805">nx</a>,1)</font>
+<a name="100"><font  size=-1>100     </font></a><font color="black">            <a href="dictionary_J.html#797">jj</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_Y.html#816">yfin</a>,<a href="dictionary_Y.html#815">y</a>,<a href="dictionary_N.html#806">ny</a>,1)</font>
+<a name="101"><font  size=-1>101     </font></a><font color="black"></font>
+<a name="102"><font  size=-1>102     </font></a><font color="black">            <a href="dictionary_F.html#794">fctfin</a> = <a href="dictionary_A.html#783">a00</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1) + <a href="dictionary_A.html#785">a10</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a> + </font>
+<a name="103"><font  size=-1>103     </font></a><font color="black">     .               <a href="dictionary_A.html#784">a01</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_Y.html#816">yfin</a> + <a href="dictionary_A.html#786">a11</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a>*<a href="dictionary_Y.html#816">yfin</a></font>
+<a name="104"><font  size=-1>104     </font></a><font color="black"></font>
+<a name="105"><font  size=-1>105     </font></a><font color="black">            <a href="dictionary_D.html#791">difpsi</a> = <a href="dictionary_F.html#794">fctfin</a> - <a href="dictionary_F.html#795">fctini</a></font>
+<a name="106"><font  size=-1>106     </font></a><font color="black"></font>
+<a name="107"><font  size=-1>107     </font></a><font color="black">            <b>WRITE</b>(6,121)<a href="dictionary_D.html#791">difpsi</a></font>
+<a name="108"><font  size=-1>108     </font></a><font color="black"></font>
+<a name="109"><font  size=-1>109     </font></a><font color="black">         <b>END</b><b>IF</b></font>
+<a name="110"><font  size=-1>110     </font></a><font color="black"></font>
+<a name="111"><font  size=-1>111     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="112"><font  size=-1>112     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(2)</font>
+<a name="113"><font  size=-1>113     </font></a><font color="black"></font>
+<a name="114"><font  size=-1>114     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="115"><font  size=-1>115     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(2)</font>
+<a name="116"><font  size=-1>116     </font></a><font color="black"></font>
+<a name="117"><font  size=-1>117     </font></a><font color="black"></font><font color="red">*..1.4  Determination de la longueur de garde pour chaque plaque.</font>
+<a name="118"><font  size=-1>118     </font></a><font color="red"></font>
+<a name="119"><font  size=-1>119     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,223)</font>
+<a name="120"><font  size=-1>120     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(1)</font>
+<a name="121"><font  size=-1>121     </font></a><font color="black"></font>
+<a name="122"><font  size=-1>122     </font></a><font color="black">         <b>WRITE</b>(6,224)</font>
+<a name="123"><font  size=-1>123     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(2)</font>
+<a name="124"><font  size=-1>124     </font></a><font color="black"></font>
+<a name="125"><font  size=-1>125     </font></a><font color="black">      <b>ELSE</b><b>IF</b> (<a href="dictionary_N.html#804">npx</a>.EQ.1 .and. <a href="dictionary_L.html#799">limcfg</a>.eq.0) <b>THEN</b></font>
+<a name="126"><font  size=-1>126     </font></a><font color="black"></font><font color="red">c       simple nul</font>
+<a name="127"><font  size=-1>127     </font></a><font color="red"></font>
+<a name="128"><font  size=-1>128     </font></a><font color="red">*..1.1  On determine le nombre de points sur chaque segment de separa-</font>
+<a name="129"><font  size=-1>129     </font></a><font color="red">*       trice.</font>
+<a name="130"><font  size=-1>130     </font></a><font color="red"></font>
+<a name="131"><font  size=-1>131     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,200)<a href="dictionary_L.html#798">lg</a>(1)</font>
+<a name="132"><font  size=-1>132     </font></a><font color="black">  200    <b>format</b>(/</font><font color="magenta">'Single null geometry'</font><font color="black">//</font>
+<a name="133"><font  size=-1>133     </font></a><font color="black">     .    </font><font color="magenta">'Number of nodes on the segment which connects the X-point'</font><font color="black">,</font>
+<a name="134"><font  size=-1>134     </font></a><font color="black">     .    </font><font color="magenta">' to the right plate:'</font><font color="black">/</font><font color="magenta">'segment length = '</font><font color="black">,f8.5)</font>
+<a name="135"><font  size=-1>135     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(1)</font>
+<a name="136"><font  size=-1>136     </font></a><font color="black"></font>
+<a name="137"><font  size=-1>137     </font></a><font color="black">         <b>write</b>(6,201)</font>
+<a name="138"><font  size=-1>138     </font></a><font color="black">  201    <b>format</b>(/</font><font color="magenta">'Spacing between first 2 nodes:'</font><font color="black">)</font>
+<a name="139"><font  size=-1>139     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(1)</font>
+<a name="140"><font  size=-1>140     </font></a><font color="black"></font>
+<a name="141"><font  size=-1>141     </font></a><font color="black">         <b>write</b>(6,202)</font>
+<a name="142"><font  size=-1>142     </font></a><font color="black">  202    <b>format</b>(/</font><font color="magenta">'Spacing between last 2 nodes:'</font><font color="black">)</font>
+<a name="143"><font  size=-1>143     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(1)</font>
+<a name="144"><font  size=-1>144     </font></a><font color="black"></font>
+<a name="145"><font  size=-1>145     </font></a><font color="black">         <b>WRITE</b>(6,203)<a href="dictionary_L.html#798">lg</a>(2)</font>
+<a name="146"><font  size=-1>146     </font></a><font color="black">  203    <b>format</b>(/</font><font color="magenta">'Number of nodes on the segment which connects the X'</font><font color="black">,</font>
+<a name="147"><font  size=-1>147     </font></a><font color="black">     .     </font><font color="magenta">'-point to the left plate:'</font><font color="black">/</font><font color="magenta">'segment length = '</font><font color="black">,f8.5)</font>
+<a name="148"><font  size=-1>148     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(2)</font>
+<a name="149"><font  size=-1>149     </font></a><font color="black"></font>
+<a name="150"><font  size=-1>150     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="151"><font  size=-1>151     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(2)</font>
+<a name="152"><font  size=-1>152     </font></a><font color="black"></font>
+<a name="153"><font  size=-1>153     </font></a><font color="black">         <b>write</b>(6,202)</font>
+<a name="154"><font  size=-1>154     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(2)</font>
+<a name="155"><font  size=-1>155     </font></a><font color="black"></font>
+<a name="156"><font  size=-1>156     </font></a><font color="black">         <b>write</b>(6,206)<a href="dictionary_L.html#798">lg</a>(3)</font>
+<a name="157"><font  size=-1>157     </font></a><font color="black">  206    <b>format</b>(/</font><font color="magenta">'Number of nodes on the loop:'</font><font color="black">/</font><font color="magenta">'length = '</font><font color="black">,f8.5)</font>
+<a name="158"><font  size=-1>158     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(3)</font>
+<a name="159"><font  size=-1>159     </font></a><font color="black"></font>
+<a name="160"><font  size=-1>160     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="161"><font  size=-1>161     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(3)</font>
+<a name="162"><font  size=-1>162     </font></a><font color="black"></font>
+<a name="163"><font  size=-1>163     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="164"><font  size=-1>164     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(3)</font>
+<a name="165"><font  size=-1>165     </font></a><font color="black"></font>
+<a name="166"><font  size=-1>166     </font></a><font color="black"></font><font color="red">*..1.2  Determination de la facon de repartir les points radialement.</font>
+<a name="167"><font  size=-1>167     </font></a><font color="red"></font>
+<a name="168"><font  size=-1>168     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,209)</font>
+<a name="169"><font  size=-1>169     </font></a><font color="black">  209    <b>format</b>(/</font><font color="magenta">'Type of &quot;radial&quot; distribution:'</font><font color="black">/</font>
+<a name="170"><font  size=-1>170     </font></a><font color="black">     .     </font><font color="magenta">'1 for distribution based on displacement along plates'</font><font color="black">/</font>
+<a name="171"><font  size=-1>171     </font></a><font color="black">     .     </font><font color="magenta">'2 for distribution based on psi (recommended)'</font><font color="black">)</font>
+<a name="172"><font  size=-1>172     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_R.html#809">repart</a></font>
+<a name="173"><font  size=-1>173     </font></a><font color="black"></font>
+<a name="174"><font  size=-1>174     </font></a><font color="black"></font><font color="red">*..1.3  Determination du nombre de points dans la direction &quot;radiale&quot;</font>
+<a name="175"><font  size=-1>175     </font></a><font color="red"></font>
+<a name="176"><font  size=-1>176     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,210)</font>
+<a name="177"><font  size=-1>177     </font></a><font color="black">  210    <b>format</b>(//</font><font color="magenta">'Number of nodes in the radial direction for'</font><font color="black">,</font>
+<a name="178"><font  size=-1>178     </font></a><font color="black">     .     </font><font color="magenta">' region 1 (SOL):'</font><font color="black">)</font>
+<a name="179"><font  size=-1>179     </font></a><font color="black">         <b>write</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,1)</font>
+<a name="180"><font  size=-1>180     </font></a><font color="black">  211    <b>format</b>(</font><font color="magenta">'total distance ='</font><font color="black">,f9.6)</font>
+<a name="181"><font  size=-1>181     </font></a><font color="black">         <b>write</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,1)</font>
+<a name="182"><font  size=-1>182     </font></a><font color="black">  212    <b>format</b>(</font><font color="magenta">'total variation in psi'</font><font color="black">,f9.6)</font>
+<a name="183"><font  size=-1>183     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(1)</font>
+<a name="184"><font  size=-1>184     </font></a><font color="black"></font>
+<a name="185"><font  size=-1>185     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="186"><font  size=-1>186     </font></a><font color="black">  213    <b>format</b>(/</font><font color="magenta">'Spacing between first 2 nodes'</font><font color="black">)</font>
+<a name="187"><font  size=-1>187     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(1)</font>
+<a name="188"><font  size=-1>188     </font></a><font color="black"></font>
+<a name="189"><font  size=-1>189     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="190"><font  size=-1>190     </font></a><font color="black">  214    <b>format</b>(/</font><font color="magenta">'Spacing between last 2 nodes'</font><font color="black">)</font>
+<a name="191"><font  size=-1>191     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(1)</font>
+<a name="192"><font  size=-1>192     </font></a><font color="black"></font>
+<a name="193"><font  size=-1>193     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,2)</font>
+<a name="194"><font  size=-1>194     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,2)</font>
+<a name="195"><font  size=-1>195     </font></a><font color="black">         <b>WRITE</b>(6,215)</font>
+<a name="196"><font  size=-1>196     </font></a><font color="black">  215    <b>format</b>(/</font><font color="magenta">'Number of nodes in region 2 (private region):'</font><font color="black">)</font>
+<a name="197"><font  size=-1>197     </font></a><font color="black">         <b>write</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,2)</font>
+<a name="198"><font  size=-1>198     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,2)</font>
+<a name="199"><font  size=-1>199     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(2)</font>
+<a name="200"><font  size=-1>200     </font></a><font color="black"></font>
+<a name="201"><font  size=-1>201     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="202"><font  size=-1>202     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(2)</font>
+<a name="203"><font  size=-1>203     </font></a><font color="black"></font>
+<a name="204"><font  size=-1>204     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="205"><font  size=-1>205     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(2)</font>
+<a name="206"><font  size=-1>206     </font></a><font color="black"></font>
+<a name="207"><font  size=-1>207     </font></a><font color="black">         <b>WRITE</b>(6,220)<a href="dictionary_D.html#793">distxo</a></font>
+<a name="208"><font  size=-1>208     </font></a><font color="black">  220    <b>format</b>(/</font><font color="magenta">'Number of nodes in region 3 (interior) and'</font>
+<a name="209"><font  size=-1>209     </font></a><font color="magenta">     .     </font><font color="black">,</font><font color="magenta">' penetration:'</font><font color="black">/</font><font color="magenta">'maximum penetration ='</font><font color="black">,f11.8)</font>
+<a name="210"><font  size=-1>210     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(3),<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="211"><font  size=-1>211     </font></a><font color="black"></font>
+<a name="212"><font  size=-1>212     </font></a><font color="black">         <a href="dictionary_P.html#807">pntrat</a> = <a href="dictionary_M.html#16">MIN</a>(<a href="dictionary_P.html#807">pntrat</a>,<a href="dictionary_D.html#793">distxo</a>)</font>
+<a name="213"><font  size=-1>213     </font></a><font color="black"></font>
+<a name="214"><font  size=-1>214     </font></a><font color="black">         <b>IF</b> (<a href="dictionary_R.html#809">repart</a> .EQ. 2) <b>THEN</b></font>
+<a name="215"><font  size=-1>215     </font></a><font color="black"></font>
+<a name="216"><font  size=-1>216     </font></a><font color="black">            <a href="dictionary_X.html#812">xfin</a> = <a href="dictionary_X.html#814">xx</a> + <a href="dictionary_X.html#813">xptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="217"><font  size=-1>217     </font></a><font color="black">            <a href="dictionary_Y.html#816">yfin</a> = <a href="dictionary_Y.html#818">yy</a> + <a href="dictionary_Y.html#817">yptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="218"><font  size=-1>218     </font></a><font color="black"></font>
+<a name="219"><font  size=-1>219     </font></a><font color="black">            <a href="dictionary_I.html#796">ii</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_X.html#812">xfin</a>,<a href="dictionary_X.html#811">x</a>,<a href="dictionary_N.html#805">nx</a>,1)</font>
+<a name="220"><font  size=-1>220     </font></a><font color="black">            <a href="dictionary_J.html#797">jj</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_Y.html#816">yfin</a>,<a href="dictionary_Y.html#815">y</a>,<a href="dictionary_N.html#806">ny</a>,1)</font>
+<a name="221"><font  size=-1>221     </font></a><font color="black"></font>
+<a name="222"><font  size=-1>222     </font></a><font color="black">            <a href="dictionary_F.html#794">fctfin</a> = <a href="dictionary_A.html#783">a00</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1) + <a href="dictionary_A.html#785">a10</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a> + </font>
+<a name="223"><font  size=-1>223     </font></a><font color="black">     .               <a href="dictionary_A.html#784">a01</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_Y.html#816">yfin</a> + <a href="dictionary_A.html#786">a11</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a>*<a href="dictionary_Y.html#816">yfin</a></font>
+<a name="224"><font  size=-1>224     </font></a><font color="black"></font>
+<a name="225"><font  size=-1>225     </font></a><font color="black">            <a href="dictionary_D.html#791">difpsi</a> = <a href="dictionary_F.html#794">fctfin</a> - <a href="dictionary_F.html#795">fctini</a></font>
+<a name="226"><font  size=-1>226     </font></a><font color="black"></font>
+<a name="227"><font  size=-1>227     </font></a><font color="black">            <b>WRITE</b>(6,121)<a href="dictionary_D.html#791">difpsi</a></font>
+<a name="228"><font  size=-1>228     </font></a><font color="black">  121       <b>FORMAT</b>(/</font><font color="magenta">'delta-psi ='</font><font color="black">, F9.6)</font>
+<a name="229"><font  size=-1>229     </font></a><font color="black"></font>
+<a name="230"><font  size=-1>230     </font></a><font color="black">         <b>END</b><b>IF</b></font>
+<a name="231"><font  size=-1>231     </font></a><font color="black"></font>
+<a name="232"><font  size=-1>232     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="233"><font  size=-1>233     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(3)</font>
+<a name="234"><font  size=-1>234     </font></a><font color="black"></font>
+<a name="235"><font  size=-1>235     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="236"><font  size=-1>236     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(3)</font>
+<a name="237"><font  size=-1>237     </font></a><font color="black"></font>
+<a name="238"><font  size=-1>238     </font></a><font color="black"></font><font color="red">*..1.4  Determination de la longueur de garde pour chaque plaque.</font>
+<a name="239"><font  size=-1>239     </font></a><font color="red"></font>
+<a name="240"><font  size=-1>240     </font></a><font color="red">         </font><font color="black"><b>write</b>(6,223)</font>
+<a name="241"><font  size=-1>241     </font></a><font color="black">  223    <b>format</b>(/</font><font color="magenta">'Guard length for plate 1'</font><font color="black">)</font>
+<a name="242"><font  size=-1>242     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(1)</font>
+<a name="243"><font  size=-1>243     </font></a><font color="black"></font>
+<a name="244"><font  size=-1>244     </font></a><font color="black">         <b>WRITE</b>(6,224)</font>
+<a name="245"><font  size=-1>245     </font></a><font color="black">  224    <b>format</b>(/</font><font color="magenta">'Guard length for plate 2'</font><font color="black">)</font>
+<a name="246"><font  size=-1>246     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(2)</font>
+<a name="247"><font  size=-1>247     </font></a><font color="black"></font>
+<a name="248"><font  size=-1>248     </font></a><font color="black">  225    <b>format</b>(/</font><font color="magenta">'Guard length for plate 3'</font><font color="black">)</font>
+<a name="249"><font  size=-1>249     </font></a><font color="black">  226    <b>format</b>(/</font><font color="magenta">'Guard length for plate 4'</font><font color="black">)</font>
+<a name="250"><font  size=-1>250     </font></a><font color="black"></font>
+<a name="251"><font  size=-1>251     </font></a><font color="black"></font><font color="red">*..2. Double nul connecte.</font>
+<a name="252"><font  size=-1>252     </font></a><font color="red"></font>
+<a name="253"><font  size=-1>253     </font></a><font color="red">      </font><font color="black"><b>ELSE</b> <b>IF</b> ((<a href="dictionary_N.html#804">npx</a> .EQ. 2) .AND. (<a href="dictionary_R.html#808">racord</a>)) <b>THEN</b></font>
+<a name="254"><font  size=-1>254     </font></a><font color="black"></font>
+<a name="255"><font  size=-1>255     </font></a><font color="black"></font><font color="red">*..2.1  On determine le nombre de points sur chaque segment de separa-</font>
+<a name="256"><font  size=-1>256     </font></a><font color="red">*       trice.</font>
+<a name="257"><font  size=-1>257     </font></a><font color="red"></font>
+<a name="258"><font  size=-1>258     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,230)<a href="dictionary_L.html#798">lg</a>(1)</font>
+<a name="259"><font  size=-1>259     </font></a><font color="black">  230    <b>format</b>(/</font><font color="magenta">'Connected double-null geometry'</font><font color="black">//</font>
+<a name="260"><font  size=-1>260     </font></a><font color="black">     .   </font><font color="magenta">'Number of nodes on segment connecting X-point to right plate:'</font>
+<a name="261"><font  size=-1>261     </font></a><font color="magenta">     .   </font><font color="black">/</font><font color="magenta">'length = '</font><font color="black">,f8.5)</font>
+<a name="262"><font  size=-1>262     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(1)</font>
+<a name="263"><font  size=-1>263     </font></a><font color="black"></font>
+<a name="264"><font  size=-1>264     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="265"><font  size=-1>265     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(1)</font>
+<a name="266"><font  size=-1>266     </font></a><font color="black"></font>
+<a name="267"><font  size=-1>267     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="268"><font  size=-1>268     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(1)</font>
+<a name="269"><font  size=-1>269     </font></a><font color="black"></font>
+<a name="270"><font  size=-1>270     </font></a><font color="black">         <b>WRITE</b>(6,203)<a href="dictionary_L.html#798">lg</a>(2)</font>
+<a name="271"><font  size=-1>271     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(2)</font>
+<a name="272"><font  size=-1>272     </font></a><font color="black"></font>
+<a name="273"><font  size=-1>273     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="274"><font  size=-1>274     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(2)</font>
+<a name="275"><font  size=-1>275     </font></a><font color="black"></font>
+<a name="276"><font  size=-1>276     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="277"><font  size=-1>277     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(2)</font>
+<a name="278"><font  size=-1>278     </font></a><font color="black"></font>
+<a name="279"><font  size=-1>279     </font></a><font color="black">         <b>WRITE</b>(6,233)<a href="dictionary_L.html#798">lg</a>(3)</font>
+<a name="280"><font  size=-1>280     </font></a><font color="black">  233    <b>format</b>(/</font><font color="magenta">'Number of nodes on segment which connects X-points'</font><font color="black">,</font>
+<a name="281"><font  size=-1>281     </font></a><font color="black">     .   </font><font color="magenta">' by the right'</font><font color="black">/</font><font color="magenta">'length of segment = '</font><font color="black">,f8.5)</font>
+<a name="282"><font  size=-1>282     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(3)</font>
+<a name="283"><font  size=-1>283     </font></a><font color="black"></font>
+<a name="284"><font  size=-1>284     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="285"><font  size=-1>285     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(3)</font>
+<a name="286"><font  size=-1>286     </font></a><font color="black"></font>
+<a name="287"><font  size=-1>287     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="288"><font  size=-1>288     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(3)</font>
+<a name="289"><font  size=-1>289     </font></a><font color="black"></font>
+<a name="290"><font  size=-1>290     </font></a><font color="black">         <b>WRITE</b>(6,236)<a href="dictionary_L.html#798">lg</a>(4)</font>
+<a name="291"><font  size=-1>291     </font></a><font color="black">  236    <b>format</b>(/</font><font color="magenta">'Number of nodes on segment which connects X points'</font><font color="black">,</font>
+<a name="292"><font  size=-1>292     </font></a><font color="black">     .   </font><font color="magenta">' by the left'</font><font color="black">/</font><font color="magenta">'length of segment = '</font><font color="black">,f8.5)</font>
+<a name="293"><font  size=-1>293     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(4)</font>
+<a name="294"><font  size=-1>294     </font></a><font color="black"></font>
+<a name="295"><font  size=-1>295     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="296"><font  size=-1>296     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(4)</font>
+<a name="297"><font  size=-1>297     </font></a><font color="black"></font>
+<a name="298"><font  size=-1>298     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="299"><font  size=-1>299     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(4)</font>
+<a name="300"><font  size=-1>300     </font></a><font color="black"></font>
+<a name="301"><font  size=-1>301     </font></a><font color="black">         <b>WRITE</b>(6,240)<a href="dictionary_L.html#798">lg</a>(5)</font>
+<a name="302"><font  size=-1>302     </font></a><font color="black">  240    <b>format</b>(/</font><font color="magenta">'Number of points on segment which connects bottom'</font><font color="black">,</font>
+<a name="303"><font  size=-1>303     </font></a><font color="black">     .   </font><font color="magenta">' X-point to lower right plate:'</font><font color="black">/</font><font color="magenta">'segment length = '</font><font color="black">,f8.5)</font>
+<a name="304"><font  size=-1>304     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(5)</font>
+<a name="305"><font  size=-1>305     </font></a><font color="black"></font>
+<a name="306"><font  size=-1>306     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="307"><font  size=-1>307     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(5)</font>
+<a name="308"><font  size=-1>308     </font></a><font color="black"></font>
+<a name="309"><font  size=-1>309     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="310"><font  size=-1>310     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(5)</font>
+<a name="311"><font  size=-1>311     </font></a><font color="black"></font>
+<a name="312"><font  size=-1>312     </font></a><font color="black">         <b>WRITE</b>(6,244)<a href="dictionary_L.html#798">lg</a>(6)</font>
+<a name="313"><font  size=-1>313     </font></a><font color="black">  244    <b>format</b>(/</font><font color="magenta">'Number of nodes on segment which connects bottom'</font><font color="black">,</font>
+<a name="314"><font  size=-1>314     </font></a><font color="black">     .   </font><font color="magenta">' X-point to lower left plate:'</font><font color="black">/</font><font color="magenta">'segment length = '</font><font color="black">,f8.5)</font>
+<a name="315"><font  size=-1>315     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(6)</font>
+<a name="316"><font  size=-1>316     </font></a><font color="black"></font>
+<a name="317"><font  size=-1>317     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="318"><font  size=-1>318     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(6)</font>
+<a name="319"><font  size=-1>319     </font></a><font color="black"></font>
+<a name="320"><font  size=-1>320     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="321"><font  size=-1>321     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(6)</font>
+<a name="322"><font  size=-1>322     </font></a><font color="black"></font>
+<a name="323"><font  size=-1>323     </font></a><font color="black"></font><font color="red">*..2.2  Determination de la facon de repartir les points radialement.</font>
+<a name="324"><font  size=-1>324     </font></a><font color="red"></font>
+<a name="325"><font  size=-1>325     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,209)</font>
+<a name="326"><font  size=-1>326     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_R.html#809">repart</a></font>
+<a name="327"><font  size=-1>327     </font></a><font color="black"></font>
+<a name="328"><font  size=-1>328     </font></a><font color="black"></font><font color="red">*..2.3  Determination du nombre de points dans la direction &quot;radiale&quot;</font>
+<a name="329"><font  size=-1>329     </font></a><font color="red"></font>
+<a name="330"><font  size=-1>330     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,250)</font>
+<a name="331"><font  size=-1>331     </font></a><font color="black">  250    <b>format</b>(//</font><font color="magenta">'Number of nodes in the radial direction in region'</font><font color="black">,</font>
+<a name="332"><font  size=-1>332     </font></a><font color="black">     .   </font><font color="magenta">' 1 (right part of SOL):'</font><font color="black">)</font>
+<a name="333"><font  size=-1>333     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,1)</font>
+<a name="334"><font  size=-1>334     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,1)</font>
+<a name="335"><font  size=-1>335     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(1)</font>
+<a name="336"><font  size=-1>336     </font></a><font color="black"></font>
+<a name="337"><font  size=-1>337     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="338"><font  size=-1>338     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(1)</font>
+<a name="339"><font  size=-1>339     </font></a><font color="black"></font>
+<a name="340"><font  size=-1>340     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="341"><font  size=-1>341     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(1)</font>
+<a name="342"><font  size=-1>342     </font></a><font color="black"></font>
+<a name="343"><font  size=-1>343     </font></a><font color="black">         <b>WRITE</b>(6,254)</font>
+<a name="344"><font  size=-1>344     </font></a><font color="black">  254    <b>format</b>(//</font><font color="magenta">'Number of nodes in the radial direction in region 2'</font><font color="black">,</font>
+<a name="345"><font  size=-1>345     </font></a><font color="black">     .   </font><font color="magenta">' (upper private region):'</font><font color="black">)</font>
+<a name="346"><font  size=-1>346     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,2)</font>
+<a name="347"><font  size=-1>347     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,2)</font>
+<a name="348"><font  size=-1>348     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(2)</font>
+<a name="349"><font  size=-1>349     </font></a><font color="black"></font>
+<a name="350"><font  size=-1>350     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="351"><font  size=-1>351     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(2)</font>
+<a name="352"><font  size=-1>352     </font></a><font color="black"></font>
+<a name="353"><font  size=-1>353     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="354"><font  size=-1>354     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(2)</font>
+<a name="355"><font  size=-1>355     </font></a><font color="black"></font>
+<a name="356"><font  size=-1>356     </font></a><font color="black">         <b>WRITE</b>(6,258)</font>
+<a name="357"><font  size=-1>357     </font></a><font color="black">  258    <b>format</b>(//</font><font color="magenta">'Number of nodes in the radial direction in region'</font><font color="black">,</font>
+<a name="358"><font  size=-1>358     </font></a><font color="black">     .   </font><font color="magenta">' 3 (left part of SOL):'</font><font color="black">)</font>
+<a name="359"><font  size=-1>359     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,3)</font>
+<a name="360"><font  size=-1>360     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,3)</font>
+<a name="361"><font  size=-1>361     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(3)</font>
+<a name="362"><font  size=-1>362     </font></a><font color="black"></font>
+<a name="363"><font  size=-1>363     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="364"><font  size=-1>364     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(3)</font>
+<a name="365"><font  size=-1>365     </font></a><font color="black"></font>
+<a name="366"><font  size=-1>366     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="367"><font  size=-1>367     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(3)</font>
+<a name="368"><font  size=-1>368     </font></a><font color="black"></font>
+<a name="369"><font  size=-1>369     </font></a><font color="black">         <b>WRITE</b>(6,262)</font>
+<a name="370"><font  size=-1>370     </font></a><font color="black">  262    <b>format</b>(//</font><font color="magenta">'Number of nodes in the radial direction in region 4'</font><font color="black">,</font>
+<a name="371"><font  size=-1>371     </font></a><font color="black">     .   </font><font color="magenta">' (lower private region):'</font><font color="black">)</font>
+<a name="372"><font  size=-1>372     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,4)</font>
+<a name="373"><font  size=-1>373     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,4)</font>
+<a name="374"><font  size=-1>374     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(4)</font>
+<a name="375"><font  size=-1>375     </font></a><font color="black"></font>
+<a name="376"><font  size=-1>376     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="377"><font  size=-1>377     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(4)</font>
+<a name="378"><font  size=-1>378     </font></a><font color="black"></font>
+<a name="379"><font  size=-1>379     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="380"><font  size=-1>380     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(4)</font>
+<a name="381"><font  size=-1>381     </font></a><font color="black"></font>
+<a name="382"><font  size=-1>382     </font></a><font color="black">         <b>WRITE</b>(6,264)<a href="dictionary_D.html#793">distxo</a></font>
+<a name="383"><font  size=-1>383     </font></a><font color="black">  264    <b>format</b>(/</font><font color="magenta">'Number of nodes in region 5 (interior) and'</font>
+<a name="384"><font  size=-1>384     </font></a><font color="magenta">     .     </font><font color="black">,</font><font color="magenta">' penetration:'</font><font color="black">/</font><font color="magenta">'maximum penetration = '</font><font color="black">,f11.8)</font>
+<a name="385"><font  size=-1>385     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(5),<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="386"><font  size=-1>386     </font></a><font color="black"></font>
+<a name="387"><font  size=-1>387     </font></a><font color="black">         <a href="dictionary_P.html#807">pntrat</a> = <a href="dictionary_M.html#16">MIN</a>(<a href="dictionary_P.html#807">pntrat</a>,<a href="dictionary_D.html#793">distxo</a>)</font>
+<a name="388"><font  size=-1>388     </font></a><font color="black"></font>
+<a name="389"><font  size=-1>389     </font></a><font color="black">         <b>IF</b> (<a href="dictionary_R.html#809">repart</a> .EQ. 2) <b>THEN</b></font>
+<a name="390"><font  size=-1>390     </font></a><font color="black"></font>
+<a name="391"><font  size=-1>391     </font></a><font color="black">            <a href="dictionary_X.html#812">xfin</a> = <a href="dictionary_X.html#814">xx</a> + <a href="dictionary_X.html#813">xptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="392"><font  size=-1>392     </font></a><font color="black">            <a href="dictionary_Y.html#816">yfin</a> = <a href="dictionary_Y.html#818">yy</a> + <a href="dictionary_Y.html#817">yptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="393"><font  size=-1>393     </font></a><font color="black"></font>
+<a name="394"><font  size=-1>394     </font></a><font color="black">            <a href="dictionary_I.html#796">ii</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_X.html#812">xfin</a>,<a href="dictionary_X.html#811">x</a>,<a href="dictionary_N.html#805">nx</a>,1)</font>
+<a name="395"><font  size=-1>395     </font></a><font color="black">            <a href="dictionary_J.html#797">jj</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_Y.html#816">yfin</a>,<a href="dictionary_Y.html#815">y</a>,<a href="dictionary_N.html#806">ny</a>,1)</font>
+<a name="396"><font  size=-1>396     </font></a><font color="black"></font>
+<a name="397"><font  size=-1>397     </font></a><font color="black">            <a href="dictionary_F.html#794">fctfin</a> = <a href="dictionary_A.html#783">a00</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1) + <a href="dictionary_A.html#785">a10</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a> + </font>
+<a name="398"><font  size=-1>398     </font></a><font color="black">     .               <a href="dictionary_A.html#784">a01</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_Y.html#816">yfin</a> + <a href="dictionary_A.html#786">a11</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a>*<a href="dictionary_Y.html#816">yfin</a></font>
+<a name="399"><font  size=-1>399     </font></a><font color="black"></font>
+<a name="400"><font  size=-1>400     </font></a><font color="black">            <a href="dictionary_D.html#791">difpsi</a> = <a href="dictionary_F.html#794">fctfin</a> - <a href="dictionary_F.html#795">fctini</a></font>
+<a name="401"><font  size=-1>401     </font></a><font color="black"></font>
+<a name="402"><font  size=-1>402     </font></a><font color="black">            <b>WRITE</b>(6,121)<a href="dictionary_D.html#791">difpsi</a></font>
+<a name="403"><font  size=-1>403     </font></a><font color="black"></font>
+<a name="404"><font  size=-1>404     </font></a><font color="black">         <b>END</b><b>IF</b></font>
+<a name="405"><font  size=-1>405     </font></a><font color="black"></font>
+<a name="406"><font  size=-1>406     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="407"><font  size=-1>407     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(5)</font>
+<a name="408"><font  size=-1>408     </font></a><font color="black"></font>
+<a name="409"><font  size=-1>409     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="410"><font  size=-1>410     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(5)</font>
+<a name="411"><font  size=-1>411     </font></a><font color="black"></font>
+<a name="412"><font  size=-1>412     </font></a><font color="black"></font><font color="red">*..2.4  Determination de la longueur de garde pour chaque plaque.</font>
+<a name="413"><font  size=-1>413     </font></a><font color="red"></font>
+<a name="414"><font  size=-1>414     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,223)</font>
+<a name="415"><font  size=-1>415     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(1)</font>
+<a name="416"><font  size=-1>416     </font></a><font color="black"></font>
+<a name="417"><font  size=-1>417     </font></a><font color="black">         <b>WRITE</b>(6,224)</font>
+<a name="418"><font  size=-1>418     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(2)</font>
+<a name="419"><font  size=-1>419     </font></a><font color="black"></font>
+<a name="420"><font  size=-1>420     </font></a><font color="black">         <b>WRITE</b>(6,225)</font>
+<a name="421"><font  size=-1>421     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(3)</font>
+<a name="422"><font  size=-1>422     </font></a><font color="black"></font>
+<a name="423"><font  size=-1>423     </font></a><font color="black">         <b>WRITE</b>(6,226)</font>
+<a name="424"><font  size=-1>424     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(4)</font>
+<a name="425"><font  size=-1>425     </font></a><font color="black"></font>
+<a name="426"><font  size=-1>426     </font></a><font color="black"></font><font color="red">*..3. Double nul deconnecte.</font>
+<a name="427"><font  size=-1>427     </font></a><font color="red"></font>
+<a name="428"><font  size=-1>428     </font></a><font color="red">      </font><font color="black"><b>ELSE</b> <b>IF</b> ((<a href="dictionary_N.html#804">npx</a> .EQ. 2) .AND. .NOT.(<a href="dictionary_R.html#808">racord</a>)) <b>THEN</b></font>
+<a name="429"><font  size=-1>429     </font></a><font color="black"></font>
+<a name="430"><font  size=-1>430     </font></a><font color="black"></font><font color="red">*..3.1  On determine le nombre de points sur chaque segment de separa-</font>
+<a name="431"><font  size=-1>431     </font></a><font color="red">*       trice.</font>
+<a name="432"><font  size=-1>432     </font></a><font color="red"></font>
+<a name="433"><font  size=-1>433     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,270)<a href="dictionary_L.html#798">lg</a>(1)</font>
+<a name="434"><font  size=-1>434     </font></a><font color="black">  270    <b>format</b>(/</font><font color="magenta">'Disconnected double-null geometry'</font><font color="black">//</font>
+<a name="435"><font  size=-1>435     </font></a><font color="black">     .   </font><font color="magenta">'Number of nodes on segment connecting upper X-point to'</font><font color="black">/</font>
+<a name="436"><font  size=-1>436     </font></a><font color="black">     .   </font><font color="magenta">' upper right plate:'</font><font color="black">/</font><font color="magenta">'segment length = '</font><font color="black">,f8.5)</font>
+<a name="437"><font  size=-1>437     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(1)</font>
+<a name="438"><font  size=-1>438     </font></a><font color="black"></font>
+<a name="439"><font  size=-1>439     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="440"><font  size=-1>440     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(1)</font>
+<a name="441"><font  size=-1>441     </font></a><font color="black"></font>
+<a name="442"><font  size=-1>442     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="443"><font  size=-1>443     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(1)</font>
+<a name="444"><font  size=-1>444     </font></a><font color="black"></font>
+<a name="445"><font  size=-1>445     </font></a><font color="black">         <b>WRITE</b>(6,203)<a href="dictionary_L.html#798">lg</a>(2)</font>
+<a name="446"><font  size=-1>446     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(2)</font>
+<a name="447"><font  size=-1>447     </font></a><font color="black"></font>
+<a name="448"><font  size=-1>448     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="449"><font  size=-1>449     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(2)</font>
+<a name="450"><font  size=-1>450     </font></a><font color="black"></font>
+<a name="451"><font  size=-1>451     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="452"><font  size=-1>452     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(2)</font>
+<a name="453"><font  size=-1>453     </font></a><font color="black"></font>
+<a name="454"><font  size=-1>454     </font></a><font color="black">         <b>WRITE</b>(6,240)<a href="dictionary_L.html#798">lg</a>(5)</font>
+<a name="455"><font  size=-1>455     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(5)</font>
+<a name="456"><font  size=-1>456     </font></a><font color="black"></font>
+<a name="457"><font  size=-1>457     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="458"><font  size=-1>458     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(5)</font>
+<a name="459"><font  size=-1>459     </font></a><font color="black"></font>
+<a name="460"><font  size=-1>460     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="461"><font  size=-1>461     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(5)</font>
+<a name="462"><font  size=-1>462     </font></a><font color="black"></font>
+<a name="463"><font  size=-1>463     </font></a><font color="black">         <b>WRITE</b>(6,244)<a href="dictionary_L.html#798">lg</a>(6)</font>
+<a name="464"><font  size=-1>464     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(6)</font>
+<a name="465"><font  size=-1>465     </font></a><font color="black"></font>
+<a name="466"><font  size=-1>466     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="467"><font  size=-1>467     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(6)</font>
+<a name="468"><font  size=-1>468     </font></a><font color="black"></font>
+<a name="469"><font  size=-1>469     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="470"><font  size=-1>470     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(6)</font>
+<a name="471"><font  size=-1>471     </font></a><font color="black"></font>
+<a name="472"><font  size=-1>472     </font></a><font color="black">         <b>WRITE</b>(6,273)</font>
+<a name="473"><font  size=-1>473     </font></a><font color="black">  273    <b>format</b>(/</font><font color="magenta">'Number of nodes on right side of inner separatrix.'</font><font color="black">)</font>
+<a name="474"><font  size=-1>474     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(3)</font>
+<a name="475"><font  size=-1>475     </font></a><font color="black"></font>
+<a name="476"><font  size=-1>476     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="477"><font  size=-1>477     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(3)</font>
+<a name="478"><font  size=-1>478     </font></a><font color="black"></font>
+<a name="479"><font  size=-1>479     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="480"><font  size=-1>480     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(3)</font>
+<a name="481"><font  size=-1>481     </font></a><font color="black"></font>
+<a name="482"><font  size=-1>482     </font></a><font color="black">         <b>WRITE</b>(6,274)</font>
+<a name="483"><font  size=-1>483     </font></a><font color="black">  274    <b>format</b>(/</font><font color="magenta">'Number of nodes on left side of inner separatrix.'</font><font color="black">)</font>
+<a name="484"><font  size=-1>484     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#803">nptseg</a>(4)</font>
+<a name="485"><font  size=-1>485     </font></a><font color="black"></font>
+<a name="486"><font  size=-1>486     </font></a><font color="black">         <b>WRITE</b>(6,201)</font>
+<a name="487"><font  size=-1>487     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#787">deltp1</a>(4)</font>
+<a name="488"><font  size=-1>488     </font></a><font color="black"></font>
+<a name="489"><font  size=-1>489     </font></a><font color="black">         <b>WRITE</b>(6,202)</font>
+<a name="490"><font  size=-1>490     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#788">deltpn</a>(4)</font>
+<a name="491"><font  size=-1>491     </font></a><font color="black"></font>
+<a name="492"><font  size=-1>492     </font></a><font color="black"></font><font color="red">*..3.2  Determination de la facon de repartir les points radialement.</font>
+<a name="493"><font  size=-1>493     </font></a><font color="red"></font>
+<a name="494"><font  size=-1>494     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,209)</font>
+<a name="495"><font  size=-1>495     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_R.html#809">repart</a></font>
+<a name="496"><font  size=-1>496     </font></a><font color="black"></font>
+<a name="497"><font  size=-1>497     </font></a><font color="black"></font><font color="red">*..3.3  Determination du nombre de points dans la direction &quot;radiale&quot;</font>
+<a name="498"><font  size=-1>498     </font></a><font color="red"></font>
+<a name="499"><font  size=-1>499     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,280)</font>
+<a name="500"><font  size=-1>500     </font></a><font color="black">  280    <b>format</b>(//</font><font color="magenta">'Number of nodes in radial direction in region 1'</font><font color="black">/</font>
+<a name="501"><font  size=-1>501     </font></a><font color="black">     .   </font><font color="magenta">'(between separatrices):'</font><font color="black">)</font>
+<a name="502"><font  size=-1>502     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,1)</font>
+<a name="503"><font  size=-1>503     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,1)</font>
+<a name="504"><font  size=-1>504     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(1)</font>
+<a name="505"><font  size=-1>505     </font></a><font color="black"></font>
+<a name="506"><font  size=-1>506     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="507"><font  size=-1>507     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(1)</font>
+<a name="508"><font  size=-1>508     </font></a><font color="black"></font>
+<a name="509"><font  size=-1>509     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="510"><font  size=-1>510     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(1)</font>
+<a name="511"><font  size=-1>511     </font></a><font color="black"></font>
+<a name="512"><font  size=-1>512     </font></a><font color="black">         <b>WRITE</b>(6,282)</font>
+<a name="513"><font  size=-1>513     </font></a><font color="black">  282    <b>format</b>(//</font><font color="magenta">'Number of nodes in radial direction in region 2'</font><font color="black">/</font>
+<a name="514"><font  size=-1>514     </font></a><font color="black">     .   </font><font color="magenta">'(right part of SOL):'</font><font color="black">)</font>
+<a name="515"><font  size=-1>515     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,2)</font>
+<a name="516"><font  size=-1>516     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,2)</font>
+<a name="517"><font  size=-1>517     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(2)</font>
+<a name="518"><font  size=-1>518     </font></a><font color="black"></font>
+<a name="519"><font  size=-1>519     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="520"><font  size=-1>520     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(2)</font>
+<a name="521"><font  size=-1>521     </font></a><font color="black"></font>
+<a name="522"><font  size=-1>522     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="523"><font  size=-1>523     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(2)</font>
+<a name="524"><font  size=-1>524     </font></a><font color="black"></font>
+<a name="525"><font  size=-1>525     </font></a><font color="black">         <b>WRITE</b>(6,284)</font>
+<a name="526"><font  size=-1>526     </font></a><font color="black">  284    <b>format</b>(//</font><font color="magenta">'Number of nodes in radial direction in region 3'</font><font color="black">/</font>
+<a name="527"><font  size=-1>527     </font></a><font color="black">     .   </font><font color="magenta">'(upper private region):'</font><font color="black">)</font>
+<a name="528"><font  size=-1>528     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,3)</font>
+<a name="529"><font  size=-1>529     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,3)</font>
+<a name="530"><font  size=-1>530     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(3)</font>
+<a name="531"><font  size=-1>531     </font></a><font color="black"></font>
+<a name="532"><font  size=-1>532     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="533"><font  size=-1>533     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(3)</font>
+<a name="534"><font  size=-1>534     </font></a><font color="black"></font>
+<a name="535"><font  size=-1>535     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="536"><font  size=-1>536     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(3)</font>
+<a name="537"><font  size=-1>537     </font></a><font color="black"></font>
+<a name="538"><font  size=-1>538     </font></a><font color="black">         <b>WRITE</b>(6,286)</font>
+<a name="539"><font  size=-1>539     </font></a><font color="black">  286    <b>format</b>(//</font><font color="magenta">'Number of nodes in radial direction in region 4'</font><font color="black">/</font>
+<a name="540"><font  size=-1>540     </font></a><font color="black">     .   </font><font color="magenta">'(left part of SOL):'</font><font color="black">)</font>
+<a name="541"><font  size=-1>541     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,4)</font>
+<a name="542"><font  size=-1>542     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,4)</font>
+<a name="543"><font  size=-1>543     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(4)</font>
+<a name="544"><font  size=-1>544     </font></a><font color="black"></font>
+<a name="545"><font  size=-1>545     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="546"><font  size=-1>546     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(4)</font>
+<a name="547"><font  size=-1>547     </font></a><font color="black"></font>
+<a name="548"><font  size=-1>548     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="549"><font  size=-1>549     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(4)</font>
+<a name="550"><font  size=-1>550     </font></a><font color="black"></font>
+<a name="551"><font  size=-1>551     </font></a><font color="black">         <b>WRITE</b>(6,288)</font>
+<a name="552"><font  size=-1>552     </font></a><font color="black">  288    <b>format</b>(//</font><font color="magenta">'Number of nodes in radial direction in region 5'</font><font color="black">/</font>
+<a name="553"><font  size=-1>553     </font></a><font color="black">     .   </font><font color="magenta">'(lower private region):'</font><font color="black">)</font>
+<a name="554"><font  size=-1>554     </font></a><font color="black">         <b>WRITE</b>(6,211)<a href="dictionary_D.html#792">distnv</a>(1,5)</font>
+<a name="555"><font  size=-1>555     </font></a><font color="black">         <b>WRITE</b>(6,212)<a href="dictionary_D.html#792">distnv</a>(2,5)</font>
+<a name="556"><font  size=-1>556     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(5)</font>
+<a name="557"><font  size=-1>557     </font></a><font color="black"></font>
+<a name="558"><font  size=-1>558     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="559"><font  size=-1>559     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(5)</font>
+<a name="560"><font  size=-1>560     </font></a><font color="black"></font>
+<a name="561"><font  size=-1>561     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="562"><font  size=-1>562     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(5)</font>
+<a name="563"><font  size=-1>563     </font></a><font color="black"></font>
+<a name="564"><font  size=-1>564     </font></a><font color="black">         <b>WRITE</b>(6,289)<a href="dictionary_D.html#793">distxo</a></font>
+<a name="565"><font  size=-1>565     </font></a><font color="black">  289    <b>format</b>(//</font><font color="magenta">'Number of nodes in radial direction in region 6'</font><font color="black">/</font>
+<a name="566"><font  size=-1>566     </font></a><font color="black">     .   </font><font color="magenta">'(interior):'</font><font color="black">)</font>
+<a name="567"><font  size=-1>567     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_N.html#802">npr</a>(6),<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="568"><font  size=-1>568     </font></a><font color="black"></font>
+<a name="569"><font  size=-1>569     </font></a><font color="black">         <a href="dictionary_P.html#807">pntrat</a> = <a href="dictionary_M.html#16">MIN</a>(<a href="dictionary_P.html#807">pntrat</a>,<a href="dictionary_D.html#793">distxo</a>)</font>
+<a name="570"><font  size=-1>570     </font></a><font color="black"></font>
+<a name="571"><font  size=-1>571     </font></a><font color="black">         <b>IF</b> (<a href="dictionary_R.html#809">repart</a> .EQ. 2) <b>THEN</b></font>
+<a name="572"><font  size=-1>572     </font></a><font color="black"></font>
+<a name="573"><font  size=-1>573     </font></a><font color="black">            <a href="dictionary_X.html#812">xfin</a> = <a href="dictionary_X.html#814">xx</a> + <a href="dictionary_X.html#813">xptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="574"><font  size=-1>574     </font></a><font color="black">            <a href="dictionary_Y.html#816">yfin</a> = <a href="dictionary_Y.html#818">yy</a> + <a href="dictionary_Y.html#817">yptxo</a>*<a href="dictionary_P.html#807">pntrat</a></font>
+<a name="575"><font  size=-1>575     </font></a><font color="black"></font>
+<a name="576"><font  size=-1>576     </font></a><font color="black">            <a href="dictionary_I.html#796">ii</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_X.html#812">xfin</a>,<a href="dictionary_X.html#811">x</a>,<a href="dictionary_N.html#805">nx</a>,1)</font>
+<a name="577"><font  size=-1>577     </font></a><font color="black">            <a href="dictionary_J.html#797">jj</a> = <a href="dictionary_I.html#411">ifind</a>(<a href="dictionary_Y.html#816">yfin</a>,<a href="dictionary_Y.html#815">y</a>,<a href="dictionary_N.html#806">ny</a>,1)</font>
+<a name="578"><font  size=-1>578     </font></a><font color="black"></font>
+<a name="579"><font  size=-1>579     </font></a><font color="black">            <a href="dictionary_F.html#794">fctfin</a> = <a href="dictionary_A.html#783">a00</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1) + <a href="dictionary_A.html#785">a10</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a> + </font>
+<a name="580"><font  size=-1>580     </font></a><font color="black">     .               <a href="dictionary_A.html#784">a01</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_Y.html#816">yfin</a> + <a href="dictionary_A.html#786">a11</a>(<a href="dictionary_I.html#796">ii</a>,<a href="dictionary_J.html#797">jj</a>,1)*<a href="dictionary_X.html#812">xfin</a>*<a href="dictionary_Y.html#816">yfin</a></font>
+<a name="581"><font  size=-1>581     </font></a><font color="black"></font>
+<a name="582"><font  size=-1>582     </font></a><font color="black">            <a href="dictionary_D.html#791">difpsi</a> = <a href="dictionary_F.html#794">fctfin</a> - <a href="dictionary_F.html#795">fctini</a></font>
+<a name="583"><font  size=-1>583     </font></a><font color="black"></font>
+<a name="584"><font  size=-1>584     </font></a><font color="black">            <b>WRITE</b>(6,121)<a href="dictionary_D.html#791">difpsi</a></font>
+<a name="585"><font  size=-1>585     </font></a><font color="black"></font>
+<a name="586"><font  size=-1>586     </font></a><font color="black">         <b>END</b><b>IF</b></font>
+<a name="587"><font  size=-1>587     </font></a><font color="black"></font>
+<a name="588"><font  size=-1>588     </font></a><font color="black">         <b>WRITE</b>(6,213)</font>
+<a name="589"><font  size=-1>589     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#789">deltr1</a>(6)</font>
+<a name="590"><font  size=-1>590     </font></a><font color="black"></font>
+<a name="591"><font  size=-1>591     </font></a><font color="black">         <b>WRITE</b>(6,214)</font>
+<a name="592"><font  size=-1>592     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_D.html#790">deltrn</a>(6)</font>
+<a name="593"><font  size=-1>593     </font></a><font color="black"></font>
+<a name="594"><font  size=-1>594     </font></a><font color="black"></font><font color="red">*..3.4  Determination de la longueur de garde pour chaque plaque.</font>
+<a name="595"><font  size=-1>595     </font></a><font color="red"></font>
+<a name="596"><font  size=-1>596     </font></a><font color="red">         </font><font color="black"><b>WRITE</b>(6,223)</font>
+<a name="597"><font  size=-1>597     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(1)</font>
+<a name="598"><font  size=-1>598     </font></a><font color="black"></font>
+<a name="599"><font  size=-1>599     </font></a><font color="black">         <b>WRITE</b>(6,224)</font>
+<a name="600"><font  size=-1>600     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(2)</font>
+<a name="601"><font  size=-1>601     </font></a><font color="black"></font>
+<a name="602"><font  size=-1>602     </font></a><font color="black">         <b>WRITE</b>(6,225)</font>
+<a name="603"><font  size=-1>603     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(3)</font>
+<a name="604"><font  size=-1>604     </font></a><font color="black"></font>
+<a name="605"><font  size=-1>605     </font></a><font color="black">         <b>WRITE</b>(6,226)</font>
+<a name="606"><font  size=-1>606     </font></a><font color="black">         <b>READ</b>(5,*)<a href="dictionary_T.html#810">tgarde</a>(4)</font>
+<a name="607"><font  size=-1>607     </font></a><font color="black"></font>
+<a name="608"><font  size=-1>608     </font></a><font color="black">      <b>END</b><b>IF</b></font>
+<a name="609"><font  size=-1>609     </font></a><font color="black"></font>
+<a name="610"><font  size=-1>610     </font></a><font color="black">      RETURN</font>
+<a name="611"><font  size=-1>611     </font></a><font color="black">      <b>END</b></font>
+<a name="612"><font  size=-1>612     </font></a><font color="black"></font></pre></body></html>

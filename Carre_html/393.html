@@ -1,0 +1,104 @@
+<html><head><title>derive.F</title></head><body link="blue" vlink="blue"><h3>File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/derive.F</h3>
+<SCRIPT>
+ defaultStatus = "File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/derive.F";
+top.document.title  = "derive.F";
+</SCRIPT>
+<pre><font color="black"></font><a name="1"><font  size=-1>1     </font></a><font color="black">      <b>SUBROUTINE</b> <a href="dictionary_D.html#89">DERIVE</a>(<a href="dictionary_N.html#396">nx</a>, <a href="dictionary_N.html#399">ny</a>, <a href="dictionary_X.html#406">x</a>, <a href="dictionary_Y.html#407">y</a>, <a href="dictionary_P.html#401">psi</a>, <a href="dictionary_P.html#402">psidx</a>, <a href="dictionary_P.html#403">psidy</a>)</font>
+<a name="2"><font  size=-1>2     </font></a><font color="black"></font><font color="red">c</font>
+<a name="3"><font  size=-1>3     </font></a><font color="red">c  version : 07.07.97 19:37</font>
+<a name="4"><font  size=-1>4     </font></a><font color="red">c</font>
+<a name="5"><font  size=-1>5     </font></a><font color="red">c======================================================================</font>
+<a name="6"><font  size=-1>6     </font></a><font color="red">*..  Cette sous-routine calcule en chaque point ou psi est defini, la</font>
+<a name="7"><font  size=-1>7     </font></a><font color="red">*  derivee selon x et la derivee selon y.</font>
+<a name="8"><font  size=-1>8     </font></a><font color="red">c======================================================================</font>
+<a name="9"><font  size=-1>9     </font></a><font color="red"></font>
+<a name="10"><font  size=-1>10     </font></a><font color="red">      </font><font color="black"><b>IMPLICIT</b> <b>NONE</b></font>
+<a name="11"><font  size=-1>11     </font></a><font color="black"></font>
+<a name="12"><font  size=-1>12     </font></a><font color="black"></font><font color="red">cank-970707: dimensions from the file</font>
+<a name="13"><font  size=-1>13     </font></a><font color="red">*  dimensions</font>
+<a name="14"><font  size=-1>14     </font></a><font color="red"></font><font color="green">#include </font><font color="black">&lt;CARREDIM.F&gt;</font>
+<a name="15"><font  size=-1>15     </font></a><font color="black"></font>
+<a name="16"><font  size=-1>16     </font></a><font color="black"></font><font color="red">*  arguments</font>
+<a name="17"><font  size=-1>17     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_N.html#396">nx</a>, <a href="dictionary_N.html#399">ny</a></font>
+<a name="18"><font  size=-1>18     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_P.html#401">psi</a>(<a href="dictionary_N.html#397">nxmax</a>,<a href="dictionary_N.html#400">nymax</a>), <a href="dictionary_P.html#402">psidx</a>(<a href="dictionary_N.html#397">nxmax</a>,<a href="dictionary_N.html#400">nymax</a>), <a href="dictionary_P.html#403">psidy</a>(<a href="dictionary_N.html#397">nxmax</a>,<a href="dictionary_N.html#400">nymax</a>),</font>
+<a name="19"><font  size=-1>19     </font></a><font color="black">     .  <a href="dictionary_X.html#406">x</a>(<a href="dictionary_N.html#396">nx</a>),<a href="dictionary_Y.html#407">y</a>(<a href="dictionary_N.html#399">ny</a>)</font>
+<a name="20"><font  size=-1>20     </font></a><font color="black"></font>
+<a name="21"><font  size=-1>21     </font></a><font color="black"></font><font color="red">*  variables locales</font>
+<a name="22"><font  size=-1>22     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#394">i</a>, <a href="dictionary_J.html#395">j</a>, <a href="dictionary_N.html#398">nxymax</a></font>
+<a name="23"><font  size=-1>23     </font></a><font color="black">      <b>parameter</b> (<a href="dictionary_N.html#398">nxymax</a>=<a href="dictionary_N.html#400">nymax</a>)</font>
+<a name="24"><font  size=-1>24     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_T.html#404">tmp</a>(<a href="dictionary_N.html#398">nxymax</a>), <a href="dictionary_T.html#405">tmpp</a>(<a href="dictionary_N.html#398">nxymax</a>)</font>
+<a name="25"><font  size=-1>25     </font></a><font color="black"></font>
+<a name="26"><font  size=-1>26     </font></a><font color="black"></font><font color="red">*  procedures</font>
+<a name="27"><font  size=-1>27     </font></a><font color="red">      </font><font color="black"><b>EXTERNAL</b> <a href="dictionary_D.html#382">DERIV</a></font>
+<a name="28"><font  size=-1>28     </font></a><font color="black"></font>
+<a name="29"><font  size=-1>29     </font></a><font color="black"></font><font color="red">c=========================</font>
+<a name="30"><font  size=-1>30     </font></a><font color="red">c.. x,y: tableaux des coordonnees des points.</font>
+<a name="31"><font  size=-1>31     </font></a><font color="red">c.. nx,ny: nombre de points dans chaque tableau.</font>
+<a name="32"><font  size=-1>32     </font></a><font color="red">c.. psi: tableau de la valeur de la fonction en chacun de ces points.</font>
+<a name="33"><font  size=-1>33     </font></a><font color="red">c.. psidx: tableau de la valeur de la fonction derivee par rapport a x</font>
+<a name="34"><font  size=-1>34     </font></a><font color="red">c        en chacun de ces points.</font>
+<a name="35"><font  size=-1>35     </font></a><font color="red">c.. psidy: tableau de la valeur de la fonction derivee par rapport a y</font>
+<a name="36"><font  size=-1>36     </font></a><font color="red">c        en chacun de ces points.</font>
+<a name="37"><font  size=-1>37     </font></a><font color="red">c.. i,j: indices</font>
+<a name="38"><font  size=-1>38     </font></a><font color="red">c.. tmp: tableau selon une ligne ou une colonne de psi.</font>
+<a name="39"><font  size=-1>39     </font></a><font color="red">c.. tmpp: tableau de la meme ligne ou colonne de derivee de psi par</font>
+<a name="40"><font  size=-1>40     </font></a><font color="red">c         rapport a x ou y.</font>
+<a name="41"><font  size=-1>41     </font></a><font color="red">c=========================</font>
+<a name="42"><font  size=-1>42     </font></a><font color="red"></font>
+<a name="43"><font  size=-1>43     </font></a><font color="red">*</font>
+<a name="44"><font  size=-1>44     </font></a><font color="red">*.. 1  Calcul des derivees partielles par rapport a X.</font>
+<a name="45"><font  size=-1>45     </font></a><font color="red">*</font>
+<a name="46"><font  size=-1>46     </font></a><font color="red"></font>
+<a name="47"><font  size=-1>47     </font></a><font color="red">*..Boucle sur toutes les lignes.</font>
+<a name="48"><font  size=-1>48     </font></a><font color="red"></font>
+<a name="49"><font  size=-1>49     </font></a><font color="red">      </font><font color="black"><b>DO</b> 10 <a href="dictionary_J.html#395">j</a>=1, <a href="dictionary_N.html#399">ny</a></font>
+<a name="50"><font  size=-1>50     </font></a><font color="black"></font>
+<a name="51"><font  size=-1>51     </font></a><font color="black"></font><font color="red">*..Copie du vecteur (ligne) dans un vecteur temporaire.</font>
+<a name="52"><font  size=-1>52     </font></a><font color="red"></font>
+<a name="53"><font  size=-1>53     </font></a><font color="red">         </font><font color="black"><b>DO</b> 15 <a href="dictionary_I.html#394">i</a>=1, <a href="dictionary_N.html#396">nx</a></font>
+<a name="54"><font  size=-1>54     </font></a><font color="black">            <a href="dictionary_T.html#404">tmp</a>(<a href="dictionary_I.html#394">i</a>) = <a href="dictionary_P.html#401">psi</a>(<a href="dictionary_I.html#394">i</a>,<a href="dictionary_J.html#395">j</a>)</font>
+<a name="55"><font  size=-1>55     </font></a><font color="black">   15    <b>CONTINUE</b></font>
+<a name="56"><font  size=-1>56     </font></a><font color="black"></font>
+<a name="57"><font  size=-1>57     </font></a><font color="black"></font><font color="red">*..Calcul de la derivee de ce vecteur.</font>
+<a name="58"><font  size=-1>58     </font></a><font color="red"></font>
+<a name="59"><font  size=-1>59     </font></a><font color="red">         </font><font color="black"><b>CALL</b> <a href="dictionary_D.html#382">DERIV</a>(<a href="dictionary_N.html#397">nxmax</a>, <a href="dictionary_X.html#406">x</a>, <a href="dictionary_T.html#404">tmp</a>, <a href="dictionary_T.html#405">tmpp</a>, <a href="dictionary_N.html#396">nx</a>)</font>
+<a name="60"><font  size=-1>60     </font></a><font color="black"></font>
+<a name="61"><font  size=-1>61     </font></a><font color="black"></font><font color="red">*..Copie du vecteur de derivees par rapport a x temporaire dans le</font>
+<a name="62"><font  size=-1>62     </font></a><font color="red">*  vecteur de derivee par rapport a X: psidx</font>
+<a name="63"><font  size=-1>63     </font></a><font color="red"></font>
+<a name="64"><font  size=-1>64     </font></a><font color="red">         </font><font color="black"><b>DO</b> 20 <a href="dictionary_I.html#394">i</a>=1, <a href="dictionary_N.html#396">nx</a></font>
+<a name="65"><font  size=-1>65     </font></a><font color="black">            <a href="dictionary_P.html#402">psidx</a>(<a href="dictionary_I.html#394">i</a>,<a href="dictionary_J.html#395">j</a>) = <a href="dictionary_T.html#405">tmpp</a>(<a href="dictionary_I.html#394">i</a>)</font>
+<a name="66"><font  size=-1>66     </font></a><font color="black">   20    <b>CONTINUE</b></font>
+<a name="67"><font  size=-1>67     </font></a><font color="black"></font>
+<a name="68"><font  size=-1>68     </font></a><font color="black">   10 <b>CONTINUE</b></font>
+<a name="69"><font  size=-1>69     </font></a><font color="black"></font>
+<a name="70"><font  size=-1>70     </font></a><font color="black"></font><font color="red">*</font>
+<a name="71"><font  size=-1>71     </font></a><font color="red">*.. 2  Calcul des derivees partielles par rapport a Y.</font>
+<a name="72"><font  size=-1>72     </font></a><font color="red">*</font>
+<a name="73"><font  size=-1>73     </font></a><font color="red"></font>
+<a name="74"><font  size=-1>74     </font></a><font color="red">*..Boucle sur toutes les colonnes.</font>
+<a name="75"><font  size=-1>75     </font></a><font color="red"></font>
+<a name="76"><font  size=-1>76     </font></a><font color="red">      </font><font color="black"><b>DO</b> 30 <a href="dictionary_I.html#394">i</a>=1, <a href="dictionary_N.html#396">nx</a></font>
+<a name="77"><font  size=-1>77     </font></a><font color="black"></font>
+<a name="78"><font  size=-1>78     </font></a><font color="black"></font><font color="red">*..Copie du vecteur (colonne) dans un vecteur temporaire.</font>
+<a name="79"><font  size=-1>79     </font></a><font color="red"></font>
+<a name="80"><font  size=-1>80     </font></a><font color="red">         </font><font color="black"><b>DO</b> 35 <a href="dictionary_J.html#395">j</a>=1, <a href="dictionary_N.html#399">ny</a></font>
+<a name="81"><font  size=-1>81     </font></a><font color="black">            <a href="dictionary_T.html#404">tmp</a>(<a href="dictionary_J.html#395">j</a>) = <a href="dictionary_P.html#401">psi</a>(<a href="dictionary_I.html#394">i</a>,<a href="dictionary_J.html#395">j</a>)</font>
+<a name="82"><font  size=-1>82     </font></a><font color="black">   35    <b>CONTINUE</b></font>
+<a name="83"><font  size=-1>83     </font></a><font color="black"></font>
+<a name="84"><font  size=-1>84     </font></a><font color="black"></font><font color="red">*..Calcul de la derivee de ce vecteur.</font>
+<a name="85"><font  size=-1>85     </font></a><font color="red"></font>
+<a name="86"><font  size=-1>86     </font></a><font color="red">         </font><font color="black"><b>CALL</b> <a href="dictionary_D.html#382">DERIV</a>(<a href="dictionary_N.html#400">nymax</a>, <a href="dictionary_Y.html#407">y</a>, <a href="dictionary_T.html#404">tmp</a>, <a href="dictionary_T.html#405">tmpp</a>, <a href="dictionary_N.html#399">ny</a>)</font>
+<a name="87"><font  size=-1>87     </font></a><font color="black"></font>
+<a name="88"><font  size=-1>88     </font></a><font color="black"></font><font color="red">*..Copie du vecteur de derivees par rapport a Y temporaire dans le</font>
+<a name="89"><font  size=-1>89     </font></a><font color="red">*  vecteur de derivee par rapport a Y: psidy</font>
+<a name="90"><font  size=-1>90     </font></a><font color="red"></font>
+<a name="91"><font  size=-1>91     </font></a><font color="red">         </font><font color="black"><b>DO</b> 40 <a href="dictionary_J.html#395">j</a>=1, <a href="dictionary_N.html#399">ny</a></font>
+<a name="92"><font  size=-1>92     </font></a><font color="black">            <a href="dictionary_P.html#403">psidy</a>(<a href="dictionary_I.html#394">i</a>,<a href="dictionary_J.html#395">j</a>) = <a href="dictionary_T.html#405">tmpp</a>(<a href="dictionary_J.html#395">j</a>)</font>
+<a name="93"><font  size=-1>93     </font></a><font color="black">   40    <b>CONTINUE</b></font>
+<a name="94"><font  size=-1>94     </font></a><font color="black"></font>
+<a name="95"><font  size=-1>95     </font></a><font color="black">   30 <b>CONTINUE</b></font>
+<a name="96"><font  size=-1>96     </font></a><font color="black"></font>
+<a name="97"><font  size=-1>97     </font></a><font color="black">      RETURN</font>
+<a name="98"><font  size=-1>98     </font></a><font color="black">      <b>END</b></font>
+<a name="99"><font  size=-1>99     </font></a><font color="black"></font></pre></body></html>

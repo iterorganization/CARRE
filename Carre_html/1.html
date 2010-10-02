@@ -1,0 +1,170 @@
+<html><head><title>aazero.F</title></head><body link="blue" vlink="blue"><h3>File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/aazero.F</h3>
+<SCRIPT>
+ defaultStatus = "File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/aazero.F";
+top.document.title  = "aazero.F";
+</SCRIPT>
+<pre><font color="black"></font><a name="1"><font  size=-1>1     </font></a><font color="black"></font>
+<a name="2"><font  size=-1>2     </font></a><font color="black"></font><font color="red">************************************************************************</font>
+<a name="3"><font  size=-1>3     </font></a><font color="red">      </font><font color="black"><b>REAL</b>*8 <b>FUNCTION</b> <a href="dictionary_A.html#2">aazero</a>(<a href="dictionary_F.html#11">fcn</a>,<a href="dictionary_X.html#22">x0</a>,<a href="dictionary_D.html#5">dx0</a>,<a href="dictionary_D.html#8">dxmin</a>,<a href="dictionary_F.html#12">fmin</a>,<a href="dictionary_X.html#27">xmin</a>,<a href="dictionary_X.html#26">xmax</a>,<a href="dictionary_I.html#14">itmax</a>)</font>
+<a name="4"><font  size=-1>4     </font></a><font color="black"></font><font color="red">************************************************************************</font>
+<a name="5"><font  size=-1>5     </font></a><font color="red">      </font><font color="black"><b>IMPLICIT</b> <b>NONE</b></font>
+<a name="6"><font  size=-1>6     </font></a><font color="black"></font><font color="red">c</font>
+<a name="7"><font  size=-1>7     </font></a><font color="red">c  Purpose: find the zero of a REAL function fcn by the secant method.</font>
+<a name="8"><font  size=-1>8     </font></a><font color="red">c</font>
+<a name="9"><font  size=-1>9     </font></a><font color="red">c  Prerequisites: none</font>
+<a name="10"><font  size=-1>10     </font></a><font color="red">c</font>
+<a name="11"><font  size=-1>11     </font></a><font color="red">c  References: none</font>
+<a name="12"><font  size=-1>12     </font></a><font color="red">c</font>
+<a name="13"><font  size=-1>13     </font></a><font color="red">c  Revision    author              comment</font>
+<a name="14"><font  size=-1>14     </font></a><font color="red">c  15/11/91     R. Marchand         initial installation</font>
+<a name="15"><font  size=-1>15     </font></a><font color="red">c</font>
+<a name="16"><font  size=-1>16     </font></a><font color="red">c  Input/output variables:</font>
+<a name="17"><font  size=-1>17     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#14">itmax</a></font>
+<a name="18"><font  size=-1>18     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_X.html#22">x0</a>,<a href="dictionary_D.html#5">dx0</a>,<a href="dictionary_D.html#8">dxmin</a>,<a href="dictionary_F.html#12">fmin</a>,<a href="dictionary_X.html#27">xmin</a>,<a href="dictionary_X.html#26">xmax</a></font>
+<a name="19"><font  size=-1>19     </font></a><font color="black"></font><font color="red">c  x0: initial guess</font>
+<a name="20"><font  size=-1>20     </font></a><font color="red">c  dx0: initial step</font>
+<a name="21"><font  size=-1>21     </font></a><font color="red">c  dxmin: minimum acceptable step: aazero is accepted if dx.le.dxmin</font>
+<a name="22"><font  size=-1>22     </font></a><font color="red">c  fmin: minimum acceptable function value: aazero is accepted if</font>
+<a name="23"><font  size=-1>23     </font></a><font color="red">c        f.le.fmin*f1</font>
+<a name="24"><font  size=-1>24     </font></a><font color="red">c  xmin: lower bound of the x interval in which to find the root</font>
+<a name="25"><font  size=-1>25     </font></a><font color="red">c  xmax: upper bound of the x interval in which to find the root</font>
+<a name="26"><font  size=-1>26     </font></a><font color="red">c        N.B.: if xmin=xmax, no bounds are assumed.</font>
+<a name="27"><font  size=-1>27     </font></a><font color="red">c  itmax: maximum number of iterations allowable</font>
+<a name="28"><font  size=-1>28     </font></a><font color="red">c</font>
+<a name="29"><font  size=-1>29     </font></a><font color="red">c  Common variables: none</font>
+<a name="30"><font  size=-1>30     </font></a><font color="red">c</font>
+<a name="31"><font  size=-1>31     </font></a><font color="red">c  Local variables:</font>
+<a name="32"><font  size=-1>32     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#13">it</a></font>
+<a name="33"><font  size=-1>33     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_D.html#7">dxmax</a>,<a href="dictionary_X.html#23">x1</a>,<a href="dictionary_F.html#9">f1</a>,<a href="dictionary_X.html#24">x2</a>,<a href="dictionary_F.html#10">f2</a>,<a href="dictionary_Z.html#29">zfmin</a>,<a href="dictionary_D.html#4">dx</a>,<a href="dictionary_D.html#6">dxinv</a>,<a href="dictionary_O.html#17">one</a>,<a href="dictionary_X.html#25">xl</a>,<a href="dictionary_X.html#28">xr</a>,<a href="dictionary_S.html#19">sgl</a>,<a href="dictionary_S.html#20">sgr</a>,<a href="dictionary_S.html#18">sg</a></font>
+<a name="34"><font  size=-1>34     </font></a><font color="black">      <b>save</b> <a href="dictionary_O.html#17">one</a></font>
+<a name="35"><font  size=-1>35     </font></a><font color="black"></font><font color="red">c</font>
+<a name="36"><font  size=-1>36     </font></a><font color="red">c  Procedures:</font>
+<a name="37"><font  size=-1>37     </font></a><font color="red">      </font><font color="black"><b>REAL</b>*8 <a href="dictionary_F.html#11">fcn</a></font>
+<a name="38"><font  size=-1>38     </font></a><font color="black">      <b>external</b> <a href="dictionary_F.html#11">fcn</a></font>
+<a name="39"><font  size=-1>39     </font></a><font color="black">      <b>intrinsic</b> <a href="dictionary_A.html#3">abs</a>,<a href="dictionary_S.html#21">sign</a>,<a href="dictionary_M.html#16">min</a>,<a href="dictionary_M.html#15">max</a></font>
+<a name="40"><font  size=-1>40     </font></a><font color="black"></font><font color="red">c</font>
+<a name="41"><font  size=-1>41     </font></a><font color="red">c  Data:</font>
+<a name="42"><font  size=-1>42     </font></a><font color="red">      </font><font color="black"><b>data</b> <a href="dictionary_O.html#17">one</a>/1./</font>
+<a name="43"><font  size=-1>43     </font></a><font color="black"></font><font color="red">c</font>
+<a name="44"><font  size=-1>44     </font></a><font color="red">c  Computation:</font>
+<a name="45"><font  size=-1>45     </font></a><font color="red">c</font>
+<a name="46"><font  size=-1>46     </font></a><font color="red">      <a href="dictionary_D.html#7">dxmax</a></font><font color="black">=100.*<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_D.html#5">dx0</a>)</font>
+<a name="47"><font  size=-1>47     </font></a><font color="black">      <b>if</b>(<a href="dictionary_X.html#27">xmin</a>.lt.<a href="dictionary_X.html#26">xmax</a>) <b>then</b></font>
+<a name="48"><font  size=-1>48     </font></a><font color="black">        <a href="dictionary_X.html#23">x1</a>=<a href="dictionary_M.html#15">max</a>(<a href="dictionary_X.html#27">xmin</a>,<a href="dictionary_M.html#16">min</a>(<a href="dictionary_X.html#26">xmax</a>,<a href="dictionary_X.html#22">x0</a>))</font>
+<a name="49"><font  size=-1>49     </font></a><font color="black">      <b>else</b></font>
+<a name="50"><font  size=-1>50     </font></a><font color="black">        <a href="dictionary_X.html#23">x1</a>=<a href="dictionary_X.html#22">x0</a></font>
+<a name="51"><font  size=-1>51     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="52"><font  size=-1>52     </font></a><font color="black">      <a href="dictionary_X.html#25">xl</a>=<a href="dictionary_X.html#23">x1</a></font>
+<a name="53"><font  size=-1>53     </font></a><font color="black">      <a href="dictionary_X.html#28">xr</a>=<a href="dictionary_X.html#23">x1</a></font>
+<a name="54"><font  size=-1>54     </font></a><font color="black"></font><font color="red">c</font>
+<a name="55"><font  size=-1>55     </font></a><font color="red">      <a href="dictionary_F.html#9">f1</a></font><font color="black">=<a href="dictionary_F.html#11">fcn</a>(<a href="dictionary_X.html#23">x1</a>)</font>
+<a name="56"><font  size=-1>56     </font></a><font color="black">      <b>if</b>(<a href="dictionary_F.html#9">f1</a>.eq.0.) <b>then</b></font>
+<a name="57"><font  size=-1>57     </font></a><font color="black">        <a href="dictionary_X.html#24">x2</a>=<a href="dictionary_X.html#22">x0</a></font>
+<a name="58"><font  size=-1>58     </font></a><font color="black">        <b>go</b> <b>to</b> 20</font>
+<a name="59"><font  size=-1>59     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="60"><font  size=-1>60     </font></a><font color="black">      <a href="dictionary_Z.html#29">zfmin</a>=<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_F.html#12">fmin</a>*<a href="dictionary_F.html#9">f1</a>)</font>
+<a name="61"><font  size=-1>61     </font></a><font color="black">      <a href="dictionary_S.html#19">sgl</a>=<a href="dictionary_S.html#21">sign</a>(<a href="dictionary_O.html#17">one</a>,<a href="dictionary_F.html#9">f1</a>)</font>
+<a name="62"><font  size=-1>62     </font></a><font color="black">      <a href="dictionary_S.html#20">sgr</a>=<a href="dictionary_S.html#19">sgl</a></font>
+<a name="63"><font  size=-1>63     </font></a><font color="black"></font><font color="red">c</font>
+<a name="64"><font  size=-1>64     </font></a><font color="red">c     if(x1-xmin.gt.xmax-x1) then</font>
+<a name="65"><font  size=-1>65     </font></a><font color="red">c       dx=abs(dx0)</font>
+<a name="66"><font  size=-1>66     </font></a><font color="red">c     else</font>
+<a name="67"><font  size=-1>67     </font></a><font color="red">c       dx=-abs(dx0)</font>
+<a name="68"><font  size=-1>68     </font></a><font color="red">c     endif</font>
+<a name="69"><font  size=-1>69     </font></a><font color="red">      </font><font color="black"><b>if</b>(<a href="dictionary_X.html#27">xmin</a>.lt.<a href="dictionary_X.html#26">xmax</a>) <b>then</b></font>
+<a name="70"><font  size=-1>70     </font></a><font color="black">        <b>if</b>(<a href="dictionary_X.html#23">x1</a>.eq.<a href="dictionary_X.html#26">xmax</a>) <b>then</b></font>
+<a name="71"><font  size=-1>71     </font></a><font color="black">          <a href="dictionary_D.html#4">dx</a>=<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_D.html#5">dx0</a>)</font>
+<a name="72"><font  size=-1>72     </font></a><font color="black">        <b>else</b><b>if</b>(<a href="dictionary_X.html#23">x1</a>.eq.<a href="dictionary_X.html#27">xmin</a>) <b>then</b></font>
+<a name="73"><font  size=-1>73     </font></a><font color="black">          <a href="dictionary_D.html#4">dx</a>=-<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_D.html#5">dx0</a>)</font>
+<a name="74"><font  size=-1>74     </font></a><font color="black">        <b>else</b></font>
+<a name="75"><font  size=-1>75     </font></a><font color="black">          <a href="dictionary_D.html#4">dx</a>=-<a href="dictionary_D.html#5">dx0</a></font>
+<a name="76"><font  size=-1>76     </font></a><font color="black">        <b>end</b><b>if</b></font>
+<a name="77"><font  size=-1>77     </font></a><font color="black">      <b>else</b></font>
+<a name="78"><font  size=-1>78     </font></a><font color="black">        <a href="dictionary_D.html#4">dx</a>=-<a href="dictionary_D.html#5">dx0</a></font>
+<a name="79"><font  size=-1>79     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="80"><font  size=-1>80     </font></a><font color="black"></font><font color="red">c</font>
+<a name="81"><font  size=-1>81     </font></a><font color="red">      </font><font color="black"><b>do</b> 10 <a href="dictionary_I.html#13">it</a>=1,<a href="dictionary_I.html#14">itmax</a></font>
+<a name="82"><font  size=-1>82     </font></a><font color="black">      <a href="dictionary_X.html#24">x2</a>=<a href="dictionary_X.html#23">x1</a>-<a href="dictionary_D.html#4">dx</a></font>
+<a name="83"><font  size=-1>83     </font></a><font color="black">      <b>if</b>(<a href="dictionary_X.html#27">xmin</a>.lt.<a href="dictionary_X.html#26">xmax</a>) <b>then</b></font>
+<a name="84"><font  size=-1>84     </font></a><font color="black">        <b>if</b>(<a href="dictionary_S.html#19">sgl</a>.ne.<a href="dictionary_S.html#20">sgr</a>) <b>then</b></font>
+<a name="85"><font  size=-1>85     </font></a><font color="black">          <a href="dictionary_X.html#24">x2</a>=<a href="dictionary_M.html#15">max</a>(<a href="dictionary_X.html#25">xl</a>,<a href="dictionary_M.html#16">min</a>(<a href="dictionary_X.html#28">xr</a>,<a href="dictionary_X.html#24">x2</a>))</font>
+<a name="86"><font  size=-1>86     </font></a><font color="black">        <b>else</b></font>
+<a name="87"><font  size=-1>87     </font></a><font color="black">          <a href="dictionary_X.html#24">x2</a>=<a href="dictionary_M.html#15">max</a>(<a href="dictionary_X.html#27">xmin</a>,<a href="dictionary_M.html#16">min</a>(<a href="dictionary_X.html#26">xmax</a>,<a href="dictionary_X.html#24">x2</a>))</font>
+<a name="88"><font  size=-1>88     </font></a><font color="black">        <b>end</b><b>if</b></font>
+<a name="89"><font  size=-1>89     </font></a><font color="black">        <b>if</b>((<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_X.html#24">x2</a>-<a href="dictionary_X.html#23">x1</a>).le.<a href="dictionary_D.html#8">dxmin</a> .and. <a href="dictionary_I.html#13">it</a>.gt.2) .or. <a href="dictionary_X.html#23">x1</a>.eq.<a href="dictionary_X.html#24">x2</a>) <b>go</b> <b>to</b> 30</font>
+<a name="90"><font  size=-1>90     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="91"><font  size=-1>91     </font></a><font color="black">      <a href="dictionary_F.html#10">f2</a>=<a href="dictionary_F.html#11">fcn</a>(<a href="dictionary_X.html#24">x2</a>)</font>
+<a name="92"><font  size=-1>92     </font></a><font color="black">      <b>if</b>(<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_F.html#10">f2</a>).le.<a href="dictionary_Z.html#29">zfmin</a>) <b>go</b> <b>to</b> 20</font>
+<a name="93"><font  size=-1>93     </font></a><font color="black">      <a href="dictionary_S.html#18">sg</a>=<a href="dictionary_S.html#21">sign</a>(<a href="dictionary_O.html#17">one</a>,<a href="dictionary_F.html#10">f2</a>)</font>
+<a name="94"><font  size=-1>94     </font></a><font color="black">      <b>if</b>(<a href="dictionary_S.html#19">sgl</a>.eq.<a href="dictionary_S.html#20">sgr</a>) <b>then</b></font>
+<a name="95"><font  size=-1>95     </font></a><font color="black">        <a href="dictionary_X.html#25">xl</a>=<a href="dictionary_M.html#16">min</a>(<a href="dictionary_X.html#25">xl</a>,<a href="dictionary_X.html#24">x2</a>)</font>
+<a name="96"><font  size=-1>96     </font></a><font color="black">        <a href="dictionary_X.html#28">xr</a>=<a href="dictionary_M.html#15">max</a>(<a href="dictionary_X.html#28">xr</a>,<a href="dictionary_X.html#24">x2</a>)</font>
+<a name="97"><font  size=-1>97     </font></a><font color="black">        <b>if</b>(<a href="dictionary_S.html#18">sg</a>.ne.<a href="dictionary_S.html#19">sgl</a>) <b>then</b></font>
+<a name="98"><font  size=-1>98     </font></a><font color="black">          <b>if</b>(<a href="dictionary_X.html#24">x2</a>.lt.<a href="dictionary_X.html#28">xr</a>) <b>then</b></font>
+<a name="99"><font  size=-1>99     </font></a><font color="black">            <a href="dictionary_S.html#19">sgl</a>=<a href="dictionary_S.html#18">sg</a></font>
+<a name="100"><font  size=-1>100     </font></a><font color="black">            <a href="dictionary_X.html#25">xl</a>=<a href="dictionary_X.html#24">x2</a></font>
+<a name="101"><font  size=-1>101     </font></a><font color="black">          <b>else</b></font>
+<a name="102"><font  size=-1>102     </font></a><font color="black">            <a href="dictionary_S.html#20">sgr</a>=<a href="dictionary_S.html#18">sg</a></font>
+<a name="103"><font  size=-1>103     </font></a><font color="black">            <a href="dictionary_X.html#28">xr</a>=<a href="dictionary_X.html#24">x2</a></font>
+<a name="104"><font  size=-1>104     </font></a><font color="black">          <b>end</b><b>if</b></font>
+<a name="105"><font  size=-1>105     </font></a><font color="black">        <b>end</b><b>if</b></font>
+<a name="106"><font  size=-1>106     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="107"><font  size=-1>107     </font></a><font color="black">      <b>if</b>(<a href="dictionary_S.html#19">sgl</a>.ne.<a href="dictionary_S.html#20">sgr</a>) <b>then</b></font>
+<a name="108"><font  size=-1>108     </font></a><font color="black">        <b>if</b>(<a href="dictionary_S.html#18">sg</a>.eq.<a href="dictionary_S.html#19">sgl</a>) <b>then</b></font>
+<a name="109"><font  size=-1>109     </font></a><font color="black">          <a href="dictionary_X.html#25">xl</a>=<a href="dictionary_X.html#24">x2</a></font>
+<a name="110"><font  size=-1>110     </font></a><font color="black">          <a href="dictionary_S.html#19">sgl</a>=<a href="dictionary_S.html#18">sg</a></font>
+<a name="111"><font  size=-1>111     </font></a><font color="black">        <b>else</b></font>
+<a name="112"><font  size=-1>112     </font></a><font color="black">          <a href="dictionary_X.html#28">xr</a>=<a href="dictionary_X.html#24">x2</a></font>
+<a name="113"><font  size=-1>113     </font></a><font color="black">          <a href="dictionary_S.html#20">sgr</a>=<a href="dictionary_S.html#18">sg</a></font>
+<a name="114"><font  size=-1>114     </font></a><font color="black">        <b>end</b><b>if</b></font>
+<a name="115"><font  size=-1>115     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="116"><font  size=-1>116     </font></a><font color="black"></font><font color="red">c</font>
+<a name="117"><font  size=-1>117     </font></a><font color="red">      <a href="dictionary_D.html#6">dxinv</a></font><font color="black">=(<a href="dictionary_F.html#10">f2</a>-<a href="dictionary_F.html#9">f1</a>)/(<a href="dictionary_F.html#10">f2</a>*(<a href="dictionary_X.html#24">x2</a>-<a href="dictionary_X.html#23">x1</a>))</font>
+<a name="118"><font  size=-1>118     </font></a><font color="black">      <b>if</b>(<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_D.html#6">dxinv</a>)*<a href="dictionary_D.html#7">dxmax</a>.le.1.) <b>then</b></font>
+<a name="119"><font  size=-1>119     </font></a><font color="black">        <a href="dictionary_D.html#4">dx</a>=<a href="dictionary_S.html#21">sign</a>(<a href="dictionary_D.html#7">dxmax</a>,<a href="dictionary_D.html#6">dxinv</a>)</font>
+<a name="120"><font  size=-1>120     </font></a><font color="black">      <b>else</b></font>
+<a name="121"><font  size=-1>121     </font></a><font color="black">        <a href="dictionary_D.html#4">dx</a>=1./<a href="dictionary_D.html#6">dxinv</a></font>
+<a name="122"><font  size=-1>122     </font></a><font color="black">        <b>if</b>(<a href="dictionary_A.html#3">abs</a>(<a href="dictionary_D.html#6">dxinv</a>)*<a href="dictionary_D.html#8">dxmin</a>.ge.1. .and. <a href="dictionary_I.html#13">it</a>.gt.1) <b>go</b> <b>to</b> 30</font>
+<a name="123"><font  size=-1>123     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="124"><font  size=-1>124     </font></a><font color="black"></font><font color="red">c</font>
+<a name="125"><font  size=-1>125     </font></a><font color="red">      </font><font color="black"><b>if</b>(<a href="dictionary_S.html#19">sgl</a>.ne.<a href="dictionary_S.html#20">sgr</a>) <b>then</b></font>
+<a name="126"><font  size=-1>126     </font></a><font color="black">        <b>if</b>(<a href="dictionary_S.html#18">sg</a>.ne.<a href="dictionary_S.html#19">sgl</a>) <b>then</b></font>
+<a name="127"><font  size=-1>127     </font></a><font color="black"></font><font color="red">c         shoot to the left</font>
+<a name="128"><font  size=-1>128     </font></a><font color="red">          </font><font color="black"><b>if</b>(<a href="dictionary_D.html#4">dx</a>.gt.0.) <b>then</b></font>
+<a name="129"><font  size=-1>129     </font></a><font color="black">            <a href="dictionary_D.html#4">dx</a>=<a href="dictionary_M.html#16">min</a>(<a href="dictionary_D.html#4">dx</a>,0.8*(<a href="dictionary_X.html#24">x2</a>-<a href="dictionary_X.html#25">xl</a>))</font>
+<a name="130"><font  size=-1>130     </font></a><font color="black">          <b>else</b></font>
+<a name="131"><font  size=-1>131     </font></a><font color="black">            <a href="dictionary_D.html#4">dx</a>=0.5*(<a href="dictionary_X.html#24">x2</a>-<a href="dictionary_X.html#25">xl</a>)</font>
+<a name="132"><font  size=-1>132     </font></a><font color="black">          <b>end</b><b>if</b></font>
+<a name="133"><font  size=-1>133     </font></a><font color="black">        <b>else</b></font>
+<a name="134"><font  size=-1>134     </font></a><font color="black"></font><font color="red">c         shoot to the right</font>
+<a name="135"><font  size=-1>135     </font></a><font color="red">          </font><font color="black"><b>if</b>(<a href="dictionary_D.html#4">dx</a>.lt.0.) <b>then</b></font>
+<a name="136"><font  size=-1>136     </font></a><font color="black">            <a href="dictionary_D.html#4">dx</a>=<a href="dictionary_M.html#15">max</a>(<a href="dictionary_D.html#4">dx</a>,0.8*(<a href="dictionary_X.html#24">x2</a>-<a href="dictionary_X.html#28">xr</a>))</font>
+<a name="137"><font  size=-1>137     </font></a><font color="black">          <b>else</b></font>
+<a name="138"><font  size=-1>138     </font></a><font color="black">            <a href="dictionary_D.html#4">dx</a>=0.5*(<a href="dictionary_X.html#24">x2</a>-<a href="dictionary_X.html#28">xr</a>)</font>
+<a name="139"><font  size=-1>139     </font></a><font color="black">          <b>end</b><b>if</b></font>
+<a name="140"><font  size=-1>140     </font></a><font color="black">        <b>end</b><b>if</b></font>
+<a name="141"><font  size=-1>141     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="142"><font  size=-1>142     </font></a><font color="black"></font><font color="red">c</font>
+<a name="143"><font  size=-1>143     </font></a><font color="red">      <a href="dictionary_X.html#23">x1</a></font><font color="black">=<a href="dictionary_X.html#24">x2</a></font>
+<a name="144"><font  size=-1>144     </font></a><font color="black">      <a href="dictionary_F.html#9">f1</a>=<a href="dictionary_F.html#10">f2</a></font>
+<a name="145"><font  size=-1>145     </font></a><font color="black">10    <b>continue</b></font>
+<a name="146"><font  size=-1>146     </font></a><font color="black"></font><font color="red">c</font>
+<a name="147"><font  size=-1>147     </font></a><font color="red">c  no convergence</font>
+<a name="148"><font  size=-1>148     </font></a><font color="red">      </font><font color="black"><b>WRITE</b>(6,*)</font><font color="magenta">' warning: no convergence in aazero'</font>
+<a name="149"><font  size=-1>149     </font></a><font color="magenta">      <a href="dictionary_A.html#2">aazero</a></font><font color="black">=<a href="dictionary_X.html#22">x0</a></font>
+<a name="150"><font  size=-1>150     </font></a><font color="black">      RETURN</font>
+<a name="151"><font  size=-1>151     </font></a><font color="black"></font><font color="red">c</font>
+<a name="152"><font  size=-1>152     </font></a><font color="red">c  good convergence, the function is sufficiently small</font>
+<a name="153"><font  size=-1>153     </font></a><font color="red">20    </font><font color="black"><b>continue</b></font>
+<a name="154"><font  size=-1>154     </font></a><font color="black">      <a href="dictionary_A.html#2">aazero</a>=<a href="dictionary_X.html#24">x2</a></font>
+<a name="155"><font  size=-1>155     </font></a><font color="black">      RETURN</font>
+<a name="156"><font  size=-1>156     </font></a><font color="black"></font><font color="red">c</font>
+<a name="157"><font  size=-1>157     </font></a><font color="red">c  good convergence, step size is sufficiently small</font>
+<a name="158"><font  size=-1>158     </font></a><font color="red">30    </font><font color="black"><b>continue</b></font>
+<a name="159"><font  size=-1>159     </font></a><font color="black">      <a href="dictionary_A.html#2">aazero</a>=<a href="dictionary_X.html#24">x2</a>-<a href="dictionary_D.html#4">dx</a></font>
+<a name="160"><font  size=-1>160     </font></a><font color="black">      <b>if</b>(<a href="dictionary_X.html#27">xmin</a>.lt.<a href="dictionary_X.html#26">xmax</a>) <b>then</b></font>
+<a name="161"><font  size=-1>161     </font></a><font color="black">        <a href="dictionary_A.html#2">aazero</a>=<a href="dictionary_M.html#15">max</a>(<a href="dictionary_X.html#27">xmin</a>,<a href="dictionary_M.html#16">min</a>(<a href="dictionary_X.html#26">xmax</a>,<a href="dictionary_A.html#2">aazero</a>))</font>
+<a name="162"><font  size=-1>162     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="163"><font  size=-1>163     </font></a><font color="black">      RETURN</font>
+<a name="164"><font  size=-1>164     </font></a><font color="black">      <b>end</b></font>
+<a name="165"><font  size=-1>165     </font></a><font color="black"></font></pre></body></html>

@@ -1,0 +1,108 @@
+<html><head><title>indcrb.F</title></head><body link="blue" vlink="blue"><h3>File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/indcrb.F</h3>
+<SCRIPT>
+ defaultStatus = "File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/indcrb.F";
+top.document.title  = "indcrb.F";
+</SCRIPT>
+<pre><font color="black"></font><a name="1"><font  size=-1>1     </font></a><font color="black"></font>
+<a name="2"><font  size=-1>2     </font></a><font color="black"></font><font color="red">************************************************************************</font>
+<a name="3"><font  size=-1>3     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <b>FUNCTION</b> <a href="dictionary_I.html#669">indcrb</a>(<a href="dictionary_V.html#682">vx</a>,<a href="dictionary_V.html#683">vy</a>,<a href="dictionary_N.html#681">n</a>,<a href="dictionary_X.html#684">x</a>,<a href="dictionary_Y.html#685">y</a>,<a href="dictionary_D.html#674">d</a>)</font>
+<a name="4"><font  size=-1>4     </font></a><font color="black"></font><font color="red">************************************************************************</font>
+<a name="5"><font  size=-1>5     </font></a><font color="red">      </font><font color="black"><b>IMPLICIT</b> <b>NONE</b></font>
+<a name="6"><font  size=-1>6     </font></a><font color="black"></font>
+<a name="7"><font  size=-1>7     </font></a><font color="black"></font><font color="red">*..  Cette fonction renvoie l'indice du point du debut du segment entre</font>
+<a name="8"><font  size=-1>8     </font></a><font color="red">*  2 points parametrises sur lequel se trouve le point x,y. On effectue</font>
+<a name="9"><font  size=-1>9     </font></a><font color="red">*  un produit scalaire entre les vecteurs allant du point a chaque</font>
+<a name="10"><font  size=-1>10     </font></a><font color="red">*  extremite du segment. Sur le segment de contact ou se trouve le</font>
+<a name="11"><font  size=-1>11     </font></a><font color="red">*  point, l'angle sera le plus grand. L'indice trouve est le plus grand</font>
+<a name="12"><font  size=-1>12     </font></a><font color="red">*  tel que la distance parcourue jusqu'a cet indice est inferieure ou</font>
+<a name="13"><font  size=-1>13     </font></a><font color="red">*  egale a la distance d</font>
+<a name="14"><font  size=-1>14     </font></a><font color="red"></font>
+<a name="15"><font  size=-1>15     </font></a><font color="red">*  arguments</font>
+<a name="16"><font  size=-1>16     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_N.html#681">n</a></font>
+<a name="17"><font  size=-1>17     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_V.html#682">vx</a>(<a href="dictionary_N.html#681">n</a>),<a href="dictionary_V.html#683">vy</a>(<a href="dictionary_N.html#681">n</a>),<a href="dictionary_X.html#684">x</a>,<a href="dictionary_Y.html#685">y</a>,<a href="dictionary_D.html#674">d</a></font>
+<a name="18"><font  size=-1>18     </font></a><font color="black"></font>
+<a name="19"><font  size=-1>19     </font></a><font color="black"></font><font color="red">*  variables locales</font>
+<a name="20"><font  size=-1>20     </font></a><font color="red">      </font><font color="black"><b>INTEGER</b> <a href="dictionary_I.html#678">i</a></font>
+<a name="21"><font  size=-1>21     </font></a><font color="black">      <b>REAL</b>*8 <a href="dictionary_M.html#680">mumin</a>, <a href="dictionary_M.html#679">mu</a>, <a href="dictionary_A.html#670">ax</a>, <a href="dictionary_A.html#671">ay</a>, <a href="dictionary_B.html#672">bx</a>, <a href="dictionary_B.html#673">by</a>, <a href="dictionary_D.html#676">dist</a>, <a href="dictionary_E.html#677">eps</a>,<a href="dictionary_D.html#675">dd</a></font>
+<a name="22"><font  size=-1>22     </font></a><font color="black">      <b>PARAMETER</b> (<a href="dictionary_E.html#677">eps</a>=1.E-6)</font>
+<a name="23"><font  size=-1>23     </font></a><font color="black"></font>
+<a name="24"><font  size=-1>24     </font></a><font color="black"></font><font color="red">*  procedures</font>
+<a name="25"><font  size=-1>25     </font></a><font color="red">      </font><font color="black"><b>INTRINSIC</b> <a href="dictionary_S.html#102">SQRT</a></font>
+<a name="26"><font  size=-1>26     </font></a><font color="black"></font>
+<a name="27"><font  size=-1>27     </font></a><font color="black"></font><font color="red">c=========================</font>
+<a name="28"><font  size=-1>28     </font></a><font color="red">c.. n   : nombre  de points de la courbe.</font>
+<a name="29"><font  size=-1>29     </font></a><font color="red">c.. vx,vy: vecteurs des coordonnees des points de la courbe.</font>
+<a name="30"><font  size=-1>30     </font></a><font color="red">c.. x,y : point sur la courbe dont on recherche l'indice.</font>
+<a name="31"><font  size=-1>31     </font></a><font color="red">c.. ax,ay,bx,by: composantes x et y des vecteurs a et b.</font>
+<a name="32"><font  size=-1>32     </font></a><font color="red">c.. mu: angle entre les vecteurs a et b.</font>
+<a name="33"><font  size=-1>33     </font></a><font color="red">c=========================</font>
+<a name="34"><font  size=-1>34     </font></a><font color="red"></font>
+<a name="35"><font  size=-1>35     </font></a><font color="red">*..Initialisation.</font>
+<a name="36"><font  size=-1>36     </font></a><font color="red"></font>
+<a name="37"><font  size=-1>37     </font></a><font color="red">      <a href="dictionary_M.html#680">mumin</a> </font><font color="black">= 1.</font>
+<a name="38"><font  size=-1>38     </font></a><font color="black">      <a href="dictionary_I.html#669">indcrb</a> = 1</font>
+<a name="39"><font  size=-1>39     </font></a><font color="black"></font>
+<a name="40"><font  size=-1>40     </font></a><font color="black"></font><font color="red">*..Test pour savoir si le point x,y est egal au premier point parame-</font>
+<a name="41"><font  size=-1>41     </font></a><font color="red">*  trise.</font>
+<a name="42"><font  size=-1>42     </font></a><font color="red"></font>
+<a name="43"><font  size=-1>43     </font></a><font color="red">      <a href="dictionary_A.html#670">ax</a> </font><font color="black">= <a href="dictionary_V.html#682">vx</a>(1) - <a href="dictionary_X.html#684">x</a></font>
+<a name="44"><font  size=-1>44     </font></a><font color="black">      <a href="dictionary_A.html#671">ay</a> = <a href="dictionary_V.html#683">vy</a>(1) - <a href="dictionary_Y.html#685">y</a></font>
+<a name="45"><font  size=-1>45     </font></a><font color="black"></font>
+<a name="46"><font  size=-1>46     </font></a><font color="black">      <a href="dictionary_D.html#676">dist</a> = <a href="dictionary_S.html#102">SQRT</a>(<a href="dictionary_A.html#670">ax</a>*<a href="dictionary_A.html#670">ax</a> + <a href="dictionary_A.html#671">ay</a>*<a href="dictionary_A.html#671">ay</a>)</font>
+<a name="47"><font  size=-1>47     </font></a><font color="black">      <a href="dictionary_D.html#675">dd</a>=<a href="dictionary_S.html#102">sqrt</a>((<a href="dictionary_V.html#682">vx</a>(2)-<a href="dictionary_V.html#682">vx</a>(1))**2+(<a href="dictionary_V.html#683">vy</a>(2)-<a href="dictionary_V.html#683">vy</a>(1))**2)</font>
+<a name="48"><font  size=-1>48     </font></a><font color="black"></font>
+<a name="49"><font  size=-1>49     </font></a><font color="black">      <b>IF</b> (<a href="dictionary_D.html#676">dist</a> .LT. <a href="dictionary_E.html#677">eps</a> .and. <a href="dictionary_D.html#675">dd</a>.gt.<a href="dictionary_D.html#674">d</a>) <b>THEN</b></font>
+<a name="50"><font  size=-1>50     </font></a><font color="black"></font>
+<a name="51"><font  size=-1>51     </font></a><font color="black">         <a href="dictionary_I.html#669">indcrb</a> = 1</font>
+<a name="52"><font  size=-1>52     </font></a><font color="black">         RETURN</font>
+<a name="53"><font  size=-1>53     </font></a><font color="black"></font>
+<a name="54"><font  size=-1>54     </font></a><font color="black">      <b>END</b><b>IF</b></font>
+<a name="55"><font  size=-1>55     </font></a><font color="black"></font>
+<a name="56"><font  size=-1>56     </font></a><font color="black"></font><font color="red">*..Boucle sur tous les points parametrises.</font>
+<a name="57"><font  size=-1>57     </font></a><font color="red"></font>
+<a name="58"><font  size=-1>58     </font></a><font color="red">      <a href="dictionary_D.html#675">dd</a></font><font color="black">=0.</font>
+<a name="59"><font  size=-1>59     </font></a><font color="black">      <b>DO</b> 10 <a href="dictionary_I.html#678">i</a>=1, <a href="dictionary_N.html#681">n</a>-1</font>
+<a name="60"><font  size=-1>60     </font></a><font color="black">      <a href="dictionary_D.html#675">dd</a>=<a href="dictionary_D.html#675">dd</a>+<a href="dictionary_S.html#102">sqrt</a>((<a href="dictionary_V.html#682">vx</a>(<a href="dictionary_I.html#678">i</a>+1)-<a href="dictionary_V.html#682">vx</a>(<a href="dictionary_I.html#678">i</a>))**2+(<a href="dictionary_V.html#683">vy</a>(<a href="dictionary_I.html#678">i</a>+1)-<a href="dictionary_V.html#683">vy</a>(<a href="dictionary_I.html#678">i</a>))**2)</font>
+<a name="61"><font  size=-1>61     </font></a><font color="black">      <b>if</b>(<a href="dictionary_D.html#675">dd</a>.ge.<a href="dictionary_D.html#674">d</a>) <b>then</b></font>
+<a name="62"><font  size=-1>62     </font></a><font color="black"></font>
+<a name="63"><font  size=-1>63     </font></a><font color="black"></font><font color="red">*..Def. des 2 vecteurs a et b.</font>
+<a name="64"><font  size=-1>64     </font></a><font color="red"></font>
+<a name="65"><font  size=-1>65     </font></a><font color="red">         <a href="dictionary_A.html#670">ax</a> </font><font color="black">= <a href="dictionary_V.html#682">vx</a>(<a href="dictionary_I.html#678">i</a>) - <a href="dictionary_X.html#684">x</a></font>
+<a name="66"><font  size=-1>66     </font></a><font color="black">         <a href="dictionary_A.html#671">ay</a> = <a href="dictionary_V.html#683">vy</a>(<a href="dictionary_I.html#678">i</a>) - <a href="dictionary_Y.html#685">y</a></font>
+<a name="67"><font  size=-1>67     </font></a><font color="black">         <a href="dictionary_B.html#672">bx</a> = <a href="dictionary_V.html#682">vx</a>(<a href="dictionary_I.html#678">i</a>+1) - <a href="dictionary_X.html#684">x</a></font>
+<a name="68"><font  size=-1>68     </font></a><font color="black">         <a href="dictionary_B.html#673">by</a> = <a href="dictionary_V.html#683">vy</a>(<a href="dictionary_I.html#678">i</a>+1) - <a href="dictionary_Y.html#685">y</a></font>
+<a name="69"><font  size=-1>69     </font></a><font color="black"></font>
+<a name="70"><font  size=-1>70     </font></a><font color="black"></font><font color="red">*..Test pour voir si le point x,y tombe sur le point parametrise suivant</font>
+<a name="71"><font  size=-1>71     </font></a><font color="red"></font>
+<a name="72"><font  size=-1>72     </font></a><font color="red">         <a href="dictionary_D.html#676">dist</a> </font><font color="black">= <a href="dictionary_S.html#102">SQRT</a>(<a href="dictionary_B.html#672">bx</a>*<a href="dictionary_B.html#672">bx</a> + <a href="dictionary_B.html#673">by</a>*<a href="dictionary_B.html#673">by</a>)</font>
+<a name="73"><font  size=-1>73     </font></a><font color="black">         <b>IF</b> (<a href="dictionary_D.html#676">dist</a> .LT. <a href="dictionary_E.html#677">eps</a>) <b>THEN</b></font>
+<a name="74"><font  size=-1>74     </font></a><font color="black">            <b>IF</b> (<a href="dictionary_I.html#678">i</a> .NE. <a href="dictionary_N.html#681">n</a>-1) <b>THEN</b></font>
+<a name="75"><font  size=-1>75     </font></a><font color="black">               <a href="dictionary_I.html#669">indcrb</a> = <a href="dictionary_I.html#678">i</a> + 1</font>
+<a name="76"><font  size=-1>76     </font></a><font color="black">               RETURN</font>
+<a name="77"><font  size=-1>77     </font></a><font color="black">            <b>ELSE</b></font>
+<a name="78"><font  size=-1>78     </font></a><font color="black">               <a href="dictionary_I.html#669">indcrb</a> = <a href="dictionary_I.html#678">i</a></font>
+<a name="79"><font  size=-1>79     </font></a><font color="black">               RETURN</font>
+<a name="80"><font  size=-1>80     </font></a><font color="black">            <b>END</b><b>IF</b></font>
+<a name="81"><font  size=-1>81     </font></a><font color="black">         <b>ELSE</b></font>
+<a name="82"><font  size=-1>82     </font></a><font color="black"></font>
+<a name="83"><font  size=-1>83     </font></a><font color="black"></font><font color="red">*..On trouve le cosinus de l'angle entre les 2 vecteurs</font>
+<a name="84"><font  size=-1>84     </font></a><font color="red"></font>
+<a name="85"><font  size=-1>85     </font></a><font color="red">            <a href="dictionary_M.html#679">mu</a> </font><font color="black">= (((<a href="dictionary_A.html#670">ax</a>*<a href="dictionary_B.html#672">bx</a>) + (<a href="dictionary_A.html#671">ay</a>*<a href="dictionary_B.html#673">by</a>))</font>
+<a name="86"><font  size=-1>86     </font></a><font color="black">     .                /<a href="dictionary_S.html#102">SQRT</a>(((<a href="dictionary_A.html#670">ax</a>**2)+(<a href="dictionary_A.html#671">ay</a>**2)) * ((<a href="dictionary_B.html#672">bx</a>**2)+(<a href="dictionary_B.html#673">by</a>**2))))</font>
+<a name="87"><font  size=-1>87     </font></a><font color="black"></font><font color="red">c</font>
+<a name="88"><font  size=-1>88     </font></a><font color="red"></font>
+<a name="89"><font  size=-1>89     </font></a><font color="red">*..L'indice de segment correspond au cosinus le plus petit</font>
+<a name="90"><font  size=-1>90     </font></a><font color="red"></font>
+<a name="91"><font  size=-1>91     </font></a><font color="red">            </font><font color="black"><b>IF</b> (<a href="dictionary_M.html#679">mu</a> .lt. <a href="dictionary_M.html#680">mumin</a>) <b>THEN</b></font>
+<a name="92"><font  size=-1>92     </font></a><font color="black">               <a href="dictionary_I.html#669">indcrb</a> = <a href="dictionary_I.html#678">i</a></font>
+<a name="93"><font  size=-1>93     </font></a><font color="black">               <a href="dictionary_M.html#680">mumin</a> = <a href="dictionary_M.html#679">mu</a></font>
+<a name="94"><font  size=-1>94     </font></a><font color="black">            <b>END</b><b>IF</b></font>
+<a name="95"><font  size=-1>95     </font></a><font color="black"></font>
+<a name="96"><font  size=-1>96     </font></a><font color="black">         <b>END</b><b>IF</b></font>
+<a name="97"><font  size=-1>97     </font></a><font color="black"></font>
+<a name="98"><font  size=-1>98     </font></a><font color="black">      <b>end</b><b>if</b></font>
+<a name="99"><font  size=-1>99     </font></a><font color="black">   10 <b>CONTINUE</b></font>
+<a name="100"><font  size=-1>100     </font></a><font color="black"></font>
+<a name="101"><font  size=-1>101     </font></a><font color="black">      RETURN</font>
+<a name="102"><font  size=-1>102     </font></a><font color="black">      <b>END</b></font>
+<a name="103"><font  size=-1>103     </font></a><font color="black"></font></pre></body></html>

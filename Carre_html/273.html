@@ -1,0 +1,88 @@
+<html><head><title>coinci.F</title></head><body link="blue" vlink="blue"><h3>File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/coinci.F</h3>
+<SCRIPT>
+ defaultStatus = "File: /afs/ipp-garching.mpg.de/home/h/hmk/svn/solps5.0/src/Carre/src/carre/coinci.F";
+top.document.title  = "coinci.F";
+</SCRIPT>
+<pre><font color="black"></font><a name="1"><font  size=-1>1     </font></a><font color="black">      <b>integer</b> <b>function</b> <a href="dictionary_C.html#43">coinci</a>(<a href="dictionary_V.html#286">vx</a>,<a href="dictionary_V.html#287">vy</a>,<a href="dictionary_N.html#280">n</a>,<a href="dictionary_R.html#283">rx</a>,<a href="dictionary_R.html#284">ry</a>)</font>
+<a name="2"><font  size=-1>2     </font></a><font color="black"></font>
+<a name="3"><font  size=-1>3     </font></a><font color="black"></font><font color="red">c  version : 20.04.2001 23:04</font>
+<a name="4"><font  size=-1>4     </font></a><font color="red"></font>
+<a name="5"><font  size=-1>5     </font></a><font color="red">c=======================================================================</font>
+<a name="6"><font  size=-1>6     </font></a><font color="red">c*** This function checks the points along a curve to find the point</font>
+<a name="7"><font  size=-1>7     </font></a><font color="red">c*** which coincides - within the tolerance parameter - with the</font>
+<a name="8"><font  size=-1>8     </font></a><font color="red">c*** specified reference point. </font>
+<a name="9"><font  size=-1>9     </font></a><font color="red">c*** If such a point is not found, then the closest point is marked after</font>
+<a name="10"><font  size=-1>10     </font></a><font color="red">c*** the confirmation from user.</font>
+<a name="11"><font  size=-1>11     </font></a><font color="red"></font>
+<a name="12"><font  size=-1>12     </font></a><font color="red">c*** Input:</font>
+<a name="13"><font  size=-1>13     </font></a><font color="red">c***  vx, vy  coordinates of points along the curve</font>
+<a name="14"><font  size=-1>14     </font></a><font color="red">c***  n       number of these points</font>
+<a name="15"><font  size=-1>15     </font></a><font color="red">c***  rx, ry  coordinates of the reference points</font>
+<a name="16"><font  size=-1>16     </font></a><font color="red"></font>
+<a name="17"><font  size=-1>17     </font></a><font color="red">c*** Internel parameters:</font>
+<a name="18"><font  size=-1>18     </font></a><font color="red">c***  const   the tolerance</font>
+<a name="19"><font  size=-1>19     </font></a><font color="red"></font>
+<a name="20"><font  size=-1>20     </font></a><font color="red">c*** Output:</font>
+<a name="21"><font  size=-1>21     </font></a><font color="red">c***  The function value gives the index of the point found</font>
+<a name="22"><font  size=-1>22     </font></a><font color="red"></font>
+<a name="23"><font  size=-1>23     </font></a><font color="red">      </font><font color="black"><b>implicit</b> <b>none</b></font>
+<a name="24"><font  size=-1>24     </font></a><font color="black"></font>
+<a name="25"><font  size=-1>25     </font></a><font color="black"></font><font color="red">*  arguments</font>
+<a name="26"><font  size=-1>26     </font></a><font color="red">      </font><font color="black"><b>integer</b> <a href="dictionary_N.html#280">n</a></font>
+<a name="27"><font  size=-1>27     </font></a><font color="black">      <b>real</b>*8 <a href="dictionary_V.html#286">vx</a>(<a href="dictionary_N.html#280">n</a>), <a href="dictionary_V.html#287">vy</a>(<a href="dictionary_N.html#280">n</a>), <a href="dictionary_R.html#283">rx</a>, <a href="dictionary_R.html#284">ry</a></font>
+<a name="28"><font  size=-1>28     </font></a><font color="black"></font>
+<a name="29"><font  size=-1>29     </font></a><font color="black"></font><font color="red">*  variables locales</font>
+<a name="30"><font  size=-1>30     </font></a><font color="red">      </font><font color="black"><b>integer</b> <a href="dictionary_I.html#277">i</a>, <a href="dictionary_I.html#278">imn</a>, <a href="dictionary_I.html#279">irp</a></font>
+<a name="31"><font  size=-1>31     </font></a><font color="black">      <b>real</b>*8 <a href="dictionary_C.html#276">const</a>, <a href="dictionary_R.html#282">rmn</a>, <a href="dictionary_T.html#285">tol</a>, <a href="dictionary_R.html#281">r</a></font>
+<a name="32"><font  size=-1>32     </font></a><font color="black">      <b>parameter</b> (<a href="dictionary_C.html#276">const</a>=0.001, <a href="dictionary_T.html#285">tol</a>=<a href="dictionary_C.html#276">const</a>*<a href="dictionary_C.html#276">const</a>)</font>
+<a name="33"><font  size=-1>33     </font></a><font color="black">      <b>character</b> <a href="dictionary_C.html#275">c</a></font>
+<a name="34"><font  size=-1>34     </font></a><font color="black"></font>
+<a name="35"><font  size=-1>35     </font></a><font color="black"></font><font color="red">*  procedures</font>
+<a name="36"><font  size=-1>36     </font></a><font color="red">      </font><font color="black"><b>intrinsic</b> <a href="dictionary_A.html#274">abs</a></font>
+<a name="37"><font  size=-1>37     </font></a><font color="black">      </font>
+<a name="38"><font  size=-1>38     </font></a><font color="black">      <b>data</b> <a href="dictionary_I.html#279">irp</a> /0/</font>
+<a name="39"><font  size=-1>39     </font></a><font color="black"></font><font color="red">c=======================================================================</font>
+<a name="40"><font  size=-1>40     </font></a><font color="red"></font>
+<a name="41"><font  size=-1>41     </font></a><font color="red">      <a href="dictionary_R.html#282">rmn</a></font><font color="black">=1.e16</font>
+<a name="42"><font  size=-1>42     </font></a><font color="black">      <a href="dictionary_I.html#278">imn</a>=0</font>
+<a name="43"><font  size=-1>43     </font></a><font color="black">      <b>do</b> <a href="dictionary_I.html#277">i</a>=1, <a href="dictionary_N.html#280">n</a></font>
+<a name="44"><font  size=-1>44     </font></a><font color="black">        <a href="dictionary_R.html#281">r</a>=(<a href="dictionary_V.html#286">vx</a>(<a href="dictionary_I.html#277">i</a>)-<a href="dictionary_R.html#283">rx</a>)**2+(<a href="dictionary_V.html#287">vy</a>(<a href="dictionary_I.html#277">i</a>)-<a href="dictionary_R.html#284">ry</a>)**2</font>
+<a name="45"><font  size=-1>45     </font></a><font color="black">        <b>if</b> (<a href="dictionary_R.html#281">r</a>.le.<a href="dictionary_T.html#285">tol</a>) <b>then</b></font>
+<a name="46"><font  size=-1>46     </font></a><font color="black">          <a href="dictionary_C.html#43">coinci</a> = <a href="dictionary_I.html#277">i</a></font>
+<a name="47"><font  size=-1>47     </font></a><font color="black">          return</font>
+<a name="48"><font  size=-1>48     </font></a><font color="black">        <b>else</b> <b>if</b>(<a href="dictionary_R.html#281">r</a>.lt.<a href="dictionary_R.html#282">rmn</a>) <b>then</b></font>
+<a name="49"><font  size=-1>49     </font></a><font color="black">          <a href="dictionary_R.html#282">rmn</a>=<a href="dictionary_R.html#281">r</a></font>
+<a name="50"><font  size=-1>50     </font></a><font color="black">          <a href="dictionary_I.html#278">imn</a>=<a href="dictionary_I.html#277">i</a></font>
+<a name="51"><font  size=-1>51     </font></a><font color="black">        <b>end</b><b>if</b></font>
+<a name="52"><font  size=-1>52     </font></a><font color="black">      <b>end</b> <b>do</b></font>
+<a name="53"><font  size=-1>53     </font></a><font color="black">      <b>if</b>(<a href="dictionary_I.html#279">irp</a>.ge.2) <b>then</b></font>
+<a name="54"><font  size=-1>54     </font></a><font color="black">        <b>print</b> *,</font><font color="magenta">'More than two occasions of the X-point mismatch in '</font><font color="black">,</font>
+<a name="55"><font  size=-1>55     </font></a><font color="black">     ,    </font><font color="magenta">'coinci'</font>
+<a name="56"><font  size=-1>56     </font></a><font color="magenta">        </font><font color="black"><b>print</b> *,</font><font color="magenta">'==&gt; May be an internal error in Carre'</font>
+<a name="57"><font  size=-1>57     </font></a><font color="magenta">        </font><font color="black"><b>call</b> <a href="dictionary_P.html#45">pltend</a></font>
+<a name="58"><font  size=-1>58     </font></a><font color="black">        <b>stop</b></font>
+<a name="59"><font  size=-1>59     </font></a><font color="black">      <b>end</b> <b>if</b></font>
+<a name="60"><font  size=-1>60     </font></a><font color="black">      <a href="dictionary_I.html#279">irp</a>=<a href="dictionary_I.html#279">irp</a>+1</font>
+<a name="61"><font  size=-1>61     </font></a><font color="black">      <a href="dictionary_R.html#282">rmn</a>=<a href="dictionary_S.html#102">sqrt</a>(<a href="dictionary_R.html#282">rmn</a>)</font>
+<a name="62"><font  size=-1>62     </font></a><font color="black">      <b>if</b>(<a href="dictionary_I.html#279">irp</a>.eq.1) <b>then</b></font>
+<a name="63"><font  size=-1>63     </font></a><font color="black">        <b>print</b> *</font>
+<a name="64"><font  size=-1>64     </font></a><font color="black">        <b>print</b> *,</font><font color="magenta">'== The following message may appear twice:'</font>
+<a name="65"><font  size=-1>65     </font></a><font color="magenta">        </font><font color="black"><b>print</b> *</font>
+<a name="66"><font  size=-1>66     </font></a><font color="black">      <b>end</b> <b>if</b></font>
+<a name="67"><font  size=-1>67     </font></a><font color="black">      <b>print</b> </font><font color="magenta">'(1x,1p,2a,2(e10.3,a))'</font><font color="black">,</font>
+<a name="68"><font  size=-1>68     </font></a><font color="black">     ,  </font><font color="magenta">'A separatrix misses the X-point by more than '</font><font color="black">,</font>
+<a name="69"><font  size=-1>69     </font></a><font color="black">     ,  </font><font color="magenta">'the hard-wired tolerance ('</font><font color="black">,<a href="dictionary_R.html#282">rmn</a>,</font><font color="magenta">' vs.'</font><font color="black">,<a href="dictionary_C.html#276">const</a>,</font><font color="magenta">' )'</font>
+<a name="70"><font  size=-1>70     </font></a><font color="magenta">      </font><font color="black"><b>print</b> *,</font><font color="magenta">'Are you sure the X-points should be connected? (y/n)'</font>
+<a name="71"><font  size=-1>71     </font></a><font color="magenta"> 10   </font><font color="black"><b>read</b> </font><font color="magenta">'(a1)'</font><font color="black">,<a href="dictionary_C.html#275">c</a></font>
+<a name="72"><font  size=-1>72     </font></a><font color="black">      <b>if</b>(<a href="dictionary_C.html#275">c</a>.eq.</font><font color="magenta">'y' </font><font color="black">.or. <a href="dictionary_C.html#275">c</a>.eq.</font><font color="magenta">'Y'</font><font color="black">) <b>then</b></font>
+<a name="73"><font  size=-1>73     </font></a><font color="black">        <a href="dictionary_C.html#43">coinci</a> = <a href="dictionary_I.html#278">imn</a></font>
+<a name="74"><font  size=-1>74     </font></a><font color="black">        return</font>
+<a name="75"><font  size=-1>75     </font></a><font color="black">      <b>else</b> <b>if</b>(<a href="dictionary_C.html#275">c</a>.eq.</font><font color="magenta">'n' </font><font color="black">.or. <a href="dictionary_C.html#275">c</a>.eq.</font><font color="magenta">'N'</font><font color="black">) <b>then</b></font>
+<a name="76"><font  size=-1>76     </font></a><font color="black">        <b>call</b> <a href="dictionary_P.html#45">pltend</a></font>
+<a name="77"><font  size=-1>77     </font></a><font color="black">        <b>stop</b></font>
+<a name="78"><font  size=-1>78     </font></a><font color="black">      <b>end</b> <b>if</b></font>
+<a name="79"><font  size=-1>79     </font></a><font color="black">      <b>print</b> *,</font><font color="magenta">'Please answer with Y or N'</font>
+<a name="80"><font  size=-1>80     </font></a><font color="magenta">      </font><font color="black"><b>go</b> <b>to</b> 10</font>
+<a name="81"><font  size=-1>81     </font></a><font color="black"></font><font color="red">c=======================================================================</font>
+<a name="82"><font  size=-1>82     </font></a><font color="red">      </font><font color="black"><b>end</b></font>
+<a name="83"><font  size=-1>83     </font></a><font color="black"></font></pre></body></html>
