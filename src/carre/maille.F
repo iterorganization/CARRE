@@ -38,7 +38,8 @@ cank-970707: dimensions from the file
      .  xpto,ypto,separx(npnimx,4,npx),
      .  separy(npnimx,4,npx),xstruc(npstmx,nstruc),pty(npx+1),
      .  ystruc(npstmx,nstruc),xn(npnimx),yn(npnimx),ptx(npx+1),
-     .  xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*),distnv(5,5),
+     .  xmail(npmamx,nrmamx,nregmx),ymail(npmamx,nrmamx,nregmx),
+     .  distnv(5,nivmx),
      .  nivx(npnimx,nivmx),nivy(npnimx,nivmx),fctpx(npx+1),
      .  a00(nxmax,nymax,3),a10(nxmax,nymax,3),
      .  a01(nxmax,nymax,3),a11(nxmax,nymax,3),
@@ -826,7 +827,8 @@ c----------------------------------------------------------------------
             if (pntrat.ne.pntrat_old) then
 
 	      call endpag
-	      call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
+	      call trace2(x(1),x(nx),y(1),y(ny),
+     .          separx,separy,ptsep,npx,nptot,
      .          nstruc,npstru,xstruc,ystruc,nivx,nivy,
      .          nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
            
