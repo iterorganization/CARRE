@@ -30,9 +30,9 @@ c
 c  variables locales
       integer i,j,k,nin,nn(2),inouv,sens,npcrb(2),nt,ii,jj,dir,indstr,
      .  plaque
-	real*8 valfct,fctnew,xt(3),yt(3),zero
-	parameter(zero=0.)
-	real*8 xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2)
+      real*8 valfct,fctnew,xt(3),yt(3),zero
+      parameter(zero=0.)
+      real*8 xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2)
       real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
       character echx*3,echy*3
 c
@@ -122,4 +122,5 @@ c***
       
 
       return
-	end
+      end
+

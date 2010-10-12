@@ -34,9 +34,9 @@ c
 c  variables locales
       integer i,j,k,nin,nn(2),inouv,sens,npcrb(2),nt,ii,jj,dir,indstr,
      .  plaque
-	real*8 valfct,fctnew,xt(3),yt(3),zero,xpto,ypto,fctpto
-	parameter(zero=0.)
-	real*8 xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2),x1,
+      real*8 valfct,fctnew,xt(3),yt(3),zero,xpto,ypto,fctpto
+      parameter(zero=0.)
+      real*8 xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2),x1,
      .  x2,y1,y2
       real xs(npnimx),ys(npnimx),xmin,xmax,ymin,ymax
       character echx*3,echy*3
@@ -83,13 +83,13 @@ c***
 C     ON DESSINE LA SURFACE INTERIEURE
 
       x1 = xn1(1)
-	y1 = yn1(1)
+      y1 = yn1(1)
 C     On identifie le point de depart
         
          valfct=fctini
 *..Psi value at the X-point
        x2=xfin
-	 y2=yfin 
+       y2=yfin 
             
             sens=1
 
@@ -160,9 +160,9 @@ c***
 
       endif
       do i=1,nn(inouv)
-	xs(i)=xn(i,inouv)
-	ys(i)=yn(i,inouv)
-	enddo
+        xs(i)=xn(i,inouv)
+        ys(i)=yn(i,inouv)
+        enddo
       if(nn(inouv).gt.0) 
      > CALL agcurv(xs,1,ys,1,nn(inouv),nin)
       
@@ -174,4 +174,5 @@ c***
       
 
       return
-	end
+      end
+
