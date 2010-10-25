@@ -257,7 +257,8 @@ c       simple nul
 
          WRITE(6,230)lg(1)
   230    format(/'Connected double-null geometry'//
-     .   'Number of nodes on segment connecting X-point to right plate:'
+     .   'Number of nodes on segment connecting ',
+     .   ' top X-point to upper right plate:'
      .   /'length = ',f8.5)
          READ(5,*)nptseg(1)
 
@@ -267,7 +268,11 @@ c       simple nul
          WRITE(6,202)
          READ(5,*)deltpn(1)
 
-         WRITE(6,203)lg(2)
+         WRITE(6,231)lg(2)
+  231    format(/'Connected double-null geometry'//
+     .   'Number of nodes on segment connecting ',
+     .   ' top X-point to upper left plate:'
+     .   /'length = ',f8.5)
          READ(5,*)nptseg(2)
 
          WRITE(6,201)

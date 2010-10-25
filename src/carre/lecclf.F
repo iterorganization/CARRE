@@ -247,8 +247,8 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
 
          WRITE(6,130)lg(1)
   130    FORMAT(/'Vous avez un double nul connecte'//
-     .   'Nombre de points sur le segment qui va du point X a la',
-     .   ' plaque de droite:'/'longueur = ',F8.5)
+     .   'Nombre de points sur le segment qui va du point X superieur',
+     .   ' a la plaque en haut a droite:'/'longueur = ',F8.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)
@@ -257,7 +257,10 @@ c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
          WRITE(6,102)
          READ(5,*)deltpn(1)
 
-         WRITE(6,103)lg(2)
+         WRITE(6,131)lg(2)
+  131    FORMAT(/'Vous avez un double nul connecte'//
+     .   'Nombre de points sur le segment qui va du point X superieur',
+     .   ' a la plaque en haut a gauche:'/'longueur = ',F8.5)
          READ(5,*)nptseg(2)
 
          WRITE(6,101)
