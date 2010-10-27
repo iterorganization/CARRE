@@ -26,8 +26,8 @@ c  1.   parametres de relaxation
       rlcept=1.e-6
 c
 c  2.   langue de travail
-      sellan='english'
-c     sellan='francais'
+c     sellan='english'
+      sellan='francais'
 c
       return
 c======================================================================

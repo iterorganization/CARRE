@@ -15,6 +15,6 @@ COMPILE 	= ${FC} -c ${FFLAGS}
 
 #NCAR	 	= ${NCARG} ${NCARG_ROOT}/BD/*.o
 LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib
-#LDFLAGS 	= ${NCARG} -lmscl ${NCARG_ROOT}/BD/*.o
+#LDFLAGS 	= ${NCAR} -lmscl
 LDFLAGS 	= -lX11 -lm -lmscl 
 DUMMY           = $(OBJECTCODE)/bidon.o 
