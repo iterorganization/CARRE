@@ -21,7 +21,7 @@ c      read(iunit,*,err=99)rr
 #ifdef READOPT
       read(vari,err=99) rr
 #else
-      read(vari,'(e21.13e3)',err=99) rr
+      read(vari,'(e)',err=99) rr
 #endif
       ierror=0
       return

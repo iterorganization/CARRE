@@ -19,7 +19,7 @@ cank-970702: moved dimensions into a separate file
 
 *  arguments
       INTEGER npxtot,npx,ii(gradmx),jj(gradmx),iptx(npxmx),
-     .        jptx(npxmx),limcfg
+     .        jptx(npxmx),limcfg,ios
       REAL*8 pointx(gradmx),pointy(gradmx),ptx(npxmx),pty(npxmx),
      .       xpto,ypto
       LOGICAL racord
@@ -31,7 +31,7 @@ cank-970702: moved dimensions into a separate file
 *  variables locales
       INTEGER i, j, k, ipx, ipo, iptxtm, jptxtm
       REAL*8 ptxtmp,ptytmp,eps_hlp
-      CHARACTER rep*1
+      CHARACTER rep*1, ch*2
 c*** Tolerance for coinciding X-points
       parameter (eps_hlp=1.e-5)
 cank-970701 <<<
@@ -88,7 +88,7 @@ c======================================================================
 c======================================================================
 *..Initialisation
 
-      npx = 0
+  2   npx = 0
       do i=1,nptxm
 	kptx(i)=0
       enddo
@@ -274,6 +274,7 @@ c-langue
           write(6,*)' -1   pour une configuration limiteur'
           write(6,*)' Pour une configuration deflecteur, selectionnez',
      .    ' le ou les points X.'
+	  
 c       write(6,*)' Choisissez en donnant l''indice approprie.'
         elseif(sellan(1:7).eq.'english') then
           WRITE(6,225) (i,pointx(i),pointy(i), i=1, npxtot)
@@ -290,7 +291,17 @@ c       write(6,*)' Choose option by typing the appropriate index.'
 *..Indexation des points X.
 
    30   CONTINUE
-           READ(5,*) ipx
+      
+        READ (5,*, end=31, err=666) ipx
+        GO TO 31
+  666   if(sellan(1:8).eq.'francais') then
+          PRINT *, "Erreur de lecture. Veuillez recommencer."
+        elseif(sellan(1:7).eq.'english') then
+          PRINT *, "Invalid input. Please try again."
+        end if
+        go to 2
+   31	continue
+        if (ipx.lt.-1 .or. ipx.gt.npxtot) goto 666 
 
            IF (ipx.GT.0) THEN
               npx = npx + 1

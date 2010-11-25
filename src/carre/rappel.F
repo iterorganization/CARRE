@@ -33,10 +33,10 @@ c======================================================================
 *.. Impression des donnees se rapportant aux separatrices.
 
       if(sellan(1:8).eq.'francais') then
-        write(iusor,105) 'SEPARATRICES:'
+        write(iusor,105) 'SEGMENTS DE SEPARATRICE:'
   105   FORMAT(//T10,A)
       elseif(sellan(1:7).eq.'english') then
-        write(iusor,205) 'SEPARATRICES:'
+        write(iusor,205) 'SEPARATRIX SEGMENTS:'
  205    FORMAT(//T10,A)
       endif
         write(iusor,110)'#','nptseg(i)','lg(i)','deltp1(i)','deltpn(i)',
