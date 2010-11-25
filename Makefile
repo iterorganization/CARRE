@@ -3,8 +3,14 @@
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
 
-VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy:src/usol
-INCLUDE = -Isrc/include
+SRCDIR = src90
+
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy:${SRCDIR}/usol
+INCLUDE = -I${SRCDIR}/include ${USOLINC}
+
+USOLINC = -I./usol/lib/${OBJECTCODE}/silo/include
+USOLLIB = -L./usol/lib/${OBJECTCODE}/silo/lib -lsilo
+
 
 include config/compiler.${OBJECTCODE}
 ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no ),yes)
@@ -15,7 +21,7 @@ EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
 
 include LISTOBJ
 
-DEST = $(OBJS:%.o=$(OBJECTCODE)/%.o)
+DEST = $(OBJS:%.o=$(OBJECTCODE)/%.o) $(OBJSL90:%.o=$(OBJECTCODE)/%.o) $(OBJSU90:%.o=$(OBJECTCODE)/%.o)
 MAINLIST = $(EXCLUDELIS:.=\.)
 LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
@@ -23,7 +29,7 @@ $(OBJECTCODE)/%.o : %.F
 	- /bin/rm -f ${OBJECTCODE}/$*.f
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f; \
 	case $< in \
-		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
+		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
@@ -32,14 +38,14 @@ $(OBJECTCODE)/%.o : %.F90
 	- /bin/rm -f ${OBJECTCODE}/$*.f
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f90; \
 	case $< in \
-		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90;; \
+		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90;; \
 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
 $(OBJECTCODE)/%.o : %.f90
 	case $< in \
-		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< ; \
+		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< ;; \
 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< ; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
@@ -73,19 +79,17 @@ local:
 	-gtfl btor.dat structure.dat rzpsi.dat ncar.cfg gmeta fort.11 carre.out carre.log carre.dat warnings.dat traduit.log selptx.inf traduit.out 
 
 tags:
-	rm TAGS ; etags src/*/*.F `find -L src/ -name '*.[Ff]90' -not -name ".*" -follow` 
+	rm TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
-depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
-	makedepend -f	${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
+depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} ${EXCLUDELIST:.o=.F}
+	makedepend -f ${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJECTCODE}/dependencies.${OBJECTCODE} ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak
-	sed -e '3,$$s/^\.\.\/src\/[^\/]*\///' ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak | \
+	sed -e '3,$$s/^\.\.\/${SRCDIR}\/[^\/]*\///' ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak | \
 	sed -e '3,$$s/^/${OBJECTCODE}\//' > ${OBJECTCODE}/dependencies.${OBJECTCODE}
-	@egrep '^      use ' src/carre/*.F | grep -v 'IGNORE' | awk '{sub(".F",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies
 	@for d in `echo "${VPATH}" | tr : \ `; do \
-		echo $$d ; \
 		dirfiles=`find -L $$d/ -name '*.f90'` ; \
 		if [ -n "$$dirfiles" ] ; then \
-			grep -i '^[[:space:]]*use ' $$d/*.f90 /dev/null | grep -v 'IGNORE' | awk '{sub(".f90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies ;\
+			grep -i '^[[:space:]]*use ' $$d/*.f90 /dev/null | grep -v 'IGNORE' | awk '{sub(".f90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 			for f in `find -L $$d -name '*.f90' -printf "%f "`; do \
 				line='$${OBJECTCODE}/'"`echo $$f | tr A-Z a-z | sed -e 's/.f90/.mod/'`:"'$${OBJECTCODE}/'"`echo $$f | sed -e 's/.f90/.o/'`";\
 				echo $$line >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
@@ -93,7 +97,7 @@ depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 		fi ; \
 		dirfiles=`find -L $$d/ -name '*.F90'` ; \
 		if [ -n "$$dirfiles" ] ; then \
-			grep -i '^[[:space:]]*use ' $$d/*.F90 /dev/null | grep -v 'IGNORE' | awk '{sub(".F90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies ;\
+			grep -i '^[[:space:]]*use ' $$d/*.F90 /dev/null | grep -v 'IGNORE' | awk '{sub(".F90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 			for f in `find -L $$d -name '*.F90' -printf "%f "`; do \
 				line='$${OBJECTCODE}/'"`echo $$f | tr A-Z a-z | sed -e 's/.f90/.mod/'`:"'$${OBJECTCODE}/'"`echo $$f | sed -e 's/.F90/.o/'`";\
 				echo $$line >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
@@ -106,16 +110,44 @@ update:
 	cd $(SOLPSTOP); gmake update
 
 listobj:
-	@rm -f LISTOBJ; touch LISTOBJ; l="OBJS ="; \
-	for d in `echo "$(VPATH)" | tr : \ `; do \
+	@rm -f LISTOBJ; touch LISTOBJ ; \
+	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
+	for d in `echo "${VPATH}" | tr : \ `; do \
 		l="$$l `find $$d -name '*.F' -printf "%f "`"; \
-		l="$$l `find -L $$d -name '*.F90' -printf "%f "`"; \
-		l="$$l `find -L $$d -name '*.f90' -printf "%f "`"; \
+		ll90="$$ll90 `find -L $$d -name '*.f90' -printf "%f "`"; \
+		lu90="$$lu90 `find -L $$d -name '*.F90' -printf "%f "`"; \
 	done; \
-	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
+	E="-e 's/\*.F//g' -e 's/\.F/\.o/g'" ; \
+	EL90="-e 's/\*.f90//g' -e 's/\.f90/\.o/g'" ; \
+	EU90="-e 's/\*.F90//g' -e 's/\.F90/\.o/g'" ; \
+	for f in ${MAINLIST}; do \
 		E="$$E -e 's/ $$f//'"; \
+		EL90="$$EL90 -e 's/ $$f//'"; \
+		EU90="$$EU90 -e 's/ $$f//'"; \
 	done; \
-	echo "$$l" | eval sed "$$E" > LISTOBJ
+	E="$$E -e 's/[ ]*//'"; \
+	EL90="$$EL90 -e 's/[ ]*//'"; \
+	EU90="$$EU90 -e 's/[ ]*//'"; \
+	echo "l=" $$l; \
+	echo "ll90=" $$ll90; \
+	echo "lu90=" $$lu90; \
+	echo "E=" $$E; \
+	echo "EL90=" $$EL90; \
+	echo "EU90=" $$EU90; \
+	echo "$$l" | eval sed "$$E" > LISTOBJ ; \
+	echo "$$ll90" | eval sed "$$EL90" >> LISTOBJ ; \
+	echo "$$lu90" | eval sed "$$EU90" >> LISTOBJ
+
+#	@rm -f LISTOBJ; touch LISTOBJ; l="OBJS ="; \
+#	for d in `echo "$(VPATH)" | tr : \ `; do \
+#		l="$$l `find $$d -name '*.F' -printf "%f "`"; \
+#		l="$$l `find -L $$d -name '*.F90' -printf "%f "`"; \
+#		l="$$l `find -L $$d -name '*.f90' -printf "%f "`"; \
+#	done; \
+#	E="-e 's/\.F90/\.o/g' -e 's/\.f90/\.o/g' -e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
+#		E="$$E -e 's/ $$f//'"; \
+#	done; \
+#	echo "$$l" | eval sed "$$E" > LISTOBJ
 
 LISTOBJ: listobj
 

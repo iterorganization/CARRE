@@ -24,8 +24,8 @@ foreach F (${FILES})
 
     # Copy to correct place in target tree
     set F90 = `echo $FBN | sed -e 's/.F/.f90/'`
-    #set F90TARGET = `echo $F | sed -e 's/.F/.F90/'`
-    set F90TARGET = `echo $F | sed -e 's/.F/.F/'`
+    set F90TARGET = `echo $F | sed -e 's/.F/.F90/'`
+    #set F90TARGET = `echo $F | sed -e 's/.F/.F/'`
     cp $F90 $2/$F90TARGET
     # cleanup
     rm $FBN $F90
