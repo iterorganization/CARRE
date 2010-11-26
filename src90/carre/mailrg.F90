@@ -7,6 +7,8 @@
 !  version : 07.07.97 19:11
 !
 !======================================================================
+      use CarreSiloIO
+
       IMPLICIT NONE
 
 !..  Cette sous-routine fait le maillage curviligne orthogonal dans
@@ -120,6 +122,8 @@
 12    continue
 
       DO 25 ir=2, nprad
+
+         call csioSetSurface( ir )
 
 !---
          print*, 'ir=', ir
@@ -370,6 +374,8 @@
 !  4.   on relaxe les points de facon iterative pour realiser la
 !       meilleure orthogonalite possible
              do i=1,nrelax
+               call csioSetRelax( i )
+
                call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
      &           maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2)
                ortmax=zero
@@ -392,6 +398,11 @@
                  endif
                  ortmax=max(ortmax,abs(ort2(ipol)))
                enddo
+
+               ! write out current grid status
+               csio FIXME
+               mailx(1, 1:ir), maily(1, 1:ir)
+
                if(ortmax.le.rlcept) go to 19
              enddo
              if(sellan(1:8).eq.'francais') then

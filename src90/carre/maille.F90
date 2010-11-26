@@ -13,6 +13,8 @@
 !*** various possible magnetic configurations (single null,
 !*** connected double null, disconnected double null, or limiter)
 !======================================================================
+      use CarreSiloIO
+
       IMPLICIT NONE
 
 !ank-970707: dimensions from the file
@@ -302,6 +304,8 @@
 
 !.. Define the primary curve and the grid points
 
+         call csioSetRegion( 1 )
+
          ireg=1
          np1(ireg) = 0
 
@@ -388,6 +392,8 @@
 
 !..Define the primary curve and the grid points
 
+         call csioSetRegion( 2 )
+
          ireg=2
          np1(ireg) = 0
 
@@ -459,6 +465,8 @@
 !  1.3.3  region 3
 
 !..Define the primary curve and the grid points
+
+         call csioSetRegion( 3 )
 
          ireg=3
          np1(ireg) = 0

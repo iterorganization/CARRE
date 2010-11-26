@@ -6,18 +6,27 @@ CPP	= /usr/lib/cpp
 SRCDIR = src90
 
 VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy:${SRCDIR}/usol
-INCLUDE = -I${SRCDIR}/include ${USOLINC}
+INCLUDE = -I${SRCDIR}/include
 
-USOLINC = -I./usol/lib/${OBJECTCODE}/silo/include
-USOLLIB = -L./usol/lib/${OBJECTCODE}/silo/lib -lsilo
 
+# Libraries from usol
+#USOLLIBDIR = ./usol/lib/${OBJECTCODE}
+USOLLIBDIR = /home/hajo/workspace-local/lib/OBJECTCODE/${OBJECTCODE}
+
+# SILO
+INCLUDE += -I${USOLLIBDIR}/silo/include
+USOLLIBS += -L${USOLLIBDIR}/silo/lib -lsiloh5
+
+# HDF5
+INCLUDE += -I${USOLLIBDIR}/hdf5/include
+USOLLIBS += -L${USOLLIBDIR}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
 
 include config/compiler.${OBJECTCODE}
 ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no ),yes)
 include config.local/compiler.${OBJECTCODE}
 endif
 
-EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
+EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o silotest.o
 
 include LISTOBJ
 
@@ -54,15 +63,19 @@ all: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 
 ${OBJECTCODE}/carre: ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a
 	rm -f ${OBJECTCODE}/carre 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/carre ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/carre ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
+
+${OBJECTCODE}/silotest: ${OBJECTCODE}/silotest.o ${OBJECTCODE}/libcarre.a
+	rm -f ${OBJECTCODE}/silotest 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/silotest ${OBJECTCODE}/silotest.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
 
 ${OBJECTCODE}/traduit: ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a
 	rm -f ${OBJECTCODE}/traduit 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/traduit ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/traduit ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
 
 ${OBJECTCODE}/fcrr: ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a Makefile
 	rm -f ${OBJECTCODE}/fcrr 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
 
 ${OBJECTCODE}/libcarre.a: ${DEST}
 	ar r $@ $?

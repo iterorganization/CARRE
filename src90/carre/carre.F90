@@ -17,6 +17,8 @@
 !*** parametrises the separatrices passing through them, and traces
 !*** them together with the real structures.
 !======================================================================
+      use CarreSiloIO
+
       IMPLICIT NONE
 
 !  a modifier pour generaliser la geometrie:
@@ -234,6 +236,11 @@
       nstruc=0
       call listru(8,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,strumx)
 
+      call csioGetStructureSegments( nstruc, npstru, xstruc, ystruc, csioStrucNSeg, csioStrucSegments )
+      call csioOpenFile()
+
+      call csioCloseFile()
+      stop
 !
 !..4.0  Calculate the first partial derivatives in x and y and store
 !       them in arrays psidx and psidy
@@ -398,6 +405,8 @@
 !.. Close the graphics
 !
       CALL pltend
+
+      call csioCloseFile()
 
       STOP
       END
