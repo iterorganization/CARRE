@@ -2,7 +2,16 @@
      .            plaque,x2,y2,nx,ny,x,y,psi,nstruc,npstru,
      .            xstruc,ystruc,a00,a10,a01,a11,
      .            repart,gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,
-     .            xnlast,ynlast,nnlast,nuldec)
+     .            xnlast,ynlast,nnlast,nuldec,sol,xpto,ypto,gdpsi,
+     .            racpsi,a,gdr,r,ra,rho,somort,somortp,gdsomortp,
+     .            somortpur,somortpurp,gdsomortpurp,sompropo,
+     .            sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .            somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
+     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
+     .            nivx,nivy,
+     .            nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
+     .            xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+c
 c
 c  version : 07.07.97 19:11
 c
@@ -18,15 +27,31 @@ cank-970707: dimensions from the file
 #include <CARREDIM.F>
 
 *  arguments
-      INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad
-     .        ,plaque,repart,nbcrb,npcrb2,nnlast
+      INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad,
+     .        plaque,repart,nbcrb,npcrb2,nnlast,sol,ireg,modif,
+     .        npx,nptot(4,npxmx),nbniv,
+     .        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg,re,
+     .        nprsb(nregmx),ipx
 
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
      .     ystruc(npstmx,nstruc),mailx(npmamx,nrmamx),
      .     maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2,
      .     a00(nxmax,nymax,3),a10(nxmax,nymax,3),a01(nxmax,nymax,3),
      .     a11(nxmax,nymax,3),gardd1,gardd2,
-     .     xcrb2(npcrb2),ycrb2(npcrb2),xnlast(nnlast),ynlast(nnlast)
+     .     xcrb2(npcrb2),ycrb2(npcrb2),xnlast(nnlast),ynlast(nnlast),
+     .     xpto,ypto,a,gdr(nrmamx),r(nrmamx),
+     .     ra(nrmamx),
+     .     rho(nrmamx), gdpsi(nrmamx),racpsi(nrmamx),
+     .     somort(nrmamx),somortp(nrmamx),gdsomortp,
+     .     somortpur(nrmamx),somortpurp(nrmamx),gdsomortpurp,
+     .     sompropo(nrmamx),sompropop(nrmamx),gdsompropop,
+     .     somvarr(nrmamx),somvarrp(nrmamx),gdsomvarrp,
+     .     somtot(nrmamx),somtotp(nrmamx),gdsomtotp,segt(nrmamx),
+     .     xmini,xmaxi,ymini,ymaxi,separx(npnimx,4,npxmx),
+     .     separy(npnimx,4,npxmx),
+     .     nivx(npnimx,nbniv),nivy(npnimx,nbniv),
+     .     xmail(npmamx,nrmamx,nrmamx),ymail(npmamx,nrmamx,nrmamx),
+     .     xptxo,yptxo,pntrat,xfin,yfin,fctfin,distxo
 
       LOGICAL nuldec
 
@@ -38,21 +63,29 @@ cank-970707: dimensions from the file
 
 *  variables locales
       INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,ipol,i,nn(2),
-     .  ig1,ig2,npcrb(2)
+     .  ig1,ig2,npcrb(2),ntt,sensspe,choix,interir,interirbis,deci,
+     .  rr,rrr,rrrr,pra,sra,tra,prb,srb,trb,prc,src,trc,prd,srd,trd,
+     .  pre,sre,tre,prf,srf,trf,prg,srg,trg,pri,sri,tri,prj,srj,trj,
+     .  prk,srk,trk,prl,srl,trl,idep,iarr,prh,srh,trh,n,nnc,iseg
       REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2,
      .       epsiln,xn(npnimx,2),yn(npnimx,2),dd1,dd2,gard1,gard2
-     .       ,fctini,fctnew
+     .       ,fctini,fctnew,fctxo,x22,y22,x23,y23,xtt(5),ytt(5),fctanc,
+     .        longu,tpr,xc(npnimx),yc(npnimx)
       PARAMETER(zero=0.,epsmai=1.e-6,epsiln=1.E-08)
-      REAL*8 xcrb(npnimx,2),ycrb(npnimx,2)
+      REAL*8 xcrb(npnimx,2),ycrb(npnimx,2),coefa,coefb,coefc,coefd,
+     .      coefe,coeff,coefg,coefh,coefi,coefj,coefk,coefl,coef,lsp,ls,
+     .      vx(nrmamx),vy(nrmamx),lsd
+      LOGICAL interval
       CHARACTER*1 reponse
+      save valfct,fctini,fctxo,fctanc
 
 *  procedures
-      INTEGER indsgm,ifind
+      INTEGER indsgm,ifind,drctio
       REAL*8 aazero,long,nulort,ruban
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort,
-     .         UNTANG,SAUTE,chgdir,in,cross,ruban,clort
+     .         UNTANG,SAUTE,chgdir,in,cross,ruban,clort,drctio
 c======================================================================
 *..calculs
 *
@@ -61,6 +94,22 @@ c======================================================================
 
       garde1=gardd1
       garde2=gardd2
+      somort=0.0
+      somortp=0.0
+      gdsomortp=0.0
+      somortpur=0.0
+      somortpurp=0.0
+      gdsomortpurp=0.0
+      sompropo=0.0
+      sompropop=0.0
+      gdsompropop=0.0
+      somvarr=0.0
+      somvarrp=0.0
+      gdsomvarrp=0.0
+      somtot=0.0
+      somtotp=0.0
+      gdsomtotp=0.0
+      segt=0.0
 
 *..S'il y a deux courbes a ne pas traverser alors on definit la deuxieme
 
@@ -118,6 +167,58 @@ c  calcul des indices de garde
         if(d1.lt.garde1) ig1=ipol+1
         if(ll-d1.ge.garde2) ig2=ipol
 12    continue
+
+      do iseg=1,ireg-1
+	  nprsb(iseg)=npr(iseg)
+	enddo    
+	 
+	do iseg=ireg+1,nreg
+	  nprsb(iseg)=1
+	enddo
+   
+* la valeur du sol est précisé dans 'maille' selon l'indice de région et la configuration
+* sol = 1 indicates an SOL region
+       if (sol.EQ.1) then
+
+         ii = ifind(xpto,x,nx,1)
+	 jj = ifind(ypto,y,ny,1)
+         fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
+     .          a11(ii,jj,1)*xpto*ypto
+
+* on place un faux segment qui sert d'appui à saute
+         xtt(1)= xpto-0.1
+         ytt(1)= ypto
+         xtt(2)= x(nx)
+	 ytt(2)= ypto
+   	 xtt(3)= xtt(1)
+	 ytt(3)= ytt(1)
+         ntt=3
+
+* la variable de sens est dedoublée pour ne pas pertuber la valeur du sens qui
+* correspond à la plaque
+
+	 sensspe=1
+         CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sensspe,
+     .              2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+       
+*..Calcul des longueurs
+
+         gdpsi(1)=1.0
+	 racpsi(1)=1.0
+	 gdr(1)=x22
+         r(1)=x22-xpto
+	 a=r(1)
+	 ra(1)= r(1)-a
+	 rho(1)=r(1)/a
+
+         fctanc=valfct
+
+      else
+
+         gdpsi(1)=1.0
+	 racpsi(1)=1.0
+         
+      endif
 
       DO 25 ir=2, nprad
 
@@ -306,9 +407,27 @@ c***
      .            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1,
      .            plaque,x2,y2)
 
-   17    CONTINUE
+*.. Calcul de grand psi
+         gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
+         racpsi(ir)= sqrt(gdpsi(ir))
+       
+         if (sol.EQ.1) then 
 
-*..Definition de xn2 et yn2 pour le bloc common comfort.
+	   x1 = gdr(ir-1)
+	   y1=ypto	  
+	   sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
+           CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe,
+     .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+
+*..Calcul des longueurs
+
+	   gdr(ir)=x23
+           r(ir)=x23-xpto
+	   ra(ir)= r(ir)-a
+           rho(ir)=r(ir)/a
+         endif
+
+*..Definition de xn2 et yn2 pour le bloc common comort.
 
          DO 18 ipas=1,nn(inouv)
             xn2(ipas)=xn(ipas,inouv)
@@ -352,11 +471,13 @@ c
 c  2.   on initialise la fonction qui doit s'annuler pour une
 c       distribution orthogonale
              call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir),
-     .         maily(1,ir),ort1,nppol,pasmin,garde1,garde2,l0,l1)
+     .         maily(1,ir),ort1,nppol,pasmin,garde1,garde2,l0,l1,
+     .         ortpur1,propo1,varr1,tot1)
 c
 c  3.   on procede a un premier deplacement des noeuds
                l2(1)=zero
                l2(nppol)=l1(nppol)
+               segt(ir)=l2(nppol)
                do ipol=ipol1,ipoln
                  if(ort1(ipol).gt.zero) then
                    l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol+1)
@@ -365,13 +486,21 @@ c  3.   on procede a un premier deplacement des noeuds
                  endif
                  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
+	       
+	        somort(ir)= somort(ir)+ (ort1(ipol)/nppol)
+	        somortpur(ir)= somortpur (ir)+ (ortpur1(ipol)/nppol)
+                sompropo(ir)= sompropo(ir)+ (propo1(ipol)/nppol)
+                somvarr(ir)= somvarr(ir)+ (varr1(ipol)/nppol)
+                somtot(ir)= somtot(ir)+ (tot1(ipol)/nppol)
+      
                enddo
 c
 c  4.   on relaxe les points de facon iterative pour realiser la
 c       meilleure orthogonalite possible
              do i=1,nrelax
                call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir),
-     .           maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2)
+     .           maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2,
+     .           ortpur2,propo2,varr2,tot2)
                ortmax=zero
                do ipol=ipol1,ipoln
                  if(abs(ort2(ipol)).gt.rlcept) then
@@ -458,6 +587,14 @@ c       meilleure orthogonalite possible
      .          'carefully upon completion !'
              endif
  19          continue
+             do ipol=ipol1,ipoln
+	        somortp(ir)= somortp(ir)+ (ort2(ipol)/nppol)
+                somortpurp(ir)= somortpurp(ir)+ (ortpur2(ipol)/nppol)
+                sompropop(ir)= sompropop(ir)+ (propo2(ipol)/nppol)
+                somvarrp(ir)= somvarrp(ir)+ (varr2(ipol)/nppol)
+                somtotp(ir)= somtotp(ir)+ (tot2(ipol)/nppol)
+              enddo
+             
            endif
 
          else
@@ -511,5 +648,16 @@ c---
 c---
    25 CONTINUE
 
+       do ir=2,nprad
+	 
+	 gdsomortp= gdsomortp + (somortp(ir)/(nprad-1)) 
+	 gdsomortpurp= gdsomortpurp+ (somortpurp(ir)/(nprad-1)) 
+	 gdsompropop= gdsompropop+ (sompropop(ir)/(nprad-1))
+	 gdsomvarrp= gdsomvarrp+ (somvarrp(ir)/(nprad-1))
+	 gdsomtotp= gdsomtotp+ (somtotp(ir)/(nprad-1)) 
+
+      enddo
+
+  888 CONTINUE
       RETURN
       END

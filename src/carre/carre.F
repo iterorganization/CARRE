@@ -33,6 +33,7 @@ c        1. permettre l'imposition de points fixes ou de coins
 
 cank-970702: moved dimensions to the CARREDIM.F
 #include <CARREDIM.F>
+#include <COMLAN.F>
       REAL*8 cstlin,zero,eps_Xpt,rmax,zmax
       common /geom/ eps_Xpt
       PARAMETER (cstlin=0.00, zero=0.)
@@ -42,7 +43,9 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx),
      .   nbdef, nivtot(nivmx), nbniv,ptxint,nreg,
      .   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,
-     .   itmp, is, ip
+     .   itmp,nn1,sol,ir,nprad,ipol,nppol,mini,maxi,re,rp,rz,ireg,ro,rv,
+     .   ry,modif,reb,rzb,rpb,chgt,nprsb(nregmx),
+     .   rg,ipx,ig,ireg1,ireg2,idep,iarr,idp2,iar2,n
 
       REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax),
      .   psidx(nxmax,nymax), psidy(nxmax,nymax),
@@ -53,14 +56,29 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx),
      .   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx),
      .   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3),
-     .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+     .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), 
+     .   pntrat,distxo,gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),
+     .   a(nregmx),
+     .   gdr(nrmamx,nregmx),
+     .   r(nrmamx,nregmx),ra(nrmamx,nregmx),rho(nrmamx,nregmx),
+     .   somort(nrmamx,nregmx),somortp(nrmamx,nregmx),
+     .   gdsomortp(nregmx),xmini,
+     .   xmaxi,ymini,ymaxi,somortpur(nrmamx,nregmx),
+     .   somortpurp(nrmamx,nregmx),gdsomortpurp(nregmx),
+     .   sompropo(nrmamx,nregmx),sompropop(nrmamx,nregmx),
+     .   gdsompropop(nregmx),
+     .   somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx),
+     .   gdsomvarrp(nregmx),
+     .   somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
+     .   gdsomtotp(nregmx),segt(nrmamx,nregmx),
+     .   vx(npmamx),vy(npmamx),ls,tgarde(4)
 
 !     arrays to hold copies of structures (r for "real")
 !     (if virtual structures are used)
       integer :: rnstruc, rnpstru(strumx)
       REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
 
-      LOGICAL racord
+      LOGICAL racord, last
       character lign80*80,nomstr(strumx)*80
 
       REAL*8 stp0, stpmin
@@ -73,9 +91,10 @@ cank-970702: moved dimensions to the CARREDIM.F
 *..Procedures
 *
       INTRINSIC ABS,MIN,index
+	REAL*8 long
       EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0,
-     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,entete,
-     ,     trc_stk_in,trc_stk_out,
+     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete,
+     ,     trc_stk_in,trc_stk_out,long,
      $     virtualtargets,virtuallimiters
 c======================================================================
 c.. nxmax,nymax: maximum number of the data points in x and y
@@ -150,7 +169,59 @@ c           limiter
 c     N.B.: When the limiter configuration is selected, npx is set equal
 c           to 1 and the coordinates of the X-point correspond to the
 c           innermost point of the limiter.
-c======================================================================
+c      GRAND ET PETIT RAYON
+c      sol: variable utilisée dans le cadre du maillage des régions 
+c           périphériques. Si cette valeur=1 alors la région contient 
+c           des courbes de niveau passant par ypto. On peut alors déterminer 
+c           les grandeurs gdpsi,racpsi,gdr,r,a,rho.
+C      gdr: grand rayon (lecture des surfaces poloidales sur l'axe radial)
+c        r: petit rayon
+c        a: petit rayon de la séparatrice
+c       ra: différence entre la petit rayon de la séparatrice et le petit
+c           rayon d'une ligne de niveau.
+c      rho: rapport entre le ptit rayon de la séparatrice et le petit rayon
+c           d'une ligne de niveau.       
+c  sensspe: sens correspondant à la fausse plaque pour le calcul des rayons.
+c
+
+C      QUALITE DE LA MAILLE GLOBALE
+*  les variables servent verifier la manière dont est quantifiee la qualité de
+*  la maille (mailrg)
+c    somort:(somme des orthogonalités avec ort1) valeur qui prend en compte 
+c           l'orthogonalité, l'espace et la taille de deux cellules consecutives
+c           ainsi que la répartition des points nppol entre une ligne de niveau 
+c           et celle qui la précède.
+c    somortp:(somme des orthogonalités poussée) cette valeur correspond au somort
+c           à la fin des itérations avec l'utilisation de ort2, le tout divisé par nppol.
+* les itérations fonctionnent correctement meme avec la deuxième ligne de niveau
+* donc non seulement l'instruction fonctionne car la fonction se rapproche de zéro
+* mais en plus elle n'est pas à l'origine de la déformation en zig-zag
+* (de toute facon si c était le cas, on le constaterait systematiquement donc c'est 
+* plutot la géométrie, la géographie ainsi que la longueur des plaques et des lignes
+* de niveau qui deviennent les principaux suspects)
+c    gdsomortp:(grande somme des orthogonalités poussée) cette valeur correspond
+c             à l'ensemble des somortp sur une meme ligne de niveau que l'on
+c             divise par nppol (le but est d'avoir un indice de qualité de la région)
+* gdsomortp n'a pas grande signification et peut tromper sur la qualité de la ligne 
+* de niveau. Il peut être utilisé pour comparer l'influence de chaque composante 
+* de la fonction ort.
+
+C     INFLUENCE DE LA VRAIE ORTHOGONALITE SUR CLORT
+c     ortpur:(orthogonalité pure) cette valeur ne tient compte que de l'orthogonalité
+* ortpur peut prendre des valeurs un million de fois plus élévées que la somme des trois 
+* critères donc il doit y avoir une atténuation dans le calcul de ort.
+c     propo: (proportionalité) cette valeur ne tient compte que de la proportionalité
+c     varr: (variance) cette valeur ne tient compte que de la variation de longueur 
+c     des cellules de la maille pour trois cellules qui se suivent et sur une même ligne de niveau.
+c     tot:(total) correspond à la somme de ortpur, propo et varr. on verifie juste que tot = ort
+c     somortpur, sompropo, somvarr, somtot : correspondent aux sommes de ortpur, propo,
+c      varr et tot pour une ligne de niveau lors du premier déplacement des noeuds.
+c     somortpurp, sompropop, somvarrp, somtotp : correspondent aux sommes de ortpur,
+c      propo, varr et tot pour une ligne de niveau après les itérations.
+c     gdsomortpurp, gdsompropop, gdsomvarr et gdsomtotp: correspondent à la somme,
+c      sur toutes les lignes de niveau de la région de somortpur, sompropo, somvarr et somtotpt.
+
+
 *
 *..1.0  Initialisation des variables par defaut et de la bibliotheque
 *       graphique
@@ -173,12 +244,17 @@ c  2.1  specify output format
 
 *
 *..3.0  Read the data
-*
+101   CONTINUE
 
 *..Read the values of x
 
 100   format(a)
+     
       iflag=-1
+      rewind(7)
+      rewind(8)
+      rewind(9)
+      rewind(10)
       call entete(7,'$r',iflag)
       read(7,100)lign80
       i=index(lign80,'=')
@@ -305,8 +381,8 @@ c
 *
 c<<<
 	write(0,*) '=== carre *..10.0 - before frtier'
-	write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') (ptx(i),i=1,npx)
-	write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') (pty(i),i=1,npx)
+	write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') ptx(1:npx)
+	write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') pty(1:npx)
         if(limcfg.eq.0) then
 	  write(0,*) 'nptot(4,nxpoints)'
 	  write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
@@ -324,6 +400,12 @@ c>>>
      .      distnv,ptxint,a00,a10,a01,a11)
           call trc_stk_out
         endif
+
+call trace2(x(1),x(nx),y(1),y(ny),separx,separy,
+     _	       ptsep,npx,nptot,
+     _	       nstruc,npstru,xstruc,ystruc,
+     _	       nivx,nivy,nivtot,nbniv,pntrat,
+     _         distxo,xn,yn,nn1)
 
         if ( .not. dovirtualtargets ) exit
         if ( isetup == 2 ) exit
@@ -375,7 +457,13 @@ c>>>
      .    separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru,
      .    xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail,
      .    np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv,
-     .    a00,a10,a01,a11,fctpx,limcfg)
+     .    a00,a10,a01,a11,fctpx,limcfg,gdpsi,racpsi,
+     .    a,gdr,r,ra,rho,sol,somort,ir,nprad,ipol,somortp,
+     .    nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .    sompropo,
+     .    sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .    somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
+     .    ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
 
 c*
 c* WARNINGS CALCULATION AND OUTPUT
@@ -387,17 +475,16 @@ c     &  distnv(1,2),xpto,ypto)
 *..13.0  Plot the structures, the separatrices, and the limiting level
 *        lines for each region, together with the resulting grid
 *
-
         call trace(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
-     .           nstruc,npstru,xstruc,ystruc,
-     .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg)
+     .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
+     .           np1,npr,xmail,ymail,nreg,.false.)
 
       endif ! nptx.gt.0
 
 *
 *.. Close the graphics
 *
-      CALL pltend
+  111  CALL pltend
 
       STOP
       END
