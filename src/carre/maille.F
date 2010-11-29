@@ -2,7 +2,13 @@
      .     separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru,
      .     xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail,
      .     np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv,
-     .     a00,a10,a01,a11,fctpx,limcfg)
+     .     a00,a10,a01,a11,fctpx,limcfg,gdpsi,racpsi,
+     .     a,gdr,r,ra,rho,sol,somort,ir,nprad,ipol,somortp,nppol,
+     .     gdsomortp,somortpur,somortpurp,gdsomortpurp,sompropo,
+     .     sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
+     .     somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
+     .     ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
+  
 c
 c  version : 23.06.98 19:53
 c
@@ -22,30 +28,49 @@ cank-970707: dimensions from the file
 *  arguments
       INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint,
      .        nstruc,npstru(nstruc),nreg,inddef(4),
-     .        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg
+     .        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg,nn1,
+     .        sol,ir,nprad,ipol,nppol,ireg,modif,re,nprsb(nregmx)
+     
       LOGICAL racord
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),
      .  xpto,ypto,separx(npnimx,4,npx),
      .  separy(npnimx,4,npx),xstruc(npstmx,nstruc),pty(npx+1),
      .  ystruc(npstmx,nstruc),xn(npnimx),yn(npnimx),ptx(npx+1),
-     .  xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*),distnv(5,5),
+     .  xmail(npmamx,nrmamx,nregmx),ymail(npmamx,nrmamx,nregmx),
+     .  distnv(5,nivmx),
      .  nivx(npnimx,nivmx),nivy(npnimx,nivmx),fctpx(npx+1),
      .  a00(nxmax,nymax,3),a10(nxmax,nymax,3),
-     .  a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+     .  a01(nxmax,nymax,3),a11(nxmax,nymax,3),
+     .  gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),xrad(nrmamx),
+     .  yrad(nrmamx),
+     .  fctrad(nrmamx),
+     .  a(nregmx),
+     .  gdr(nrmamx,nregmx),
+     .  r(nrmamx,nregmx),ra(nrmamx,nregmx),
+     .  rho(nrmamx,nregmx),somort(nrmamx,nregmx),somortp(nrmamx,nregmx),
+     .  gdsomortp(nregmx),somortpur(nrmamx,nregmx),
+     .  somortpurp(nrmamx,nregmx),gdsomortpurp(nregmx),
+     .  sompropo(nrmamx,nregmx),sompropop(nrmamx,nregmx),
+     .  gdsompropop(nregmx),
+     .  somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx),
+     .  gdsomvarrp(nregmx),
+     .  somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
+     .  gdsomtotp(nregmx),segt(nrmamx,nregmx),
+     .  xmini,xmaxi,ymini,ymaxi,distxo,pntrat,tgarde(4)
 
 *  variables en common
 #include <COMLAN.F>
 #include <COMRLX.F>
 
 *  variables locales
-      INTEGER nptseg(10),isep,ipas,ireg,ipx,sens,nn,idef,
+      INTEGER nptseg(10),isep,ipas,ipx,sens,nn,idef,
      .  repart,nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2
      .  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
-      REAL*8 dist,x2,y2,pntrat,lg(10),deltp1(10),deltpn(10),
+      REAL*8 dist,x2,y2,lg(10),deltp1(10),deltpn(10),
      .  deltr1(10),deltrn(10),xx,yy,fctini,fctfin,difpsi,dpmin(10),
-     .  dpmax(10),drmin(10),drmax(10),xfin,yfin,tgarde(4),gardd1,
-     .  gardd2,xptxo,yptxo,distxo,xint,yint,xext,yext,psiint,
-     .  psiext,xptxex,yptxex,bouclx,boucly,ll
+     .  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1,
+     .  gardd2,xptxo,yptxo,xint,yint,xext,yext,psiint,
+     .  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
       REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10),
      .  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx)
      .  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx),
@@ -57,7 +82,7 @@ cank-970707: dimensions from the file
       INTEGER drctio,horair,ifind
       REAL*8 long,plqdst,ruban
       EXTERNAL long,COORD,drctio,horair,ifind,LECCLE,lecclf,DOUBLD,
-     .         ruban,plqdst
+     .         ruban,plqdst,trace3
      ,        ,trc_stk_in,trc_stk_out
       intrinsic max
 c=========================
@@ -281,7 +306,7 @@ c----------------------------------------------------------------------
             ient = 5
             isor = 6
 
-            pntrat_old = pntrat        
+            pntrat_old = pntrat   
             
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)

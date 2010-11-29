@@ -1,6 +1,6 @@
       subroutine trace(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot,
      .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .        nivtot,nbniv,np1,npr,xmail,ymail,nreg)
+     .        nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
 c======================================================================
 c
 c  version : 07.07.97 20:15
@@ -27,6 +27,7 @@ c  variables locales
       real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
       real deltax,deltay
       character echx*3,echy*3
+      logical last
 c
 c  procedures
       external agcurv,newpag,endpag
@@ -166,7 +167,7 @@ c     call agcurv(x,1,y,1,2,2)
 c***
 c
 
-      CALL endpag
+      if (last) CALL endpag
 
       return
       end

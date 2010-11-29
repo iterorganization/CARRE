@@ -254,8 +254,6 @@ c---
             mailx(1,ir)=xnlast(1)
             maily(1,ir)=ynlast(1)
 
-            GO TO 17
-
          ENDIF
 
          IF (repart .EQ. 1) THEN

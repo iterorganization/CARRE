@@ -42,7 +42,7 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   npx, npxtot,ptsep(4,npxmx),
      .   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx),
      .   nbdef, nivtot(nivmx), nbniv,ptxint,nreg,
-     .   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,
+     .   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,is,ip,
      .   itmp,nn1,sol,ir,nprad,ipol,nppol,mini,maxi,re,rp,rz,ireg,ro,rv,
      .   ry,modif,reb,rzb,rpb,chgt,nprsb(nregmx),
      .   rg,ipx,ig,ireg1,ireg2,idep,iarr,idp2,iar2,n
@@ -401,7 +401,7 @@ c>>>
           call trc_stk_out
         endif
 
-call trace2(x(1),x(nx),y(1),y(ny),separx,separy,
+        call trace2(x(1),x(nx),y(1),y(ny),separx,separy,
      _	       ptsep,npx,nptot,
      _	       nstruc,npstru,xstruc,ystruc,
      _	       nivx,nivy,nivtot,nbniv,pntrat,
