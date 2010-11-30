@@ -1,0 +1,490 @@
+      PROGRAM CARRE
+!======================================================================
+!
+!  version : 1.01.99 15:49
+!
+!======================================================================
+!ank -- The comments are translated from French, sorry for errors!
+
+!..  Ce programme permet de trouver la localisation des points X
+!  pour un tokamak. Il parametrise ensuite les separatrices qui passent
+!  par ces points X et il les trace ainsi que les structures reelles.
+!  Une maille curviligne orthogonale alignee sur les surfaces de flux
+!  est alors construite.
+
+!*** This program builds an orthogonal curvilinear mesh aligned to the
+!*** flux surfaces.  It finds the localisation of the X-points,
+!*** parametrises the separatrices passing through them, and traces
+!*** them together with the real structures.
+!======================================================================
+      IMPLICIT NONE
+
+!  a modifier pour generaliser la geometrie:
+!  modifier argsep et maille pour utiliser un critere plus general que
+!  la droite ou la gauche dans la designation des separatrices.
+!  Aussi, distribuer les points de facon proportionelle, et les ortho-
+!  gonaliser par relaxation, avec une protection de proximite.
+
+!  a faire:
+!        1. permettre l'imposition de points fixes ou de coins
+
+
+!  variables.
+
+!ank-970702: moved dimensions to the CARREDIM.F
+#include <CARREDIM.F>
+#include <COMLAN.F>
+      REAL*8 cstlin,zero,eps_Xpt,rmax,zmax
+      common /geom/ eps_Xpt
+      PARAMETER (cstlin=0.00, zero=0.)
+      INTEGER i, j, nx, ny, nstruc, npstru(strumx), & 
+     &   ii(gradmx), jj(gradmx), iptx(npxmx), jptx(npxmx), & 
+     &   npx, npxtot,ptsep(4,npxmx), & 
+     &   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx), & 
+     &   nbdef, nivtot(nivmx), nbniv,ptxint,nreg, & 
+     &   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,is,ip, & 
+     &   itmp,nn1,sol,ir,nprad,ipol,nppol,mini,maxi,re,rp,rz,ireg,ro,rv, & 
+     &   ry,modif,reb,rzb,rpb,chgt,nprsb(nregmx), & 
+     &   rg,ipx,ig,ireg1,ireg2,idep,iarr,idp2,iar2,n
+
+      REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax), & 
+     &   psidx(nxmax,nymax), psidy(nxmax,nymax), & 
+     &   xstruc(npstmx,strumx), ystruc(npstmx,strumx), & 
+     &   pointx(gradmx), pointy(gradmx), & 
+     &   ptx(npxmx), pty(npxmx), xpto, ypto, fctpx(npxmx), & 
+     &   separx(npnimx,4,npxmx), separy(npnimx,4,npxmx), & 
+     &   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx), & 
+     &   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
+     &   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3), & 
+     &   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
+     &   pntrat,distxo,gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx), & 
+     &   a(nregmx), & 
+     &   gdr(nrmamx,nregmx), & 
+     &   r(nrmamx,nregmx),ra(nrmamx,nregmx),rho(nrmamx,nregmx), & 
+     &   somort(nrmamx,nregmx),somortp(nrmamx,nregmx), & 
+     &   gdsomortp(nregmx),xmini, & 
+     &   xmaxi,ymini,ymaxi,somortpur(nrmamx,nregmx), & 
+     &   somortpurp(nrmamx,nregmx),gdsomortpurp(nregmx), & 
+     &   sompropo(nrmamx,nregmx),sompropop(nrmamx,nregmx), & 
+     &   gdsompropop(nregmx), & 
+     &   somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx), & 
+     &   gdsomvarrp(nregmx), & 
+     &   somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx), & 
+     &   gdsomtotp(nregmx),segt(nrmamx,nregmx), & 
+     &   vx(npmamx),vy(npmamx),ls,tgarde(4)
+
+!     arrays to hold copies of structures (r for "real")
+!     (if virtual structures are used)
+      integer :: rnstruc, rnpstru(strumx)
+      REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
+
+      LOGICAL racord, last
+      character lign80*80,nomstr(strumx)*80
+
+      REAL*8 stp0, stpmin
+      PARAMETER (stp0=0.01,stpmin=0.001)
+
+      integer :: isetup
+      logical dovirtualtargets
+      parameter (dovirtualtargets=.false.)
+
+!..Procedures
+!
+      INTRINSIC ABS,MIN,index
+      REAL*8 long
+      EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0, & 
+     &   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete, & 
+     &     trc_stk_in,trc_stk_out,long, & 
+     &     virtualtargets,virtuallimiters
+!======================================================================
+!.. nxmax,nymax: maximum number of the data points in x and y
+!.. gradmx: maximum number of points where the gradient vanishes
+!.. npxmx : maximum number of the X-points
+!.. nbdmx : maximum number of structures being the divertor targets
+!.. strumx: maximum number of structures
+!.. npstmx: maximum number of points per structure
+!.. npnimx: maximum number of tracing points on a curve
+!.. nivmx : maximum number of limiting level lines
+!.. npmamx: maximum number of grid points in poloidal direction
+!.. nrmamx: maximum number of grid points in radial direction
+!.. nregmx: maximum number of regions
+!.. cstlin: a linear constant added along y to artificially disconnect
+!           the X-points. Set to 0 for connected double-nulls
+!
+!.. nx,ny : number of data points in x and y
+!.. x,y   : tables of coordinates of the data points
+!.. psi   : psi values at each data point
+!.. psidx,psidy: values of psi derivatives in x and y
+!                at each data point
+!.. nstruc: number of structures
+!.. npstru: number of points per structure
+!.. xstruc,ystruc: coordinates of the structure points
+!                  (point index, structure index)
+!.. npxtot: number of the points where the gradient vanishes
+!.. pointx,pointy: coordinates of the points where the gradient
+!                  vanishes
+!.. ii,jj : x and y indices of the cells where the gradient vanishes
+!.. npx   : number of the X-points
+!.. ptx,pty: X-point co-ordinates
+!.. iptx,jptx: x and y indices of the cells containing the X-points
+!.. xpto,ypto: coordinates of the O-point
+!.. racord: determines whether the X-points are connected
+!.. fctpx: the psi values at each X- or O-point
+!.. separx,separy: coordinates of the points of the parametrised
+!               separatrices (point index, branch index, X-point index)
+!.. nptot : number of parametrisation points for each separatrix
+!           (separatrix index, point index)
+!.. ptsep : separatrix pointer, used as index
+!           (separatrix index, point index)
+!.. ptxint: index of the internal X-point in the case of disconnected
+!           double-null
+!.. nbdef : number of the divertor plates
+!.. inddef: table of indices of the divertor plates
+!.. indplq: table of the structure indices (0 means not a target)
+!           (separatrix index, X-point index)
+!.. nbniv : number of the limiting level lines
+!.. nivx,nivy: coordinates of the points of the parametrised
+!              limiting level lines (point index, curve index)
+!.. nivtot: number of points for each parametrised limiting level line
+!.. distnv: distance along a plate between the separatrix strike-point
+!           and a limiting level line
+!           (distance selector [1=real, 2=psi], curve index)
+!.. nreg  : number of the grid regions depending on the configuration
+!.. np1   : numbers of the grid points in poloidal direction
+!           (region index)
+!.. npr   : numbers of the grid points in radial direction
+!           (region index)
+!.. xmail,ymail: grid point coordinates
+!                (poloidal, radial, region)
+!.. xn,yn : working array for coordinates along a parametrised curve
+!.. nrelax: maximum number of iterations in the relaxation procedure
+!           of construction of the orthogonal grid
+!.. relax : relaxation parameter
+!.. stpmin: minimum tolerable distance between any two grid points
+!           in the course of relaxation
+!.. rlcept: convergence criterion in the relaxation procedure
+!.. limcfg: indicates when a limiter configuration is considered (when
+!           non zero). This variable is assigned the index of the
+!           limiter
+!     N.B.: When the limiter configuration is selected, npx is set equal
+!           to 1 and the coordinates of the X-point correspond to the
+!           innermost point of the limiter.
+!      GRAND ET PETIT RAYON
+!      sol: variable utilisée dans le cadre du maillage des régions
+!           périphériques. Si cette valeur=1 alors la région contient
+!           des courbes de niveau passant par ypto. On peut alors déterminer
+!           les grandeurs gdpsi,racpsi,gdr,r,a,rho.
+!      gdr: grand rayon (lecture des surfaces poloidales sur l'axe radial)
+!        r: petit rayon
+!        a: petit rayon de la séparatrice
+!       ra: différence entre la petit rayon de la séparatrice et le petit
+!           rayon d'une ligne de niveau.
+!      rho: rapport entre le ptit rayon de la séparatrice et le petit rayon
+!           d'une ligne de niveau.
+!  sensspe: sens correspondant à la fausse plaque pour le calcul des rayons.
+!
+
+!      QUALITE DE LA MAILLE GLOBALE
+!  les variables servent verifier la manière dont est quantifiee la qualité de
+!  la maille (mailrg)
+!    somort:(somme des orthogonalités avec ort1) valeur qui prend en compte
+!           l'orthogonalité, l'espace et la taille de deux cellules consecutives
+!           ainsi que la répartition des points nppol entre une ligne de niveau
+!           et celle qui la précède.
+!    somortp:(somme des orthogonalités poussée) cette valeur correspond au somort
+!           à la fin des itérations avec l'utilisation de ort2, le tout divisé par nppol.
+! les itérations fonctionnent correctement meme avec la deuxième ligne de niveau
+! donc non seulement l'instruction fonctionne car la fonction se rapproche de zéro
+! mais en plus elle n'est pas à l'origine de la déformation en zig-zag
+! (de toute facon si c était le cas, on le constaterait systematiquement donc c'est
+! plutot la géométrie, la géographie ainsi que la longueur des plaques et des lignes
+! de niveau qui deviennent les principaux suspects)
+!    gdsomortp:(grande somme des orthogonalités poussée) cette valeur correspond
+!             à l'ensemble des somortp sur une meme ligne de niveau que l'on
+!             divise par nppol (le but est d'avoir un indice de qualité de la région)
+! gdsomortp n'a pas grande signification et peut tromper sur la qualité de la ligne
+! de niveau. Il peut être utilisé pour comparer l'influence de chaque composante
+! de la fonction ort.
+
+!     INFLUENCE DE LA VRAIE ORTHOGONALITE SUR CLORT
+!     ortpur:(orthogonalité pure) cette valeur ne tient compte que de l'orthogonalité
+! ortpur peut prendre des valeurs un million de fois plus élévées que la somme des trois
+! critères donc il doit y avoir une atténuation dans le calcul de ort.
+!     propo: (proportionalité) cette valeur ne tient compte que de la proportionalité
+!     varr: (variance) cette valeur ne tient compte que de la variation de longueur
+!     des cellules de la maille pour trois cellules qui se suivent et sur une même ligne de niveau.
+!     tot:(total) correspond à la somme de ortpur, propo et varr. on verifie juste que tot = ort
+!     somortpur, sompropo, somvarr, somtot : correspondent aux sommes de ortpur, propo,
+!      varr et tot pour une ligne de niveau lors du premier déplacement des noeuds.
+!     somortpurp, sompropop, somvarrp, somtotp : correspondent aux sommes de ortpur,
+!      propo, varr et tot pour une ligne de niveau après les itérations.
+!     gdsomortpurp, gdsompropop, gdsomvarr et gdsomtotp: correspondent à la somme,
+!      sur toutes les lignes de niveau de la région de somortpur, sompropo, somvarr et somtotpt.
+
+
+!
+!..1.0  Initialisation des variables par defaut et de la bibliotheque
+!       graphique
+!
+      call defaut
+      CALL pltini
+      CALL cadre
+      CALL motifs
+!
+!..2.0  Open the data files
+!
+      OPEN(UNIT=7, FILE='rzpsi.dat', STATUS='old')
+      OPEN(UNIT=8, FILE='structure.dat', STATUS='old')
+      OPEN(UNIT=9, FILE='carre.dat', STATUS='unknown')
+      OPEN(UNIT=10,FILE='carre.out',STATUS='unknown')
+      open(unit=11,status='scratch')
+!
+!  2.1  specify output format
+      write(10,*)'output format: carre70'
+
+!
+!..3.0  Read the data
+101   CONTINUE
+
+!..Read the values of x
+
+100   format(a)
+
+      iflag=-1
+      rewind(7)
+      rewind(8)
+      rewind(9)
+      rewind(10)
+      call entete(7,'$r',iflag)
+      read(7,100)lign80
+      i=index(lign80,'=')
+      call rdfrin(11,lign80(i+1:80),nx,ierror)
+      READ(7,*) (x(i), i=1, nx)
+
+!..Read the values of y
+
+      call entete(7,'$z',iflag)
+      read(7,100)lign80
+      i=index(lign80,'=')
+      call rdfrin(11,lign80(i+1:80),ny,ierror)
+      READ(7,*) (y(i), i=1, ny)
+
+      rmax = 0.0
+      do i = 1, nx-1
+        rmax = max(rmax, (x(i+1)-x(i))**2)
+      enddo
+      zmax = 0.0
+      do i = 1, ny-1
+        zmax = max(zmax, (y(i+1)-y(i))**2)
+      enddo
+      eps_Xpt = sqrt(rmax+zmax)
+
+!..Read the values of psi
+
+      call entete(7,'$psi',iflag)
+      READ(7,*) ((psi(i,j), i=1, nx), j=1, ny)
+
+      DO 5 j=1,ny
+         DO 4 i=1,nx
+            psi(i,j) = psi(i,j) + MIN(cstlin*(y(j)-y(ny/2)),zero)
+    4    CONTINUE
+    5 CONTINUE
+!---
+!  ceci sert a modifier la symetrie haut-bas de psi, de facon ad hoc.
+!     write(6,*)'facteur de symetrie haut-bas'
+!     read(5,*)a00(1,1,1)
+!     do j=1,ny/2
+!     do i=1,nx
+!       xpto=psi(i,j)
+!       ypto=psi(i,ny-j+1)
+!       psi(i,j)=0.5*((1.+a00(1,1,1))*xpto+(1.-a00(1,1,1))*ypto)
+!       psi(i,ny-j+1)=0.5*((1.+a00(1,1,1))*ypto+(1.-a00(1,1,1))*xpto)
+!     enddo
+!     enddo
+!---
+      close(unit=7)
+
+!
+!..3.1  Read the structures.
+!
+      nstruc=0
+      call listru(8,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,strumx)
+
+!
+!..4.0  Calculate the first partial derivatives in x and y and store
+!       them in arrays psidx and psidy
+
+      CALL DERIVE(nx,ny,x,y,psi,psidx,psidy)
+
+!
+!..5.0  Plot the level lines for psidx=0 and psidy=0
+!
+      CALL cntour(psidx,psidy,nx,ny,x(1),x(nx),y(1),y(ny))
+!
+!  interpolation coefficients for psi and its derivatives
+
+      call inipsi(psi,psidx,psidy,x,y,nxmax,nymax,nx,ny,a00,a10,a01,a11)
+
+!
+!..6.0  Determine the points where the derivatives in x and y vanish
+!
+
+      CALL GRAD0(nxmax,nymax,nx,ny,x,y,gradmx,pointx, & 
+     &          pointy,ii,jj,npxtot,a00,a10,a01,a11)
+
+!
+!..7.0  Select the X-points of interest
+!
+
+!ank-970702: moved dimensions to the included file
+      CALL SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, & 
+     &            pty,iptx,jptx,xpto,ypto,racord,limcfg)
+
+!     when using virtual targets, needs two passes through the setup
+!     steps 8 to 10
+
+      do isetup = 1, 2
+!
+!..8.0  Parametrise the separatrices
+!
+      IF (npx.GT.0 .and. limcfg.eq.0) THEN
+!
+        CALL SPTRIS(nx,ny,x,y,psi,npx,ptx,pty, & 
+     &      iptx,jptx,fctpx,separx,separy,nptot, & 
+     &      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
+     &      a00,a10,a01,a11)
+
+!
+!..9.0  Arrange the separatrices
+!
+        CALL ARGSEP(npx,ptx,pty,fctpx,separx,separy,indplq,nptot,npnimx, & 
+     &            ptsep,racord,ptxint,ypto,nbdef,inddef)
+
+      ELSEIF(LIMCFG.NE.0) THEN
+!
+!  13.   Identify the limiter
+!
+        call limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot, & 
+     &      nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx, & 
+     &      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
+     &      a00,a10,a01,a11)
+
+      do itmp=1,4
+        ptsep(itmp,1) = 0
+      enddo
+
+      ENDIF
+
+      if(npx.gt.0) then
+!
+!..10.0  Find the level lines in more detail
+!
+!<<<
+      write(0,*) '=== carre *..10.0 - before frtier'
+      write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') ptx(1:npx)
+      write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') pty(1:npx)
+        if(limcfg.eq.0) then
+        write(0,*) 'nptot(4,nxpoints)'
+        write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
+        write(0,*) 'Strike points (presumably)'
+        write(0,'(3h x:,1p,8e12.4/(3x,8e12.4))') & 
+     &     ((separx(nptot(i,j),i,j),i=1,4),j=1,npx)
+        write(0,'(3h y:,1p,8e12.4/(3x,8e12.4))') & 
+     &     ((separy(nptot(i,j),i,j),i=1,4),j=1,npx)
+!>>>
+          call trc_stk_in('carre','*..10.0')
+          CALL FRTIER(nx,ny,x,y,psi,nstruc, & 
+     &      npstru,xstruc,ystruc,inddef,nbdef,npx,separx, & 
+     &      separy,nptot,ptsep,racord,nivx,nivy,nivtot, & 
+     &      nbniv,stp0,stpmin, & 
+     &      distnv,ptxint,a00,a10,a01,a11)
+          call trc_stk_out
+        endif
+
+        call trace2(x(1),x(nx),y(1),y(ny),separx,separy, & 
+     &        ptsep,npx,nptot, & 
+     &        nstruc,npstru,xstruc,ystruc, & 
+     &        nivx,nivy,nivtot,nbniv,pntrat, & 
+     &         distxo,xn,yn,nn1)
+
+        if ( .not. dovirtualtargets ) exit
+        if ( isetup == 2 ) exit
+
+!..10.0  Set up the virtual structure
+
+!..      Save current structures
+        rnstruc = nstruc
+        rnpstru = npstru
+        rxstruc = xstruc
+        rystruc = ystruc
+
+        nstruc = 0
+
+!..   10.1  Set up virtual targets
+
+        CALL VIRTUALTARGETS(nx,ny,x,y,psi,npx,ptx,pty, & 
+     &       fctpx,separx,separy,nptot, & 
+     &       rnstruc,rnpstru,rxstruc,rystruc,indplq,inddef,nbdef, & 
+     &       a00,a10,a01,a11,nstruc,npstru,xstruc,ystruc)
+
+!..   10.2  Set up virtual limiters
+
+        call VIRTUALLIMITERS(nivx,nivy,nivtot,nbniv,npx,ptx,pty, & 
+     &       nstruc,npstru,xstruc,ystruc)
+
+!..   10.2.1 Write out resulting structures
+
+        open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
+        do is = 1, nstruc
+           do ip = 1, abs(npstru( is ))
+              write (100,*) xstruc(ip,is)*1000, & 
+     &             ystruc(ip,is)*1000
+           enddo
+           write (100,*) ''
+        enddo
+        close(UNIT=100)
+
+      endif                     ! npx.gt.0
+
+      enddo                     ! end setup loop
+
+!
+!..12.0  Grid the regions
+!
+      if(npx.gt.0) then
+
+        CALL MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord, & 
+     &    separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
+     &    xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
+     &    np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv, & 
+     &    a00,a10,a01,a11,fctpx,limcfg,gdpsi,racpsi, & 
+     &    a,gdr,r,ra,rho,sol,somort,ir,nprad,ipol,somortp, & 
+     &    nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp, & 
+     &    sompropo, & 
+     &    sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp, & 
+     &    somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi, & 
+     &    ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
+
+!*
+!* WARNINGS CALCULATION AND OUTPUT
+!*
+!        if (npx.EQ.1) CALL WARNINGS(separx,separy,nivx,nivy,
+!     &  distnv(1,2),xpto,ypto)
+
+!
+!..13.0  Plot the structures, the separatrices, and the limiting level
+!        lines for each region, together with the resulting grid
+!
+        call trace(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
+     &           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv, & 
+     &           np1,npr,xmail,ymail,nreg,.false.)
+
+      endif ! nptx.gt.0
+
+!
+!.. Close the graphics
+!
+  111  CALL pltend
+
+      STOP
+      END
