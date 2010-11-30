@@ -85,17 +85,17 @@ module CarreDiagnostics
           ! somortpur, sompropo, somvarr, somtot : correspondent aux sommes de ortpur, propo,
           ! varr et tot pour une ligne de niveau lors du premier déplacement des noeuds.
           real(rKind) :: somortpur(nrmamx,nregmx), sompropo(nrmamx,nregmx), &
-               & somvarr(nrmamx,nregmx), somtot(nrmamx,nregmx)
+               & somvarr(nrmamx,nregmx)!, somtot(nrmamx,nregmx)
 
           ! somortpurp, sompropop, somvarrp, somtotp : correspondent aux sommes de ortpur,
           ! propo, varr et tot pour une ligne de niveau après les itérations.
           real(rKind) :: somortpurp(nrmamx,nregmx), sompropop(nrmamx,nregmx), &
-               & somvarrp(nrmamx,nregmx), somtotp(nrmamx,nregmx)
+               & somvarrp(nrmamx,nregmx)!, somtotp(nrmamx,nregmx)
        
           ! gdsomortpurp, gdsompropop, gdsomvarr et gdsomtotp: correspondent à la somme,
           ! sur toutes les lignes de niveau de la région de somortpur, sompropo, somvarr et somtotpt.
           real(rKind) :: gdsomortpurp(nregmx), gdsompropop(nregmx), &
-               & gdsomvarrp(nregmx), gdsomtotp(nregmx)
+               & gdsomvarrp(nregmx) !, gdsomtotp(nregmx)
 
 
   end type CarreDiag
@@ -125,15 +125,12 @@ contains
     diag%somortpur(:,irf:irt)=0.0
     diag%somvarr(:,irf:irt)=0.0
     diag%somvarrp(:,irf:irt)=0.0
-    diag%somtot(:,irf:irt)=0.0
-    diag%somtotp(:,irf:irt)=0.0
     diag%segt(:,irf:irt)=0.0
 
     diag%gdsomortp(irf:irt)=0.0
     diag%gdsompropop(irf:irt)=0.0
     diag%gdsomortpurp(irf:irt)=0.0
     diag%gdsomvarrp(irf:irt)=0.0
-    diag%gdsomtotp(irf:irt)=0.0
 
   end subroutine cdClear
     

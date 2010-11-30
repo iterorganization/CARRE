@@ -294,7 +294,7 @@
               call trace2(x(1),x(nx),y(1),y(ny), & 
      &     separx,separy,ptsep,npx,nptot, & 
      &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-     &         nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+     &         nivtot,nbniv)
 
             endif
             GO TO 3
@@ -1500,7 +1500,7 @@
             call trace2(x(1),x(nx),y(1),y(ny), & 
      &          separx,separy,ptsep,npx,nptot, & 
      &          nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-     &          nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+     &          nivtot,nbniv)
             endif
             GO TO 105
          else
@@ -2353,7 +2353,7 @@
 
       call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
      &        nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-     &        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+     &        nivtot,nbniv)
 
 
             endif

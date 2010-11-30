@@ -55,7 +55,7 @@
       CHARACTER*1 reponse
 
       REAL*8 :: ort1(npmamx), ort2(npmamx)
-      REAL*8 :: ortpur(npmamx),propo(npmamx),varr(npmamx),tot(npmamx)
+      REAL*8 :: ortpur(npmamx),propo(npmamx),varr(npmamx)
 
       integer :: ntt, sensspe
       REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
@@ -424,11 +424,12 @@
 !       distribution orthogonale
              call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
                   & maily(1,ir),ort1,nppol,pasmin,garde1,garde2,l0,l1, & 
-                  & ortpur,propo,varr,tot)
+                  & ortpur,propo,varr)
 !
 !  3.   on procede a un premier deplacement des noeuds
              l2(1)=zero
              l2(nppol)=l1(nppol)
+             diag%segt(ir,ireg)=l2(nppol)
              do ipol=ipol1,ipoln
                      if(ort1(ipol).gt.zero) then
                              l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol+1)
@@ -442,7 +443,6 @@
                      diag%somortpur(ir,ireg)= diag%somortpur(ir,ireg)+(ortpur(ipol)/nppol)
                      diag%sompropo(ir,ireg)= diag%sompropo(ir,ireg)+(propo(ipol)/nppol)
                      diag%somvarr(ir,ireg)= diag%somvarr(ir,ireg)+(varr(ipol)/nppol)
-                     diag%somtot(ir,ireg)= diag%somtot(ir,ireg)+(tot(ipol)/nppol)
              enddo
 !
 !  4.   on relaxe les points de facon iterative pour realiser la
@@ -452,7 +452,7 @@
 
                      call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
                           & maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2, & 
-                          & ortpur,propo,varr,tot)
+                          & ortpur,propo,varr)
                      ortmax=zero
                      do ipol=ipol1,ipoln
                              if(abs(ort2(ipol)).gt.rlcept) then
@@ -552,7 +552,6 @@
               diag%somortpurp(ir,ireg) = diag%somortpurp(ir,ireg)+(ortpur(ipol)/nppol)
               diag%sompropop(ir,ireg) = diag%sompropop(ir,ireg)+(propo(ipol)/nppol)
               diag%somvarrp(ir,ireg) = diag%somvarrp(ir,ireg)+(varr(ipol)/nppol)
-              diag%somtotp(ir,ireg) = diag%somtotp(ir,ireg)+(tot(ipol)/nppol)
               enddo
            endif
 
@@ -612,7 +611,6 @@
               diag%gdsomortpurp(ireg)=diag%gdsomortpurp(ireg)+(diag%somortpurp(ir,ireg)/(nprad-1))
               diag%gdsompropop(ireg)=diag%gdsompropop(ireg)+(diag%sompropop(ir,ireg)/(nprad-1))
               diag%gdsomvarrp(ireg)=diag%gdsomvarrp(ireg)+(diag%somvarrp(ir,ireg)/(nprad-1))
-              diag%gdsomtotp(ireg)=diag%gdsomtotp(ireg)+(diag%somtotp(ir,ireg)/(nprad-1))
       enddo
 
   888 CONTINUE

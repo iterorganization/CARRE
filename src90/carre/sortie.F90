@@ -244,11 +244,11 @@
 
          write(10,*)
          write(10,144)
-  144    format(t2,'ir',t8,'somtot',t24,'somtotp',t40,'segt')
+  144    format(t2,'ir',t40,'segt')
          DO ireg=1, nreg
             WRITE(10,107) ireg
             DO i=1, npr(ireg)
-                    WRITE(10,149) i,diag%somtot(i,ireg),diag%somtotp(i,ireg), & 
+                    WRITE(10,149) i, & 
                          & diag%segt(i,ireg)
             enddo
          enddo
@@ -263,7 +263,7 @@
          write(10,*)
          write(10,154)
   154    format(t2,'ireg',t8,'gdsomortp',t24,'gdsomortpurp', & 
-     &          t40,'gdsompropop',t56,'gdsomvarrp',t72,'gdsomtotp')
+     &          t40,'gdsompropop',t56,'gdsomvarrp')
          if(sellan(1:8).eq.'francais') then
            write(10,*) '$Totaux par region'
          elseif(sellan(1:7).eq.'english') then
@@ -272,7 +272,7 @@
 
          DO ireg=1, nreg
                  WRITE(10,169) ireg,diag%gdsomortp(ireg),diag%gdsomortpurp(ireg), & 
-                      & diag%gdsompropop(ireg),diag%gdsomvarrp(ireg),diag%gdsomtotp(ireg)
+                      & diag%gdsompropop(ireg),diag%gdsomvarrp(ireg)
          enddo
   169    FORMAT(i4,1p5E16.8)
 

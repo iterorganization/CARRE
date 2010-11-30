@@ -300,7 +300,7 @@
 !       distribution orthogonale
               call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
      &          maily(1,ir),ort1,nppol+1,pasmin,zero,zero,l0,l1, & 
-     &          ortpur,propo,varr,tot)
+     &          ortpur,propo,varr)
 !***
 !             print*,'point 3'
 !***
@@ -308,7 +308,7 @@
 !  3.   on procede a un premier deplacement des noeuds
               l2(1)=l1(1)
               l2(nppol+1)=l1(nppol+1)
-              !segt(ir)=l2(nppol)
+              diag%segt(ir,ireg)=l2(nppol)
               do ipol=ipol1,ipoln
                 if(ort1(ipol).gt.zero) then
                   l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol+1)
@@ -322,7 +322,6 @@
                 diag%somortpur(ir,ireg)= diag%somortpur(ir,ireg)+(ortpur(ipol)/nppol)
                 diag%sompropo(ir,ireg)= diag%sompropo(ir,ireg)+(propo(ipol)/nppol)
                 diag%somvarr(ir,ireg)= diag%somvarr(ir,ireg)+(varr(ipol)/nppol)
-                diag%somtot(ir,ireg)= diag%somtot(ir,ireg)+(tot(ipol)/nppol)
               enddo
 !***
 !             print*,'point 4'
@@ -335,7 +334,7 @@
 
                 call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
      &            maily(1,ir),ort2,nppol+1,pasmin,zero,zero,l0,l2, & 
-     &            ortpur,propo,varr,tot)
+     &            ortpur,propo,varr)
                 ortmax=zero
                 do ipol=ipol1,ipoln
                   if(abs(ort2(ipol)).gt.rlcept) then
@@ -443,7 +442,6 @@
                       diag%somortpurp(ir,ireg) = diag%somortpurp(ir,ireg)+(ortpur(ipol)/nppol)
                       diag%sompropop(ir,ireg) = diag%sompropop(ir,ireg)+(propo(ipol)/nppol)
                       diag%somvarrp(ir,ireg) = diag%somvarrp(ir,ireg)+(varr(ipol)/nppol)
-                      diag%somtotp(ir,ireg) = diag%somtotp(ir,ireg)+(tot(ipol)/nppol)
               enddo
 !             print*,'apres 19 continue'
 !***
@@ -505,7 +503,6 @@
               diag%gdsomortpurp(ireg)=diag%gdsomortpurp(ireg)+(diag%somortpurp(ir,ireg)/(nprad-1))
               diag%gdsompropop(ireg)=diag%gdsompropop(ireg)+(diag%sompropop(ir,ireg)/(nprad-1))
               diag%gdsomvarrp(ireg)=diag%gdsomvarrp(ireg)+(diag%somvarrp(ir,ireg)/(nprad-1))
-              diag%gdsomtotp(ireg)=diag%gdsomtotp(ireg)+(diag%somtotp(ir,ireg)/(nprad-1))
       enddo
       RETURN
       END
