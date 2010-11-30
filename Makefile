@@ -1,4 +1,4 @@
-#  VERSION : 27.07.97 22:41
+#  VERSION : --> see SVN
 
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
@@ -87,6 +87,9 @@ clean:
 neat:
 	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f
 
+runclean: 
+	@rm carre0*
+
 local:
 	-rm rzpsi.mtv rzpsi.ps map loadmap gnuplot.data gnuplot.cmd
 	-gtfl btor.dat structure.dat rzpsi.dat ncar.cfg gmeta fort.11 carre.out carre.log carre.dat warnings.dat traduit.log selptx.inf traduit.out 
@@ -141,26 +144,9 @@ listobj:
 	E="$$E -e 's/[ ]*//'"; \
 	EL90="$$EL90 -e 's/[ ]*//'"; \
 	EU90="$$EU90 -e 's/[ ]*//'"; \
-	echo "l=" $$l; \
-	echo "ll90=" $$ll90; \
-	echo "lu90=" $$lu90; \
-	echo "E=" $$E; \
-	echo "EL90=" $$EL90; \
-	echo "EU90=" $$EU90; \
 	echo "$$l" | eval sed "$$E" > LISTOBJ ; \
 	echo "$$ll90" | eval sed "$$EL90" >> LISTOBJ ; \
 	echo "$$lu90" | eval sed "$$EU90" >> LISTOBJ
-
-#	@rm -f LISTOBJ; touch LISTOBJ; l="OBJS ="; \
-#	for d in `echo "$(VPATH)" | tr : \ `; do \
-#		l="$$l `find $$d -name '*.F' -printf "%f "`"; \
-#		l="$$l `find -L $$d -name '*.F90' -printf "%f "`"; \
-#		l="$$l `find -L $$d -name '*.f90' -printf "%f "`"; \
-#	done; \
-#	E="-e 's/\.F90/\.o/g' -e 's/\.f90/\.o/g' -e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
-#		E="$$E -e 's/ $$f//'"; \
-#	done; \
-#	echo "$$l" | eval sed "$$E" > LISTOBJ
 
 LISTOBJ: listobj
 
