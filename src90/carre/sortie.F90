@@ -1,11 +1,13 @@
       SUBROUTINE SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
      &    deltrn,pntrat,tgarde,distxo,repart,xmail,ymail, & 
      &    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero, & 
-     &    fctpx)
+     &    fctpx,diag)
 !
 !  version : 07.07.97 19:08
 !
 !======================================================================
+      use CarreDiagnostics
+
       IMPLICIT NONE
 
 !..  Cette sous-routine imprime les resultats dans un fichier de sortie:
@@ -25,6 +27,8 @@
      &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
      &     ptx(npx+1),pty(npx+1),fctpx(npx+1)
       logical racord
+      type(CarreDiag), intent(in) :: diag
+
 
 !  variables en common
 #include <COMRLX.F>
@@ -83,7 +87,7 @@
             endif
          endif
 !
-!..Ecriture des parametres qui pouront servir au le prochain essai.
+!..Ecriture des parametres qui pouront servir au prochain essai.
          if(sellan(1:8).eq.'francais') then
            write(10,*)'$parametres'
          elseif(sellan(1:7).eq.'english') then
@@ -180,6 +184,103 @@
   210      format('$end')
          endif
 
+         write(10,*)
+         write(10,*) 'a= ',diag%a(1)
+         write(10,124)
+  124    format(t2,'ir',t8,'gdpsi',t24,'racpsi',t40,'gdr', & 
+     &          t56,'r',t72,'rho',t88,'ra')
+         if(sellan(1:8).eq.'francais') then
+           write(10,*) '$Coordonnees'
+         elseif(sellan(1:7).eq.'english') then
+           write(10,*) '$Flux surface labels'
+         endif
+
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+                    WRITE(10,129) i,diag%gdpsi(i,ireg),diag%racpsi(i,ireg), & 
+                         & diag%gdr(i,ireg),diag%r(i,ireg),&
+                         & diag%rho(i,ireg),diag%ra(i,ireg)
+           enddo
+         enddo
+  129    FORMAT(i2,1p6E16.8)
+
+         if(sellan(1:8).eq.'francais') then
+           WRITE(10,110)
+         elseif(sellan(1:7).eq.'english') then
+           write(10,210)
+         endif
+
+         write(10,*)
+         write(10,164)
+  164    format(t2,'ir',t8,'somort',t24,'somortp',t40,'somortpur', & 
+     &          t56,'somortpurp')
+         if(sellan(1:8).eq.'francais') then
+           write(10,*) '$Qualite des surfaces de maille'
+         elseif(sellan(1:7).eq.'english') then
+           write(10,*) '$Flux surface quality indices'
+         endif
+
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+                    WRITE(10,139) i,diag%somort(i,ireg),diag%somortp(i,ireg), & 
+                         & diag%somortpur(i,ireg),diag%somortpurp(i,ireg)
+            enddo
+         enddo
+  139    FORMAT(i2,1p4E16.8)
+
+         write(10,*)
+         write(10,134)
+  134    format(t2,'ir',t8,'sompropo',t24,'sompropop',t40,'somvarr', & 
+     &          t56,'somvarrp')
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+                    WRITE(10,139) i,diag%sompropo(i,ireg),diag%sompropop(i,ireg), & 
+                         & diag%somvarr(i,ireg),diag%somvarrp(i,ireg)
+            enddo
+         enddo
+
+         write(10,*)
+         write(10,144)
+  144    format(t2,'ir',t8,'somtot',t24,'somtotp',t40,'segt')
+         DO ireg=1, nreg
+            WRITE(10,107) ireg
+            DO i=1, npr(ireg)
+                    WRITE(10,149) i,diag%somtot(i,ireg),diag%somtotp(i,ireg), & 
+                         & diag%segt(i,ireg)
+            enddo
+         enddo
+  149    FORMAT(i2,1p3E16.8)
+
+         if(sellan(1:8).eq.'francais') then
+           WRITE(10,110)
+         elseif(sellan(1:7).eq.'english') then
+           write(10,210)
+         endif
+
+         write(10,*)
+         write(10,154)
+  154    format(t2,'ireg',t8,'gdsomortp',t24,'gdsomortpurp', & 
+     &          t40,'gdsompropop',t56,'gdsomvarrp',t72,'gdsomtotp')
+         if(sellan(1:8).eq.'francais') then
+           write(10,*) '$Totaux par region'
+         elseif(sellan(1:7).eq.'english') then
+           write(10,*) '$Totals per region'
+         endif
+
+         DO ireg=1, nreg
+                 WRITE(10,169) ireg,diag%gdsomortp(ireg),diag%gdsomortpurp(ireg), & 
+                      & diag%gdsompropop(ireg),diag%gdsomvarrp(ireg),diag%gdsomtotp(ireg)
+         enddo
+  169    FORMAT(i4,1p5E16.8)
+
+         if(sellan(1:8).eq.'francais') then
+           WRITE(10,110)
+         elseif(sellan(1:7).eq.'english') then
+           write(10,210)
+         endif
       ENDIF
 
       RETURN

@@ -1,6 +1,7 @@
 
 !***********************************************************************
-      subroutine clort(x1,y1,x2,y2,ort,nppol,pasmin,g1,g2,l0,l2)
+      subroutine clort(x1,y1,x2,y2,ort,nppol,pasmin,g1,g2,l0,l2, & 
+     &         ortpur,propo,varr,tot)
 !***********************************************************************
       implicit none
 !  calcul des fonctions qui s'annulent quand deux series de points sont
@@ -9,7 +10,9 @@
 !  arguments
       integer nppol
       real*8 x1(nppol),y1(nppol),x2(nppol),y2(nppol),ort(nppol),pasmin, & 
-     &  g1,g2,l0(nppol),l2(nppol)
+     &  g1,g2,l0(nppol),l2(nppol),ortpur(nppol),propo(nppol), & 
+     &  varr(nppol), & 
+     &  tot(nppol)
 !
 !  x1, y1: coordonnees des points de maille de reference (sur la courbe
 !          precedente
@@ -59,11 +62,20 @@
           cs2=cs2/(l2p*l12)
           cs3=cs3/(l1m*l12)
           cs4=cs4/(l1p*l12)
-          ort(i)= & 
-     &       cs2+cs3-cs1-cs4 & 
-     &      -((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2) & 
-     &      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2) & 
-     &      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
+          
+          ortpur(i)=cs2+cs3-cs1-cs4
+          propo(i)= - ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2) & 
+               &      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
+          varr(i)= 1e34*(pasmin/(l2(i)-l2(i-1)))**2- & 
+               &             (pasmin/(l2(i+1)-l2(i)))**2
+          tot(i)= ortpur(i) + propo(i) + varr(i)
+
+          ort(i)=tot(i)
+!!$          ort(i)= & 
+!!$               &       cs2+cs3-cs1-cs4 & 
+!!$               &      -((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2) & 
+!!$               &      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2) & 
+!!$               &      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
 
         enddo
       else
@@ -86,10 +98,18 @@
           cs2=cs2/(l2p*l12)
           cs3=cs3/(l1m*l12)
           cs4=cs4/(l1p*l12)
-          ort(i)= & 
-     &       cs2+cs3-cs1-cs4 & 
-     &      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
+!!$          ort(i)= & 
+!!$     &       cs2+cs3-cs1-cs4 & 
+!!$     &      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
 
+          ortpur(i)=cs2+cs3-cs1-cs4
+          propo(i)=  ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2) & 
+     &      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
+          varr(i)= (pasmin/(l2(i)-l2(i-1)))**2- & 
+     &             (pasmin/(l2(i+1)-l2(i)))**2
+          tot(i)= ortpur(i) + varr(i)
+          
+          ort(i) = tot(i)
         enddo
       endif
 !

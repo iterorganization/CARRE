@@ -1,13 +1,15 @@
       SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, & 
-     &            plaque,x2,y2,nx,ny,x,y,psi,nstruc,npstru, & 
+     &            plaque,x2,y2,nx,ny,x,y,psi,xpto,ypto,nstruc,npstru, & 
      &            xstruc,ystruc,a00,a10,a01,a11, & 
      &            repart,gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2, & 
-     &            xnlast,ynlast,nnlast,nuldec)
+     &            xnlast,ynlast,nnlast,nuldec,solregion,diag,ireg)
 !
 !  version : 07.07.97 19:11
 !
 !======================================================================
       use CarreSiloIO
+      use CarreDiagnostics
+      use SiloIO
 
       IMPLICIT NONE
 
@@ -21,7 +23,7 @@
 
 !  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad & 
-     &        ,plaque,repart,nbcrb,npcrb2,nnlast
+     &        ,plaque,repart,nbcrb,npcrb2,nnlast,ireg
 
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), & 
      &     ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), & 
@@ -29,8 +31,12 @@
      &     a00(nxmax,nymax,3),a10(nxmax,nymax,3),a01(nxmax,nymax,3), & 
      &     a11(nxmax,nymax,3),gardd1,gardd2, & 
      &     xcrb2(npcrb2),ycrb2(npcrb2),xnlast(nnlast),ynlast(nnlast)
+      REAL*8 :: xpto, ypto
 
       LOGICAL nuldec
+      logical solregion ! is region part of SOL?
+
+      type(CarreDiag), intent(inout) :: diag
 
 !  variables en common
 
@@ -42,19 +48,27 @@
       INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,ipol,i,nn(2), & 
      &  ig1,ig2,npcrb(2)
       REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2, & 
-     &       epsiln,xn(npnimx,2),yn(npnimx,2),dd1,dd2,gard1,gard2 & 
-     &       ,fctini,fctnew
+     &       epsiln,xn(npnimx,2),yn(npnimx,2),dd1,dd2,gard1,gard2, & 
+     &       fctini,fctnew
       PARAMETER(zero=0.,epsmai=1.e-6,epsiln=1.E-08)
       REAL*8 xcrb(npnimx,2),ycrb(npnimx,2)
       CHARACTER*1 reponse
 
+      REAL*8 :: ort1(npmamx), ort2(npmamx)
+      REAL*8 :: ortpur(npmamx),propo(npmamx),varr(npmamx),tot(npmamx)
+
+      integer :: ntt, sensspe
+      REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
+
+
+
 !  procedures
-      INTEGER indsgm,ifind
+      INTEGER indsgm,ifind,drctio
       REAL*8 aazero,long,nulort,ruban
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort, & 
-     &         UNTANG,SAUTE,chgdir,in,cross,ruban,clort
+     &         UNTANG,SAUTE,chgdir,in,cross,ruban,clort,drctio
 !======================================================================
 !..calculs
 !
@@ -63,6 +77,9 @@
 
       garde1=gardd1
       garde2=gardd2
+	
+      ! clear diagnostic values for this region
+      call cdClearRegion( diag, ireg )
 
 !..S'il y a deux courbes a ne pas traverser alors on definit la deuxieme
 
@@ -86,9 +103,6 @@
 
       nn(1)=nn1
       ll=long(xn(1,1),yn(1,1),nn(1))
-!***
-!     print*,'nbcrb, ll=',nbcrb,ll
-!***
 
 !..Calcul de la fonction pour le premier point de la courbe de reference
 
@@ -99,9 +113,6 @@
      &       a01(ii,jj,1)*yn(1,1) + a11(ii,jj,1)*xn(1,1)*yn(1,1)
 
       valfct=fctini
-!***
-!     print*,'valfct=',valfct
-!***
 
 !
 !  calcul des indices de garde
@@ -120,6 +131,47 @@
         if(d1.lt.garde1) ig1=ipol+1
         if(ll-d1.ge.garde2) ig2=ipol
 12    continue
+
+        
+      ! compute psi at o-point
+      ii = ifind(xpto,x,nx,1)
+      jj = ifind(ypto,y,ny,1)
+      fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto + a11(ii,jj,1)*xpto*ypto
+
+      ! la valeur du sol est précisé dans 'maille' selon l'indice de région et la configuration
+      ! sol = 1 indicates an SOL region
+      if (solregion) then
+
+              ! on place un faux segment qui sert d'appui à saute
+              xtt(1)= xpto-0.1
+              ytt(1)= ypto
+              xtt(2)= x(nx)
+              ytt(2)= ypto
+              xtt(3)= xtt(1)
+              ytt(3)= ytt(1)
+              ntt=3
+
+              ! la variable de sens est dedoublée pour ne pas pertuber la valeur du sens qui
+              ! correspond à la plaque
+
+              sensspe=1
+              CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sensspe, & 
+                   & 2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+              
+              !..Calcul des longueurs
+              diag%gdpsi(1,ireg)=1.0
+              diag%racpsi(1,ireg)=1.0
+              diag%gdr(1,ireg)=x22
+              diag%r(1,ireg)=x22-xpto
+              diag%a(ireg)=diag%r(1,ireg)
+              diag%ra(1,ireg)= diag%r(1,ireg)-diag%a(ireg)
+              diag%rho(1,ireg)=diag%r(1,ireg)/diag%a(ireg)
+              
+              fctanc=valfct
+      else
+              diag%gdpsi(1,ireg)=1.0
+              diag%racpsi(1,ireg)=1.0
+      endif
 
       DO 25 ir=2, nprad
 
@@ -156,8 +208,6 @@
 
             mailx(1,ir)=xnlast(1)
             maily(1,ir)=ynlast(1)
-
-            GO TO 17
 
          ENDIF
 
@@ -310,9 +360,26 @@
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
-   17    CONTINUE
+!.. Calcul de grand psi
+         diag%gdpsi(ir,ireg)= (valfct-fctxo)/(fctini-fctxo)
+         diag%racpsi(ir,ireg)= sqrt(diag%gdpsi(ir,ireg))
 
-!..Definition de xn2 et yn2 pour le bloc common comfort.
+         if (solregion) then
+                 x1 = diag%gdr(ir-1,ireg)
+                 y1=ypto
+                 sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
+                 CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe, & 
+                      & repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+
+                 !..Calcul des longueurs
+                 
+                 diag%gdr(ir,ireg)=x23
+                 diag%r(ir,ireg)=x23-xpto
+                 diag%ra(ir,ireg)=diag%r(ir,ireg)-diag%a(ireg)
+                 diag%rho(ir,ireg)=diag%r(ir,ireg)/diag%a(ireg)
+         endif
+
+!..Definition de xn2 et yn2 pour le bloc common comort.
 
          DO 18 ipas=1,nn(inouv)
             xn2(ipas)=xn(ipas,inouv)
@@ -356,55 +423,66 @@
 !  2.   on initialise la fonction qui doit s'annuler pour une
 !       distribution orthogonale
              call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-     &         maily(1,ir),ort1,nppol,pasmin,garde1,garde2,l0,l1)
+                  & maily(1,ir),ort1,nppol,pasmin,garde1,garde2,l0,l1, & 
+                  & ortpur,propo,varr,tot)
 !
 !  3.   on procede a un premier deplacement des noeuds
-               l2(1)=zero
-               l2(nppol)=l1(nppol)
-               do ipol=ipol1,ipoln
-                 if(ort1(ipol).gt.zero) then
-                   l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol+1)
-                 else
-                   l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol-1)
-                 endif
-                 call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol), & 
-     &             mailx(ipol,ir),maily(ipol,ir))
-               enddo
+             l2(1)=zero
+             l2(nppol)=l1(nppol)
+             do ipol=ipol1,ipoln
+                     if(ort1(ipol).gt.zero) then
+                             l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol+1)
+                     else
+                             l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol-1)
+                     endif
+                     call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol), & 
+                          & mailx(ipol,ir),maily(ipol,ir))
+                     
+                     diag%somort(ir,ireg)= diag%somort(ir,ireg)+(ort1(ipol)/nppol)
+                     diag%somortpur(ir,ireg)= diag%somortpur(ir,ireg)+(ortpur(ipol)/nppol)
+                     diag%sompropo(ir,ireg)= diag%sompropo(ir,ireg)+(propo(ipol)/nppol)
+                     diag%somvarr(ir,ireg)= diag%somvarr(ir,ireg)+(varr(ipol)/nppol)
+                     diag%somtot(ir,ireg)= diag%somtot(ir,ireg)+(tot(ipol)/nppol)
+             enddo
 !
 !  4.   on relaxe les points de facon iterative pour realiser la
 !       meilleure orthogonalite possible
              do i=1,nrelax
-               call csioSetRelax( i )
+                     call csioSetRelax( i )
 
-               call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-     &           maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2)
-               ortmax=zero
-               do ipol=ipol1,ipoln
-                 if(abs(ort2(ipol)).gt.rlcept) then
-                   del=-ort2(ipol)*(l2(ipol)-l1(ipol)) & 
-     &                            /(ort2(ipol)-ort1(ipol))
-                   if(del.gt.zero) then
-                     del=min(del,relax*(l2(ipol+1)-l2(ipol)))
-                   else
-                     del=max(del,relax*(l2(ipol-1)-l2(ipol)))
-                   endif
-                   if(del.ne.zero) then
-                     l1(ipol)=l2(ipol)
-                     ort1(ipol)=ort2(ipol)
-                     l2(ipol)=l1(ipol)+del
-                   endif
-                   call coord(xn(1,inouv),yn(1,inouv),nn(inouv), & 
-     &               l2(ipol),mailx(ipol,ir),maily(ipol,ir))
-                 endif
-                 ortmax=max(ortmax,abs(ort2(ipol)))
-               enddo
+                     call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
+                          & maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2, & 
+                          & ortpur,propo,varr,tot)
+                     ortmax=zero
+                     do ipol=ipol1,ipoln
+                             if(abs(ort2(ipol)).gt.rlcept) then
+                                     del=-ort2(ipol)*(l2(ipol)-l1(ipol)) & 
+                                          & /(ort2(ipol)-ort1(ipol))
+                                     if(del.gt.zero) then
+                                             del=min(del,relax*(l2(ipol+1)-l2(ipol)))
+                                     else
+                                             del=max(del,relax*(l2(ipol-1)-l2(ipol)))
+                                     endif
+                                     if(del.ne.zero) then
+                                             l1(ipol)=l2(ipol)
+                                             ort1(ipol)=ort2(ipol)
+                                             l2(ipol)=l1(ipol)+del
+                                     endif
+                                     call coord(xn(1,inouv),yn(1,inouv),nn(inouv), & 
+                                          & l2(ipol),mailx(ipol,ir),maily(ipol,ir))
+                             endif
+                             ortmax=max(ortmax,abs(ort2(ipol)))
+                     enddo
 
-               ! write out current grid status
-               csio FIXME
-               mailx(1, 1:ir), maily(1, 1:ir)
+                     ! write out current grid status
+                     call csioOpenFile()
+                     call siloWriteQuadGrid( csioDbfile, 'region', &
+                          & nppol, ir, &
+                          & mailx(1:nppol, 1:ir), maily(1:nppol, 1:ir) )
 
-               if(ortmax.le.rlcept) go to 19
+                     if(ortmax.le.rlcept) go to 19
              enddo
+
              if(sellan(1:8).eq.'francais') then
                print*, & 
      &          'L''algorithme adaptatif d''optimisation de '// & 
@@ -469,6 +547,13 @@
      &          'carefully upon completion !'
              endif
  19          continue
+             do ipol=ipol1,ipoln
+              diag%somortp(ir,ireg)= diag%somortp(ir,ireg)+ (ort2(ipol)/nppol)
+              diag%somortpurp(ir,ireg) = diag%somortpurp(ir,ireg)+(ortpur(ipol)/nppol)
+              diag%sompropop(ir,ireg) = diag%sompropop(ir,ireg)+(propo(ipol)/nppol)
+              diag%somvarrp(ir,ireg) = diag%somvarrp(ir,ireg)+(varr(ipol)/nppol)
+              diag%somtotp(ir,ireg) = diag%somtotp(ir,ireg)+(tot(ipol)/nppol)
+              enddo
            endif
 
          else
@@ -522,5 +607,14 @@
 !---
    25 CONTINUE
 
+      do ir=2,nprad
+              diag%gdsomortp(ireg)=diag%gdsomortp(ireg)+(diag%somortp(ir,ireg)/(nprad-1))
+              diag%gdsomortpurp(ireg)=diag%gdsomortpurp(ireg)+(diag%somortpurp(ir,ireg)/(nprad-1))
+              diag%gdsompropop(ireg)=diag%gdsompropop(ireg)+(diag%sompropop(ir,ireg)/(nprad-1))
+              diag%gdsomvarrp(ireg)=diag%gdsomvarrp(ireg)+(diag%somvarrp(ir,ireg)/(nprad-1))
+              diag%gdsomtotp(ireg)=diag%gdsomtotp(ireg)+(diag%somtotp(ir,ireg)/(nprad-1))
+      enddo
+
+  888 CONTINUE
       RETURN
       END

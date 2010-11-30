@@ -2,11 +2,15 @@
      &               x2,y2,xfin,yfin,fctini,nx,ny,x,y,psi, & 
      &               nstruc,npstru,xstruc,ystruc, & 
      &               a00,a10,a01,a11,repart,xptxo,yptxo,xpto,ypto, & 
-     &               nivx,nivy,nivtot,nbniv,distxo)
+     &               nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !
 !  version : 07.07.97 18:47
 !
 !======================================================================
+      use SiloIO
+      use CarreDiagnostics
+      use CarreSiloIO
+
       IMPLICIT NONE
 
 !..  Cette sous-routine fait le maillage curviligne orthogonal dans
@@ -24,7 +28,7 @@
 
 !  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc), & 
-     &  nn1,nppol,nprad,repart,nivtot(nivmx),nbniv
+     &  nn1,nppol,nprad,repart,nivtot(nivmx),nbniv,ireg
 
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), & 
      &  ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), & 
@@ -34,6 +38,8 @@
      &  xptxo,yptxo,xpto,ypto,nivx(npnimx,nivmx), & 
      &  nivy(npnimx,nivmx),pntrat,distxo
 
+      type(CarreDiag), intent(inout) :: diag
+
 !  variables locales
       INTEGER ipas,indstr,ianc,inouv,ii,jj,ir,dir,ipol,i,nn(2),nt,sens & 
      &        ,npcrb(2),plaque
@@ -42,6 +48,12 @@
       PARAMETER(zero=0.,epsmai=1.e-6)
       REAL*8 xcrb(npnimx,2),ycrb(npnimx,2)
       CHARACTER*1 reponse
+
+      REAL*8 :: ort1(npmamx), ort2(npmamx)
+      REAL*8 :: ortpur(npmamx),propo(npmamx),varr(npmamx),tot(npmamx)
+
+      integer :: ntt
+      REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
 
 !  procedures
       INTEGER ifind
@@ -69,6 +81,9 @@
 
 !..Initialisation.
 
+      ! clear diagnostic values for this region
+      call cdClearRegion( diag, ireg )
+
       plaque=0
 
       DO 10 i=1,nn1
@@ -77,6 +92,9 @@
    10 CONTINUE
 
       nn(1)=nn1
+!.. On prepare une structure artificielle pour trouver la distance
+!.. horizontale vers l'exterieur entre le point O et la separatrice
+!.. soit le petit rayon a du plasma
 
       IF (repart .EQ. 2) THEN
 
@@ -92,7 +110,34 @@
 
       ENDIF
 
+      ii = ifind(xpto,x,nx,1)
+      jj = ifind(ypto,y,ny,1)
+      fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto + & 
+     &       a11(ii,jj,1)*xpto*ypto
+      xtt(1)= xpto-0.1
+      ytt(1)= ypto
+      xtt(2)= x(nx)
+      ytt(2)=ypto
+      xtt(3)=xtt(1)
+      ytt(3)=ytt(1)
+      ntt=3
+      sens=1
+      CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sens, & 
+     &            2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+
+!..Calcul des longueurs
+
+      diag%gdpsi(1,ireg)=1.0
+      diag%racpsi(1,ireg)=1.0
+      diag%gdr(1,ireg)=x22
+      diag%r(1,ireg)=x22-xpto
+      diag%a(ireg)=diag%r(1,ireg)
+      diag%ra(1,ireg)= diag%r(1,ireg)-diag%a(ireg)
+      diag%rho(1,ireg)=diag%r(1,ireg)/diag%a(ireg)
+
       DO 25 ir=2, nprad
+
+        call csioSetSurface( ir )
 
 !---
         print*,'ir=',ir
@@ -126,6 +171,7 @@
 
           ENDIF
 
+          fctanc=valfct
 !..Parametrisation de la ligne de niveau qui passe par ce point.
 
           xn(1,inouv)=x2
@@ -183,6 +229,22 @@
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
+!.. Calcul de grand psi
+
+          diag%gdpsi(ir,ireg)= (valfct-fctxo)/(fctini-fctxo)
+          diag%racpsi(ir,ireg)= sqrt(diag%gdpsi(ir,ireg))
+          sens=2
+        x1 = diag%gdr(ir-1,ireg)
+        y1=ypto
+          CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens, & 
+     &               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+
+!..Calcul des longueurs
+
+          diag%gdr(ir,ireg)=x23
+          diag%r(ir,ireg)=x23-xpto
+          diag%ra(ir,ireg)=diag%r(ir,ireg)-diag%a(ireg)
+          diag%rho(ir,ireg)=diag%r(ir,ireg)/diag%a(ireg)
 !..Le dernier point de la courbe est egal au premier.
 
           xn(nn(inouv),inouv)=xn(1,inouv)
@@ -237,7 +299,8 @@
 !  2.   initialisation de la fonction qui doit s'annuler pour une
 !       distribution orthogonale
               call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-     &          maily(1,ir),ort1,nppol+1,pasmin,zero,zero,l0,l1)
+     &          maily(1,ir),ort1,nppol+1,pasmin,zero,zero,l0,l1, & 
+     &          ortpur,propo,varr,tot)
 !***
 !             print*,'point 3'
 !***
@@ -245,6 +308,7 @@
 !  3.   on procede a un premier deplacement des noeuds
               l2(1)=l1(1)
               l2(nppol+1)=l1(nppol+1)
+              !segt(ir)=l2(nppol)
               do ipol=ipol1,ipoln
                 if(ort1(ipol).gt.zero) then
                   l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol+1)
@@ -253,6 +317,12 @@
                 endif
                 call coord1(xn(1,inouv),yn(1,inouv),nn(inouv), & 
      &            l2(ipol),mailx(ipol,ir),maily(ipol,ir),period)
+
+                diag%somort(ir,ireg)= diag%somort(ir,ireg)+(ort1(ipol)/nppol)
+                diag%somortpur(ir,ireg)= diag%somortpur(ir,ireg)+(ortpur(ipol)/nppol)
+                diag%sompropo(ir,ireg)= diag%sompropo(ir,ireg)+(propo(ipol)/nppol)
+                diag%somvarr(ir,ireg)= diag%somvarr(ir,ireg)+(varr(ipol)/nppol)
+                diag%somtot(ir,ireg)= diag%somtot(ir,ireg)+(tot(ipol)/nppol)
               enddo
 !***
 !             print*,'point 4'
@@ -261,8 +331,11 @@
 !  4.   on relaxe les points de facon iterative pour realiser la
 !       meilleure orthogonalite possible
               do i=1,nrelax
+                call csioSetRelax( i )
+
                 call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-     &            maily(1,ir),ort2,nppol+1,pasmin,zero,zero,l0,l2)
+     &            maily(1,ir),ort2,nppol+1,pasmin,zero,zero,l0,l2, & 
+     &            ortpur,propo,varr,tot)
                 ortmax=zero
                 do ipol=ipol1,ipoln
                   if(abs(ort2(ipol)).gt.rlcept) then
@@ -283,6 +356,13 @@
                   endif
                   ortmax=max(ortmax,abs(ort2(ipol)))
                 enddo
+
+                ! write out current grid status                
+                call csioOpenFile()
+                call siloWriteQuadGrid( csioDbfile, 'region', &
+                     & nppol, ir, &
+                     & mailx(1:nppol, 1:ir), maily(1:nppol, 1:ir) )
+
                 if(ortmax.le.rlcept) go to 19
 !***
 !               print*,'point 5'
@@ -358,7 +438,13 @@
               endif
 !***
  19           continue
-!***
+              do ipol=ipol1,ipoln
+                      diag%somortp(ir,ireg)= diag%somortp(ir,ireg)+ (ort2(ipol)/nppol)
+                      diag%somortpurp(ir,ireg) = diag%somortpurp(ir,ireg)+(ortpur(ipol)/nppol)
+                      diag%sompropop(ir,ireg) = diag%sompropop(ir,ireg)+(propo(ipol)/nppol)
+                      diag%somvarrp(ir,ireg) = diag%somvarrp(ir,ireg)+(varr(ipol)/nppol)
+                      diag%somtotp(ir,ireg) = diag%somtotp(ir,ireg)+(tot(ipol)/nppol)
+              enddo
 !             print*,'apres 19 continue'
 !***
 
@@ -400,6 +486,7 @@
 !***
 !
 !  on definit la frontiere interieure
+!..On remet la periode a zero.
       if(pntrat.lt.distxo) then
         nbniv=nbniv+1
         nivtot(nbniv)=nn(inouv)
@@ -413,5 +500,12 @@
 
       period=zero
 
+      do ir=2,nprad
+              diag%gdsomortp(ireg)=diag%gdsomortp(ireg)+(diag%somortp(ir,ireg)/(nprad-1))
+              diag%gdsomortpurp(ireg)=diag%gdsomortpurp(ireg)+(diag%somortpurp(ir,ireg)/(nprad-1))
+              diag%gdsompropop(ireg)=diag%gdsompropop(ireg)+(diag%sompropop(ir,ireg)/(nprad-1))
+              diag%gdsomvarrp(ireg)=diag%gdsomvarrp(ireg)+(diag%somvarrp(ir,ireg)/(nprad-1))
+              diag%gdsomtotp(ireg)=diag%gdsomtotp(ireg)+(diag%somtotp(ir,ireg)/(nprad-1))
+      enddo
       RETURN
       END

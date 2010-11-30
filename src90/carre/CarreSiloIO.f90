@@ -12,10 +12,10 @@ module CarreSiloIO
   include "CARREDIM.F"
   
   integer :: iReg = 0, iSurf = 0, iRelax = 0
-  integer :: dbfile
+  integer :: csioDbfile
   logical :: fileopen = .false.
 
-  character(5+2+4+5), save :: filename = 'carre01000100001'
+  character(5+2+3+5), save :: filename = 'carre0100100001'
 
   integer :: csioStrucNSeg
   real(rKind), allocatable, dimension(:,:,:) :: csioStrucSegments
@@ -25,22 +25,27 @@ module CarreSiloIO
   public csioSetRegion, csioSetSurface, csioSetRelax, csioSetFilename, csioGetStructureSegments
   public csioStrucNSeg, csioStrucSegments
 
+  public csioDbfile
+
 contains
  
   subroutine csioOpenFile()
 
+    call csioCloseFile()
+
     call csioSetFilename()    
-    call siloOpen( filename, dbfile )
-    
+    call siloOpen( filename, csioDbfile )
+    fileopen = .true.
+
     if ( allocated( csioStrucSegments ) ) then
-            call siloWriteLineSegmentGrid( dbfile, "structure", csioStrucNSeg, csioStrucSegments )            
+            call siloWriteLineSegmentGrid( csioDbfile, "structure", csioStrucNSeg, csioStrucSegments )            
     end if
 
   end subroutine csioOpenFile
 
   subroutine csioCloseFile()
     if ( fileopen ) then 
-            call siloClose( dbfile )
+            call siloClose( csioDbfile )
             fileopen = .false.
     end if
   end subroutine csioCloseFile
@@ -68,7 +73,7 @@ contains
 
 
   subroutine csioSetFilename()
-    write ( filename, '(a5,i2.2,i4.4,i5.5)' ) 'carre', ireg, isurf, irelax
+    write ( filename, '(a5,i2.2,i3.3,i5.5)' ) 'carre', ireg, isurf, irelax
   end subroutine csioSetFilename
 
 

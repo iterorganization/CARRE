@@ -17,6 +17,7 @@
 !*** parametrises the separatrices passing through them, and traces
 !*** them together with the real structures.
 !======================================================================
+      use CarreDiagnostics
       use CarreSiloIO
 
       IMPLICIT NONE
@@ -35,6 +36,7 @@
 
 !ank-970702: moved dimensions to the CARREDIM.F
 #include <CARREDIM.F>
+#include <COMLAN.F>
       REAL*8 cstlin,zero,eps_Xpt,rmax,zmax
       common /geom/ eps_Xpt
       PARAMETER (cstlin=0.00, zero=0.)
@@ -57,6 +59,9 @@
      &   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3), & 
      &   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3)
 
+	! diagonstic output
+	type(CarreDiag) :: diag
+
 !     arrays to hold copies of structures (r for "real")
 !     (if virtual structures are used)
       integer :: rnstruc, rnpstru(strumx)
@@ -76,7 +81,7 @@
 !
       INTRINSIC ABS,MIN,index
       EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0, & 
-     &   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,entete, & 
+     &   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete, & 
      &     trc_stk_in,trc_stk_out, & 
      &     virtualtargets,virtuallimiters
 !======================================================================
@@ -152,6 +157,9 @@
 !     N.B.: When the limiter configuration is selected, npx is set equal
 !           to 1 and the coordinates of the X-point correspond to the
 !           innermost point of the limiter.
+!
+! For description of diagnostic output, see CarreDiagnostic.F90.
+!
 !======================================================================
 !
 !..1.0  Initialisation des variables par defaut et de la bibliotheque
@@ -181,6 +189,10 @@
 
 100   format(a)
       iflag=-1
+      rewind(7)
+      rewind(8)
+      rewind(9)
+      rewind(10)
       call entete(7,'$r',iflag)
       read(7,100)lign80
       i=index(lign80,'=')
@@ -237,10 +249,7 @@
       call listru(8,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,strumx)
 
       call csioGetStructureSegments( nstruc, npstru, xstruc, ystruc, csioStrucNSeg, csioStrucSegments )
-      call csioOpenFile()
 
-      call csioCloseFile()
-      stop
 !
 !..4.0  Calculate the first partial derivatives in x and y and store
 !       them in arrays psidx and psidy
@@ -312,8 +321,8 @@
 !
 !<<<
       write(0,*) '=== carre *..10.0 - before frtier'
-      write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') (ptx(i),i=1,npx)
-      write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') (pty(i),i=1,npx)
+      write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') ptx(1:npx)
+      write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') pty(1:npx)
         if(limcfg.eq.0) then
         write(0,*) 'nptot(4,nxpoints)'
         write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
@@ -331,6 +340,11 @@
      &      distnv,ptxint,a00,a10,a01,a11)
           call trc_stk_out
         endif
+
+        call trace2(x(1),x(nx),y(1),y(ny),separx,separy, & 
+     &        ptsep,npx,nptot, & 
+     &        nstruc,npstru,xstruc,ystruc, & 
+     &        nivx,nivy,nivtot,nbniv)
 
         if ( .not. dovirtualtargets ) exit
         if ( isetup == 2 ) exit
@@ -382,7 +396,7 @@
      &    separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
      &    xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
      &    np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv, & 
-     &    a00,a10,a01,a11,fctpx,limcfg)
+     &    a00,a10,a01,a11,fctpx,limcfg,diag)
 
 !*
 !* WARNINGS CALCULATION AND OUTPUT

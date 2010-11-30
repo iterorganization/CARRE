@@ -2,8 +2,8 @@
      &     separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
      &     xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
      &     np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv, & 
-     &     a00,a10,a01,a11,fctpx,limcfg)
-!
+     &     a00,a10,a01,a11,fctpx,limcfg,diag)
+  !
 !  version : 23.06.98 19:53
 !
 !======================================================================
@@ -13,15 +13,17 @@
 !*** various possible magnetic configurations (single null,
 !*** connected double null, disconnected double null, or limiter)
 !======================================================================
+    
       use CarreSiloIO
-
+      use CarreDiagnostics
+  
       IMPLICIT NONE
-
-!ank-970707: dimensions from the file
-!  dimensions
+  
+      !ank-970707: dimensions from the file
+      !  dimensions
 #include <CARREDIM.F>
 
-!  arguments
+      !  arguments
       INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint, & 
      &        nstruc,npstru(nstruc),nreg,inddef(4), & 
      &        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg
@@ -34,12 +36,13 @@
      &  nivx(npnimx,nivmx),nivy(npnimx,nivmx),fctpx(npx+1), & 
      &  a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
      &  a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+      type(CarreDiag), intent(inout) :: diag
 
-!  variables en common
+      !  variables en common
 #include <COMLAN.F>
 #include <COMRLX.F>
 
-!  variables locales
+      !  variables locales
       INTEGER nptseg(10),isep,ipas,ireg,ipx,sens,nn,idef, & 
      &  repart,nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
      &  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
@@ -47,19 +50,20 @@
      &  deltr1(10),deltrn(10),xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
      &  dpmax(10),drmin(10),drmax(10),xfin,yfin,tgarde(4),gardd1, & 
      &  gardd2,xptxo,yptxo,distxo,xint,yint,xext,yext,psiint, & 
-     &  psiext,xptxex,yptxex,bouclx,boucly,ll
+     &  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
       REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10), & 
      &  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx) & 
      &  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx), & 
      &  ynlast(npnimx)
       CHARACTER*3 rep
       LOGICAL nuldec, correct
+      integer :: nn1
 
-!  procedures
+      !  procedures
       INTEGER drctio,horair,ifind
       REAL*8 long,plqdst,ruban
       EXTERNAL long,COORD,drctio,horair,ifind,LECCLE,lecclf,DOUBLD, & 
-     &         ruban,plqdst & 
+     &         ruban,plqdst,trace3 & 
      &        ,trc_stk_in,trc_stk_out
       intrinsic max
 !=========================
@@ -245,6 +249,26 @@
      &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
      &             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
+!..Initialise the primary level line
+
+         nn1=0
+
+         DO ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+         end do	
+
+! on colle la dernière ligne de niveau sur trace2 pour avoir
+! la pénétration.
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
+     &        ptsep,npx,nptot, & 
+     &        nstruc,npstru,xstruc,ystruc, & 
+     &        nivx,nivy,nivtot,nbniv, & 
+     &         pntrat,distxo,xn,yn,nn1, & 
+     &         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
+     &         a00,a01,a10,a11,psi,nx,ny,x,y)
          if (correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -261,8 +285,18 @@
 
             ient = 5
             isor = 6
+            pntrat_old = pntrat
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
      &                  pntrat,tgarde,distxo,ient,isor,ifail)
+            if (pntrat.ne.pntrat_old) then
+              call endpag
+
+              call trace2(x(1),x(nx),y(1),y(ny), & 
+     &     separx,separy,ptsep,npx,nptot, & 
+     &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+     &         nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+
+            endif
             GO TO 3
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
@@ -275,7 +309,7 @@
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
      &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
 
 !..1.2  Distribute the points along separatrices
 
@@ -382,10 +416,10 @@
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
      &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &              x,y,psi,nstruc,npstru,xstruc,ystruc, & 
+     &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
      &              a00,a10,a01,a11,repart, & 
      &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &              ynlast,nnlast,nuldec)
+     &              ynlast,nnlast,nuldec,.true.,diag,ireg)
 
 !
 !  1.3.2  region 2
@@ -456,11 +490,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &              x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &              a00,a10,a01,a11,repart, & 
-     &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &              ynlast,nnlast,nuldec)
+              &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &              a00,a10,a01,a11,repart, & 
+              &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &              ynlast,nnlast,nuldec,.false.,diag,ireg)
 !
 !  1.3.3  region 3
 
@@ -507,7 +541,7 @@
      &       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &       a00,a10,a01,a11,repart, & 
-     &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
+     &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !----------------------------------------------------------------------
 
       ELSE IF ((npx.EQ.2) .AND. (racord)) THEN
@@ -684,7 +718,7 @@
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
      &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
 
 !..2.2  Distribute the points along separatrices
 
@@ -815,10 +849,10 @@
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
      &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
+     &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
      &               a00,a10,a01,a11,repart, & 
      &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+     &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
 !
 !..2.3.2 Region 2: top PFR
@@ -889,11 +923,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
 !
 !..2.3.3 Region 3: left
@@ -978,11 +1012,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
 
 !..2.3.4 Region 4: bottom PFR
@@ -1054,11 +1088,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
 !
 !..2.3.5  Region 5: central region
@@ -1117,7 +1151,7 @@
      &       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &       a00,a10,a01,a11,repart, & 
-     &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
+     &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !----------------------------------------------------------------------
 
       ELSE IF ((npx.EQ.2) .AND. (.NOT.(racord))) THEN
@@ -1429,6 +1463,23 @@
      &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
      &             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
+!..Initialise the primary level line
+
+         nn1=0
+
+         DO 381 ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+  381    CONTINUE
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
+     &        ptsep,npx,nptot, & 
+     &        nstruc,npstru,xstruc,ystruc, & 
+     &        nivx,nivy,nivtot,nbniv, & 
+     &         pntrat,distxo,xn,yn,nn1, & 
+     &         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
+     &         a00,a01,a10,a11,psi,nx,ny,x,y)
          if (correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -1444,6 +1495,13 @@
             isor = 6
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
      &                  pntrat,tgarde,distxo,ient,isor,ifail)
+            if (pntrat.ne.pntrat_old) then
+            call endpag
+            call trace2(x(1),x(nx),y(1),y(ny), & 
+     &          separx,separy,ptsep,npx,nptot, & 
+     &          nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+     &          nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+            endif
             GO TO 105
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
@@ -1456,7 +1514,7 @@
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
      &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
 
 !..3.2  Distribute the points along separatrices
 
@@ -1572,6 +1630,8 @@
 
 !..3.3.1 Region 1: between the separatrices
 
+        ireg=1
+        print*, 'ireg=', ireg
          nbcrb = 2
 
 !.. The second boundary
@@ -1721,11 +1781,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
 !..Arangement of the mesh point which must coinside with outer X-point
 
@@ -1834,11 +1894,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
 !..3.3.3 Region 3: top PFR
 
@@ -1909,11 +1969,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
 
 !..3.3.4 Region 4: left
@@ -2009,11 +2069,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
 !..3.3.5 Region 5: bottom PFR
 
@@ -2083,11 +2143,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec)
+              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &               a00,a10,a01,a11,repart, & 
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
 !..3.3.6  Region 6: central region
 
@@ -2140,7 +2200,7 @@
      &      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &      a00,a10,a01,a11,repart, & 
-     &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
+     &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !----------------------------------------------------------------------
 
       ELSE IF (limcfg.eq.1) THEN
@@ -2255,6 +2315,23 @@
      &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
      &             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
+!..Initialise the primary level line
+
+         nn1=0
+
+         DO 391 ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+  391    CONTINUE
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
+     &        ptsep,npx,nptot, & 
+     &        nstruc,npstru,xstruc,ystruc, & 
+     &     nivx,nivy,nivtot,nbniv, & 
+     &           pntrat,distxo,xn,yn,nn1, & 
+     &           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
+     &           a00,a01,a10,a11,psi,nx,ny,x,y)
          if(correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -2270,6 +2347,16 @@
             isor = 6
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
      &                  pntrat,tgarde,distxo,ient,isor,ifail)
+            if (pntrat.ne.pntrat_old) then
+            call endpag
+
+
+      call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
+     &        nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+     &        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+
+
+            endif
             GO TO 203
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
@@ -2282,7 +2369,7 @@
 
          CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
      &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx)
+     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
 
 !..4.2  Distribute the points along separatrices
 
@@ -2371,11 +2458,11 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &              x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &              a00,a10,a01,a11,repart, & 
-     &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &              ynlast,nnlast,nuldec)
+              &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
+              &              a00,a10,a01,a11,repart, & 
+              &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+              &              ynlast,nnlast,nuldec,.false.,diag,ireg)
 
 !..4.3.2  Region 2
 
@@ -2423,7 +2510,7 @@
      &      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &      a00,a10,a01,a11,repart, & 
-     &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo)
+     &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 
 !       ...
       ENDIF
@@ -2433,7 +2520,7 @@
 
       CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,deltrn, & 
      &  pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx)
+     &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx,diag)
 
 !c<<<
 !      write(0,*) '<=== Leaving maille'
