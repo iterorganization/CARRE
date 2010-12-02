@@ -77,9 +77,10 @@ contains
   end subroutine csioSetFilename
 
 
-  !> Write a line segment grid
-  !> Segments: dim. 1: segment index, dim. 2: 1 = start point, 2 = end point, dim. 3: 1 = x coordinate, 2 = y coordinate
 
+  !> Get a description of a line segment grid as expected by siloWriteLineSegmentGrid
+  !> Segments: dim. 1: segment index, dim. 2: 1 = x coordinate, 2 = y coordinate, dim. 3: 1 = start point, 2 = end point,
+  
   subroutine csioGetStructureSegments( nstruc, npstru, xstruc, ystruc, nSeg, segments )
     integer, intent(in) :: nstruc
     integer, intent(in), dimension(strumx) :: npstru
@@ -101,8 +102,8 @@ contains
             do ip = 1, abs(npstru( is )) - 1
                     ic = ic + 1
                     segments(ic,1,1) = xstruc(ip,is)
-                    segments(ic,1,2) = ystruc(ip,is)
-                    segments(ic,2,1) = xstruc(ip + 1, is)
+                    segments(ic,2,1) = ystruc(ip,is)
+                    segments(ic,1,2) = xstruc(ip + 1, is)
                     segments(ic,2,2) = ystruc(ip + 1, is)
             end do
     end do
