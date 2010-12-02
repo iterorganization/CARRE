@@ -49,8 +49,20 @@
       REAL*8 xcrb(npnimx,2),ycrb(npnimx,2)
       CHARACTER*1 reponse
 
+      ! ort1,2: for current radial surface
+      ! ort1: grid optimization function for first distribution of points
+      ! ort2: grid optimization function for current distribution of points
       REAL*8 :: ort1(npmamx), ort2(npmamx)
-      REAL*8 :: ortpur(npmamx),propo(npmamx),varr(npmamx),tot(npmamx)
+      ! individual contributions to the grid optimization function for current
+      ! radial surface (i.e. individual components of ort1,2)
+      ! ortpur: orthogonality function,
+      ! propo: proportional distribution w.r.t. separatrix,
+      ! varr: minimal distance between points
+      REAL*8 :: ortpur(npmamx),propo(npmamx),varr(npmamx)
+
+      ! cort,cortpur/propo/varr: optimization function + individual contributions for final
+      ! grid point distribution for all grid nodes placed up to now
+      REAL*8 :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx),cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
 
       integer :: ntt
       REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
@@ -301,6 +313,14 @@
               call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
      &          maily(1,ir),ort1,nppol+1,pasmin,zero,zero,l0,l1, & 
      &          ortpur,propo,varr)
+
+              ! collect optimization function for all surfaces
+              cort(1:nppol,ir) = ort1(1:nppol)
+              cortpur(1:nppol,ir) = ortpur(1:nppol)
+              cpropo(1:nppol,ir) = propo(1:nppol)
+              cvarr(1:nppol,ir) = varr(1:nppol)
+
+
 !***
 !             print*,'point 3'
 !***
@@ -335,6 +355,13 @@
                 call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
      &            maily(1,ir),ort2,nppol+1,pasmin,zero,zero,l0,l2, & 
      &            ortpur,propo,varr)
+
+                ! collect optimization function for all surfaces
+                cort(1:nppol,ir) = ort2(1:nppol)
+                cortpur(1:nppol,ir) = ortpur(1:nppol)
+                cpropo(1:nppol,ir) = propo(1:nppol)
+                cvarr(1:nppol,ir) = varr(1:nppol)
+
                 ortmax=zero
                 do ipol=ipol1,ipoln
                   if(abs(ort2(ipol)).gt.rlcept) then
@@ -356,11 +383,33 @@
                   ortmax=max(ortmax,abs(ort2(ipol)))
                 enddo
 
-                ! write out current grid status                
+                ! write out current grid status
+                
+                ! entire grid created so far
                 call csioOpenFile()
-                call siloWriteQuadGrid( csioDbfile, 'region', &
+                call siloWriteQuadGrid( csioDbfile, "region", &
                      & nppol, ir, &
                      & mailx(1:nppol, 1:ir), maily(1:nppol, 1:ir) )
+
+                call siloWriteQuadData( csioDbfile,  "region", "cort", &
+                     & cort(1:nppol, 1:ir), DB_NODECENT )
+                call siloWriteQuadData( csioDbfile,  "region", "cortpur", &
+                     & cortpur(1:nppol, 1:ir), DB_NODECENT )
+                call siloWriteQuadData( csioDbfile,  "region", "cpropo", &
+                     & cpropo(1:nppol, 1:ir), DB_NODECENT )
+                call siloWriteQuadData( csioDbfile,  "region", "cvarr", &
+                     & cvarr(1:nppol, 1:ir), DB_NODECENT )
+
+                ! only current flux surface
+                call siloWriteLineSegmentGridFromPoints( csioDbfile, "currentsurface", mailx(1:nppol,ir), maily(1:nppol,ir) )
+                call siloWriteUMData( csioDbfile,  "currentsurface", "ort", &
+                     & siloExpandSegmentData( ort2(1:nppol) ), DB_NODECENT )
+                call siloWriteUMData( csioDbfile,  "currentsurface", "ortpur", &
+                     & siloExpandSegmentData( ortpur(1:nppol) ), DB_NODECENT )
+                call siloWriteUMData( csioDbfile,  "currentsurface", "propo", &
+                     & siloExpandSegmentData( propo(1:nppol) ), DB_NODECENT )
+                call siloWriteUMData( csioDbfile,  "currentsurface", "varr", &
+                     & siloExpandSegmentData( varr(1:nppol) ), DB_NODECENT )
 
                 if(ortmax.le.rlcept) go to 19
 !***
