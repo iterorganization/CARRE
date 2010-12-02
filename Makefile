@@ -10,8 +10,8 @@ INCLUDE = -I${SRCDIR}/include
 
 
 # Libraries from usol
-#USOLLIBDIR = ./usol/lib/${OBJECTCODE}
-USOLLIBDIR = /home/hajo/workspace-local/lib/OBJECTCODE/${OBJECTCODE}
+USOLLIBDIR = ./usol/lib/${OBJECTCODE}
+#USOLLIBDIR = /home/hajo/workspace-local/lib/OBJECTCODE/${OBJECTCODE}
 
 # SILO
 INCLUDE += -I${USOLLIBDIR}/silo/include

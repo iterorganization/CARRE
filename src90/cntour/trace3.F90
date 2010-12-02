@@ -12,7 +12,8 @@
 
 !ank-970707: dimensions from the file
 !  dimensions
-
+#include <CARREDIM.F>    
+      
 !
 !  arguments
       integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, & 
