@@ -166,9 +166,11 @@
 !       graphique
 !
       call defaut
+
       CALL pltini
       CALL cadre
       CALL motifs
+
 !
 !..2.0  Open the data files
 !

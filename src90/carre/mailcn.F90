@@ -383,10 +383,13 @@
                   ortmax=max(ortmax,abs(ort2(ipol)))
                 enddo
 
+#ifdef USE_SILO
+                ! TODO: maybe move this into a subroutine in CarreSiloIO
                 ! write out current grid status
                 
                 ! entire grid created so far
                 call csioOpenFile()
+                
                 call siloWriteQuadGrid( csioDbfile, "region", &
                      & nppol, ir, &
                      & mailx(1:nppol, 1:ir), maily(1:nppol, 1:ir) )
@@ -410,6 +413,7 @@
                      & siloExpandSegmentData( propo(1:nppol) ), DB_NODECENT )
                 call siloWriteUMData( csioDbfile,  "currentsurface", "varr", &
                      & siloExpandSegmentData( varr(1:nppol) ), DB_NODECENT )
+#endif                
 
                 if(ortmax.le.rlcept) go to 19
 !***

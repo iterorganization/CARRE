@@ -34,18 +34,24 @@ contains
     call csioCloseFile()
 
     call csioSetFilename()    
+#ifdef USE_SILO           
     call siloOpen( filename, csioDbfile )
+#endif
     fileopen = .true.
 
     if ( allocated( csioStrucSegments ) ) then
+#ifdef USE_SILO           
             call siloWriteLineSegmentGrid( csioDbfile, "structure", csioStrucNSeg, csioStrucSegments )            
+#endif
     end if
 
   end subroutine csioOpenFile
 
   subroutine csioCloseFile()
     if ( fileopen ) then 
+#ifdef USE_SILO           
             call siloClose( csioDbfile )
+#endif
             fileopen = .false.
     end if
   end subroutine csioCloseFile

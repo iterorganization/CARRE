@@ -3,15 +3,42 @@
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
 
+# Source form: src is old fixed form source (no longer maintained), src90 is current free form source
 SRCDIR = src90
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy:${SRCDIR}/usol
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCDIR}/fcrr
 INCLUDE = -I${SRCDIR}/include
 
+ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+EXCLUDELIS = carre.o tradui.o fcrr.o fcrblkd.o
 
+# *************************************************************
+# ITM-CARRE
+# If we're compiling for the ITM, we don't want any utility executables and graphics output
+# But we want the UAL library
+ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
+NOUSE_MSCL = -DNOUSE_MSCL
+USE_NCARG = 
+USE_SILO = 
+
+
+EXCLUDELIS +=
+ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre
+VPATH = ${SRCDIR}/carre:${SRCDIR}/itmcarre:${SRCDIR}/usol
+endif
+# *************************************************************
+# NCAR graphics, used for runtime plotting
+ifeq ($(USE_NCARG),-DUSE_NCARG)
+EXCLUDELIS += bidon.o
+else
+VPATH +=:${SRCDIR}/dummy
+endif
+# *************************************************************
+# SILO/VisIt graphics output
+# Set up HDF5 and SILO libraries only if specifically requested
+ifeq ($(USE_SILO),-DUSE_SILO)
 # Libraries from usol
 USOLLIBDIR = ./usol/lib/${OBJECTCODE}
-#USOLLIBDIR = /home/hajo/workspace-local/lib/OBJECTCODE/${OBJECTCODE}
 
 # SILO
 INCLUDE += -I${USOLLIBDIR}/silo/include
@@ -20,19 +47,21 @@ USOLLIBS += -L${USOLLIBDIR}/silo/lib -lsiloh5
 # HDF5
 INCLUDE += -I${USOLLIBDIR}/hdf5/include
 USOLLIBS += -L${USOLLIBDIR}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
+VPATH += :${SRCDIR}/usol
+endif
+# *************************************************************
 
+include LISTOBJ
+
+# Bring in compiler-specific configuration (moved here because we need the *USE_* variables set up properly)
 include config/compiler.${OBJECTCODE}
 ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no ),yes)
 include config.local/compiler.${OBJECTCODE}
 endif
 
-EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o silotest.o
-
-include LISTOBJ
-
 DEST = $(OBJS:%.o=$(OBJECTCODE)/%.o) $(OBJSL90:%.o=$(OBJECTCODE)/%.o) $(OBJSU90:%.o=$(OBJECTCODE)/%.o)
 MAINLIST = $(EXCLUDELIS:.=\.)
-LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
+#LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJECTCODE)/%.o : %.F
 	- /bin/rm -f ${OBJECTCODE}/$*.f
@@ -59,11 +88,15 @@ $(OBJECTCODE)/%.o : %.f90
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
-all: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+all: ${ALLTARGETS}
 
 ${OBJECTCODE}/carre: ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a
 	rm -f ${OBJECTCODE}/carre 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJECTCODE}/carre ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
+
+${OBJECTCODE}/itmcarre: ${OBJECTCODE}/itmcarre.o ${OBJECTCODE}/libcarre.a
+	rm -f ${OBJECTCODE}/carre 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/itmcarre ${OBJECTCODE}/itmcarre.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
 
 ${OBJECTCODE}/silotest: ${OBJECTCODE}/silotest.o ${OBJECTCODE}/libcarre.a
 	rm -f ${OBJECTCODE}/silotest 2>/dev/null; \
@@ -82,7 +115,7 @@ ${OBJECTCODE}/libcarre.a: ${DEST}
 	ranlib $@
 
 clean:
-	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f ${OBJECTCODE}/*.f90 ${OBJECTCODE}/*.mod ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 
 neat:
 	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f
@@ -126,6 +159,7 @@ update:
 	cd $(SOLPSTOP); gmake update
 
 listobj:
+	echo ${VPATH}
 	@rm -f LISTOBJ; touch LISTOBJ ; \
 	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${VPATH}" | tr : \ `; do \

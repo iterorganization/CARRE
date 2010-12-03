@@ -269,6 +269,7 @@
      &         pntrat,distxo,xn,yn,nn1, & 
      &         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
      &         a00,a01,a10,a11,psi,nx,ny,x,y)
+
          if (correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -289,9 +290,10 @@
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
      &                  pntrat,tgarde,distxo,ient,isor,ifail)
             if (pntrat.ne.pntrat_old) then
-              call endpag
 
-              call trace2(x(1),x(nx),y(1),y(ny), & 
+            call endpag
+
+            call trace2(x(1),x(nx),y(1),y(ny), & 
      &     separx,separy,ptsep,npx,nptot, & 
      &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
      &         nivtot,nbniv)
@@ -1480,6 +1482,7 @@
      &         pntrat,distxo,xn,yn,nn1, & 
      &         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
      &         a00,a01,a10,a11,psi,nx,ny,x,y)
+
          if (correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -1496,8 +1499,8 @@
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
      &                  pntrat,tgarde,distxo,ient,isor,ifail)
             if (pntrat.ne.pntrat_old) then
-            call endpag
-            call trace2(x(1),x(nx),y(1),y(ny), & 
+               call endpag
+               call trace2(x(1),x(nx),y(1),y(ny), & 
      &          separx,separy,ptsep,npx,nptot, & 
      &          nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
      &          nivtot,nbniv)
@@ -2325,13 +2328,14 @@
             yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
   391    CONTINUE
 
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
+            call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
      &        ptsep,npx,nptot, & 
      &        nstruc,npstru,xstruc,ystruc, & 
      &     nivx,nivy,nivtot,nbniv, & 
      &           pntrat,distxo,xn,yn,nn1, & 
      &           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
      &           a00,a01,a10,a11,psi,nx,ny,x,y)
+
          if(correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -2348,14 +2352,10 @@
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
      &                  pntrat,tgarde,distxo,ient,isor,ifail)
             if (pntrat.ne.pntrat_old) then
-            call endpag
-
-
-      call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-     &        nivtot,nbniv)
-
-
+                    call endpag
+                    call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
+                         & nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+                         & nivtot,nbniv)           
             endif
             GO TO 203
          else
