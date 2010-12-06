@@ -7,7 +7,9 @@
 !  version : 07.07.97 18:47
 !
 !======================================================================
+#ifdef USE_SILO
       use SiloIO
+#endif
       use CarreDiagnostics
       use CarreSiloIO
 

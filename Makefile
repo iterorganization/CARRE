@@ -10,7 +10,8 @@ VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCD
 INCLUDE = -I${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
-EXCLUDELIS = carre.o tradui.o fcrr.o fcrblkd.o
+EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o 
+MAINLIST = carre.o tradui.o fcrr.o fcrblkd.o 
 
 # *************************************************************
 # ITM-CARRE
@@ -21,15 +22,23 @@ NOUSE_MSCL = -DNOUSE_MSCL
 USE_NCARG = 
 USE_SILO = 
 
-
-EXCLUDELIS +=
+EXCLUDELIST +=
 ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre
 VPATH = ${SRCDIR}/carre:${SRCDIR}/itmcarre:${SRCDIR}/usol
+
+#SCHEMAS_O = ${filter-out ${EXCLUDELIST},\
+#  ${addsuffix .o,\
+#    ${addprefix ${OBJECTCODE}/,\
+#      ${filter-out *,\
+#        ${basename \
+#	  ${notdir \
+#            ${shell echo src/schemas/*.[fF] src/schemas/*.[fF]90}}}}}}}
+
 endif
 # *************************************************************
 # NCAR graphics, used for runtime plotting
 ifeq ($(USE_NCARG),-DUSE_NCARG)
-EXCLUDELIS += bidon.o
+EXCLUDELIST += bidon.o
 else
 VPATH +=:${SRCDIR}/dummy
 endif
@@ -48,8 +57,11 @@ USOLLIBS += -L${USOLLIBDIR}/silo/lib -lsiloh5
 INCLUDE += -I${USOLLIBDIR}/hdf5/include
 USOLLIBS += -L${USOLLIBDIR}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
 VPATH += :${SRCDIR}/usol
+else
+EXCLUDELIST += SiloIO.o
 endif
 # *************************************************************
+
 
 include LISTOBJ
 
@@ -60,7 +72,6 @@ include config.local/compiler.${OBJECTCODE}
 endif
 
 DEST = $(OBJS:%.o=$(OBJECTCODE)/%.o) $(OBJSL90:%.o=$(OBJECTCODE)/%.o) $(OBJSU90:%.o=$(OBJECTCODE)/%.o)
-MAINLIST = $(EXCLUDELIS:.=\.)
 #LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJECTCODE)/%.o : %.F
@@ -130,7 +141,7 @@ local:
 tags:
 	rm TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
-depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} ${EXCLUDELIST:.o=.F90}
+depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} 
 	makedepend -f ${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJECTCODE}/dependencies.${OBJECTCODE} ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak
 	sed -e '3,$$s/^\.\.\/${SRCDIR}\/[^\/]*\///' ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak | \
@@ -138,16 +149,18 @@ depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} ${EXCLUDELIST:.o=.F9
 	@for d in `echo "${VPATH}" | tr : \ `; do \
 		dirfiles=`find -L $$d/ -name '*.f90'` ; \
 		if [ -n "$$dirfiles" ] ; then \
-			grep -i '^[[:space:]]*use ' $$d/*.f90 /dev/null | grep -v 'IGNORE' | awk '{sub(".f90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 			for f in `find -L $$d -name '*.f90' -printf "%f "`; do \
+				${CPP} ${DEFINES} -P -C ${INCLUDE} $$d/$$f ${OBJECTCODE}/$$f; \
+				grep -i '^[[:space:]]*use ' ${OBJECTCODE}/$$f /dev/null | grep -v 'IGNORE' | awk '{sub(".f90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 				line='$${OBJECTCODE}/'"`echo $$f | tr A-Z a-z | sed -e 's/.f90/.mod/'`:"'$${OBJECTCODE}/'"`echo $$f | sed -e 's/.f90/.o/'`";\
 				echo $$line >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 			done \
 		fi ; \
 		dirfiles=`find -L $$d/ -name '*.F90'` ; \
 		if [ -n "$$dirfiles" ] ; then \
-			grep -i '^[[:space:]]*use ' $$d/*.F90 /dev/null | grep -v 'IGNORE' | awk '{sub(".F90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 			for f in `find -L $$d -name '*.F90' -printf "%f "`; do \
+				${CPP} ${DEFINES} -P -C ${INCLUDE} $$d/$$f ${OBJECTCODE}/$$f; \
+				grep -i '^[[:space:]]*use ' ${OBJECTCODE}/$$f /dev/null | grep -v 'IGNORE' | awk '{sub(".F90",".o",$$1);sub("^.*/","$${OBJECTCODE}/",$$1); print $$1,"$${OBJECTCODE}/"$$3".o"}' >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 				line='$${OBJECTCODE}/'"`echo $$f | tr A-Z a-z | sed -e 's/.f90/.mod/'`:"'$${OBJECTCODE}/'"`echo $$f | sed -e 's/.F90/.o/'`";\
 				echo $$line >> ${OBJECTCODE}/dependencies.${OBJECTCODE} ;\
 			done \
@@ -169,7 +182,7 @@ listobj:
 	E="-e 's/\*.F//g' -e 's/\.F/\.o/g'" ; \
 	EL90="-e 's/\*.f90//g' -e 's/\.f90/\.o/g'" ; \
 	EU90="-e 's/\*.F90//g' -e 's/\.F90/\.o/g'" ; \
-	for f in ${MAINLIST}; do \
+	for f in ${EXCLUDELIST}; do \
 		E="$$E -e 's/ $$f//'"; \
 		EL90="$$EL90 -e 's/ $$f//'"; \
 		EU90="$$EU90 -e 's/ $$f//'"; \

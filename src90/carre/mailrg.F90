@@ -9,7 +9,9 @@
 !======================================================================
       use CarreSiloIO
       use CarreDiagnostics
+#ifdef USE_SILO
       use SiloIO
+#endif
 
       IMPLICIT NONE
 

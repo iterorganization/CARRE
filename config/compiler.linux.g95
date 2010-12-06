@@ -1,16 +1,27 @@
+
+DEFINES 	= 
+
 FC		= g95
 CPP		= /lib/cpp -C -traditional
 
-ifdef SOLPS_DEBUG
-FFLAGS		= -g -C -fbounds-check -ftrace=full
+ifdef CARRE_DEBUG
+FFLAGS 		= -g -C -Wall -fbounds-check -ftrace=full
+FFLAGS	       += -fmod=${OBJECTCODE}/
+LDFLAGS		= -Wall
 else
-FFLAGS		= -g -O
+FFLAGS		= -O 
+FFLAGS	       += -fmod=${OBJECTCODE}/
 endif
 
-DBLPAD		= -r8 
+DBLPAD		= -r8
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-LDLIBS		= -L${SOLPS_LIB}
-LDFLAGS 	= ${NCARG} -lmscl
-LDEXTRA 	= 
+ifeq ($(USE_NCARG),-DUSE_NCARG)
+LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
+LDFLAGS 	+= ${NCARG}
+endif
+
+ifneq ($(NOUSE_MSCL),-DNOUSE_MSCL)
+LDFLAGS 	+= -lmscl
+endif

@@ -18,10 +18,12 @@
 !100   format(a)
 !      rewind iunit
 !      read(iunit,*,err=99)rr
+      write (*,*) 'rdrfre: vari', vari
 #ifdef READOPT
       read(vari,err=99) rr
 #else
-      read(vari,'(e)',err=99) rr
+!      read(vari,'(e20.8)',err=99) rr
+      read(vari,*,err=99) rr
 #endif
       ierror=0
       return

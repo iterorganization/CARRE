@@ -4,8 +4,9 @@ module CarreSiloIO
 
   use Logging 
   use KindDefinitions , only: iKind, rKind
+#ifdef USE_SILO           
   use SiloIO
-
+#endif
   implicit none
 
 

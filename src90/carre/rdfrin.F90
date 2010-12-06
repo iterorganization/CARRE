@@ -17,10 +17,12 @@
 !100   format(a)
 !      rewind iunit
 !      read(iunit,*,err=99)ii
+      write (*,*) 'rdrfin: vari', vari
 #ifdef READOPT
       read(vari,err=99)ii
 #else
-      read(vari,'(i)',err=99)ii
+!      read(vari,'(i10)',err=99)ii
+      read(vari,*,err=99)ii
 #endif
       ierror=0
       return
