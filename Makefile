@@ -159,7 +159,6 @@ update:
 	cd $(SOLPSTOP); gmake update
 
 listobj:
-	echo ${VPATH}
 	@rm -f LISTOBJ; touch LISTOBJ ; \
 	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${VPATH}" | tr : \ `; do \
