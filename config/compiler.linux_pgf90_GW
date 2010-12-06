@@ -1,16 +1,29 @@
+
+DEFINES 	= 
+
 FC		= pgf90
-CPP		= /lib/cpp -traditional
+CPP		= /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C 
+FFLAGS 		= -g -C
+FFLAGS	       += -module ${OBJECTCODE}/
+LDFLAGS		= 
 else
 FFLAGS		= -O
+FFLAGS	       += -module ${OBJECTCODE}/
+LDFLAGS		= 
 endif
 
+DBLPAD		= 
 DBLPAD		= -r8 -i4
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-LDLIBS		= -L${SOLPS_LIB}
-LDFLAGS 	= ${NCARG} -lmscl
-LDEXTRA 	= 
+#ifdef USE_NCARG
+LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
+LDFLAGS 	+= ${NCARG}
+#endif
+
+#ifndef NOUSE_MSCL
+LDFLAGS 	+= -lmscl
+#endif

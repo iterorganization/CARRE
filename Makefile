@@ -130,7 +130,7 @@ local:
 tags:
 	rm TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
-depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} ${EXCLUDELIST:.o=.F}
+depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} ${EXCLUDELIST:.o=.F90}
 	makedepend -f ${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJECTCODE}/dependencies.${OBJECTCODE} ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak
 	sed -e '3,$$s/^\.\.\/${SRCDIR}\/[^\/]*\///' ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak | \
@@ -190,3 +190,4 @@ ${OBJECTCODE}/dependencies.${OBJECTCODE}:
 
 include ${OBJECTCODE}/dependencies.${OBJECTCODE}
 
+# DO NOT DELETE
