@@ -24,7 +24,7 @@ USE_SILO =
 
 EXCLUDELIST +=
 ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre
-VPATH = ${SRCDIR}/carre:${SRCDIR}/itmcarre:${SRCDIR}/usol
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types
 
 #SCHEMAS_O = ${filter-out ${EXCLUDELIST},\
 #  ${addsuffix .o,\

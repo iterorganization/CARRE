@@ -86,6 +86,7 @@
       write(6,*) '3: format SONNET-DIVIMP'
       write(6,*) '4: format DG-SONNET-B2-EIRENE'
       write(6,*) '5: revised DIVIMP with'// & 
+      write(6,*) '6: Write ITM CPO'// & 
      & ' grid parameters and PSI values'
       read(5,*) isel
       write(6,*) 'The format chosen is :',isel
@@ -158,6 +159,16 @@
 ! jdemod - added fpsi to call to ecrim5
         call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
 !
+! CPO Output: use 
+!
+      elseif(isel.eq.6) then
+!
+        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
+             &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+             &    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+             &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+!!$        call b2agbb (nx,ny,fpsi,ffbz,bb, & 
+!!$             &    crx,cry,psidx,psidy,nxmx,nymx)
       else
         write(6,*) 'Wrong value (must be 1 to 5): isel=',isel
         stop
