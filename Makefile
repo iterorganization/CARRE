@@ -7,7 +7,7 @@ CPP	= /usr/lib/cpp
 SRCDIR = src90
 
 VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCDIR}/fcrr
-INCLUDE = -I${SRCDIR}/include
+INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o 
@@ -24,7 +24,7 @@ USE_SILO =
 
 EXCLUDELIST +=
 ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/schemas
 
 #SCHEMAS_O = ${filter-out ${EXCLUDELIST},\
 #  ${addsuffix .o,\
@@ -50,11 +50,11 @@ ifeq ($(USE_SILO),-DUSE_SILO)
 USOLLIBDIR = ./usol/lib/${OBJECTCODE}
 
 # SILO
-INCLUDE += -I${USOLLIBDIR}/silo/include
+INCLUDE += -I ${USOLLIBDIR}/silo/include
 USOLLIBS += -L${USOLLIBDIR}/silo/lib -lsiloh5
 
 # HDF5
-INCLUDE += -I${USOLLIBDIR}/hdf5/include
+INCLUDE += -I ${USOLLIBDIR}/hdf5/include
 USOLLIBS += -L${USOLLIBDIR}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
 VPATH += :${SRCDIR}/usol
 else
@@ -99,6 +99,7 @@ $(OBJECTCODE)/%.o : %.f90
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
+
 all: ${ALLTARGETS}
 
 ${OBJECTCODE}/carre: ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a
@@ -141,7 +142,7 @@ local:
 tags:
 	rm TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
-depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} 
+olddepend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} 
 	makedepend -f ${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJECTCODE}/dependencies.${OBJECTCODE} ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak
 	sed -e '3,$$s/^\.\.\/${SRCDIR}\/[^\/]*\///' ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak | \
@@ -167,6 +168,9 @@ depend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90}
 		fi \
 	done;
 
+depend: 
+	bin/sfmakedepend -d -p '$${OBJECTCODE}/' ${INCLUDE} \
+	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE} src90/*/*.[fF] src90/*/*.[fF]90 
 
 update:
 	cd $(SOLPSTOP); gmake update
