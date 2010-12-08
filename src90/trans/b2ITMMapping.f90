@@ -1,7 +1,8 @@
 module b2ITMMapping
 
   use itm_types
-  use euitm_schemas
+  use euITM_schemas
+  use itm_grid
 
   implicit none
 
@@ -11,73 +12,193 @@ module b2ITMMapping
   integer, parameter :: ALIGNX = 0
   integer, parameter :: ALIGNY = 1
 
+  ! Data structure holding an intermediate grid description to be 
+  ! transferred into a CPO
+  type B2ITMGridDesc
+          integer :: ncv, nfcx, nfcy, nvx          
+
+          ! Mapping arrays: 
+          ! 1d CPO lists -> 2d B2 data structure
+          integer, dimension(:), allocatable :: mapCvix, mapCviy, mapFcix, mapFciy, mapFcAlign, mapVxix, mapVxiy
+          ! 2d B2 data structure -> 1d CPO lists
+          integer, dimension(:,:), allocatable :: mapCvI, mapFcxI, mapFcyI, mapVxI
+  end type B2ITMGridDesc
 
 contains
 
-  subroutine b2ITMFillGridDescription( grid )
+  ! service routines for B2ITMGridData
 
-    type(type_grid_full), intent(out) :: grid
+  subroutine allocateB2ITMGridDesc( gd, nx, ny, ncv, nfcx, nfcy, nvx )
+    type(B2ITMGridDesc), intent(inout) :: gd
+    integer, intent(in) ::  nx, ny, ncv, nfcx, nfcy, nvx
+    
+    allocate( gd%mapCvI(-1:nx, -1:ny) )
+    allocate( gd%mapFcxI(-1:nx, -1:ny) )
+    allocate( gd%mapFcyI(-1:nx, -1:ny) )
+    allocate( gd%mapVxI(-1:nx, -1:ny) )
+    
+    allocate( gd%mapCvix(ncv), gd%mapCviy(ncv) )
+    allocate( gd%mapFcix(nfcx+nfcy), gd%mapFciy(nfcx+nfcy), gd%mapFcAlign(nfcx+nfcy) )
+    allocate( gd%mapVxix(nvx), gd%mapVxiy(nvx) )
+
+  end subroutine allocateB2ITMGridDesc
+  
+  subroutine deallocateB2ITMGridDesc( gd )
+    type(B2ITMGridDesc), intent(inout) :: gd
+
+    deallocate( gd%mapCvI )
+    deallocate( gd%mapFcxI )
+    deallocate( gd%mapFcyI )
+    deallocate( gd%mapVxI )
+
+    deallocate( gd%mapCvix, gd%mapCviy )
+    deallocate( gd%mapFcix, gd%mapFciy, gd%mapFcAlign )
+    deallocate( gd%mapVxix, gd%mapVxiy )
+
+  end subroutine deallocateB2ITMGridDesc
+
+
+  !> Routine that fills in a grid description which is part of a CPO
+  !> using the given grid data and prepared mappings
+  subroutine b2ITMFillGridDescription( b2gd, itmgrid, &
+       & nx,ny,crx,cry, &
+       & leftix,leftiy,rightix,rightiy, &
+       & topix,topiy,bottomix,bottomiy )
+    
+    type(B2ITMGridDesc), intent(in) :: b2gd
+    type(type_grid_full), intent(out) :: itmgrid
+
+    ! Size of grid arrays: (-1:nx, -1:ny) 
+    integer, intent(in) :: nx, ny
+    !   .. output arguments
+    ! vertex coordinates
+    real (R8), intent(in) :: &
+         & crx(-1:nx,-1:ny,0:3), cry(-1:nx,-1:ny,0:3)
+    integer, intent(in) :: &
+         & leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),&
+         & rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny),&
+         & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),&
+         & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny)
+
 
     ! internal
-
     integer, parameter :: NDIM = 2
 
-    allocate( grid % spaces(2) )
-    grid % metric => null()
+    integer :: ivx, ifc, icv, ix, iy, nix, niy
+
+    allocate( itmgrid % spaces(2) )
+    itmgrid % metric => null()
 
     ! Coordinate types
     ! (dimension of space = NDIM = size( type_coord )
-    allocate( grid % spaces(1) % type_coord(NDIM) )
-    grid % spaces(1) % type_coord(1) = (/ COORDTYPE_R, COORDTYPE_Z /)
+    allocate( itmgrid % spaces(1) % type_coord(NDIM) )    
+    itmgrid % spaces(1) % type_coord = (/ COORDTYPE_R, COORDTYPE_Z /)
 
     ! Number of objects
-    allocate( grid % spaces(1) % nobject(NDIM) )
-    grid % spaces(1) % nobject = (/ nfc, ncv /)
+    allocate( itmgrid % spaces(1) % nobject(NDIM) )
+    itmgrid % spaces(1) % nobject = (/ b2gd%nfcx + b2gd%nfcy, b2gd%ncv /)
 
     ! Number of boundaries the objects have (at maximum)
-    allocate( grid % spaces(1) % nobject_bou(NDIM) )
-    grid % spaces(1) % nobject_bou = (/ 2, 4 /)
+    allocate( itmgrid % spaces(1) % nobject_bou(NDIM) )
+    itmgrid % spaces(1) % nobject_bou = (/ 2, 4 /)
 
     ! Maximum number of neighbours an object can have per side
-    allocate( grid % spaces(1) % neighborside(NDIM) )
-    grid % spaces(1) % neighborside = (/ 0, 1 /)
+    allocate( itmgrid % spaces(1) % neighborside(NDIM) )
+    itmgrid % spaces(1) % neighborside = (/ 0, 1 /)
 
     ! Fill in node information
-    allocate( grid % spaces(1) % node_value(nvx, NDIM) )
+    allocate( itmgrid % spaces(1) % node_value(b2gd%nvx, NDIM) )
 
-    ix = mapVxix( ivx )
-    iy = mapVxiy( ivx )
-    grid % spaces(1) % node_value(ivx, 1) =  crx( ix, iy, 0 )
-    grid % spaces(1) % node_value(ivx, 2) =  cry( ix, iy, 0 )
+    do ivx = 1, gd % nvx
+            ix = b2gd % mapVxix( ivx )
+            iy = b2gd % mapVxiy( ivx )
+            itmgrid % spaces(1) % node_value(ivx, 1) =  crx( ix, iy, 0 )
+            itmgrid % spaces(1) % node_value(ivx, 2) =  cry( ix, iy, 0 )
+    end do
 
-    ! Fill in object definitions
-    allocate( grid % spaces(1) % objdef( maxval(grid % spaces(1) % nobject), &
-         & maxval(grid % spaces(1) % nobject_bou), NDIM )
+    ! Fill in object definitions (i.e. what objects compose an object)
+    allocate( itmgrid % spaces(1) % objdef( maxval(itmgrid % spaces(1) % nobject), &
+         & maxval(itmgrid % spaces(1) % nobject_bou), NDIM ) )
+    ! first set all to undefined
+    itmgrid % spaces(1) % objdef = GRID_UNDEF
 
-    
-    
+    ! 1d objects: faces
 
-  end subroutine b2ITMFillGridCPO
+    ! x-aligned faces    
+    do ifc = 1, b2gd % nfcx    
+            ! get position of this face in the b2 grid
+            ix = b2gd % mapFcix( ifc )
+            iy = b2gd % mapFciy( ifc )
+            ! get index of start vertex 
+            ! objdef dims: index of face, 1=start node, 1=one-dimensional object
+            itmgrid % spaces(1) % objdef( ifc, 1, 1 ) = b2gd % mapVxI( ix, iy )
+            ! get index of end vertex 
+            ! in the b2 grid, the end node/vertex of an x-aligned face is the 
+            ! vertex associated with the right neighbour cell
+            nix = rightix( ix, iy )
+            niy = rightiy( ix, iy )
+            ! objdef dims: index of face, 2=end node, 1=one-dimensional object
+            itmgrid % spaces(1) % objdef( ifc, 2, 1 ) = b2gd % mapVxI( nix, niy )
+    end do
+    ! y-aligned faces    
+    do ifc = b2gd % nfcx + 1, b2gd % nfcx + b2gd % nfcy    
+            ! get position of this face in the b2 grid
+            ix = b2gd % mapFcix( ifc )
+            iy = b2gd % mapFciy( ifc )
+            ! get index of start vertex 
+            ! objdef dims: index of face, 1=start node, 1=one-dimensional object
+            itmgrid % spaces(1) % objdef( ifc, 1, 1 ) = b2gd % mapVxI( ix, iy )
+            ! get index of end vertex 
+            ! in the b2 grid, the end node/vertex of a y-aligned face is the 
+            ! vertex associated with the top neighbour cell
+            nix = topix( ix, iy )
+            niy = topiy( ix, iy )
+            ! objdef dims: index of face, 2=end node, 1=one-dimensional object
+            itmgrid % spaces(1) % objdef( ifc, 2, 1 ) = b2gd % mapVxI( nix, niy )
+    end do
+
+    ! 2d objects: cells
+    do icv = 1, b2gd % ncv
+            ix = b2gd % mapCvix( icv )
+            iy = b2gd % mapCviy( icv )
+
+            ! put faces composing the quadliateral in the list: left face (y-aligned)
+            itmgrid % spaces(1) % objdef( icv, 1, 2 ) = b2gd % mapFcyI( ix, iy )
+            ! bottom face (x-aligned
+            itmgrid % spaces(1) % objdef( icv, 2, 2 ) = b2gd % mapFcxI( ix, iy )
+            ! right face (y-aligned): take left face of right neighbour
+            nix = rightix( ix )
+            niy = rightiy( iy )
+            itmgrid % spaces(1) % objdef( icv, 3, 2 ) = b2gd % mapFcyI( nix, niy )            
+            ! top face (x-aligned): take bottom face of top neighbour
+            nix = topix( ix )
+            niy = topiy( iy )
+            itmgrid % spaces(1) % objdef( icv, 4, 2 ) = b2gd % mapFcxI( nix, niy )            
+    end do
+
+  end subroutine b2ITMFillGridDescription
 
 
 
   subroutine b2ITMCreateMap( nx,ny,crx,cry,&
          & leftix,leftiy,rightix,rightiy, &
-         & topix,topiy,bottomix,bottomiy )
+         & topix,topiy,bottomix,bottomiy, gd )
 
       !   ..input arguments (unchanged on exit)
       
       ! Size of grid arrays: (-1:nx, -1:ny) 
-      integer  nx, ny
+      integer :: nx, ny
       !   .. output arguments
       ! vertex coordinates
-      real (R8) ::&
+      real(R8), intent(in) :: &
            & crx(-1:nx,-1:ny,0:3), cry(-1:nx,-1:ny,0:3)
-      integer ::&
-           & leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),&
-           & rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny),&
-           & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),&
+      integer, intent(in) :: &
+           & leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny), &
+           & rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
+           & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny), &
            & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny)
+
+      type(B2ITMGridDesc), intent(inout) :: gd
 
       ! internal
       integer :: ix, iy, ic, i1, i2
@@ -94,13 +215,6 @@ contains
 
       ! numbers of unique objects
       integer :: ncv, nfcx, nfcy, nvx
-
-      ! Mapping arrays: 
-      ! 1d CPO lists -> 2d B2 data structure
-      integer, dimension(:), allocatable :: mapCvix, mapCviy, mapFcix, mapFciy, mapFcAlign, mapVxix, mapVxiy
-      ! 2d B2 data structure -> 1d CPO lists
-      integer, dimension(-1:nx,-1:ny) :: mapCvI, mapFcxI, mapFcyI, mapVxI
-
 
       
       ! set up initial lexicographic indices
@@ -206,10 +320,8 @@ contains
       ! number of unique vertices
       nvx = ( nx + 2 ) * ( ny + 2 ) - count( .not. isNeeded( vxi )  )
 
-      ! allocate inverse mapping
-      allocate( mapCvix(ncv), mapCviy(ncv) )
-      allocate( mapFcix(nfcx+nfcy), mapFciy(nfcx+nfcy), mapFcAlign(nfcx+nfcy) )
-      allocate( mapVxix(nvx), mapVxiy(nvx) )
+      ! allocate the mapping structure
+      call allocateB2ITMGridDesc( gd, nx, ny, ncv, nfcx, nfcy, nvx )
 
       ! build the mappings
 
@@ -223,13 +335,13 @@ contains
                                       stop 'b2ITMCreateMap: found more cells than expected'
                               end if
                               ! Map CPO -> B2
-                              mapCvix(ic) = ix
-                              mapCviy(ic) = iy
+                              gd%mapCvix(ic) = ix
+                              gd%mapCviy(ic) = iy
                               ! Map B2 -> CPO
-                              mapCvI( ix, iy ) = ic
+                              gd%mapCvI( ix, iy ) = ic
                       else
                               ! not needed
-                              mapCvI( ix, iy ) = 0
+                              gd%mapCvI( ix, iy ) = 0
                       end if
               end do
       end do
@@ -244,14 +356,14 @@ contains
                                       stop 'b2ITMCreateMap: found more x-aligned faces than expected'
                               end if
                               ! Map CPO -> B2
-                              mapFcix(ic) = ix
-                              mapFciy(ic) = iy
-                              mapFcAlign(ic) = ALIGNX
+                              gd%mapFcix(ic) = ix
+                              gd%mapFciy(ic) = iy
+                              gd%mapFcAlign(ic) = ALIGNX
                               ! Map B2 -> CPO
-                              mapFcxI( ix, iy ) = ic
+                              gd%mapFcxI( ix, iy ) = ic
                       else
                               ! not needed
-                              mapFcxI( ix, iy ) = 0
+                              gd%mapFcxI( ix, iy ) = 0
                       end if
               end do
       end do
@@ -268,14 +380,14 @@ contains
                                       stop 'b2ITMCreateMap: found more y-aligned faces than expected'
                               end if
                               ! Map CPO -> B2
-                              mapFcix(ic) = ix
-                              mapFciy(ic) = iy
-                              mapFcAlign(ic) = ALIGNY
+                              gd%mapFcix(ic) = ix
+                              gd%mapFciy(ic) = iy
+                              gd%mapFcAlign(ic) = ALIGNY
                               ! Map B2 -> CPO
-                              mapFcyI( ix, iy ) = ic
+                              gd%mapFcyI( ix, iy ) = ic
                       else
                               ! not needed
-                              mapFcyI( ix, iy ) = 0
+                              gd%mapFcyI( ix, iy ) = 0
                       end if
               end do
       end do
@@ -290,10 +402,10 @@ contains
                                       stop 'b2ITMCreateMap: found more needed vertices than expected'
                               end if
                               ! Map CPO -> B2
-                              mapVxix(ic) = ix
-                              mapVxiy(ic) = iy
+                              gd%mapVxix(ic) = ix
+                              gd%mapVxiy(ic) = iy
                               ! Map B2 -> CPO
-                              mapVxI( ix, iy ) = ic
+                              gd%mapVxI( ix, iy ) = ic
                       else
                               ! Vertex marked as not needed. Check whether
                               ! vertex was identified as special (x-point), 
@@ -301,9 +413,10 @@ contains
                               do i1 = 1, svc
                                       if ( ( svix( i1 ) == ix ) &
                                            & .and. ( sviy( i1 ) == iy ) ) then
-                                              ! Found it in the special vertex list
-                                              mapVxI( ix, iy ) = &
-                                                   & mapVxI( svixAlias( i1 ), sviyAlias( i1 ) )
+                                              ! Found it in the special vertex list. 
+                                              ! Now set the value in the  vertex map accordingly
+                                              gd%mapVxI( ix, iy ) = &
+                                                   & gd%mapVxI( svixAlias( i1 ), sviyAlias( i1 ) )
                                       end if
                               end do
 
