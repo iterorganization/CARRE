@@ -1,15 +1,15 @@
 
-DEFINES 	= 
+DEFINES 	+= 
 
 FC		= g95
 CPP		= /lib/cpp -C -traditional
 
 ifdef CARRE_DEBUG
-FFLAGS 		= -g -C -Wall -Wno=unused-vars -fbounds-check -ftrace=full -ffree-line-length-huge
+FFLAGS 		= -g -C -Wall -Wno=unused-vars -fbounds-check -ftrace=full -ffree-line-length-huge -fno-second-underscore
 FFLAGS	       += -fmod=${OBJECTCODE}/
 LDFLAGS		= -Wall
 else
-FFLAGS		= -O -ffree-line-length-huge 
+FFLAGS		= -O -ffree-line-length-huge  -fno-second-underscore
 FFLAGS	       += -fmod=${OBJECTCODE}/
 endif
 
@@ -24,4 +24,9 @@ endif
 
 ifneq ($(NOUSE_MSCL),-DNOUSE_MSCL)
 LDFLAGS 	+= -lmscl
+endif
+
+ifeq ($(USE_UAL),-DUSE_UAL)
+  INCLUDE+= -I /afs/efda-itm.eu/project/switm/ual/${UAL_VERSION}/include/amd64_g95
+  LDLIBS += -L/afs/efda-itm.eu/project/switm/ual/${UAL_VERSION}/lib -lUALFORTRANInterface_g95
 endif

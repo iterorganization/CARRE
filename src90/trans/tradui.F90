@@ -13,6 +13,9 @@
       use euITM_schemas  
       use write_structures
 
+#ifdef USE_UAL
+      use euITM_routines
+#endif
       
       implicit none
 
@@ -45,6 +48,12 @@
       type(B2ITMGridDesc) :: b2gd
       type(type_grid_full) :: itmgrid
 
+      ! variables for UAL I/O
+#ifdef USE_UAL
+      type (type_edge),pointer :: cpoedge(:) => null()
+      integer :: idx, shot, run, refshot, refrun
+      character(len=5)::treename
+#endif
 
 
 !  procedures
@@ -206,11 +215,38 @@
                    & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
                    & leftix,leftiy,rightix,rightiy, &
                    & topix,topiy,bottomix,bottomiy )
-
               
+#ifdef USE_READWRITECPO
               call open_write_file(747, 'griddesc.txt')
               call write_cpo(itmgrid, "GridDesc")
               call close_write_file
+#endif
+
+
+#ifdef USE_UAL
+              allocate(cpoedge(1))
+              allocate(cpoedge(1)%datainfo%dataprovider(1))
+              cpoedge(1)%datainfo%dataprovider="IPP"
+              allocate(cpoedge(1)%codeparam%codename(3))
+              cpoedge(1)%codeparam%codename(1)="ITMCARRE"
+              cpoedge(1)%time= 0.0D0
+
+              cpoedge(1)%grid = itmgrid
+
+              shot =11
+              run = 1
+              refshot = 10
+              refrun =0
+              treename = 'euitm'
+
+              call euitm_create(treename, shot, run, refshot, refrun, idx)
+              !call euitm_open(treename,shot,run,idx)
+              call euitm_put(idx,"edge",cpoedge)
+              call euitm_deallocate(cpoedge)
+#endif
+
+
+
       else
         write(6,*) 'Wrong value (must be 1 to 5): isel=',isel
         stop

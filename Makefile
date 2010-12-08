@@ -13,6 +13,13 @@ ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o euitm_routines.o
 MAINLIST = carre.o tradui.o fcrr.o fcrblkd.o 
 
+
+DEFINES = ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL}
+
+# Include object lists
+include LISTOBJ
+
+
 # *************************************************************
 # ITM-CARRE
 # If we're compiling for the ITM, we don't want any utility executables and graphics output
@@ -26,13 +33,7 @@ EXCLUDELIST +=
 ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
 VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/schemas:${SRCDIR}/itm_grid:${SRCDIR}/itm_shared:${SRCDIR}/itm_constants
 
-#SCHEMAS_O = ${filter-out ${EXCLUDELIST},\
-#  ${addsuffix .o,\
-#    ${addprefix ${OBJECTCODE}/,\
-#      ${filter-out *,\
-#        ${basename \
-#	  ${notdir \
-#            ${shell echo src/schemas/*.[fF] src/schemas/*.[fF]90}}}}}}}
+UAL_VERSION=4.08b
 
 endif
 # *************************************************************
@@ -63,13 +64,13 @@ endif
 # *************************************************************
 
 
-include LISTOBJ
-
-# Bring in compiler-specific configuration (moved here because we need the *USE_* variables set up properly)
+# Bring in system-specific configuration (moved here because we need the *USE_* variables set up properly)
 include config/compiler.${OBJECTCODE}
 ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no ),yes)
 include config.local/compiler.${OBJECTCODE}
 endif
+
+
 
 DEST = $(OBJS:%.o=$(OBJECTCODE)/%.o) $(OBJSL90:%.o=$(OBJECTCODE)/%.o) $(OBJSU90:%.o=$(OBJECTCODE)/%.o)
 #LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
