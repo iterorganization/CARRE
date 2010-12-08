@@ -8,6 +8,12 @@
 !*** This program translates the grid created with carre into other
 !*** grid formats
 !======================================================================
+      use b2Connectivity
+      use b2ITMMapping
+      use euITM_schemas  
+      use write_structures
+
+      
       implicit none
 
 !ank-970707: dimensions from the file
@@ -29,6 +35,17 @@
      &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), & 
      &  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3)
       character nom*80
+
+      ! connectivity and cut arrays
+      integer :: nncut
+      integer :: leftcut(ncutmx),rightcut(ncutmx),bottomcut(ncutmx),topcut(ncutmx)
+      integer, allocatable, dimension(:,:) :: leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy
+      integer, parameter :: PERIODIC_BC = 0
+      
+      type(B2ITMGridDesc) :: b2gd
+      type(type_grid_full) :: itmgrid
+
+
 
 !  procedures
       external limail, change, ecrim1, b2agfz, b2agbb, ecrim2, ecrim3, & 
@@ -85,9 +102,8 @@
       write(6,*) '2: format B2.5'
       write(6,*) '3: format SONNET-DIVIMP'
       write(6,*) '4: format DG-SONNET-B2-EIRENE'
-      write(6,*) '5: revised DIVIMP with'// & 
-      write(6,*) '6: Write ITM CPO'// & 
-     & ' grid parameters and PSI values'
+      write(6,*) '5: revised DIVIMP with grid parameters and PSI values'
+      write(6,*) '6: Write ITM CPO' 
       read(5,*) isel
       write(6,*) 'The format chosen is :',isel
 
@@ -159,16 +175,42 @@
 ! jdemod - added fpsi to call to ecrim5
         call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
 !
-! CPO Output: use 
+! CPO Output
 !
       elseif(isel.eq.6) then
-!
-        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
-             &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-             &    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
-             &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
-!!$        call b2agbb (nx,ny,fpsi,ffbz,bb, & 
-!!$             &    crx,cry,psidx,psidy,nxmx,nymx)
+
+              ! assemble the crx, cry arrays
+              call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
+                   &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+                   &    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+                   &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+              
+              ! allocate connectivity arrays 
+              allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
+                   & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
+
+              ! assemble the connectivity arrays
+              call computeB2Connectivity (nx,ny,&
+                   & crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
+                   & leftix,leftiy,rightix,rightiy, &
+                   & topix,topiy,bottomix,bottomiy, &
+                   & leftcut,rightcut,bottomcut,topcut, &
+                   & PERIODIC_BC,nncut,ncutmx)
+              
+              ! set up the B2<->CPO mappings
+              call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
+                   & leftix,leftiy,rightix,rightiy, &
+                   & topix,topiy,bottomix,bottomiy, b2gd )
+
+              call b2ITMFillGridDescription( b2gd, itmgrid, &
+                   & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
+                   & leftix,leftiy,rightix,rightiy, &
+                   & topix,topiy,bottomix,bottomiy )
+
+              
+              call open_write_file(747, 'griddesc.txt')
+              call write_cpo(itmgrid, "GridDesc")
+              call close_write_file
       else
         write(6,*) 'Wrong value (must be 1 to 5): isel=',isel
         stop

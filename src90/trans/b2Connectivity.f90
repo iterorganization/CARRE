@@ -50,7 +50,6 @@ contains
          & (dist(ix1,iy1,1,ix2,iy2,0)+dist(ix1,iy1,3,ix2,iy2,2)).lt.geom_match_dist
 
 
-
     nncut=0
     do ic=1,nncutmax
             bottomcut1(ic)=ny1+1
@@ -160,11 +159,11 @@ contains
             end if
 
             nncut=max(nncut,ic)
-            if(nncut.gt.nncutmax) then
-                    write(*,*) ' Increase nncutmax in b2mod_geo!'
-                    write(*,*) ' nncut = ',nncut,' nncutmax = ',nncutmax
-                    call xertst (nncut.le.nncutmax,'faulty parameter nncutmax')
-            end if
+!!$            if(nncut.gt.nncutmax) then
+!!$                    write(*,*) ' Increase nncutmax in b2mod_geo!'
+!!$                    write(*,*) ' nncut = ',nncut,' nncutmax = ',nncutmax
+!!$                    call xertst (nncut.le.nncutmax,'faulty parameter nncutmax')
+!!$            end if
     end do
 
 !!$  cxpb  Once we know the vertical boundaries of the periodic region, we can

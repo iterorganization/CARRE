@@ -5,11 +5,11 @@ FC		= g95
 CPP		= /lib/cpp -C -traditional
 
 ifdef CARRE_DEBUG
-FFLAGS 		= -g -C -Wall -fbounds-check -ftrace=full
+FFLAGS 		= -g -C -Wall -Wno=unused-vars -fbounds-check -ftrace=full -ffree-line-length-huge
 FFLAGS	       += -fmod=${OBJECTCODE}/
 LDFLAGS		= -Wall
 else
-FFLAGS		= -O 
+FFLAGS		= -O -ffree-line-length-huge 
 FFLAGS	       += -fmod=${OBJECTCODE}/
 endif
 

@@ -10,7 +10,7 @@ VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCD
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
-EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o 
+EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o euitm_routines.o
 MAINLIST = carre.o tradui.o fcrr.o fcrblkd.o 
 
 # *************************************************************
@@ -23,8 +23,8 @@ USE_NCARG =
 USE_SILO = 
 
 EXCLUDELIST +=
-ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/schemas
+ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/schemas:${SRCDIR}/itm_grid:${SRCDIR}/itm_shared:${SRCDIR}/itm_constants
 
 #SCHEMAS_O = ${filter-out ${EXCLUDELIST},\
 #  ${addsuffix .o,\
@@ -168,9 +168,32 @@ olddepend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90}
 		fi \
 	done;
 
-depend: 
+simpledepend: 
 	bin/sfmakedepend -d -p '$${OBJECTCODE}/' ${INCLUDE} \
 	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE} src90/*/*.[fF] src90/*/*.[fF]90 
+
+depend:
+# 	First do preprocessor #includes dependencies (-u disables USE dependency output)	
+	bin/sfmakedepend -d -u -p '$${OBJECTCODE}/' ${INCLUDE} \
+	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE}.include src90/*/*.[fF] src90/*/*.[fF]90 
+#	Now preprocess all files and do dependencies of preprocessed files to get correct USE dependencies
+	-rm ${OBJECTCODE}/*.f90 ${OBJECTCODE}/*.f
+	@for d in `echo "${VPATH}" | tr : \ `; do \
+		dirfiles=`find -L $$d/ -name '*.F90'` ; \
+		if [ -n "$$dirfiles" ] ; then \
+			for f in `find -L $$d -name '*.F90' -printf "%f "`; do \
+				basename=`basename $$f .F90`; \
+				${CPP} ${DEFINES} -P -C ${INCLUDE} $$d/$$f ${OBJECTCODE}/$$basename.f90; \
+			done \
+		fi ; \
+		dirfiles=`find -L $$d/ -name '*.f90'` ; \
+		if [ -n "$$dirfiles" ] ; then \
+			cp $$dirfiles ${OBJECTCODE} ; \
+		fi ; \
+	done ; \
+	bin/sfmakedepend -d -p '$${OBJECTCODE}/' ${INCLUDE} \
+	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE}.use ${OBJECTCODE}/*.[fF] ${OBJECTCODE}/*.[fF]90 
+
 
 update:
 	cd $(SOLPSTOP); gmake update
@@ -200,11 +223,14 @@ listobj:
 
 LISTOBJ: listobj
 
-${OBJECTCODE}/dependencies.${OBJECTCODE}:
+${OBJECTCODE}/dependencies.${OBJECTCODE}.include:
 	-mkdir ${OBJECTCODE}
-	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}
+	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
+	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}.use
 	${MAKE} depend
+${OBJECTCODE}/dependencies.${OBJECTCODE}.use: ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
 
-include ${OBJECTCODE}/dependencies.${OBJECTCODE}
+include ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
+include ${OBJECTCODE}/dependencies.${OBJECTCODE}.use
 
 # DO NOT DELETE

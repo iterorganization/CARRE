@@ -3,6 +3,8 @@ module b2ITMMapping
   use itm_types
   use euITM_schemas
   use itm_grid
+  use Logging
+  use Helper
 
   implicit none
 
@@ -32,6 +34,11 @@ contains
     type(B2ITMGridDesc), intent(inout) :: gd
     integer, intent(in) ::  nx, ny, ncv, nfcx, nfcy, nvx
     
+    gd%ncv = ncv
+    gd%nfcx = nfcx
+    gd%nfcy = nfcy
+    gd%nvx = nvx
+
     allocate( gd%mapCvI(-1:nx, -1:ny) )
     allocate( gd%mapFcxI(-1:nx, -1:ny) )
     allocate( gd%mapFcyI(-1:nx, -1:ny) )
@@ -108,8 +115,7 @@ contains
 
     ! Fill in node information
     allocate( itmgrid % spaces(1) % node_value(b2gd%nvx, NDIM) )
-
-    do ivx = 1, gd % nvx
+    do ivx = 1, b2gd % nvx
             ix = b2gd % mapVxix( ivx )
             iy = b2gd % mapVxiy( ivx )
             itmgrid % spaces(1) % node_value(ivx, 1) =  crx( ix, iy, 0 )
@@ -120,7 +126,7 @@ contains
     allocate( itmgrid % spaces(1) % objdef( maxval(itmgrid % spaces(1) % nobject), &
          & maxval(itmgrid % spaces(1) % nobject_bou), NDIM ) )
     ! first set all to undefined
-    itmgrid % spaces(1) % objdef = GRID_UNDEF
+    itmgrid % spaces(1) % objdef = GRID_UNDEFINED
 
     ! 1d objects: faces
 
@@ -167,13 +173,44 @@ contains
             ! bottom face (x-aligned
             itmgrid % spaces(1) % objdef( icv, 2, 2 ) = b2gd % mapFcxI( ix, iy )
             ! right face (y-aligned): take left face of right neighbour
-            nix = rightix( ix )
-            niy = rightiy( iy )
+            nix = rightix( ix, iy )
+            niy = rightiy( ix, iy )
             itmgrid % spaces(1) % objdef( icv, 3, 2 ) = b2gd % mapFcyI( nix, niy )            
             ! top face (x-aligned): take bottom face of top neighbour
-            nix = topix( ix )
-            niy = topiy( iy )
+            nix = topix( ix, iy )
+            niy = topiy( ix, iy )
             itmgrid % spaces(1) % objdef( icv, 4, 2 ) = b2gd % mapFcxI( nix, niy )            
+    end do
+
+    ! Fill in connectivity information
+    allocate( itmgrid % spaces(1) % neighbors( maxval( itmgrid % spaces(1) % nobject) , &
+         & maxval(itmgrid % spaces(1) % nobject_bou), NDIM ) )
+    ! first set all to undefined
+    itmgrid % spaces(1) % neighbors = GRID_UNDEFINED
+    
+    do icv = 1, b2gd % ncv
+            ix = b2gd % mapCvix( icv )
+            iy = b2gd % mapCviy( icv )
+
+            ! left neighbour
+            nix = leftix( ix, iy )
+            niy = leftiy( ix, iy )
+            itmgrid % spaces(1) % neighbors(icv,1,1) = b2gd % mapCvI( nix, niy )
+
+            ! bottom neighbour
+            nix = bottomix( ix, iy )
+            niy = bottomiy( ix, iy )
+            itmgrid % spaces(1) % neighbors(icv,2,1) = b2gd % mapCvI( nix, niy )
+            
+            ! right neighbour
+            nix = rightix( ix, iy )
+            niy = rightiy( ix, iy )
+            itmgrid % spaces(1) % neighbors(icv,3,1) = b2gd % mapCvI( nix, niy )
+
+            ! top neighbour
+            nix = topix( ix, iy )
+            niy = topiy( ix, iy )
+            itmgrid % spaces(1) % neighbors(icv,4,1) = b2gd % mapCvI( nix, niy )
     end do
 
   end subroutine b2ITMFillGridDescription
@@ -216,6 +253,7 @@ contains
       ! numbers of unique objects
       integer :: ncv, nfcx, nfcy, nvx
 
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: create map for a nx="//int2str(nx)//", ny="//int2str(ny)//" b2 grid" )
       
       ! set up initial lexicographic indices
       ic = 0
@@ -280,6 +318,8 @@ contains
 
               end do
       end do
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: found "//int2str(svc)//" special vertices (x-points)" )
+
 
       ! identify duplicate special vertices
       
@@ -424,6 +464,14 @@ contains
                       end if
               end do
       end do
+
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: finished setting up map" )
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: map contains  "//int2str(gd%ncv)//" unique cells")
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: map contains  "//int2str(gd%nfcx)//" unique x-aligned faces")
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: map contains  "//int2str(gd%nfcy)//" unique y-aligned faces")
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: map contains  "//int2str(gd%nvx)//" unique vertices")
+
+
 
     contains 
 
