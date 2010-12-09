@@ -100,6 +100,10 @@ $(OBJECTCODE)/%.o : %.f90
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
+# compile an executable
+${OBJECTCODE}/%.exe : ${OBJECTCODE}/%.o
+	${FC} $(FFLAGS) -o ${BUILDDIR}/$*.exe $^ ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
+
 
 all: ${ALLTARGETS}
 
