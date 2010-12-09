@@ -39,7 +39,7 @@ contains
 
     allocate( itmgrid % spaces(2) )
     call fill1dSpace( itmgrid % spaces(1), COORDTYPE_R, pointsr )
-    call fill2dSpace( itmgrid % spaces(2), COORDTYPE_Z, pointsz )
+    call fill1dSpace( itmgrid % spaces(2), COORDTYPE_Z, pointsz )
     itmgrid % metric => null()
     
   end function example_2d

@@ -1,16 +1,37 @@
-FC		= pgf90
-CPP		= /lib/cpp -traditional
 
-ifdef SOLPS_DEBUG
-FFLAGS		= -g -C 
+DEFINES 	+= 
+
+FC		= pgf95
+CPP		= /lib/cpp -C -traditional
+
+ifdef CARRE_DEBUG
+FFLAGS 		= -g  -Mnosecond_underscore  #-C -Wall -Wno=unused-vars -fbounds-check -ftrace=full -ffree-line-length-huge -fno-second-underscore
+FFLAGS	       += -module ${OBJECTCODE}/
+LDFLAGS		= 
 else
-FFLAGS		= -O
+FFLAGS		= -O  -Mnosecond_underscore
+FFLAGS	       += -module ${OBJECTCODE}/
 endif
 
-DBLPAD		= -r8 -i4
+DBLPAD		= 
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-LDLIBS		= -L${SOLPS_LIB}
-LDFLAGS 	= ${NCARG} -lmscl
-LDEXTRA 	= 
+ifeq ($(USE_NCARG),-DUSE_NCARG)
+LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
+LDFLAGS 	+= ${NCARG}
+endif
+
+ifneq ($(NOUSE_MSCL),-DNOUSE_MSCL)
+LDFLAGS 	+= -lmscl
+endif
+
+ifeq ($(USE_UAL),-DUSE_UAL)
+  INCLUDE+= -I /afs/efda-itm.eu/project/switm/ual/${UAL_VERSION}/include/amd64_pgi
+  LDLIBS += -L/afs/efda-itm.eu/project/switm/ual/${UAL_VERSION}/lib -lUALFORTRANInterface_pgi
+endif
+
+
+
+
+

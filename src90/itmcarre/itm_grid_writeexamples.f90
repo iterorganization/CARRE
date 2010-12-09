@@ -17,7 +17,8 @@ program itm_grid_writeexamples
 
   ! write to ual
   
-  call euitm_create( treename='euitm', shot=1, run=1, refshot=0, refrun=0, idx=idx)
+  !call euitm_create( treename='euitm', shot=1, run=1, refshot=0, refrun=0, idx=idx)
+  call euitm_create( 'euitm', 1, 1, 0, 0, idx)
   call euitm_put(idx,"edge", edgecpo)
   call euitm_deallocate(edgecpo)
 
