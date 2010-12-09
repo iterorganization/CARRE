@@ -291,18 +291,28 @@ contains
                       if ( isYFaceGhostFace( ix, iy ) ) then
                               fcyi( ix, iy ) = - fcyi( ix, iy )
                       end if
-
-                      ! if either of the faces associated with this cell is needed,
-                      ! the vertex associated with this cell is needed
-                      if ( isNeeded( fcxi( ix, iy ) ) .or. IsNeeded( fcyi( ix, iy ) ) ) then
-                              ! vertex is needed
-                      else
-                              vxi( ix, iy ) = - vxi( ix, iy )
-                      end if
                      
               end do
       end do
       
+      ! remove unneeded vertices from list. A vertex is not needed if is neither a
+      ! start or end vertex of a needed faces. This has to be done after the final
+      ! decisions on the faces was done.
+      do ix = -1, nx
+              do iy = -1, ny
+
+                      
+                      ! if either of the faces associated with this cell is needed,
+                      ! the vertex associated with this cell is needed
+                      !if ( isNeeded( fcxi( ix, iy ) ) .or. IsNeeded( fcyi( ix, iy ) ) ) then
+                      if ( isVertexNeeded( ix, iy ) ) then 
+                              ! vertex is needed
+                      else
+                              vxi( ix, iy ) = - vxi( ix, iy )
+                      end if
+              end do
+      end do
+
 
       ! search x-points
       svc = 0
@@ -623,7 +633,33 @@ contains
 
       end function isSpecialVertex
 
+      ! Decide whether a vertex is needed based on whether a face
+      ! connected to this vertex is needed
+      logical function isVertexNeeded( ix, iy ) 
+        integer, intent(in) :: ix, iy
 
+        ! internal
+        integer :: lix, liy, bix, biy
+
+        lix = leftix( ix, iy )
+        liy = leftiy( ix, iy )
+        if ( .not. isInDomain( bix, biy ) ) then
+                ! if neighbour not in domain, reset to current position
+                lix = ix
+                liy = iy
+        end if
+
+        bix = bottomix( ix, iy )
+        biy = bottomiy( ix, iy )
+        if ( .not. isInDomain( bix, biy ) ) then
+                ! if neighbour not in domain, reset to current position
+                bix = ix
+                biy = iy
+        end if
+
+        isVertexNeeded = isNeeded( fcxi( ix, iy ) ) .or. isNeeded( fcyi( ix, iy ) ) &
+             & .or. isNeeded( fcxi( lix, liy ) ) .or. isNeeded( fciy( bix, biy ) ) 
+      
     end subroutine b2ITMCreateMap
 
     
