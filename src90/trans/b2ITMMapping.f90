@@ -658,8 +658,10 @@ contains
         end if
 
         isVertexNeeded = isNeeded( fcxi( ix, iy ) ) .or. isNeeded( fcyi( ix, iy ) ) &
-             & .or. isNeeded( fcxi( lix, liy ) ) .or. isNeeded( fciy( bix, biy ) ) 
+             & .or. isNeeded( fcxi( lix, liy ) ) .or. isNeeded( fcyi( bix, biy ) ) 
       
+      end function isVertexNeeded
+
     end subroutine b2ITMCreateMap
 
     
