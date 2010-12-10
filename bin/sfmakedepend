@@ -142,7 +142,7 @@ sub new {
     my $filename = shift;
     my $path = shift;
     my $self = {};
-    $self->{'source_file'} = $filename;
+    $self->{'source_file'} = $filename;   
     $self->{'filepath'} = $path;
     $self->{'includes'} = {};
     $self->{'uses'} = {};
@@ -310,7 +310,8 @@ sub find_mods {
 		push(@module_files, $name.".".$main::obj_ext); # this is the .o file for this module
 		push(@module_files, lc($modname).".".$main::mod_ext); # this is the module file for this module
 	    } else {
-		warn "Don't know where module $modname lives (USEd in file ".%{$self->{'filepath'}}.").\n";
+		warn "Don't know where module $modname lives (USEd in file ".${$self->{'source_file'}}.").\n";
+#		warn "Don't know where module $modname lives (USEd in file ".$sourcefile.").\n";
 	    }
 	} elsif ($main::cray) {
 	    if ($file = $main::mod_files{$modname}) {
