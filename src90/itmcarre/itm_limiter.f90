@@ -27,7 +27,7 @@ contains
 
   
   subroutine itmlimReadFromStructureFile(filename, limiter)
-    character(*), input(in) :: filename    
+    character(*), intent(in) :: filename
     type(type_limelement), intent(inout) :: limiter
 
     ! internal    
@@ -42,7 +42,7 @@ contains
     integer :: is
 
     ! open & read structure file
-    OPEN(UNIT=8, FILE=name, STATUS='old')
+    OPEN(UNIT=8, FILE=filename, STATUS='old')
     nstruc=0
     call listru(8,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,nstrmx)
     ! ... file is closed in listru
@@ -60,7 +60,7 @@ contains
 
             limiter % name( is ) = nomstr( is )
             limiter % limgeometry % npoints( is, 1 ) = abs( npstru( is ) )
-            if ( npstru < 0 ) then             
+            if ( npstru( is ) < 0 ) then
                     limiter % limgeometry % closed( is, 1 ) = ITM_STRUCT_CLOSED
             end if
             limiter % limgeometry % rzcoordinate % r( is, 1, 1 : abs(npstru( is )) ) &
