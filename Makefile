@@ -10,7 +10,7 @@ VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCD
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
-EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o euitm_routines.o
+EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o euitm_routines.o itm_test_limiter1.o itm_test_limiter2.o itm_test_limiter.o
 MAINLIST = carre.o tradui.o fcrr.o fcrblkd.o 
 
 
@@ -209,6 +209,7 @@ update:
 	cd $(SOLPSTOP); gmake update
 
 listobj:
+	echo ${VPATH}
 	@rm -f LISTOBJ; touch LISTOBJ ; \
 	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${VPATH}" | tr : \ `; do \
