@@ -8,7 +8,7 @@
 !*** This program translates the grid created with carre into other
 !*** grid formats
 !======================================================================
-#idfef USE_ITMCARRE
+#ifdef USE_ITMCARRE
       use b2Connectivity
       use b2ITMMapping
       use euITM_schemas  
@@ -46,9 +46,11 @@
       integer :: leftcut(ncutmx),rightcut(ncutmx),bottomcut(ncutmx),topcut(ncutmx)
       integer, allocatable, dimension(:,:) :: leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy
       integer, parameter :: PERIODIC_BC = 0
-      
+
+#ifdef USE_ITMCARRE      
       type(B2ITMGridDesc) :: b2gd
       type(type_grid_full) :: itmgrid
+#endif
 
       ! variables for UAL I/O
 #ifdef USE_UAL
