@@ -5,6 +5,7 @@ module itm_grid_access
 
   implicit none
 
+
 contains
 
   ! Return dimension of the grid described by a given grid descriptor.
@@ -79,5 +80,6 @@ contains
     end do
 
   end subroutine gridGetNodeCoord
+
 
 end module itm_grid_access

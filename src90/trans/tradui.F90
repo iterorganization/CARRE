@@ -8,10 +8,12 @@
 !*** This program translates the grid created with carre into other
 !*** grid formats
 !======================================================================
+#idfef USE_ITMCARRE
       use b2Connectivity
       use b2ITMMapping
       use euITM_schemas  
       use write_structures
+#endif
 
 #ifdef USE_UAL
       use euITM_routines
@@ -112,7 +114,9 @@
       write(6,*) '3: format SONNET-DIVIMP'
       write(6,*) '4: format DG-SONNET-B2-EIRENE'
       write(6,*) '5: revised DIVIMP with grid parameters and PSI values'
+#ifdef USE_ITMCARRE
       write(6,*) '6: Write ITM CPO' 
+#endif
       read(5,*) isel
       write(6,*) 'The format chosen is :',isel
 
@@ -186,6 +190,8 @@
 !
 ! CPO Output
 !
+
+#ifdef USE_ITMCARRE
       elseif(isel.eq.6) then
 
               ! assemble the crx, cry arrays
@@ -245,7 +251,8 @@
               call euitm_deallocate(cpoedge)
 #endif
 
-
+#endif      
+              
 
       else
         write(6,*) 'Wrong value (must be 1 to 5): isel=',isel
