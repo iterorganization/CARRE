@@ -133,15 +133,15 @@ do {
                 n=1
                 set -- $griddir/$grid_stem.[0-9][0-9][0-9]
                 [ -f $1 ] && {
-#                    n=`ls $griddir/$grid_stem.[0-9][0-9][0-9] | tail -1`
-		    n=`echo $griddir/$grid_stem.[0-9][0-9][0-9] | awk '{print $NF}'`
+                    n=`ls $griddir/$grid_stem.[0-9][0-9][0-9] | tail -1`
+#		    n=`echo $griddir/$grid_stem.[0-9][0-9][0-9] | awk '{print $NF}'`
                     n=${n#*/$grid_stem.}
+                    /bin/echo -e "Last grid number found is : $n"
                     let "n = n + 1"
                 }
                 [ ${#n} -lt 2 ] && n=00$n || {
                     [ ${#n} -lt 3 ] && n=0$n
                 }
-                /bin/echo -e "$n"
                 mv -f traduit.out $griddir/$grid_stem.$n && \
                   /bin/echo -e "The grid is stored as $griddir/$grid_stem.$n"
                 touch CARRE.HISTORY
