@@ -4,7 +4,7 @@ module b2ITMMapping
   use euITM_schemas
   use itm_grid
   use Logging
-  use Helper
+  !use Helper
 
   implicit none
 
@@ -73,7 +73,7 @@ contains
        & topix,topiy,bottomix,bottomiy )
     
     type(B2ITMGridDesc), intent(in) :: b2gd
-    type(type_grid_full), intent(out) :: itmgrid
+    type(type_complexgrid), intent(out) :: itmgrid
 
     ! Size of grid arrays: (-1:nx, -1:ny) 
     integer, intent(in) :: nx, ny
@@ -97,39 +97,35 @@ contains
     itmgrid % metric => null()
 
     ! Coordinate types
-    ! (dimension of space = NDIM = size( type_coord )
-    allocate( itmgrid % spaces(1) % type_coord(NDIM) )    
-    itmgrid % spaces(1) % type_coord = (/ COORDTYPE_R, COORDTYPE_Z /)
+    ! (dimension of space = NDIM = size( coordtype )
+    allocate( itmgrid % spaces(1) % coordtype(NDIM) )    
+    itmgrid % spaces(1) % coordtype = (/ COORDTYPE_R, COORDTYPE_Z /)
 
-    ! Number of objects
-    allocate( itmgrid % spaces(1) % nobject(NDIM) )
-    itmgrid % spaces(1) % nobject = (/ b2gd%nfcx + b2gd%nfcy, b2gd%ncv /)
+    ! Have two types of objects: 1d edges, 2d cells
+    allocate( itmgrid % spaces(1) % objects(NDIM) )
+    ! nobjects: (/ b2gd%nfcx + b2gd%nfcy, b2gd%ncv /)
 
     ! Number of boundaries the objects have (at maximum)
-    allocate( itmgrid % spaces(1) % nobject_bou(NDIM) )
-    itmgrid % spaces(1) % nobject_bou = (/ 2, 4 /)
-
-    ! Maximum number of neighbours an object can have per side
-    allocate( itmgrid % spaces(1) % neighborside(NDIM) )
-    itmgrid % spaces(1) % neighborside = (/ 0, 1 /)
+!!$    itmgrid % spaces(1) % nobject_bou = (/ 2, 4 /)
 
     ! Fill in node information
-    allocate( itmgrid % spaces(1) % node_value(b2gd%nvx, NDIM) )
+    allocate( itmgrid % spaces(1) % nodes % geo(b2gd%nvx, NDIM, 1) )
     do ivx = 1, b2gd % nvx
             ix = b2gd % mapVxix( ivx )
             iy = b2gd % mapVxiy( ivx )
-            itmgrid % spaces(1) % node_value(ivx, 1) =  crx( ix, iy, 0 )
-            itmgrid % spaces(1) % node_value(ivx, 2) =  cry( ix, iy, 0 )
+            itmgrid % spaces(1) % nodes % geo(ivx, 1, 1) =  crx( ix, iy, 0 )
+            itmgrid % spaces(1) % nodes % geo(ivx, 2, 1) =  cry( ix, iy, 0 )
     end do
 
     ! Fill in object definitions (i.e. what objects compose an object)
-    allocate( itmgrid % spaces(1) % objdef( maxval(itmgrid % spaces(1) % nobject), &
-         & maxval(itmgrid % spaces(1) % nobject_bou), NDIM ) )
-    ! first set all to undefined
-    itmgrid % spaces(1) % objdef = GRID_UNDEFINED
+
 
     ! 1d objects: faces
-
+    ! ...have two boundaries
+    allocate( itmgrid % spaces(1) % objects(1) % boundary( b2gd%nfcx + b2gd%nfcy, 2) )
+    ! ...have no neighbours. objects(1) % neighbour left unallocated.
+    ! first set all boundary information to undefined
+    itmgrid % spaces(1) % objects(1) % boundary = GRID_UNDEFINED
     ! x-aligned faces    
     do ifc = 1, b2gd % nfcx    
             ! get position of this face in the b2 grid
@@ -137,14 +133,14 @@ contains
             iy = b2gd % mapFciy( ifc )
             ! get index of start vertex 
             ! objdef dims: index of face, 1=start node, 1=one-dimensional object
-            itmgrid % spaces(1) % objdef( ifc, 1, 1 ) = b2gd % mapVxI( ix, iy )
+            itmgrid % spaces(1) % objects(1) % boundary( ifc, 1 ) = b2gd % mapVxI( ix, iy )
             ! get index of end vertex 
             ! in the b2 grid, the end node/vertex of an x-aligned face is the 
             ! vertex associated with the right neighbour cell
             nix = rightix( ix, iy )
             niy = rightiy( ix, iy )
             ! objdef dims: index of face, 2=end node, 1=one-dimensional object
-            itmgrid % spaces(1) % objdef( ifc, 2, 1 ) = b2gd % mapVxI( nix, niy )
+            itmgrid % spaces(1) % objects(1) % boundary( ifc, 2 ) = b2gd % mapVxI( nix, niy )
     end do
     ! y-aligned faces    
     do ifc = b2gd % nfcx + 1, b2gd % nfcx + b2gd % nfcy    
@@ -153,40 +149,45 @@ contains
             iy = b2gd % mapFciy( ifc )
             ! get index of start vertex 
             ! objdef dims: index of face, 1=start node, 1=one-dimensional object
-            itmgrid % spaces(1) % objdef( ifc, 1, 1 ) = b2gd % mapVxI( ix, iy )
+            itmgrid % spaces(1) % objects(1) % boundary( ifc, 1 ) = b2gd % mapVxI( ix, iy )
             ! get index of end vertex 
             ! in the b2 grid, the end node/vertex of a y-aligned face is the 
             ! vertex associated with the top neighbour cell
             nix = topix( ix, iy )
             niy = topiy( ix, iy )
             ! objdef dims: index of face, 2=end node, 1=one-dimensional object
-            itmgrid % spaces(1) % objdef( ifc, 2, 1 ) = b2gd % mapVxI( nix, niy )
+            itmgrid % spaces(1) % objects(1) % boundary( ifc, 2 ) = b2gd % mapVxI( nix, niy )
     end do
 
     ! 2d objects: cells
+    ! ...have four boundaries
+    allocate( itmgrid % spaces(1) % objects(2) % boundary( b2gd%ncv, 4) )
+    ! first set all boundary information to undefined
+    itmgrid % spaces(1) % objects(1) % boundary = GRID_UNDEFINED
+
     do icv = 1, b2gd % ncv
             ix = b2gd % mapCvix( icv )
             iy = b2gd % mapCviy( icv )
 
             ! put faces composing the quadliateral in the list: left face (y-aligned)
-            itmgrid % spaces(1) % objdef( icv, 1, 2 ) = b2gd % mapFcyI( ix, iy )
+            itmgrid % spaces(1) % objects(2) % boundary( icv, 1 ) = b2gd % mapFcyI( ix, iy )
             ! bottom face (x-aligned
-            itmgrid % spaces(1) % objdef( icv, 2, 2 ) = b2gd % mapFcxI( ix, iy )
+            itmgrid % spaces(1) % objects(2) % boundary( icv, 2 ) = b2gd % mapFcxI( ix, iy )
             ! right face (y-aligned): take left face of right neighbour
             nix = rightix( ix, iy )
             niy = rightiy( ix, iy )
-            itmgrid % spaces(1) % objdef( icv, 3, 2 ) = b2gd % mapFcyI( nix, niy )            
+            itmgrid % spaces(1) % objects(2) % boundary( icv, 3 ) = b2gd % mapFcyI( nix, niy )
             ! top face (x-aligned): take bottom face of top neighbour
             nix = topix( ix, iy )
             niy = topiy( ix, iy )
-            itmgrid % spaces(1) % objdef( icv, 4, 2 ) = b2gd % mapFcxI( nix, niy )            
+            itmgrid % spaces(1) % objects(2) % boundary( icv, 4 ) = b2gd % mapFcxI( nix, niy )
     end do
 
     ! Fill in connectivity information
-    allocate( itmgrid % spaces(1) % neighbors( maxval( itmgrid % spaces(1) % nobject) , &
-         & maxval(itmgrid % spaces(1) % nobject_bou), NDIM ) )
+    ! ...have one neighbour per boundary
+    allocate( itmgrid % spaces(1) % objects(2) % neighbour( b2gd%ncv, 4, 1) )
     ! first set all to undefined
-    itmgrid % spaces(1) % neighbors = GRID_UNDEFINED
+    itmgrid % spaces(1) % objects(2) % neighbour = GRID_UNDEFINED
     
     do icv = 1, b2gd % ncv
             ix = b2gd % mapCvix( icv )
@@ -195,22 +196,22 @@ contains
             ! left neighbour
             nix = leftix( ix, iy )
             niy = leftiy( ix, iy )
-            itmgrid % spaces(1) % neighbors(icv,1,1) = b2gd % mapCvI( nix, niy )
+            itmgrid % spaces(1) % objects(2) % neighbour(icv,1,1) = b2gd % mapCvI( nix, niy )
 
             ! bottom neighbour
             nix = bottomix( ix, iy )
             niy = bottomiy( ix, iy )
-            itmgrid % spaces(1) % neighbors(icv,2,1) = b2gd % mapCvI( nix, niy )
+            itmgrid % spaces(1) % objects(2) % neighbour(icv,2,1) = b2gd % mapCvI( nix, niy )
             
             ! right neighbour
             nix = rightix( ix, iy )
             niy = rightiy( ix, iy )
-            itmgrid % spaces(1) % neighbors(icv,3,1) = b2gd % mapCvI( nix, niy )
+            itmgrid % spaces(1) % objects(2) % neighbour(icv,3,1) = b2gd % mapCvI( nix, niy )
 
             ! top neighbour
             nix = topix( ix, iy )
             niy = topiy( ix, iy )
-            itmgrid % spaces(1) % neighbors(icv,4,1) = b2gd % mapCvI( nix, niy )
+            itmgrid % spaces(1) % objects(2) % neighbour(icv,4,1) = b2gd % mapCvI( nix, niy )
     end do
 
   end subroutine b2ITMFillGridDescription

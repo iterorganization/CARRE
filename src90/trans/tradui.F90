@@ -49,7 +49,7 @@
 
 #ifdef USE_ITMCARRE      
       type(B2ITMGridDesc) :: b2gd
-      type(type_grid_full) :: itmgrid
+      type(type_complexgrid) :: itmgrid
 #endif
 
       ! variables for UAL I/O

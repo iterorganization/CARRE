@@ -31,14 +31,14 @@ USE_SILO =
 
 EXCLUDELIST +=
 ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_shared:${SRCDIR}/itm_constants
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants
 
 ifeq ($(USE_UAL), -DUSE_UAL)
 else
 VPATH += :${SRCDIR}/schemas
 endif
 
-UAL_VERSION=4.08b
+UAL_VERSION=4.09a
 
 endif
 # *************************************************************
