@@ -10,7 +10,7 @@ VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCD
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
-EXCLUDELIST = carre.o tradui.o fcrr.o fcrblkd.o euitm_routines.o itm_test_limiter1.o itm_test_limiter2.o itm_test_limiter.o
+EXCLUDELIST = carre.o fcrr.o tradui.o euitm_routines.o itm_test_limiter1.o itm_test_limiter2.o itm_test_limiter.o
 MAINLIST = carre.o tradui.o fcrr.o fcrblkd.o 
 
 
@@ -25,13 +25,13 @@ include LISTOBJ
 # If we're compiling for the ITM, we don't want any utility executables and graphics output
 # But we want the UAL library
 ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
-NOUSE_MSCL = -DNOUSE_MSCL
+#NOUSE_MSCL = -DNOUSE_MSCL
 USE_NCARG = 
 USE_SILO = 
 
 EXCLUDELIST +=
 ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants
 
 ifeq ($(USE_UAL), -DUSE_UAL)
 else

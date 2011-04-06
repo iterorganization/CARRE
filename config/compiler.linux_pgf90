@@ -24,7 +24,7 @@ LDFLAGS 	+= ${NCARG}
 endif
 
 ifneq ($(NOUSE_MSCL),-DNOUSE_MSCL)
-LDFLAGS 	+= -lmscl
+LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
 endif
 
 ifeq ($(USE_UAL),-DUSE_UAL)
