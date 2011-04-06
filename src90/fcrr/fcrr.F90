@@ -5,6 +5,13 @@
 !======================================================================
 !*** Converts the dg data into the input files for Carre
 !======================================================================
+
+#ifdef USE_ITMCARRE
+      use euITM_schemas  
+      use euITM_routines
+#endif
+
+
       implicit none
 #include <impcon.inc>
       logical ex
@@ -17,6 +24,13 @@
      &      chcslp   / & 
      &   'selptx.inf'/
       external fcraxn,fcrtrn,fcrdgi
+
+#ifdef USE_ITMCARRE
+      type(type_equilibrium), pointer :: cpoequil(:) => null()
+      type(type_limiter) :: cpolimiter
+      integer :: idx
+#endif
+
 !======================================================================
 !
       inquire(file=chtrg,exist=ex)
@@ -66,5 +80,132 @@
       call fcrcrro(chccrr)
       call fcrfldo(chcfld)
       call fcrslpo(chcslp)
+
+!     Write equlibrium and limiter CPO 
+#ifdef USE_ITMCARRE
+
+      allocate(cpolimiter%datainfo%dataprovider(1))
+      cpolimiter%datainfo%dataprovider="IPP"
+!!$      allocate(cpolimiter(1)%codeparam%codename(1))
+!!$      cpolimiter(1)%codeparam%codename(1)="ITMFCRR"
+!!$      cpolimiter(1)%time= 0.0D0
+      
+      call fillLimiterCpo( cpolimiter )
+
+      allocate(cpoequil(1))
+      allocate(cpoequil(1)%datainfo%dataprovider(1))
+      cpoequil(1)%datainfo%dataprovider="IPP"
+      allocate(cpoequil(1)%codeparam%codename(1))
+      cpoequil(1)%codeparam%codename(1)="ITMFCRR"
+      cpoequil(1)%time= 0.0D0
+
+      call fillEquilibriumCpo( cpoequil(1) )
+
+      call open_ual(idx)
+      !call euitm_put(idx,"equilibrium",cpoequil)
+      call euitm_put(idx,"limiter",cpolimiter)
+
+      call close_ual(idx)
+
+      call euitm_deallocate(cpoequil)
+      call euitm_deallocate(cpolimiter)
+
+contains
+
+
+  subroutine open_ual(idx)
+    integer, intent(out) :: idx
+
+    ! internal
+    integer :: shot, run, refshot, refrun
+    character(len=5)::treename
+
+    namelist /b2_ual_write_namelist/ treename, shot, run, refshot, refrun
+
+    ! default values
+    shot = 2
+    run = 1
+    refshot = 1
+    refrun = 0
+    treename = 'euitm'
+    
+!!$    ! read namelist from configuration file
+!!$    read (ninp(0),b2_ual_write_namelist)
+!!$    write (nout(0),b2_ual_write_namelist)
+
+    ! establish UAL access
+    call euitm_create(treename, shot, run, refshot, refrun, idx)
+  end subroutine open_ual
+
+
+  subroutine close_ual(idx)
+    integer, intent(in) :: idx
+
+    call euitm_close(idx)
+  end subroutine close_ual
+
+  subroutine fillLimiterCpo( cpo )
+    type(type_limiter), intent(inout) :: cpo
+
+    ! DG common block
+#include <FCRCOM.F>
+
+    ! internal
+    integer :: k, j, l, i
+
+    allocate( cpo % limiter_unit( nstr ) )
+
+    k = 0
+    do j=1,nstr
+        allocate( cpo % limiter_unit( j ) % name(1) )
+        write(cpo % limiter_unit(j) % name(1),'(a,i4)') 'Structure ', j
+        allocate( cpo % limiter_unit( j ) % closed(1) )
+
+        if(j.le.nclstr) then
+            ! Closed structure
+            cpo % limiter_unit( j ) % closed(1) = 'y'
+        else
+            ! Open structure
+            cpo % limiter_unit( j ) % closed(1) = 'n'
+        end if
+
+        l = lstr(j)
+        allocate( cpo % limiter_unit(j) % position % r( l ) )
+        allocate( cpo % limiter_unit(j) % position % z( l ) )
+
+        do i=1, l
+            cpo % limiter_unit(j) % position % r( i ) = xstr(k+i)
+            cpo % limiter_unit(j) % position % z( i ) = ystr(k+i)
+        end do
+        k=k+lstr(j)
+      end do
+
+  end subroutine fillLimiterCpo
+
+
+  subroutine fillEquilibriumCpo( cpo )
+    type(type_equilibrium) :: cpo
+
+    ! internal
+    integer :: ix, iy
+#include <FCRCOM.F>
+
+    cpo % global_param % mag_axis % bphi = rbtor
+
+    cpo % profiles_2d % grid_type = '1' ! Rectangular R,Z grid
+    allocate( cpo % profiles_2d % grid % dim1( nr ) )
+    allocate( cpo % profiles_2d % grid % dim2( nz ) )
+    allocate( cpo % profiles_2d % psi( nr, nz ) )
+
+    cpo % profiles_2d % grid % dim1 = rgr(1:nr)
+    cpo % profiles_2d % grid % dim2 = zgr(1:nz)
+    cpo % profiles_2d % psi = pfm
+
+  end subroutine fillEquilibriumCpo
+
+#endif
+
+
+
 !======================================================================
       end

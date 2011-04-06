@@ -12,8 +12,11 @@
       use b2Connectivity
       use b2ITMMapping
       use euITM_schemas  
+#ifdef USE_READWRITECPO
       use write_structures
 #endif
+#endif
+
 
 #ifdef USE_UAL
       use euITM_routines
@@ -235,7 +238,7 @@
               allocate(cpoedge(1))
               allocate(cpoedge(1)%datainfo%dataprovider(1))
               cpoedge(1)%datainfo%dataprovider="IPP"
-              allocate(cpoedge(1)%codeparam%codename(3))
+              allocate(cpoedge(1)%codeparam%codename(1))
               cpoedge(1)%codeparam%codename(1)="ITMCARRE"
               cpoedge(1)%time= 0.0D0
 
