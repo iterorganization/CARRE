@@ -189,6 +189,34 @@ contains
 
   end subroutine computeB2Connectivity
 
+  subroutine computeB2Regions(nx,ny,nncut,nncutmax, &
+      & leftcut,rightcut,topcut,bottomcut, &
+      & leftix,rightix,rightiy,topix,topiy,bottomiy, &
+      & region,nnreg,resignore, &
+      & crx,cry,periodic_bc)
+
+    integer nx,ny,nncut,nncutmax
+    integer leftcut(nncutmax),rightcut(nncutmax), &
+        topcut(nncutmax),bottomcut(nncutmax), &
+        leftix(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
+        topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny), &
+        region(-1:nx,-1:ny,0:2),nnreg(0:2), &
+        resignore(-1:nx,-1:ny,1:2), &
+        periodic_bc
+    real (kind=rKind) :: &
+        crx(-1:nx,-1:ny,0:3), cry(-1:nx,-1:ny,0:3)
+
+    external init_region
+
+    call init_region(nx,ny,nncut,nncutmax, &
+        leftcut,rightcut,topcut,bottomcut, &
+        leftix,rightix,rightiy,topix,topiy,bottomiy, &
+        region,nnreg,resignore, &
+        crx,cry,periodic_bc)
+ 
+  end subroutine computeB2Regions
+  
+  
 
 
 end module b2Connectivity
