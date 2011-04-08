@@ -9,7 +9,7 @@
 !*** grid formats
 !======================================================================
 #ifdef USE_ITMCARRE
-      use b2Connectivity
+      use b2mod_connectivity
       use b2ITMMapping
       use euITM_schemas  
 #ifdef USE_READWRITECPO
@@ -53,6 +53,9 @@
 #ifdef USE_ITMCARRE      
       type(B2ITMGridDesc) :: b2gd
       type(type_complexgrid) :: itmgrid
+      integer :: inseltop, inselbot, nnreg(0:2)
+      integer, allocatable :: region(:,:,:), resignore(:,:,:)
+      integer, parameter :: istyle = -1 ! hard-wired to DG format
 #endif
 
       ! variables for UAL I/O
@@ -210,12 +213,22 @@
                    & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
 
               ! assemble the connectivity arrays
-              call computeB2Connectivity (nx,ny,&
-                   & crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
+              call init_connectivity (nx,ny,crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3), &
                    & leftix,leftiy,rightix,rightiy, &
                    & topix,topiy,bottomix,bottomiy, &
                    & leftcut,rightcut,bottomcut,topcut, &
-                   & PERIODIC_BC,nncut,ncutmx)
+                   & PERIODIC_BC,nncut,ncutmx,inseltop, inselbot, & 
+                   & geom_match_dist, istyle )
+              
+              ! compute the region arrays
+              allocate( region(-1:nx, -1:ny, 0:2) )
+              allocate( resignore(-1:nx, -1:ny, 1:2) )
+              call init_region(nx,ny,nncut,ncutmx, &
+                  & leftcut,rightcut,topcut,bottomcut, &
+                  & leftix,rightix,rightiy,topix,topiy,bottomiy, &
+                  & region,nnreg,resignore, &
+                  & crx,cry,PERIODIC_BC)
+
               
               ! set up the B2<->CPO mappings
               call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
