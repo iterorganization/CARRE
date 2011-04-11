@@ -12,13 +12,6 @@
       use b2mod_connectivity
       use b2ITMMapping
       use euITM_schemas  
-#ifdef USE_READWRITECPO
-      use write_structures
-#endif
-#endif
-
-
-#ifdef USE_UAL
       use euITM_routines
 #endif
       
@@ -59,7 +52,7 @@
 #endif
 
       ! variables for UAL I/O
-#ifdef USE_UAL
+#ifdef USE_ITMCARRE
       type (type_edge),pointer :: cpoedge(:) => null()
       integer :: idx, shot, run, refshot, refrun
       character(len=5)::treename
@@ -239,15 +232,7 @@
                    & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
                    & leftix,leftiy,rightix,rightiy, &
                    & topix,topiy,bottomix,bottomiy )
-              
-#ifdef USE_READWRITECPO
-              call open_write_file(747, 'griddesc.txt')
-              call write_cpo(itmgrid, "GridDesc")
-              call close_write_file
-#endif
 
-
-#ifdef USE_UAL
               allocate(cpoedge(1))
               allocate(cpoedge(1)%datainfo%dataprovider(1))
               cpoedge(1)%datainfo%dataprovider="IPP"
@@ -267,8 +252,6 @@
               !call euitm_open(treename,shot,run,idx)
               call euitm_put(idx,"edge",cpoedge)
               call euitm_deallocate(cpoedge)
-#endif
-
 #endif      
               
 

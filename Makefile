@@ -19,26 +19,21 @@ DEFINES = ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL}
 # Include object lists
 include LISTOBJ
 
-
 # *************************************************************
 # ITM-CARRE
-# If we're compiling for the ITM, we don't want any utility executables and graphics output
+# If we're compiling for the ITM, we don't want graphics output and most utilities
 # But we want the UAL library
 ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
-#NOUSE_MSCL = -DNOUSE_MSCL
 USE_NCARG = 
 USE_SILO = 
 
 EXCLUDELIST +=
-ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants
+ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared
 
-ifeq ($(USE_UAL), -DUSE_UAL)
-else
-VPATH += :${SRCDIR}/schemas
-endif
-
-UAL_VERSION=4.09a
+# Some variables are expected to be set up properly by the ITMv1 script
+# -${UAL} is the path to the UAL library files
+# -${DATAVERSION} is the currently selected UAL version (e.g. 4.09a)
 
 endif
 # *************************************************************
@@ -90,6 +85,7 @@ $(OBJECTCODE)/%.o : %.F
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
 $(OBJECTCODE)/%.o : %.F90
+	echo ${DEFINES}
 	- /bin/rm -f ${OBJECTCODE}/$*.f
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f90; \
 	case $< in \
@@ -108,7 +104,6 @@ $(OBJECTCODE)/%.o : %.f90
 # compile an executable
 ${OBJECTCODE}/%.exe : ${OBJECTCODE}/%.o
 	${FC} $(FFLAGS) -o ${OBJECTCODE}/$*.exe $^ ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
-
 
 all: ${ALLTARGETS}
 

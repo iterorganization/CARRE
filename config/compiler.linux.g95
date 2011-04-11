@@ -26,7 +26,10 @@ ifneq ($(NOUSE_MSCL),-DNOUSE_MSCL)
 LDFLAGS 	+= -lmscl
 endif
 
-ifeq ($(USE_UAL),-DUSE_UAL)
-  INCLUDE+= -I /afs/efda-itm.eu/project/switm/ual/${UAL_VERSION}/include/amd64_g95
-  LDLIBS += -L/afs/efda-itm.eu/project/switm/ual/${UAL_VERSION}/lib -lUALFORTRANInterface_g95
+ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
+  INCLUDE+= -I ${UAL}/include/amd64_pgi
+  LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_pgi
+
+  INCLUDE+= -I ${UAL}/include/amd64_g95
+  LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_g95
 endif
