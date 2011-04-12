@@ -44,7 +44,7 @@
       integer, parameter :: PERIODIC_BC = 0
 
 #ifdef USE_ITMCARRE      
-      type(B2ITMGridDesc) :: b2gd
+      type(B2ITMGridMap) :: b2gd
       type(type_complexgrid) :: itmgrid
       integer :: inseltop, inselbot, nnreg(0:2)
       integer, allocatable :: region(:,:,:), resignore(:,:,:)
@@ -231,7 +231,8 @@
               call b2ITMFillGridDescription( b2gd, itmgrid, &
                    & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
                    & leftix,leftiy,rightix,rightiy, &
-                   & topix,topiy,bottomix,bottomiy )
+                   & topix,topiy,bottomix,bottomiy, &
+                   & nnreg, topcut, region )
 
               allocate(cpoedge(1))
               allocate(cpoedge(1)%datainfo%dataprovider(1))
