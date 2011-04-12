@@ -1,8 +1,8 @@
       SUBROUTINE MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord, & 
      &     separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
      &     xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
-     &     np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv, & 
-     &     a00,a10,a01,a11,fctpx,limcfg,diag)
+     &     np1,ptx,pty,nivx,nivy,nivtot,nbniv, & 
+     &     a00,a10,a01,a11,fctpx,limcfg,diag,par)
   !
 !  version : 23.06.98 19:53
 !
@@ -16,6 +16,7 @@
     
       use CarreSiloIO
       use CarreDiagnostics
+      use carre_io
   
       IMPLICIT NONE
   
@@ -26,7 +27,7 @@
       !  arguments
       INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint, & 
      &        nstruc,npstru(nstruc),nreg,inddef(4), & 
-     &        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg
+     &        np1(nregmx),nivtot(nivmx),nbniv,limcfg
       LOGICAL racord
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax), & 
      &  xpto,ypto,separx(npnimx,4,npx), & 
@@ -37,18 +38,19 @@
      &  a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
      &  a01(nxmax,nymax,3),a11(nxmax,nymax,3)
       type(CarreDiag), intent(inout) :: diag
+      type(CarreParameters), intent(inout) :: par
 
       !  variables en common
 #include <COMLAN.F>
 #include <COMRLX.F>
 
       !  variables locales
-      INTEGER nptseg(10),isep,ipas,ireg,ipx,sens,nn,idef, & 
-     &  repart,nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
+      INTEGER isep,ipas,ireg,ipx,sens,nn,idef, & 
+     &  nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
      &  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
-      REAL*8 dist,x2,y2,pntrat,lg(10),deltp1(10),deltpn(10), & 
-     &  deltr1(10),deltrn(10),xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
-     &  dpmax(10),drmin(10),drmax(10),xfin,yfin,tgarde(4),gardd1, & 
+      REAL*8 dist,x2,y2,lg(10), & 
+     &  xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
+     &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, & 
      &  gardd2,xptxo,yptxo,distxo,xint,yint,xext,yext,psiint, & 
      &  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
       REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10), & 
@@ -66,6 +68,8 @@
      &         ruban,plqdst,trace3 & 
      &        ,trc_stk_in,trc_stk_out
       intrinsic max
+
+
 !=========================
 !.. npnimx: <=> npnimx
 !.. nreg  : number of regions
@@ -74,9 +78,6 @@
 !.. xn,yn : working arrays for coordinates along a parametrised curve
 !.. nn    : number of points on the same curve
 !.. np1   : number of points in poloidal direction
-!.. npr   : number of points in radial direction
-!.. tgarde: guard length for each divertor target
-!.. nptseg: number of points along differents segments of separatrix
 !.. ireg  : region index
 !.. ipx   : X-point index
 !.. ptxext: index of the outer X-point
@@ -84,8 +85,6 @@
 !           1=the same as the target points, 2=the opposite
 !.. idef  : index of the target from where the routine starts
 !.. a00,a10,a01,a11: coefficients.
-!.. repart: selector for the radial point distribution
-!           1=absolute distance, 2=difference in psi
 !.. nsep  : number of the separatrices per the configuration
 !.. nbcrb : number of boundary lines
 !.. ii,jj : cell identification indices
@@ -95,10 +94,7 @@
 !           because the file is incomplete
 !           (0=file is acceptable, 1=unacceptable)
 !.. x2,y2 : starting point for routine marche
-!.. pntrat: penetration value of the X-point relative to the O-point
 !.. lg    : length of each separatrix
-!.. deltp1,deltpn: values of the first and last intervals for each sep.
-!.. deltr1,deltrn: values of the first and last intervals for each reg.
 !.. dpmin,dpmax: values of the minimal and maximal interval widths
 !..
 !.. xnlast,ynlast: dans le cas du double nul decon., derniere courbe de
@@ -153,18 +149,6 @@
          fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
      &            a11(ii,jj,1)*xx*yy
 
-!..1.1  Read all the necessary data from the file
-
-         ient = 9
-         isor = 0
-
-       tgarde(1)=0
-       tgarde(2)=0
-       tgarde(3)=0
-       tgarde(4)=0
-         CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &               pntrat,tgarde,distxo,ient,isor,ifail)
-
 !..Calculate the length of each separatrix
 
          DO 1 isep = 1, 3
@@ -175,143 +159,65 @@
 
     1    CONTINUE
 
-!..Check whether all the data have been read from the file
+!.. Read initial set of code parameters
+         call read_code_parameters(par, distxo)
 
-         IF (ifail .EQ. 1) THEN
+         correct = .false.
+         do while (correct)
 
-           if(sellan(1:8).eq.'francais') then
-             CALL LECCLF(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &         deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &         distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &         npx,racord,x,y,nx,ny)
-           elseif(sellan(1:7).eq.'english') then
-             CALL LECCLE(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &         deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &         distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &         npx,racord,x,y,nx,ny)
-           endif
+             !..Calculate the psi difference between the penetration values
 
-         ENDIF
+             IF (par%repart .EQ. 2) THEN
 
-    3    CONTINUE
+                 xfin = xx + xptxo*par%pntrat
+                 yfin = yy + yptxo*par%pntrat
 
-!..Calculate the psi difference between the penetration values
+                 ii = ifind(xfin,x,nx,1)
+                 jj = ifind(yfin,y,ny,1)
 
-         IF (repart .EQ. 2) THEN
+                 fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+                     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
-            xfin = xx + xptxo*pntrat
-            yfin = yy + yptxo*pntrat
+                 difpsi = fctfin - fctini
 
-            ii = ifind(xfin,x,nx,1)
-            jj = ifind(yfin,y,ny,1)
+             ENDIF
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+             !..Calculate the intervals, dmin and dmax
 
-            difpsi = fctfin - fctini
+             !..Along the separatrices
 
-         ENDIF
+             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+                 &               dpmin(1),dpmax(1))
 
-!..Calculate the intervals, dmin and dmax
+             CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), & 
+                 &               dpmin(2),dpmax(2))
 
-!..Along the separatrices
+             CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), & 
+                 &               dpmin(3),dpmax(3))
 
-         CALL NUNIFO(nptseg(1),lg(1),deltp1(1),deltpn(1),spacep(1,1), & 
-     &               dpmin(1),dpmax(1))
+             !..Radial direction
 
-         CALL NUNIFO(nptseg(2),lg(2),deltp1(2),deltpn(2),spacep(1,2), & 
-     &               dpmin(2),dpmax(2))
+             CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+                 &               spacer(1,1),drmin(1),drmax(1))
 
-         CALL NUNIFO(nptseg(3),lg(3),deltp1(3),deltpn(3),spacep(1,3), & 
-     &               dpmin(3),dpmax(3))
+             CALL NUNIFO(par%npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+                 &               spacer(1,2),drmin(2),drmax(2))
 
-!..Radial direction
+             IF (par%repart .EQ. 1) THEN
 
-         CALL NUNIFO(npr(1),distnv(repart,1),deltr1(1),deltrn(1), & 
-     &               spacer(1,1),drmin(1),drmax(1))
+                 CALL NUNIFO(par%npr(3),par%pntrat,par%deltr1(3),par%deltrn(3), & 
+                     &                  spacer(1,3),drmin(3),drmax(3))
 
-         CALL NUNIFO(npr(2),distnv(repart,2),deltr1(2),deltrn(2), & 
-     &               spacer(1,2),drmin(2),drmax(2))
+             ELSE IF (par%repart .EQ. 2) THEN
 
-         IF (repart .EQ. 1) THEN
+                 CALL NUNIFO(par%npr(3),difpsi,par%deltr1(3),par%deltrn(3), & 
+                     &                  spacer(1,3),drmin(3),drmax(3))
 
-            CALL NUNIFO(npr(3),pntrat,deltr1(3),deltrn(3), & 
-     &                  spacer(1,3),drmin(3),drmax(3))
+             ENDIF
 
-         ELSE IF (repart .EQ. 2) THEN
-
-            CALL NUNIFO(npr(3),difpsi,deltr1(3),deltrn(3), & 
-     &                  spacer(1,3),drmin(3),drmax(3))
-
-         ENDIF
-
-         CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,6,correct)
-
-!..Initialise the primary level line
-
-         nn1=0
-
-         DO ipas=1,nptot(ptsep(3,ipx),ipx)
-            nn1=nn1+1
-            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
-         end do	
-
-! on colle la dernière ligne de niveau sur trace2 pour avoir
-! la pénétration.
-
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
-     &        ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc, & 
-     &        nivx,nivy,nivtot,nbniv, & 
-     &         pntrat,distxo,xn,yn,nn1, & 
-     &         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
-     &         a00,a01,a10,a11,psi,nx,ny,x,y)
-
-         if (correct) then
-           if(sellan(1:8).eq.'francais') then
-             WRITE(6,301)
-  301        FORMAT(//T2,'Est-ce que ces valeurs sont correctes? (o/n)')
-           elseif(sellan(1:7).eq.'english') then
-             WRITE(6,300)
-  300        format(//T2,'Do you wish to accept these values (y/n)?')
-           endif
-           READ(5,302)rep
-  302      FORMAT(A)
-         endif
-
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
-
-            ient = 5
-            isor = 6
-            pntrat_old = pntrat
-            CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &                  pntrat,tgarde,distxo,ient,isor,ifail)
-            if (pntrat.ne.pntrat_old) then
-
-            call endpag
-
-            call trace2(x(1),x(nx),y(1),y(ny), & 
-     &     separx,separy,ptsep,npx,nptot, & 
-     &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-     &         nivtot,nbniv)
-
-            endif
-            GO TO 3
-         else
-            CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
-
-         ENDIF
-
-!..Save the chosen parameters
-
-         CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
-     &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
+             !.. Check & modify code parameters
+             call check_and_modify_code_parameters(par, correct)
+         end do
 
 !..1.2  Distribute the points along separatrices
 
@@ -321,16 +227,16 @@
            sepmay(1,isep) = separy(1,ptsep(isep,ipx),ipx)
            dist=0.
 
-           DO 5 ipas=2, nptseg(isep)-1
+           DO 5 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
               CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
      &          separy(1,ptsep(isep,ipx),ipx),nptot(ptsep(isep,ipx),ipx) & 
      &          ,dist,sepmax(ipas,isep),sepmay(ipas,isep))
     5      CONTINUE
 
-           sepmax(nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
+           sepmax(par%nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
      &       ptsep(isep,ipx),ipx)
-           sepmay(nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
+           sepmay(par%nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
      &       ptsep(isep,ipx),ipx)
     6    CONTINUE
 
@@ -345,19 +251,19 @@
          ireg=1
          np1(ireg) = 0
 
-         DO 10 ipas=nptseg(1), 1, -1
+         DO 10 ipas=par%nptseg(1), 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
    10    CONTINUE
 
-         DO 11 ipas=2, nptseg(3)
+         DO 11 ipas=2, par%nptseg(3)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
    11    CONTINUE
 
-         DO 12 ipas=2, nptseg(2)
+         DO 12 ipas=2, par%nptseg(2)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
@@ -395,8 +301,8 @@
 
 !..Initialise the guard indices
 
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(2)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(2)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
@@ -405,7 +311,7 @@
      &                 npstru(inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
-         DO 17 ipas=1, npr(ireg)-1
+         DO 17 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -419,7 +325,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
      &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
      &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-     &              a00,a10,a01,a11,repart, & 
+     &              a00,a10,a01,a11,par%repart, & 
      &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
      &              ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -433,13 +339,13 @@
          ireg=2
          np1(ireg) = 0
 
-         DO 20 ipas=nptseg(1), 1, -1
+         DO 20 ipas=par%nptseg(1), 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
    20    CONTINUE
 
-         DO 21 ipas=2, nptseg(2)
+         DO 21 ipas=2, par%nptseg(2)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
@@ -470,8 +376,8 @@
 
 !..Initialise the guard indices
 
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(2)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(2)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
@@ -494,7 +400,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &              a00,a10,a01,a11,repart, & 
+              &              a00,a10,a01,a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &              ynlast,nnlast,nuldec,.false.,diag,ireg)
 !
@@ -507,7 +413,7 @@
          ireg=3
          np1(ireg) = 0
 
-         DO 30 ipas=1, nptseg(3)
+         DO 30 ipas=1, par%nptseg(3)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
@@ -539,10 +445,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat, & 
+         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
      &       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &       a00,a10,a01,a11,repart, & 
+     &       a00,a10,a01,a11,par%repart, & 
      &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !----------------------------------------------------------------------
 
@@ -580,14 +486,6 @@
          fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
      &            a11(ii,jj,1)*xx*yy
 
-!..2.1  Read all the necessary data from the file
-
-         ient = 9
-         isor = 0
-
-         CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &               pntrat,tgarde,distxo,ient,isor,ifail)
-
 !..Calculate the length of each separatrix
 
          ipx = 1
@@ -604,123 +502,81 @@
      &                   nptot(ptsep(isep,ipx),ipx))
    39    CONTINUE
 
-!..Check whether all the data have been read from the file
+!..2.1  Read all the necessary data from the file
 
-         IF (ifail .EQ. 1) THEN
+         call read_code_parameters(par, distxo)
 
-           if(sellan(1:8).eq.'francais') then
-            CALL LECCLF(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &          deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &          distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &          npx,racord,x,y,nx,ny)
-           elseif(sellan(1:7).eq.'english') then
-            CALL LECCLE(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &          deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &          distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &          npx,racord,x,y,nx,ny)
-           endif
+         correct = .false.
+         do while (correct)
 
-         ENDIF
+             !..Calculate the psi difference between the penetration values
 
-   43    CONTINUE
+             IF (par%repart .EQ. 2) THEN
 
-!..Calculate the psi difference between the penetration values
+                 xfin = xx + xptxo*par%pntrat
+                 yfin = yy + yptxo*par%pntrat
 
-         IF (repart .EQ. 2) THEN
+                 ii = ifind(xfin,x,nx,1)
+                 jj = ifind(yfin,y,ny,1)
 
-            xfin = xx + xptxo*pntrat
-            yfin = yy + yptxo*pntrat
+                 fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+                     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
-            ii = ifind(xfin,x,nx,1)
-            jj = ifind(yfin,y,ny,1)
+                 difpsi = fctfin - fctini
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+             ENDIF
 
-            difpsi = fctfin - fctini
+             !..Calculate the intervals, dmin and dmax
 
-         ENDIF
+             !..Along the separatrices
 
-!..Calculate the intervals, dmin and dmax
+             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+                 &               dpmin(1),dpmax(1))
 
-!..Along the separatrices
+             CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), & 
+                 &               dpmin(2),dpmax(2))
 
-         CALL NUNIFO(nptseg(1),lg(1),deltp1(1),deltpn(1),spacep(1,1), & 
-     &               dpmin(1),dpmax(1))
+             CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), & 
+                 &               dpmin(3),dpmax(3))
 
-         CALL NUNIFO(nptseg(2),lg(2),deltp1(2),deltpn(2),spacep(1,2), & 
-     &               dpmin(2),dpmax(2))
+             CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), & 
+                 &               dpmin(4),dpmax(4))
 
-         CALL NUNIFO(nptseg(3),lg(3),deltp1(3),deltpn(3),spacep(1,3), & 
-     &               dpmin(3),dpmax(3))
+             CALL NUNIFO(par%nptseg(5),lg(5),par%deltp1(5),par%deltpn(5),spacep(1,5), & 
+                 &               dpmin(5),dpmax(5))
 
-         CALL NUNIFO(nptseg(4),lg(4),deltp1(4),deltpn(4),spacep(1,4), & 
-     &               dpmin(4),dpmax(4))
+             CALL NUNIFO(par%nptseg(6),lg(6),par%deltp1(6),par%deltpn(6),spacep(1,6), & 
+                 &               dpmin(6),dpmax(6))
 
-         CALL NUNIFO(nptseg(5),lg(5),deltp1(5),deltpn(5),spacep(1,5), & 
-     &               dpmin(5),dpmax(5))
+             !..Radial direction
 
-         CALL NUNIFO(nptseg(6),lg(6),deltp1(6),deltpn(6),spacep(1,6), & 
-     &               dpmin(6),dpmax(6))
+             CALL NUNIFO(npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+                 &               spacer(1,1),drmin(1),drmax(1))
 
-!..Radial direction
+             CALL NUNIFO(npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+                 &               spacer(1,2),drmin(2),drmax(2))
 
-         CALL NUNIFO(npr(1),distnv(repart,1),deltr1(1),deltrn(1), & 
-     &               spacer(1,1),drmin(1),drmax(1))
+             CALL NUNIFO(npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+                 &               spacer(1,3),drmin(3),drmax(3))
 
-         CALL NUNIFO(npr(2),distnv(repart,2),deltr1(2),deltrn(2), & 
-     &               spacer(1,2),drmin(2),drmax(2))
+             CALL NUNIFO(npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+                 &               spacer(1,4),drmin(4),drmax(4))
 
-         CALL NUNIFO(npr(3),distnv(repart,3),deltr1(3),deltrn(3), & 
-     &               spacer(1,3),drmin(3),drmax(3))
+             IF (par%repart .EQ. 1) THEN
 
-         CALL NUNIFO(npr(4),distnv(repart,4),deltr1(4),deltrn(4), & 
-     &               spacer(1,4),drmin(4),drmax(4))
+                 CALL NUNIFO(npr(5),par%pntrat,par%deltr1(5),par%deltrn(5), & 
+                     &                  spacer(1,5),drmin(5),drmax(5))
 
-         IF (repart .EQ. 1) THEN
+             ELSE IF (par%repart .EQ. 2) THEN
 
-            CALL NUNIFO(npr(5),pntrat,deltr1(5),deltrn(5), & 
-     &                  spacer(1,5),drmin(5),drmax(5))
+                 CALL NUNIFO(npr(5),difpsi,par%deltr1(5),par%deltrn(5), & 
+                     &                  spacer(1,5),drmin(5),drmax(5))
 
-         ELSE IF (repart .EQ. 2) THEN
+             ENDIF
 
-            CALL NUNIFO(npr(5),difpsi,deltr1(5),deltrn(5), & 
-     &                  spacer(1,5),drmin(5),drmax(5))
-
-         ENDIF
-
-         CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,6,correct)
-
-         if(correct) then
-           if(sellan(1:8).eq.'francais') then
-             WRITE(6,301)
-           elseif(sellan(1:7).eq.'english') then
-             WRITE(6,300)
-           endif
-           READ(5,302)rep
-         endif
-
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
-
-            ient = 5
-            isor = 6
-            CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &                  pntrat,tgarde,distxo,ient,isor,ifail)
-            GO TO 43
-         else
-            CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
-
-         ENDIF
-
-!..Save the chosen parameters
-
-         CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
-     &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
+             !.. Check & modify code parameters
+             call check_and_modify_code_parameters(par, correct)
+         end do
 
 !..2.2  Distribute the points along separatrices
 
@@ -731,16 +587,16 @@
            sepmay(1,isep) = separy(1,ptsep(isep,ipx),ipx)
            dist=0.
 
-           DO 45 ipas=2, nptseg(isep)-1
+           DO 45 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
               CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
      &                   separy(1,ptsep(isep,ipx),ipx), & 
      &                   nptot(ptsep(isep,ipx),ipx),dist, & 
      &                   sepmax(ipas,isep),sepmay(ipas,isep))
    45      CONTINUE
-           sepmax(nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
+           sepmax(par%nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
      &       ptsep(isep,ipx),ipx)
-           sepmay(nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
+           sepmay(par%nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
      &       ptsep(isep,ipx),ipx)
    44    CONTINUE
 
@@ -751,7 +607,7 @@
            sepmay(1,isep+4) = separy(1,ptsep(isep,ipx),ipx)
            dist=0.
 
-           DO 47 ipas=2, nptseg(isep+4)-1
+           DO 47 ipas=2, par%nptseg(isep+4)-1
               dist=dist + spacep(ipas-1,isep+4)
               CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
      &                   separy(1,ptsep(isep,ipx),ipx), & 
@@ -759,9 +615,9 @@
      &                   sepmax(ipas,isep+4),sepmay(ipas,isep+4))
 
    47      CONTINUE
-           sepmax(nptseg(isep+4),isep+4)=separx(nptot(ptsep(isep,ipx), & 
+           sepmax(par%nptseg(isep+4),isep+4)=separx(nptot(ptsep(isep,ipx), & 
      &       ipx),ptsep(isep,ipx),ipx)
-           sepmay(nptseg(isep+4),isep+4)=separy(nptot(ptsep(isep,ipx), & 
+           sepmay(par%nptseg(isep+4),isep+4)=separy(nptot(ptsep(isep,ipx), & 
      &       ipx),ptsep(isep,ipx),ipx)
    46    CONTINUE
 
@@ -774,19 +630,19 @@
          ireg=1
          np1(ireg) = 0
 
-         DO 50 ipas=nptseg(1), 1, -1
+         DO 50 ipas=par%nptseg(1), 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
    50    CONTINUE
 
-         DO 51 ipas=2, nptseg(3)
+         DO 51 ipas=2, par%nptseg(3)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
    51    CONTINUE
 
-         DO 52 ipas=2, nptseg(5)
+         DO 52 ipas=2, par%nptseg(5)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
@@ -828,8 +684,8 @@
 
 !..Initialise the guard indices
 
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(3)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(3)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
@@ -852,7 +708,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
      &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
      &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart, & 
+     &               a00,a10,a01,a11,par%repart, & 
      &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
      &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -864,13 +720,13 @@
          ireg=2
          np1(ireg) = 0
 
-         DO 60 ipas=nptseg(1), 1, -1
+         DO 60 ipas=par%nptseg(1), 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
    60    CONTINUE
 
-         DO 61 ipas=2, nptseg(2)
+         DO 61 ipas=2, par%nptseg(2)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
@@ -903,8 +759,8 @@
 
 !..Initialise the guard indices
 
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(2)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(2)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
@@ -927,7 +783,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -939,19 +795,19 @@
          ireg=3
          np1(ireg) = 0
 
-         DO 70 ipas=nptseg(2), 1, -1
+         DO 70 ipas=par%nptseg(2), 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
    70    CONTINUE
 
-         DO 71 ipas=2, nptseg(4)
+         DO 71 ipas=2, par%nptseg(4)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
    71    CONTINUE
 
-         DO 72 ipas=2, nptseg(6)
+         DO 72 ipas=2, par%nptseg(6)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
@@ -992,8 +848,8 @@
 
 !..Initialise the guard indices
 
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(4)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(4)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
@@ -1016,7 +872,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -1028,13 +884,13 @@
          ireg=4
          np1(ireg) = 0
 
-         DO 80 ipas=nptseg(5), 1, -1
+         DO 80 ipas=par%nptseg(5), 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
    80    CONTINUE
 
-         DO 81 ipas=2, nptseg(6)
+         DO 81 ipas=2, par%nptseg(6)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
@@ -1067,8 +923,8 @@
 
 !..Initialise the guard indices
 
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(4)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(4)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
@@ -1092,7 +948,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -1105,13 +961,13 @@
          np1(ireg) = 0
          ipx = 1
 
-         DO 90 ipas=1, nptseg(3)
+         DO 90 ipas=1, par%nptseg(3)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
    90    CONTINUE
 
-         DO 91 ipas=nptseg(4)-1,1,-1
+         DO 91 ipas=par%nptseg(4)-1,1,-1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
@@ -1149,10 +1005,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat, & 
+         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
      &       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &       a00,a10,a01,a11,repart, & 
+     &       a00,a10,a01,a11,par%repart, & 
      &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !----------------------------------------------------------------------
 
@@ -1240,14 +1096,6 @@
          fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
      &            a11(ii,jj,1)*xx*yy
 
-!..3.1  Read all the necessary data from the file
-
-         ient = 9
-         isor = 0
-
-         CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &               pntrat,tgarde,distxo,ient,isor,ifail)
-
 !..Calculate the length of each separatrix
 
          ipx = 1
@@ -1264,260 +1112,198 @@
      &                   nptot(ptsep(isep,ipx),ipx))
   103    CONTINUE
 
-!..Check whether all the data have been read from the file
+            !..3.1  Read all the necessary data from the file
+            
+            !.. Read initial set of code parameters
+            call read_code_parameters(par, distxo)
 
-         IF (ifail .EQ. 1) THEN
+            correct = .false.
+            do while (correct)
 
-           if(sellan(1:8).eq.'francais') then
-            CALL LECCLF(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &           deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &           distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &           npx,racord,x,y,nx,ny)
-           elseif(sellan(1:7).eq.'english') then
-            CALL LECCLE(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &           deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &           distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &           npx,racord,x,y,nx,ny)
-           endif
+                !..Calculate the psi difference between the penetration values
 
-         ENDIF
+                IF (par%repart .EQ. 2) THEN
 
-  105    CONTINUE
+                    xfin = xx + xptxo*par%pntrat
+                    yfin = yy + yptxo*par%pntrat
 
-!..Calculate the psi difference between the penetration values
+                    ii = ifind(xfin,x,nx,1)
+                    jj = ifind(yfin,y,ny,1)
 
-         IF (repart .EQ. 2) THEN
+                    fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+                        &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
-            xfin = xx + xptxo*pntrat
-            yfin = yy + yptxo*pntrat
+                    difpsi = fctfin - fctini
 
-            ii = ifind(xfin,x,nx,1)
-            jj = ifind(yfin,y,ny,1)
+                ENDIF
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+                !..Calculate the intervals, dmin and dmax, along the separatrices
 
-            difpsi = fctfin - fctini
+                CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+                    &               dpmin(1),dpmax(1))
 
-         ENDIF
+                CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), & 
+                    &               dpmin(2),dpmax(2))
 
-!..Calculate the intervals, dmin and dmax, along the separatrices
+                CALL NUNIFO(par%nptseg(5),lg(5),par%deltp1(5),par%deltpn(5),spacep(1,5), & 
+                    &               dpmin(5),dpmax(5))
 
-         CALL NUNIFO(nptseg(1),lg(1),deltp1(1),deltpn(1),spacep(1,1), & 
-     &               dpmin(1),dpmax(1))
-
-         CALL NUNIFO(nptseg(2),lg(2),deltp1(2),deltpn(2),spacep(1,2), & 
-     &               dpmin(2),dpmax(2))
-
-         CALL NUNIFO(nptseg(5),lg(5),deltp1(5),deltpn(5),spacep(1,5), & 
-     &               dpmin(5),dpmax(5))
-
-         CALL NUNIFO(nptseg(6),lg(6),deltp1(6),deltpn(6),spacep(1,6), & 
-     &               dpmin(6),dpmax(6))
+                CALL NUNIFO(par%nptseg(6),lg(6),par%deltp1(6),par%deltpn(6),spacep(1,6), & 
+                    &               dpmin(6),dpmax(6))
 
 
-!..Calculate the intervals, dmin and dmax, in the radial direction
+                !..Calculate the intervals, dmin and dmax, in the radial direction
 
-         CALL NUNIFO(npr(1),distnv(repart,1),deltr1(1),deltrn(1), & 
-     &               spacer(1,1),drmin(1),drmax(1))
+                CALL NUNIFO(npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+                    &               spacer(1,1),drmin(1),drmax(1))
 
-         CALL NUNIFO(npr(2),distnv(repart,2),deltr1(2),deltrn(2), & 
-     &               spacer(1,2),drmin(2),drmax(2))
+                CALL NUNIFO(npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+                    &               spacer(1,2),drmin(2),drmax(2))
 
-         CALL NUNIFO(npr(3),distnv(repart,3),deltr1(3),deltrn(3), & 
-     &               spacer(1,3),drmin(3),drmax(3))
+                CALL NUNIFO(npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+                    &               spacer(1,3),drmin(3),drmax(3))
 
-         CALL NUNIFO(npr(4),distnv(repart,4),deltr1(4),deltrn(4), & 
-     &               spacer(1,4),drmin(4),drmax(4))
+                CALL NUNIFO(npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+                    &               spacer(1,4),drmin(4),drmax(4))
 
-         CALL NUNIFO(npr(5),distnv(repart,5),deltr1(5),deltrn(5), & 
-     &               spacer(1,5),drmin(5),drmax(5))
+                CALL NUNIFO(npr(5),distnv(par%repart,5),par%deltr1(5),par%deltrn(5), & 
+                    &               spacer(1,5),drmin(5),drmax(5))
 
-         IF (repart .EQ. 1) THEN
+                IF (par%repart .EQ. 1) THEN
 
-            CALL NUNIFO(npr(6),pntrat,deltr1(6),deltrn(6), & 
-     &                  spacer(1,6),drmin(6),drmax(6))
+                    CALL NUNIFO(npr(6),par%pntrat,par%deltr1(6),par%deltrn(6), & 
+                        &                  spacer(1,6),drmin(6),drmax(6))
 
-         ELSE IF (repart .EQ. 2) THEN
+                ELSE IF (par%repart .EQ. 2) THEN
 
-            CALL NUNIFO(npr(6),difpsi,deltr1(6),deltrn(6), & 
-     &                  spacer(1,6),drmin(6),drmax(6))
+                    CALL NUNIFO(npr(6),difpsi,par%deltr1(6),par%deltrn(6), & 
+                        &                  spacer(1,6),drmin(6),drmax(6))
 
-         ENDIF
-!rm  augmenter ce test
-         if(npr(1).ne.npr1) then
-            npr1=npr(1)
+                ENDIF
+                !rm  augmenter ce test
+                if(npr(1).ne.npr1) then
+                    npr1=npr(1)
 
-!.3.1.1. Appel a la routine qui trouve le point sur la boucle de la
-!        separatrice interieure ou on doit diviser cette separatrice
-!        en deux.
+                    !.3.1.1. Appel a la routine qui trouve le point sur la boucle de la
+                    !        separatrice interieure ou on doit diviser cette separatrice
+                    !        en deux.
 
-!.3.1.1. Find the point on the separatrix loop where the separatrix
-!        should be split into two
+                    !.3.1.1. Find the point on the separatrix loop where the separatrix
+                    !        should be split into two
 
-!..Initialise the primary level line
+                    !..Initialise the primary level line
 
-            nn=0
-            ipx = ptxext
+                    nn=0
+                    ipx = ptxext
 
-            DO 110 ipas=nptot(ptsep(3,ipx),ipx),1,-1
-               nn=nn+1
-               xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-               yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
-  110       CONTINUE
+                    DO ipas=nptot(ptsep(3,ipx),ipx),1,-1
+                        nn=nn+1
+                        xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
+                        yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+                    end DO
 
-            DO 111 ipas=2,nptot(ptsep(4,ipx),ipx)
-               nn=nn+1
-               xn(nn)=separx(ipas,ptsep(4,ipx),ipx)
-               yn(nn)=separy(ipas,ptsep(4,ipx),ipx)
-  111       CONTINUE
+                    DO ipas=2,nptot(ptsep(4,ipx),ipx)
+                        nn=nn+1
+                        xn(nn)=separx(ipas,ptsep(4,ipx),ipx)
+                        yn(nn)=separy(ipas,ptsep(4,ipx),ipx)
+                    end DO
 
-!..Co-ordinates of the outer X-point
+                    !..Co-ordinates of the outer X-point
 
-            xptxex = separx(1,ptsep(3,ipx),ipx)
-            yptxex = separy(1,ptsep(3,ipx),ipx)
+                    xptxex = separx(1,ptsep(3,ipx),ipx)
+                    yptxex = separy(1,ptsep(3,ipx),ipx)
 
-!..Points of the grid to be used for the first call to doubld
+                    !..Points of the grid to be used for the first call to doubld
 
-            if(npr1.eq.0) then
-              ireg=1
-              nmail=min(41,nn/5)
-              nmail=nmail+mod(nmail+1,2)
-              ll=long(separx(1,ptsep(3,ipx),ipx), & 
-     &                separy(1,ptsep(3,ipx),ipx), & 
-     &                nptot(ptsep(3,ipx),ipx))
-              xmail(1,1,ireg)=separx(nptot(ptsep(3,ipx),ipx), & 
-     &          ptsep(3,ipx),ipx)
-              ymail(1,1,ireg)=separy(nptot(ptsep(3,ipx),ipx), & 
-     &          ptsep(3,ipx),ipx)
-              do imail=nmail/2,2,-1
-                dist=ll*(nmail/2-imail+1.)/(nmail/2)
-                CALL COORD(separx(1,ptsep(3,ipx),ipx), & 
-     &            separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx), & 
-     &            dist,xmail(imail,1,ireg),ymail(imail,1,ireg))
-              enddo
-              xmail(nmail/2+1,1,ireg)=xptxex
-              ymail(nmail/2+1,1,ireg)=yptxex
+                    if(npr1.eq.0) then
+                        ireg=1
+                        nmail=min(41,nn/5)
+                        nmail=nmail+mod(nmail+1,2)
+                        ll=long(separx(1,ptsep(3,ipx),ipx), & 
+                            &                separy(1,ptsep(3,ipx),ipx), & 
+                            &                nptot(ptsep(3,ipx),ipx))
+                        xmail(1,1,ireg)=separx(nptot(ptsep(3,ipx),ipx), & 
+                            &          ptsep(3,ipx),ipx)
+                        ymail(1,1,ireg)=separy(nptot(ptsep(3,ipx),ipx), & 
+                            &          ptsep(3,ipx),ipx)
+                        do imail=nmail/2,2,-1
+                            dist=ll*(nmail/2-imail+1.)/(nmail/2)
+                            CALL COORD(separx(1,ptsep(3,ipx),ipx), & 
+                                &            separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx), & 
+                                &            dist,xmail(imail,1,ireg),ymail(imail,1,ireg))
+                        enddo
+                        xmail(nmail/2+1,1,ireg)=xptxex
+                        ymail(nmail/2+1,1,ireg)=yptxex
 
-              ll=long(separx(1,ptsep(4,ipx),ipx), & 
-     &                separy(1,ptsep(4,ipx),ipx), & 
-     &                nptot(ptsep(4,ipx),ipx))
-              xmail(nmail,1,ireg)=separx(nptot(ptsep(4,ipx),ipx), & 
-     &          ptsep(4,ipx),ipx)
-              ymail(nmail,1,ireg)=separy(nptot(ptsep(4,ipx),ipx), & 
-     &          ptsep(4,ipx),ipx)
-              do imail=2,nmail/2
-                dist=ll*(imail-1.)/(nmail/2)
-                CALL COORD(separx(1,ptsep(3,ipx),ipx), & 
-     &            separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx), & 
-     &            dist,xmail(nmail/2+imail,1,ireg), & 
-     &            ymail(nmail/2+imail,1,ireg))
-              enddo
-            endif
+                        ll=long(separx(1,ptsep(4,ipx),ipx), & 
+                            &                separy(1,ptsep(4,ipx),ipx), & 
+                            &                nptot(ptsep(4,ipx),ipx))
+                        xmail(nmail,1,ireg)=separx(nptot(ptsep(4,ipx),ipx), & 
+                            &          ptsep(4,ipx),ipx)
+                        ymail(nmail,1,ireg)=separy(nptot(ptsep(4,ipx),ipx), & 
+                            &          ptsep(4,ipx),ipx)
+                        do imail=2,nmail/2
+                            dist=ll*(imail-1.)/(nmail/2)
+                            CALL COORD(separx(1,ptsep(3,ipx),ipx), & 
+                                &            separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx), & 
+                                &            dist,xmail(nmail/2+imail,1,ireg), & 
+                                &            ymail(nmail/2+imail,1,ireg))
+                        enddo
+                    endif
 
-!..Second boundary curve
+                    !..Second boundary curve
 
-            npcrb2=0
-            ipx = ptxint
+                    npcrb2=0
+                    ipx = ptxint
 
-            DO 112 ipas=nptot(ptsep(1,ipx),ipx),1,-1
-               npcrb2=npcrb2+1
-               xcrb2(npcrb2)=separx(ipas,ptsep(1,ipx),ipx)
-               ycrb2(npcrb2)=separy(ipas,ptsep(1,ipx),ipx)
-  112       CONTINUE
+                    DO ipas=nptot(ptsep(1,ipx),ipx),1,-1
+                        npcrb2=npcrb2+1
+                        xcrb2(npcrb2)=separx(ipas,ptsep(1,ipx),ipx)
+                        ycrb2(npcrb2)=separy(ipas,ptsep(1,ipx),ipx)
+                    end DO
 
-            DO 113 ipas=2,nptot(ptsep(3,ipx),ipx)
-               npcrb2=npcrb2+1
-               xcrb2(npcrb2)=separx(ipas,ptsep(3,ipx),ipx)
-               ycrb2(npcrb2)=separy(ipas,ptsep(3,ipx),ipx)
-  113       CONTINUE
+                    DO ipas=2,nptot(ptsep(3,ipx),ipx)
+                        npcrb2=npcrb2+1
+                        xcrb2(npcrb2)=separx(ipas,ptsep(3,ipx),ipx)
+                        ycrb2(npcrb2)=separy(ipas,ptsep(3,ipx),ipx)
+                    end DO
 
-            DO 114 ipas=2,nptot(ptsep(2,ipx),ipx)
-               npcrb2=npcrb2+1
-               xcrb2(npcrb2)=separx(ipas,ptsep(2,ipx),ipx)
-               ycrb2(npcrb2)=separy(ipas,ptsep(2,ipx),ipx)
-  114       CONTINUE
+                    DO ipas=2,nptot(ptsep(2,ipx),ipx)
+                        npcrb2=npcrb2+1
+                        xcrb2(npcrb2)=separx(ipas,ptsep(2,ipx),ipx)
+                        ycrb2(npcrb2)=separy(ipas,ptsep(2,ipx),ipx)
+                    end DO
 
-            call trc_stk_in('maille','*114')
-            CALL DOUBLD(bouclx,boucly,xn,yn,nn,spacer(1,1), & 
-     &        npr(1),inddef(idef),xext,yext,xptxex,yptxex,xpto, & 
-     &        ypto,nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
-     &        ystruc,a00,a10,a01,a11,repart, & 
-     &        xcrb2,ycrb2,npcrb2)
-            call trc_stk_out
-         endif
+                    call trc_stk_in('maille','*114')
+                    CALL DOUBLD(bouclx,boucly,xn,yn,nn,spacer(1,1), & 
+                        &        npr(1),inddef(idef),xext,yext,xptxex,yptxex,xpto, & 
+                        &        ypto,nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+                        &        ystruc,a00,a10,a01,a11,par%repart, & 
+                        &        xcrb2,ycrb2,npcrb2)
+                    call trc_stk_out
+                endif
 
-         ipx = ptxint
-         dist=0.0
+                ipx = ptxint
+                dist=0.0
 
-         lg(3) = ruban(separx(1,ptsep(3,ipx),ipx), & 
-     &                separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx) & 
-     &                ,bouclx,boucly,dist)
-         CALL NUNIFO(nptseg(3),lg(3),deltp1(3),deltpn(3),spacep(1,3), & 
-     &               dpmin(3),dpmax(3))
+                lg(3) = ruban(separx(1,ptsep(3,ipx),ipx), & 
+                    &                separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx) & 
+                    &                ,bouclx,boucly,dist)
+                CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), & 
+                    &               dpmin(3),dpmax(3))
 
-         lg(4) = long(separx(1,ptsep(3,ipx),ipx),separy(1,ptsep(3,ipx) & 
-     &              ,ipx),nptot(ptsep(3,ipx),ipx)) - lg(3)
-         CALL NUNIFO(nptseg(4),lg(4),deltp1(4),deltpn(4),spacep(1,4), & 
-     &               dpmin(4),dpmax(4))
+                lg(4) = long(separx(1,ptsep(3,ipx),ipx),separy(1,ptsep(3,ipx) & 
+                    &              ,ipx),nptot(ptsep(3,ipx),ipx)) - lg(3)
+                CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), & 
+                    &               dpmin(4),dpmax(4))
 
-         CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
-!..Initialise the primary level line
+                !.. Check & modify code parameters
+                call check_and_modify_code_parameters(par, correct)
+            end do
 
-         nn1=0
 
-         DO 381 ipas=1,nptot(ptsep(3,ipx),ipx)
-            nn1=nn1+1
-            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
-  381    CONTINUE
 
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
-     &        ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc, & 
-     &        nivx,nivy,nivtot,nbniv, & 
-     &         pntrat,distxo,xn,yn,nn1, & 
-     &         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
-     &         a00,a01,a10,a11,psi,nx,ny,x,y)
-
-         if (correct) then
-           if(sellan(1:8).eq.'francais') then
-             WRITE(6,301)
-           elseif(sellan(1:7).eq.'english') then
-             WRITE(6,300)
-           endif
-           READ(5,302)rep
-         endif
-
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
-
-            ient = 5
-            isor = 6
-            CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &                  pntrat,tgarde,distxo,ient,isor,ifail)
-            if (pntrat.ne.pntrat_old) then
-               call endpag
-               call trace2(x(1),x(nx),y(1),y(ny), & 
-     &          separx,separy,ptsep,npx,nptot, & 
-     &          nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-     &          nivtot,nbniv)
-            endif
-            GO TO 105
-         else
-            CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
-
-         ENDIF
-
-!..Save the chosen parameters
-
-         CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
-     &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
 
 !..3.2  Distribute the points along separatrices
 
@@ -1581,16 +1367,16 @@
            sepmay(1,isep) = separy(1,ptsep(isep,ipx),ipx)
            dist=0.
 
-           DO 123 ipas=2, nptseg(isep)-1
+           DO 123 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
               CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
      &                   separy(1,ptsep(isep,ipx),ipx), & 
      &                   nptot(ptsep(isep,ipx),ipx),dist, & 
      &                   sepmax(ipas,isep),sepmay(ipas,isep))
   123      CONTINUE
-           sepmax(nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
+           sepmax(par%nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
      &       ptsep(isep,ipx),ipx)
-           sepmay(nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
+           sepmay(par%nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
      &       ptsep(isep,ipx),ipx)
   122    CONTINUE
 
@@ -1600,13 +1386,13 @@
            sepmay(1,isep+2) = ybcl(1,isep)
            dist=0.
 
-           DO 125 ipas=2, nptseg(isep+2)-1
+           DO 125 ipas=2, par%nptseg(isep+2)-1
               dist=dist + spacep(ipas-1,isep+2)
               CALL COORD(xbcl(1,isep),ybcl(1,isep),nbcl(isep),dist, & 
      &                   sepmax(ipas,isep+2),sepmay(ipas,isep+2))
   125      CONTINUE
-           sepmax(nptseg(isep+2),isep+2)=xbcl(nbcl(isep),isep)
-           sepmay(nptseg(isep+2),isep+2)=ybcl(nbcl(isep),isep)
+           sepmax(par%nptseg(isep+2),isep+2)=xbcl(nbcl(isep),isep)
+           sepmay(par%nptseg(isep+2),isep+2)=ybcl(nbcl(isep),isep)
   124    CONTINUE
 
          ipx = 2
@@ -1616,16 +1402,16 @@
            sepmay(1,isep+4) = separy(1,ptsep(isep,ipx),ipx)
            dist=0.
 
-           DO 127 ipas=2, nptseg(isep+4)-1
+           DO 127 ipas=2, par%nptseg(isep+4)-1
               dist=dist + spacep(ipas-1,isep+4)
               CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
      &                   separy(1,ptsep(isep,ipx),ipx), & 
      &                   nptot(ptsep(isep,ipx),ipx),dist, & 
      &                   sepmax(ipas,isep+4),sepmay(ipas,isep+4))
   127      CONTINUE
-           sepmax(nptseg(isep+4),isep+4)=separx(nptot(ptsep(isep,ipx), & 
+           sepmax(par%nptseg(isep+4),isep+4)=separx(nptot(ptsep(isep,ipx), & 
      &       ipx),ptsep(isep,ipx),ipx)
-           sepmay(nptseg(isep+4),isep+4)=separy(nptot(ptsep(isep,ipx), & 
+           sepmay(par%nptseg(isep+4),isep+4)=separy(nptot(ptsep(isep,ipx), & 
      &       ipx),ptsep(isep,ipx),ipx)
   126    CONTINUE
 
@@ -1661,7 +1447,7 @@
 
          IF (ptxint .EQ. 1) THEN
 
-            DO 132 ipas=nptseg(1), 1, -1
+            DO 132 ipas=par%nptseg(1), 1, -1
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
@@ -1669,7 +1455,7 @@
 
          ELSE IF (ptxint .EQ. 2) THEN
 
-            DO 133 ipas=nptseg(5), 1, -1
+            DO 133 ipas=par%nptseg(5), 1, -1
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
@@ -1677,13 +1463,13 @@
 
          ENDIF
 
-         DO 134 ipas=2, nptseg(3)
+         DO 134 ipas=2, par%nptseg(3)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
   134    CONTINUE
 
-         DO 135 ipas=nptseg(4)-1, 1, -1
+         DO 135 ipas=par%nptseg(4)-1, 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
@@ -1691,7 +1477,7 @@
 
          IF (ptxint .EQ. 1) THEN
 
-            DO 136 ipas=2, nptseg(2)
+            DO 136 ipas=2, par%nptseg(2)
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
@@ -1699,7 +1485,7 @@
 
          ELSE IF (ptxint .EQ. 2) THEN
 
-            DO 137 ipas=2, nptseg(6)
+            DO 137 ipas=2, par%nptseg(6)
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
@@ -1711,12 +1497,12 @@
 
          IF (ptxint .EQ. 1) THEN
             idef = 1
-            gardd2 = tgarde(2)
+            gardd2 = par%tgarde(2)
          ELSE IF (ptxint .EQ. 2) THEN
             idef = 3
-            gardd2 = tgarde(4)
+            gardd2 = par%tgarde(4)
          ENDIF
-         gardd1 = tgarde(idef)
+         gardd1 = par%tgarde(idef)
 
          ipx = ptxint
 
@@ -1786,7 +1572,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -1794,13 +1580,13 @@
 
          IF (ptxint .EQ. 1) THEN
 
-            xmail(nptseg(1)+nptseg(3)-1,npr(1),1) = xptxex
-            ymail(nptseg(1)+nptseg(3)-1,npr(1),1) = yptxex
+            xmail(par%nptseg(1)+par%nptseg(3)-1,npr(1),1) = xptxex
+            ymail(par%nptseg(1)+par%nptseg(3)-1,npr(1),1) = yptxex
 
          ELSE IF (ptxint .EQ. 2) THEN
 
-            xmail(nptseg(5)+nptseg(3)-1,npr(1),1) = xptxex
-            ymail(nptseg(5)+nptseg(3)-1,npr(1),1) = yptxex
+            xmail(par%nptseg(5)+par%nptseg(3)-1,npr(1),1) = xptxex
+            ymail(par%nptseg(5)+par%nptseg(3)-1,npr(1),1) = yptxex
 
          ENDIF
 
@@ -1817,13 +1603,13 @@
 
          IF (ptxint .EQ. 1) THEN
 
-            DO 150 ipas=1,nptseg(1)+nptseg(3)-2
+            DO 150 ipas=1,par%nptseg(1)+par%nptseg(3)-2
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
                ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
   150       CONTINUE
 
-            DO 151 ipas=1, nptseg(5)
+            DO 151 ipas=1, par%nptseg(5)
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
@@ -1831,13 +1617,13 @@
 
          ELSE IF (ptxint .EQ. 2) THEN
 
-            DO 152 ipas=1,nptseg(5)+nptseg(3)-2
+            DO 152 ipas=1,par%nptseg(5)+par%nptseg(3)-2
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
                ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
   152       CONTINUE
 
-            DO 153 ipas=1, nptseg(1)
+            DO 153 ipas=1, par%nptseg(1)
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
@@ -1849,12 +1635,12 @@
 
          IF (ptxint .EQ. 1) THEN
             idef = 1
-            gardd2 = tgarde(3)
+            gardd2 = par%tgarde(3)
          ELSE IF (ptxint .EQ. 2) THEN
             idef = 3
-            gardd2 = tgarde(1)
+            gardd2 = par%tgarde(1)
          ENDIF
-         gardd1 = tgarde(idef)
+         gardd1 = par%tgarde(idef)
 
          ipx = ptxext
 
@@ -1899,7 +1685,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -1912,13 +1698,13 @@
          ireg=3
          np1(ireg) = 0
 
-         DO 160 ipas=nptseg(1),1,-1
+         DO 160 ipas=par%nptseg(1),1,-1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
   160    CONTINUE
 
-         DO 161 ipas=2, nptseg(2)
+         DO 161 ipas=2, par%nptseg(2)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
@@ -1927,8 +1713,8 @@
 !..Initialise the guard indices and starting target
 
          idef = 1
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(2)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(2)
 
          ipx = 1
 
@@ -1974,7 +1760,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -1990,14 +1776,14 @@
 
          IF (ptxint .EQ. 1) THEN
 
-            DO 170 ipas=nptseg(1)+nptseg(2)+nptseg(3)+nptseg(4)-3, & 
-     &                             nptseg(1)+nptseg(3), -1
+            DO 170 ipas=par%nptseg(1)+par%nptseg(2)+par%nptseg(3)+par%nptseg(4)-3, & 
+     &                             par%nptseg(1)+par%nptseg(3), -1
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
                ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
   170       CONTINUE
 
-            DO 171 ipas=1, nptseg(6)
+            DO 171 ipas=1, par%nptseg(6)
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
@@ -2005,14 +1791,14 @@
 
          ELSE IF (ptxint .EQ. 2) THEN
 
-            DO 172 ipas=nptseg(5)+nptseg(6)+nptseg(3)+nptseg(4)-3, & 
-     &                             nptseg(5)+nptseg(3), -1
+            DO 172 ipas=par%nptseg(5)+par%nptseg(6)+par%nptseg(3)+par%nptseg(4)-3, & 
+     &                             par%nptseg(5)+par%nptseg(3), -1
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
                ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
   172       CONTINUE
 
-            DO 173 ipas=1, nptseg(2)
+            DO 173 ipas=1, par%nptseg(2)
                np1(ireg) = np1(ireg)+1
                xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
                ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
@@ -2024,12 +1810,12 @@
 
          IF (ptxint .EQ. 1) THEN
             idef = 2
-            gardd2 = tgarde(4)
+            gardd2 = par%tgarde(4)
          ELSE IF (ptxint .EQ. 2) THEN
             idef = 4
-            gardd2 = tgarde(2)
+            gardd2 = par%tgarde(2)
          ENDIF
-         gardd1 = tgarde(idef)
+         gardd1 = par%tgarde(idef)
 
          ipx = ptxext
 
@@ -2074,7 +1860,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -2087,13 +1873,13 @@
          ireg=5
          np1(ireg) = 0
 
-         DO 180 ipas=nptseg(5), 1, -1
+         DO 180 ipas=par%nptseg(5), 1, -1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
   180    CONTINUE
 
-         DO 181 ipas=2, nptseg(6)
+         DO 181 ipas=2, par%nptseg(6)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
@@ -2102,8 +1888,8 @@
 !..Initialise the guard indices and starting target
 
          idef = 3
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(4)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(4)
 
          ipx = 2
 
@@ -2148,7 +1934,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,repart, & 
+              &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -2160,13 +1946,13 @@
          np1(ireg) = 0
          ipx = ptxint
 
-         DO 190 ipas=1, nptseg(3)
+         DO 190 ipas=1, par%nptseg(3)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
   190    CONTINUE
 
-         DO 191 ipas=nptseg(4)-1,1,-1
+         DO 191 ipas=par%nptseg(4)-1,1,-1
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
@@ -2199,10 +1985,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat, & 
+         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
      &      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &      a00,a10,a01,a11,repart, & 
+     &      a00,a10,a01,a11,par%repart, & 
      &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !----------------------------------------------------------------------
 
@@ -2240,136 +2026,65 @@
          fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
      &            a11(ii,jj,1)*xx*yy
 
-!..4.1  Read all the necessary data from the file
-
-         ient = 9
-         isor = 0
-
-         CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &               pntrat,tgarde,distxo,ient,isor,ifail)
 
 !..Calculate the length of each separatrix
 
-            lg(isep) = long(nivx(1,1),nivy(1,1),nivtot(1))
+         lg(isep) = long(nivx(1,1),nivy(1,1),nivtot(1))
+         
+         !..4.1  Read all the necessary data from the file
+         
+         !.. Read initial set of code parameters
+         call read_code_parameters(par, distxo)
 
-!..Check whether all the data have been read from the file
+         correct = .false.
+         do while (correct)
 
-         IF (ifail .EQ. 1) THEN
+             !..Calculate the psi difference between the penetration values
 
-           if(sellan(1:8).eq.'francais') then
-             CALL LECCLF(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &         deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &         distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &         npx,racord,x,y,nx,ny)
-           elseif(sellan(1:7).eq.'english') then
-             CALL LECCLE(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &         deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &         distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-     &         npx,racord,x,y,nx,ny)
-           endif
+             IF (par%repart .EQ. 2) THEN
 
-         ENDIF
+                 xfin = xx + xptxo*par%pntrat
+                 yfin = yy + yptxo*par%pntrat
 
-  203    CONTINUE
+                 ii = ifind(xfin,x,nx,1)
+                 jj = ifind(yfin,y,ny,1)
 
-!..Calculate the psi difference between the penetration values
+                 fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+                     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
-         IF (repart .EQ. 2) THEN
+                 difpsi = fctfin - fctini
 
-            xfin = xx + xptxo*pntrat
-            yfin = yy + yptxo*pntrat
+             ENDIF
 
-            ii = ifind(xfin,x,nx,1)
-            jj = ifind(yfin,y,ny,1)
+             !..Calculate the intervals, dmin and dmax
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+             !..Along the separatrices
 
-            difpsi = fctfin - fctini
-
-         ENDIF
-
-!..Calculate the intervals, dmin and dmax
-
-!..Along the separatrices
-
-         CALL NUNIFO(nptseg(1),lg(1),deltp1(1),deltpn(1),spacep(1,1), & 
-     &               dpmin(1),dpmax(1))
+             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+                 &               dpmin(1),dpmax(1))
 
 
-!..Radial direction
+             !..Radial direction
 
-         CALL NUNIFO(npr(1),distnv(repart,1),deltr1(1),deltrn(1), & 
-     &               spacer(1,1),drmin(1),drmax(1))
+             CALL NUNIFO(npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+                 &               spacer(1,1),drmin(1),drmax(1))
 
-         IF (repart .EQ. 1) THEN
+             IF (par%repart .EQ. 1) THEN
 
-            CALL NUNIFO(npr(2),pntrat,deltr1(2),deltrn(2), & 
-     &                  spacer(1,2),drmin(2),drmax(2))
+                 CALL NUNIFO(npr(2),par%pntrat,par%deltr1(2),par%deltrn(2), & 
+                     &                  spacer(1,2),drmin(2),drmax(2))
 
-         ELSE IF (repart .EQ. 2) THEN
+             ELSE IF (par%repart .EQ. 2) THEN
 
-            CALL NUNIFO(npr(2),difpsi,deltr1(2),deltrn(2), & 
-     &                  spacer(1,2),drmin(2),drmax(2))
+                 CALL NUNIFO(npr(2),difpsi,par%deltr1(2),par%deltrn(2), & 
+                     &                  spacer(1,2),drmin(2),drmax(2))
 
-         ENDIF
+             ENDIF
 
-         CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,6,correct)
+             !.. Check & modify code parameters
+             call check_and_modify_code_parameters(par, correct)
+         end do
 
-!..Initialise the primary level line
-
-         nn1=0
-
-         DO 391 ipas=1,nptot(ptsep(3,ipx),ipx)
-            nn1=nn1+1
-            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
-  391    CONTINUE
-
-            call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
-     &        ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc, & 
-     &     nivx,nivy,nivtot,nbniv, & 
-     &           pntrat,distxo,xn,yn,nn1, & 
-     &           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
-     &           a00,a01,a10,a11,psi,nx,ny,x,y)
-
-         if(correct) then
-           if(sellan(1:8).eq.'francais') then
-             WRITE(6,301)
-           elseif(sellan(1:7).eq.'english') then
-             WRITE(6,300)
-           endif
-           READ(5,302)rep
-         endif
-
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
-
-            ient = 5
-            isor = 6
-            CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &                  pntrat,tgarde,distxo,ient,isor,ifail)
-            if (pntrat.ne.pntrat_old) then
-                    call endpag
-                    call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
-                         & nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-                         & nivtot,nbniv)           
-            endif
-            GO TO 203
-         else
-            CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
-
-         ENDIF
-
-!..Save the chosen parameters
-
-         CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
-     &     deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag)
 
 !..4.2  Distribute the points along separatrices
 
@@ -2379,14 +2094,14 @@
            sepmay(1,isep) = nivy(1,1)
            dist=0.
 
-           DO ipas=2, nptseg(isep)-1
+           DO ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
               CALL COORD(nivx(1,1),nivy(1,1),nivtot(1), & 
      &          dist,sepmax(ipas,isep),sepmay(ipas,isep))
            ENDDO
 
-           sepmax(nptseg(isep),isep)=nivx(nivtot(1),1)
-           sepmay(nptseg(isep),isep)=nivy(nivtot(1),1)
+           sepmax(par%nptseg(isep),isep)=nivx(nivtot(1),1)
+           sepmay(par%nptseg(isep),isep)=nivy(nivtot(1),1)
          ENDDO
 
 !..4.3. Grid region by region
@@ -2398,7 +2113,7 @@
          ireg=1
          np1(ireg) = 0
 
-         DO ipas=1, nptseg(1)
+         DO ipas=1, par%nptseg(1)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
@@ -2426,8 +2141,8 @@
 
 !..Initialise the guard indices
 
-         gardd1 = tgarde(idef)
-         gardd2 = tgarde(2)
+         gardd1 = par%tgarde(idef)
+         gardd2 = par%tgarde(2)
 
 !..Determine the structure orientation
 
@@ -2460,7 +2175,7 @@
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
               &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &              a00,a10,a01,a11,repart, & 
+              &              a00,a10,a01,a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &              ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -2471,7 +2186,7 @@
          ireg=2
          np1(ireg) = 0
 
-         DO ipas=1, nptseg(1)
+         DO ipas=1, par%nptseg(1)
             np1(ireg) = np1(ireg)+1
             xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
             ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
@@ -2506,10 +2221,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat, & 
+         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
      &      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &      a00,a10,a01,a11,repart, & 
+     &      a00,a10,a01,a11,par%repart, & 
      &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 
 !       ...
@@ -2518,13 +2233,142 @@
 
 !..5.  Write the grid data into a file
 
-      CALL SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,deltrn, & 
-     &  pntrat,tgarde,distxo,repart,xmail,ymail,nx,ny, & 
-     &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx,diag)
+      CALL SORTIE(nsep,nreg,np1, & 
+     &  distxo,xmail,ymail,nx,ny, & 
+     &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx,diag,par)
 
 !c<<<
 !      write(0,*) '<=== Leaving maille'
 !c>>>
       RETURN
 !======================================================================
+
+
+CONTAINS
+
+  subroutine read_code_parameters(par, distxo)
+    type(CarreParameters), intent(inout) :: par
+    real*8, intent(in) :: distxo
+
+    ! internal
+    integer :: ient,isor,ifail
+
+    par%tgarde=0
+    
+!..1.1  Read all the necessary data from the file
+
+         ient = 9
+         isor = 0
+         CALL CHANGE(par%nptseg,par%deltp1,par%deltpn,par%repart,&
+             & par%npr,par%deltr1,par%deltrn,&
+             & par%pntrat,par%tgarde,distxo,ient,isor,ifail)
+
+!..Check whether all the data have been read from the file
+
+         IF (ifail .EQ. 1) THEN
+
+           if(sellan(1:8).eq.'francais') then
+             CALL LECCLF(par%nptseg,par%npr,lg,&
+                 & par%deltp1,par%deltpn,par%deltr1,limcfg, & 
+                 & par%deltrn,par%repart,par%pntrat,par%tgarde,&
+                 & distnv,xptxo,yptxo, & 
+                 & distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
+                 & npx,racord,x,y,nx,ny)
+           elseif(sellan(1:7).eq.'english') then
+             CALL LECCLE(par%nptseg,par%npr,lg,&
+                 & par%deltp1,par%deltpn,par%deltr1,limcfg, & 
+                 & par%deltrn,par%repart,par%pntrat,par%tgarde,&
+                 & distnv,xptxo,yptxo, & 
+                 & distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
+                 & npx,racord,x,y,nx,ny)
+           endif
+
+         ENDIF
+
+  end subroutine read_code_parameters
+
+
+  subroutine check_and_modify_code_parameters(par, correct)
+    type(CarreParameters), intent(inout) :: par
+    logical, intent(out) :: correct
+
+         CALL RAPPEL(par%nptseg,par%deltp1,par%deltpn,par%repart,&
+             & par%npr,par%deltr1,par%deltrn, &
+             & par%pntrat,par%tgarde,&
+             & lg,difpsi,distnv,nreg,nsep,npx,&
+             & dpmin,dpmax,drmin,drmax,distxo,6,correct)
+
+!..Initialise the primary level line
+
+         nn1=0
+
+         DO ipas=1,nptot(ptsep(3,ipx),ipx)
+            nn1=nn1+1
+            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+         end do	
+
+! on colle la dernière ligne de niveau sur trace2 pour avoir
+! la pénétration.
+
+         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
+     &        ptsep,npx,nptot, & 
+     &        nstruc,npstru,xstruc,ystruc, & 
+     &        nivx,nivy,nivtot,nbniv, & 
+     &         par%pntrat,distxo,xn,yn,nn1, & 
+     &         par%repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
+     &         a00,a01,a10,a11,psi,nx,ny,x,y)
+
+         if (correct) then
+           if(sellan(1:8).eq.'francais') then
+             WRITE(6,301)
+           elseif(sellan(1:7).eq.'english') then
+             WRITE(6,300)
+           endif
+           READ(5,302)rep
+         endif
+
+         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
+
+            ient = 5
+            isor = 6
+            pntrat_old = par%pntrat
+            CALL CHANGE(par%nptseg,par%deltp1,par%deltpn,par%repart,&
+                & par%npr,par%deltr1,par%deltrn, & 
+                & par%pntrat,par%tgarde,distxo,ient,isor,ifail)
+            if (par%pntrat.ne.pntrat_old) then
+
+            call endpag
+
+            call trace2(x(1),x(nx),y(1),y(ny), & 
+     &     separx,separy,ptsep,npx,nptot, & 
+     &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+     &         nivtot,nbniv)
+
+            endif
+            ! parameters have been changed and state has to be recomputed
+            !GO TO 3 
+         else
+            CALL RAPPEL(par%nptseg,par%deltp1,par%deltpn,par%repart,&
+                & npr,par%deltr1,par%deltrn, & 
+     &             par%pntrat,par%tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
+     &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
+
+            CALL SORTIE(nsep,nreg,np1, & 
+                &  distxo,xmail,ymail,nx,ny, & 
+                &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par)
+         ENDIF
+
+!..Save the chosen parameters
+
+
+  301        FORMAT(//T2,'Est-ce que ces valeurs sont correctes? (o/n)')
+  300        format(//T2,'Do you wish to accept these values (y/n)?')
+  302      FORMAT(A)
+
+
+  end subroutine check_and_modify_code_parameters
+
+
+
       END

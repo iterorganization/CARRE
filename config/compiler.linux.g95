@@ -27,8 +27,8 @@ LDFLAGS 	+= -lmscl
 endif
 
 ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
-  INCLUDE+= -I ${UAL}/include/amd64_pgi
-  LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_pgi
+  INCLUDE+= -I ${UAL}/include/amd64_g95
+  LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_g95
 
   INCLUDE+= -I ${UAL}/include/amd64_g95
   LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_g95

@@ -16,7 +16,7 @@ setenv SOLPS_LIB '/afs/efda-itm.eu/user/k/klingshi/SCRATCH/solps5.0/src/lib/linu
 setenv NCARG_ROOT '/home/hajo/workspace-local/solps5.0/src/NCARG/linux.ifort64'
 setenv NCARG '-L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm'
 
-setenv CARRE_DEBUG 
+setenv CARRE_DEBUG yes
 
 # Override above settings for ITM Carre
 setenv USE_ITMCARRE -DUSE_ITMCARRE

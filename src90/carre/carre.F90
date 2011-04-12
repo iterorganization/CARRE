@@ -19,6 +19,7 @@
 !======================================================================
       use CarreDiagnostics
       use CarreSiloIO
+      use carre_io
 
       IMPLICIT NONE
 
@@ -58,6 +59,9 @@
      &   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
      &   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3), & 
      &   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+
+      type(CarreParameters) :: par
+
 
 	! diagonstic output
 	type(CarreDiag) :: diag
@@ -397,8 +401,9 @@
         CALL MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord, & 
      &    separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
      &    xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
-     &    np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv, & 
-     &    a00,a10,a01,a11,fctpx,limcfg,diag)
+     &    np1,ptx,pty,nivx,nivy,nivtot,nbniv, & 
+     &    a00,a10,a01,a11,fctpx,limcfg,diag,par)
+
 
 !*
 !* WARNINGS CALCULATION AND OUTPUT
@@ -413,7 +418,7 @@
 
         call trace(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
      &           nstruc,npstru,xstruc,ystruc, & 
-     &           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg)
+     &           nivx,nivy,nivtot,nbniv,np1,par%npr,xmail,ymail,nreg)
 
       endif ! nptx.gt.0
 

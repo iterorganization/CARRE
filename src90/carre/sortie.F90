@@ -1,12 +1,13 @@
-      SUBROUTINE SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1, & 
-     &    deltrn,pntrat,tgarde,distxo,repart,xmail,ymail, & 
+      SUBROUTINE SORTIE(nsep,nreg,np1, & 
+     &    distxo,xmail,ymail, & 
      &    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero, & 
-     &    fctpx,diag)
+     &    fctpx,diag,par)
 !
 !  version : 07.07.97 19:08
 !
 !======================================================================
       use CarreDiagnostics
+      use carre_io
 
       IMPLICIT NONE
 
@@ -18,17 +19,17 @@
 #include <CARREDIM.F>
 
 !  arguments
-      INTEGER nsep,nreg,repart,nptseg(nsep),npr(nreg),np1(nreg), & 
+      INTEGER nsep,nreg,np1(nreg), & 
      &        nx,ny,npx,numero
-      REAL*8 pntrat,deltp1(nsep),deltpn(nsep),deltr1(nreg),deltrn(nreg), & 
+      REAL*8 & 
      &     xmail(npmamx,nrmamx,nreg),ymail(npmamx,nrmamx,nreg), & 
-     &     tgarde(4),distxo,x(nxmax),y(nymax), & 
+     &     distxo,x(nxmax),y(nymax), & 
      &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
      &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
      &     ptx(npx+1),pty(npx+1),fctpx(npx+1)
       logical racord
       type(CarreDiag), intent(in) :: diag
-
+      type(CarreParameters), intent(in) :: par
 
 !  variables en common
 #include <COMRLX.F>
@@ -93,37 +94,37 @@
          elseif(sellan(1:7).eq.'english') then
            write(10,*)'$parameters'
          endif
-         WRITE(10,100)repart
+         WRITE(10,100)par%repart
   100    FORMAT('repart =',I2)
 
          WRITE(10,1015)distxo
  1015    FORMAT('distxo =',F11.8)
 
-         WRITE(10,101)pntrat
+         WRITE(10,101)par%pntrat
   101    FORMAT('pntrat =',F11.8)
 
          DO 10 isep=1, nsep
-            WRITE(10,102)isep,nptseg(isep),isep,deltp1(isep),isep, & 
-     &                deltpn(isep)
+            WRITE(10,102)isep,par%nptseg(isep),isep,par%deltp1(isep),isep, & 
+     &                par%deltpn(isep)
   102       FORMAT('nptseg(',I1,') =',I3/'deltp1(',I1,') =',F10.7/ & 
      &          'deltpn(',I1,') =',F10.7)
    10    CONTINUE
 
          DO 20 ireg=1, nreg
-            WRITE(10,103)ireg,npr(ireg),ireg,deltr1(ireg),ireg, & 
-     &                deltrn(ireg)
+            WRITE(10,103)ireg,par%npr(ireg),ireg,par%deltr1(ireg),ireg, & 
+     &                par%deltrn(ireg)
   103       FORMAT('npr(',I1,') =',I3/'deltr1(',I1,') =',F10.7/ & 
      &          'deltrn(',I1,') =',F10.7)
    20    CONTINUE
 
          DO 25 i=1, 2
-            WRITE(10,104)i,tgarde(i)
+            WRITE(10,104)i,par%tgarde(i)
   104       FORMAT('tgarde(',I1,') =',F8.5)
    25    CONTINUE
 
          IF (nsep .GT. 3) THEN
             DO 26 i=3, 4
-               WRITE(10,104)i,tgarde(i)
+               WRITE(10,104)i,par%tgarde(i)
    26       CONTINUE
          ENDIF
          write(10,115)'nrelax=',nrelax,'relax=',relax,'pasmin=',pasmin, & 
@@ -151,10 +152,10 @@
          DO 30 ireg=1, nreg
             WRITE(10,107)ireg
   107       FORMAT('''region:''',I5)
-            WRITE(10,108)np1(ireg),npr(ireg)
+            WRITE(10,108)np1(ireg),par%npr(ireg)
   108       FORMAT('''nppol=''',I5,'  ''nprad=''',I5)
 
-            DO 32 j=1, npr(ireg)
+            DO 32 j=1, par%npr(ireg)
             do 31 i=1,np1(ireg)
                xx = xmail(i,j,ireg)
                yy = ymail(i,j,ireg)
@@ -197,7 +198,7 @@
 
          DO ireg=1, nreg
             WRITE(10,107) ireg
-            DO i=1, npr(ireg)
+            DO i=1, par%npr(ireg)
                     WRITE(10,129) i,diag%gdpsi(i,ireg),diag%racpsi(i,ireg), & 
                          & diag%gdr(i,ireg),diag%r(i,ireg),&
                          & diag%rho(i,ireg),diag%ra(i,ireg)
@@ -223,7 +224,7 @@
 
          DO ireg=1, nreg
             WRITE(10,107) ireg
-            DO i=1, npr(ireg)
+            DO i=1, par%npr(ireg)
                     WRITE(10,139) i,diag%somort(i,ireg),diag%somortp(i,ireg), & 
                          & diag%somortpur(i,ireg),diag%somortpurp(i,ireg)
             enddo
@@ -236,7 +237,7 @@
      &          t56,'somvarrp')
          DO ireg=1, nreg
             WRITE(10,107) ireg
-            DO i=1, npr(ireg)
+            DO i=1, par%npr(ireg)
                     WRITE(10,139) i,diag%sompropo(i,ireg),diag%sompropop(i,ireg), & 
                          & diag%somvarr(i,ireg),diag%somvarrp(i,ireg)
             enddo
@@ -247,7 +248,7 @@
   144    format(t2,'ir',t40,'segt')
          DO ireg=1, nreg
             WRITE(10,107) ireg
-            DO i=1, npr(ireg)
+            DO i=1, par%npr(ireg)
                     WRITE(10,149) i, & 
                          & diag%segt(i,ireg)
             enddo

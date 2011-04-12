@@ -18,7 +18,7 @@
 !100   format(a)
 !      rewind iunit
 !      read(iunit,*,err=99)rr
-      write (*,*) 'rdrfre: vari', vari
+!      write (*,*) 'rdrfre: vari', vari
 #ifdef READOPT
       read(vari,err=99) rr
 #else
