@@ -26,7 +26,7 @@ USE_NCARG =
 USE_SILO = 
 
 EXCLUDELIST +=
-ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+ALLTARGETS += ${OBJECTCODE}/itmcarre_wrapper
 VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared
 
 

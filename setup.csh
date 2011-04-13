@@ -27,8 +27,8 @@ unsetenv USE_NCARG
 
 
 # ITM Carre: Override above settings for ITM Carre
-#setenv USE_ITMCARRE "-DUSE_ITMCARRE -DEUITM"
-#setenv USE_UAL -DUSE_UAL
+setenv USE_ITMCARRE "-DUSE_ITMCARRE -DEUITM"
+setenv USE_UAL -DUSE_UAL
 
-unsetenv USE_ITMCARRE
-unsetenv USE_UAL
+#unsetenv USE_ITMCARRE
+#unsetenv USE_UAL
