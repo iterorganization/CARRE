@@ -1,5 +1,5 @@
 !***********************************************************************
-      SUBROUTINE CHANGE(par,distxo,ient,isor,ifail)
+      SUBROUTINE CHANGE(par,ient,isor,ifail)
 !
 !  version : 07.07.97 18:38
 !
@@ -18,7 +18,6 @@
 
 !  arguments
       INTEGER ient,isor,ifail
-      REAL*8 distxo
       type(CarreParameters), intent(inout) :: par
 
 !  variables locales
@@ -93,11 +92,6 @@
       IF (vari(1:6) .EQ. 'repart')THEN
 !        READ(vari(ieg+1:80),*,err=98)repart
          call rdfrin(11,vari(ieg+1:80),par%repart,ierror)
-         if(ierror.eq.1) go to 98
-         GO TO 10
-      ELSE IF (vari(1:6) .EQ. 'distxo')THEN
-!        READ(vari(ieg+1:80),*,err=98)distxo
-         call rdfrre(11,vari(ieg+1:80),distxo,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'pntrat')THEN
@@ -350,7 +344,6 @@
          GO TO 10
       ENDIF
 98    continue
-      par%pntrat = MIN(par%pntrat,distxo)
 !-langue
       if(sellan(1:8).eq.'francais') then
         write(6,*)'Erreur de format. Veuillez recommencer.'

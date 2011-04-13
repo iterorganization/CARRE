@@ -324,6 +324,23 @@
      &   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
         endif
       endif
+      ! Test pntrat against distxo 
+      if ( par%pntrat > distxo ) then
+        correct = .false.
+        if(sellan(1:8).eq.'francais') then
+          WRITE(6,3111) nrelax, relax, pasmin, rlcept
+ 3111     FORMAT(// & 
+     &   T2,'Largeur de penetration trop grande!'// & 
+     &   T2,'pntrat doit etre inferieur a disxto.'// &
+     &   T2,'pntrat, distxo = ',1p,2(1e11.4,1x))
+        elseif(sellan(1:7).eq.'english') then
+          WRITE(6,3100) nrelax, relax, pasmin, rlcept
+ 3100     FORMAT(//T2,'Invalid data for penetration depth!'// & 
+     &   T2,'pntrat must be smaller than distxo.'// & 
+     &   T2,'pntrat, distxo = ',1p,2(1e11.4,1x))
+        endif
+      end if
+
 
       RETURN
       END

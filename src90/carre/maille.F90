@@ -2254,13 +2254,20 @@ CONTAINS
     ! internal
     integer :: ient,isor,ifail
 
+#ifdef EUITM 
+    ! For ITMCARRE, the code parameters are initialized 
+    ! at the entry into the ITMCARRE main subroutine.
+    ! Don't read from file or user.
+    return
+#else
+
     par%tgarde=0
     
 !..1.1  Read all the necessary data from the file
 
          ient = 9
          isor = 0
-         CALL CHANGE(par,distxo,ient,isor,ifail)
+         CALL CHANGE(par,ient,isor,ifail)
 
 !..Check whether all the data have been read from the file
 
@@ -2283,6 +2290,7 @@ CONTAINS
            endif
 
          ENDIF
+#endif
 
   end subroutine read_code_parameters
 
@@ -2291,6 +2299,18 @@ CONTAINS
     implicit none
     type(CarreParameters), intent(inout) :: par
     logical, intent(out) :: correct
+
+#ifdef EUITM 
+    ! For ITMCARRE, the code parameters cannot be modified by the user
+    correct = .true.
+    
+    ! But we still want to write out the carre.out file
+    CALL SORTIE(nsep,nreg,np1, & 
+        &  distxo,xmail,ymail,nx,ny, & 
+        &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par)
+
+    return
+#else
 
          CALL RAPPEL(par,&
              & lg,difpsi,distnv,nreg,nsep,npx,&
@@ -2331,7 +2351,7 @@ CONTAINS
             ient = 5
             isor = 6
             pntrat_old = par%pntrat
-            CALL CHANGE(par,distxo,ient,isor,ifail)
+            CALL CHANGE(par,ient,isor,ifail)
             if (par%pntrat.ne.pntrat_old) then
 
             call endpag
@@ -2355,11 +2375,11 @@ CONTAINS
 
 !..Save the chosen parameters
 
-
   301        FORMAT(//T2,'Est-ce que ces valeurs sont correctes? (o/n)')
   300        format(//T2,'Do you wish to accept these values (y/n)?')
   302      FORMAT(A)
 
+#endif
 
   end subroutine check_and_modify_code_parameters
 

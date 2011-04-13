@@ -18,16 +18,16 @@ DBLPAD		=
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-ifeq ($(USE_NCARG),-DUSE_NCARG)
+ifdef USE_NCARG
 LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
 LDFLAGS 	+= ${NCARG}
 endif
 
-ifneq ($(NOUSE_MSCL),-DNOUSE_MSCL)
+ifdef NOUSE_MSCL
 LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
 endif
 
-ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
+ifdef USE_ITMCARRE
   INCLUDE+= -I ${UAL}/include/amd64_pgi
   LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_pgi
 endif

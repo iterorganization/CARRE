@@ -23,7 +23,8 @@ include LISTOBJ
 # ITM-CARRE
 # If we're compiling for the ITM, we don't want graphics output and most utilities
 # But we want the UAL library
-ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
+ifdef USE_ITMCARRE
+#ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
 USE_NCARG = 
 USE_SILO = 
 
@@ -38,7 +39,7 @@ VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/itmcarre:${SRCD
 endif
 # *************************************************************
 # NCAR graphics, used for runtime plotting
-ifeq ($(USE_NCARG),-DUSE_NCARG)
+ifdef USE_NCARG
 EXCLUDELIST += bidon.o
 else
 VPATH +=:${SRCDIR}/dummy
@@ -46,7 +47,7 @@ endif
 # *************************************************************
 # SILO/VisIt graphics output
 # Set up HDF5 and SILO libraries only if specifically requested
-ifeq ($(USE_SILO),-DUSE_SILO)
+ifdef USE_SILO
 # Libraries from usol
 USOLLIBDIR = ./usol/lib/${OBJECTCODE}
 

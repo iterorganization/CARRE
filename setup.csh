@@ -19,5 +19,5 @@ setenv NCARG '-L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib
 setenv CARRE_DEBUG yes
 
 # Override above settings for ITM Carre
-setenv USE_ITMCARRE -DUSE_ITMCARRE
+setenv USE_ITMCARRE "-DUSE_ITMCARRE -DEUITM"
 setenv USE_UAL -DUSE_UAL
