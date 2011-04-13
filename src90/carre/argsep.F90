@@ -1,5 +1,5 @@
       SUBROUTINE ARGSEP(npx,ptx,pty,fctpx,separx,separy,indplq,nptot, & 
-     &                 npnimx,ptsep,racord,ptxint,ypto,nbdef,inddef)
+     &                 npnimx,ptsep,racord,ptxint,ypto,nbdef,inddef,eps_Xpt)
 !
 !  version : 23.06.98 20:28
 !
@@ -18,7 +18,7 @@
       INTEGER npnimx,npx,indplq(4,npx),nptot(4,npx),ptsep(4,npx), & 
      &                                       ptxint,nbdef,inddef(nbdef)
       REAL*8 ptx(npx),pty(npx),separx(npnimx,4,npx), & 
-     &       separy(npnimx,4,npx),fctpx(npx+1),ypto
+     &       separy(npnimx,4,npx),fctpx(npx+1),ypto,eps_Xpt
       LOGICAL racord
 
 !  variables locales
@@ -115,7 +115,7 @@
         IF (npx .EQ. 1) then
           do 14 j=1, 4
             IF (.NOT.(tsplaq(separx(1,j,ipx),separy(1,j,ipx), & 
-     &           nptot(j,ipx),npx,ptx(ipx),pty(ipx)))) then
+     &           nptot(j,ipx),npx,ptx(ipx),pty(ipx),eps_Xpt))) then
               indplq(j,ipx) = 0
             end if
    14     CONTINUE
@@ -123,7 +123,7 @@
           ipx2 = MOD(ipx,2) + 1
           do 15 j=1, 4
             IF (.NOT.(tsplaq(separx(1,j,ipx),separy(1,j,ipx), & 
-     &          nptot(j,ipx),npx,ptx(ipx2),pty(ipx2)))) then
+     &          nptot(j,ipx),npx,ptx(ipx2),pty(ipx2),eps_Xpt))) then
               indplq(j,ipx) = 0
             end if
    15     CONTINUE

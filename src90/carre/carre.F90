@@ -19,7 +19,8 @@
 !======================================================================
       use CarreDiagnostics
       use CarreSiloIO
-      use carre_io
+      use carre_types
+      use carre_main
 
       IMPLICIT NONE
 
@@ -38,56 +39,23 @@
 !ank-970702: moved dimensions to the CARREDIM.F
 #include <CARREDIM.F>
 #include <COMLAN.F>
-      REAL*8 cstlin,zero,eps_Xpt,rmax,zmax
-      common /geom/ eps_Xpt
-      PARAMETER (cstlin=0.00, zero=0.)
-      INTEGER i, j, nx, ny, nstruc, npstru(strumx), & 
-     &   ii(gradmx), jj(gradmx), iptx(npxmx), jptx(npxmx), & 
-     &   npx, npxtot,ptsep(4,npxmx), & 
-     &   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx), & 
-     &   nbdef, nivtot(nivmx), nbniv,ptxint,nreg, & 
-     &   np1(nregmx), npr(nregmx), ierror,iflag,limcfg, & 
-     &   itmp, is, ip
 
-      REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax), & 
-     &   psidx(nxmax,nymax), psidy(nxmax,nymax), & 
-     &   xstruc(npstmx,strumx), ystruc(npstmx,strumx), & 
-     &   pointx(gradmx), pointy(gradmx), & 
-     &   ptx(npxmx), pty(npxmx), xpto, ypto, fctpx(npxmx), & 
-     &   separx(npnimx,4,npxmx), separy(npnimx,4,npxmx), & 
-     &   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx), & 
-     &   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
-     &   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3), & 
-     &   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3)
 
       type(CarreParameters) :: par
+      type(CarreEquilibrium) :: equ
+      type(CarreStructures) :: struct
+      type(CarreGrid) :: grid
 
-
-	! diagonstic output
-	type(CarreDiag) :: diag
-
-!     arrays to hold copies of structures (r for "real")
-!     (if virtual structures are used)
-      integer :: rnstruc, rnpstru(strumx)
-      REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
-
-      LOGICAL racord
-      character lign80*80,nomstr(strumx)*80
-
-      REAL*8 stp0, stpmin
-      PARAMETER (stp0=0.01,stpmin=0.001)
-
-      integer :: isetup
-      logical dovirtualtargets
-      parameter (dovirtualtargets=.false.)
+      ! diagonstic output
+      type(CarreDiag) :: diag
 
 !..Procedures
 !
-      INTRINSIC ABS,MIN,index
-      EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0, & 
-     &   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete, & 
-     &     trc_stk_in,trc_stk_out, & 
-     &     virtualtargets,virtuallimiters
+!!$      INTRINSIC ABS,MIN,index
+!!$      EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0, & 
+!!$     &   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete, & 
+!!$     &     trc_stk_in,trc_stk_out, & 
+!!$     &     virtualtargets,virtuallimiters
 !======================================================================
 !.. nxmax,nymax: maximum number of the data points in x and y
 !.. gradmx: maximum number of points where the gradient vanishes
@@ -100,72 +68,47 @@
 !.. npmamx: maximum number of grid points in poloidal direction
 !.. nrmamx: maximum number of grid points in radial direction
 !.. nregmx: maximum number of regions
-!.. cstlin: a linear constant added along y to artificially disconnect
-!           the X-points. Set to 0 for connected double-nulls
-!
-!.. nx,ny : number of data points in x and y
-!.. x,y   : tables of coordinates of the data points
-!.. psi   : psi values at each data point
-!.. psidx,psidy: values of psi derivatives in x and y
-!                at each data point
-!.. nstruc: number of structures
-!.. npstru: number of points per structure
-!.. xstruc,ystruc: coordinates of the structure points
-!                  (point index, structure index)
-!.. npxtot: number of the points where the gradient vanishes
-!.. pointx,pointy: coordinates of the points where the gradient
-!                  vanishes
-!.. ii,jj : x and y indices of the cells where the gradient vanishes
-!.. npx   : number of the X-points
-!.. ptx,pty: X-point co-ordinates
-!.. iptx,jptx: x and y indices of the cells containing the X-points
-!.. xpto,ypto: coordinates of the O-point
-!.. racord: determines whether the X-points are connected
-!.. fctpx: the psi values at each X- or O-point
-!.. separx,separy: coordinates of the points of the parametrised
-!               separatrices (point index, branch index, X-point index)
-!.. nptot : number of parametrisation points for each separatrix
-!           (separatrix index, point index)
-!.. ptsep : separatrix pointer, used as index
-!           (separatrix index, point index)
-!.. ptxint: index of the internal X-point in the case of disconnected
-!           double-null
-!.. nbdef : number of the divertor plates
-!.. inddef: table of indices of the divertor plates
-!.. indplq: table of the structure indices (0 means not a target)
-!           (separatrix index, X-point index)
-!.. nbniv : number of the limiting level lines
-!.. nivx,nivy: coordinates of the points of the parametrised
-!              limiting level lines (point index, curve index)
-!.. nivtot: number of points for each parametrised limiting level line
-!.. distnv: distance along a plate between the separatrix strike-point
-!           and a limiting level line
-!           (distance selector [1=real, 2=psi], curve index)
-!.. nreg  : number of the grid regions depending on the configuration
-!.. np1   : numbers of the grid points in poloidal direction
-!           (region index)
-!.. npr   : numbers of the grid points in radial direction
-!           (region index)
-!.. xmail,ymail: grid point coordinates
-!                (poloidal, radial, region)
-!.. xn,yn : working array for coordinates along a parametrised curve
 !.. nrelax: maximum number of iterations in the relaxation procedure
 !           of construction of the orthogonal grid
 !.. relax : relaxation parameter
 !.. stpmin: minimum tolerable distance between any two grid points
 !           in the course of relaxation
 !.. rlcept: convergence criterion in the relaxation procedure
-!.. limcfg: indicates when a limiter configuration is considered (when
-!           non zero). This variable is assigned the index of the
-!           limiter
-!     N.B.: When the limiter configuration is selected, npx is set equal
-!           to 1 and the coordinates of the X-point correspond to the
-!           innermost point of the limiter.
 !
 ! For description of diagnostic output, see CarreDiagnostic.F90.
 !
 !======================================================================
 !
+
+      ! Initialize & read carre input from file
+      call carre_init(equ, struct, par)
+
+      ! Create the grid
+
+      call carre_main_computation(equ, struct, par, grid, diag)
+
+        ! Finalize Carre
+        call carre_finalize(equ, struct, grid)
+
+      STOP
+
+    contains
+
+      subroutine carre_init(equ, struct, par)
+        implicit none
+
+        type(CarreParameters), intent(out) :: par
+        type(CarreEquilibrium), intent(out) :: equ
+        type(CarreStructures), intent(out) :: struct
+
+        ! internal
+        REAL*8 zero,rmax,zmax
+        PARAMETER ( zero=0.)
+        INTEGER i, j, ierror, iflag, & 
+            & itmp, is, ip
+        character lign80*80,nomstr(strumx)*80
+
+
 !..1.0  Initialisation des variables par defaut et de la bibliotheque
 !       graphique
 !
@@ -186,7 +129,6 @@
 !
 !  2.1  specify output format
       write(10,*)'output format: carre70'
-
 !
 !..3.0  Read the data
 !
@@ -202,35 +144,35 @@
       call entete(7,'$r',iflag)
       read(7,100)lign80
       i=index(lign80,'=')
-      call rdfrin(11,lign80(i+1:80),nx,ierror)
-      READ(7,*) (x(i), i=1, nx)
+      call rdfrin(11,lign80(i+1:80),equ%nx,ierror)
+      READ(7,*) (equ%x(i), i=1, equ%nx)
 
 !..Read the values of y
 
       call entete(7,'$z',iflag)
       read(7,100)lign80
       i=index(lign80,'=')
-      call rdfrin(11,lign80(i+1:80),ny,ierror)
-      READ(7,*) (y(i), i=1, ny)
+      call rdfrin(11,lign80(i+1:80),equ%ny,ierror)
+      READ(7,*) (equ%y(i), i=1, equ%ny)
 
       rmax = 0.0
-      do i = 1, nx-1
-        rmax = max(rmax, (x(i+1)-x(i))**2)
+      do i = 1, equ%nx-1
+        rmax = max(rmax, (equ%x(i+1)-equ%x(i))**2)
       enddo
       zmax = 0.0
-      do i = 1, ny-1
-        zmax = max(zmax, (y(i+1)-y(i))**2)
+      do i = 1, equ%ny-1
+        zmax = max(zmax, (equ%y(i+1)-equ%y(i))**2)
       enddo
-      eps_Xpt = sqrt(rmax+zmax)
+      equ%eps_Xpt = sqrt(rmax+zmax)
 
 !..Read the values of psi
 
       call entete(7,'$psi',iflag)
-      READ(7,*) ((psi(i,j), i=1, nx), j=1, ny)
+      READ(7,*) ((equ%psi(i,j), i=1, equ%nx), j=1, equ%ny)
 
-      DO 5 j=1,ny
-         DO 4 i=1,nx
-            psi(i,j) = psi(i,j) + MIN(cstlin*(y(j)-y(ny/2)),zero)
+      DO 5 j=1,equ%ny
+         DO 4 i=1,equ%nx
+            equ%psi(i,j) = equ%psi(i,j) + MIN(par%cstlin*(equ%y(j)-equ%y(equ%ny/2)),zero)
     4    CONTINUE
     5 CONTINUE
 !---
@@ -251,158 +193,23 @@
 !
 !..3.1  Read the structures.
 !
-      nstruc=0
-      call listru(8,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,strumx)
+      call listru(8,struct)!,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,strumx)
 
-      call csioGetStructureSegments( nstruc, npstru, xstruc, ystruc, csioStrucNSeg, csioStrucSegments )
+      call csioGetStructureSegments( struct%nstruc, struct%npstru, &
+          & struct%xstruc, struct%ystruc, csioStrucNSeg, csioStrucSegments )
 
-!
-!..4.0  Calculate the first partial derivatives in x and y and store
-!       them in arrays psidx and psidy
+      end subroutine carre_init
 
-      CALL DERIVE(nx,ny,x,y,psi,psidx,psidy)
 
-!
-!..5.0  Plot the level lines for psidx=0 and psidy=0
-!
-      CALL cntour(psidx,psidy,nx,ny,x(1),x(nx),y(1),y(ny))
-!
-!  interpolation coefficients for psi and its derivatives
 
-      call inipsi(psi,psidx,psidy,x,y,nxmax,nymax,nx,ny,a00,a10,a01,a11)
 
-!
-!..6.0  Determine the points where the derivatives in x and y vanish
-!
 
-      CALL GRAD0(nxmax,nymax,nx,ny,x,y,gradmx,pointx, & 
-     &          pointy,ii,jj,npxtot,a00,a10,a01,a11)
 
-!
-!..7.0  Select the X-points of interest
-!
 
-!ank-970702: moved dimensions to the included file
-      CALL SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, & 
-     &            pty,iptx,jptx,xpto,ypto,racord,limcfg)
-
-!     when using virtual targets, needs two passes through the setup
-!     steps 8 to 10
-
-      do isetup = 1, 2
-!
-!..8.0  Parametrise the separatrices
-!
-      IF (npx.GT.0 .and. limcfg.eq.0) THEN
-!
-        CALL SPTRIS(nx,ny,x,y,psi,npx,ptx,pty, & 
-     &      iptx,jptx,fctpx,separx,separy,nptot, & 
-     &      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
-     &      a00,a10,a01,a11)
-
-!
-!..9.0  Arrange the separatrices
-!
-        CALL ARGSEP(npx,ptx,pty,fctpx,separx,separy,indplq,nptot,npnimx, & 
-     &            ptsep,racord,ptxint,ypto,nbdef,inddef)
-
-      ELSEIF(LIMCFG.NE.0) THEN
-!
-!  13.   Identify the limiter
-!
-        call limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot, & 
-     &      nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx, & 
-     &      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
-     &      a00,a10,a01,a11)
-
-      do itmp=1,4
-        ptsep(itmp,1) = 0
-      enddo
-
-      ENDIF
-
-      if(npx.gt.0) then
-!
-!..10.0  Find the level lines in more detail
-!
-!<<<
-      write(0,*) '=== carre *..10.0 - before frtier'
-      write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') ptx(1:npx)
-      write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') pty(1:npx)
-        if(limcfg.eq.0) then
-        write(0,*) 'nptot(4,nxpoints)'
-        write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
-        write(0,*) 'Strike points (presumably)'
-        write(0,'(3h x:,1p,8e12.4/(3x,8e12.4))') & 
-     &     ((separx(nptot(i,j),i,j),i=1,4),j=1,npx)
-        write(0,'(3h y:,1p,8e12.4/(3x,8e12.4))') & 
-     &     ((separy(nptot(i,j),i,j),i=1,4),j=1,npx)
-!>>>
-          call trc_stk_in('carre','*..10.0')
-          CALL FRTIER(nx,ny,x,y,psi,nstruc, & 
-     &      npstru,xstruc,ystruc,inddef,nbdef,npx,separx, & 
-     &      separy,nptot,ptsep,racord,nivx,nivy,nivtot, & 
-     &      nbniv,stp0,stpmin, & 
-     &      distnv,ptxint,a00,a10,a01,a11)
-          call trc_stk_out
-        endif
-
-        call trace2(x(1),x(nx),y(1),y(ny),separx,separy, & 
-     &        ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc, & 
-     &        nivx,nivy,nivtot,nbniv)
-
-        if ( .not. dovirtualtargets ) exit
-        if ( isetup == 2 ) exit
-
-!..10.0  Set up the virtual structure
-
-!..      Save current structures
-        rnstruc = nstruc
-        rnpstru = npstru
-        rxstruc = xstruc
-        rystruc = ystruc
-
-        nstruc = 0
-
-!..   10.1  Set up virtual targets
-
-        CALL VIRTUALTARGETS(nx,ny,x,y,psi,npx,ptx,pty, & 
-     &       fctpx,separx,separy,nptot, & 
-     &       rnstruc,rnpstru,rxstruc,rystruc,indplq,inddef,nbdef, & 
-     &       a00,a10,a01,a11,nstruc,npstru,xstruc,ystruc)
-
-!..   10.2  Set up virtual limiters
-
-        call VIRTUALLIMITERS(nivx,nivy,nivtot,nbniv,npx,ptx,pty, & 
-     &       nstruc,npstru,xstruc,ystruc)
-
-!..   10.2.1 Write out resulting structures
-
-        open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
-        do is = 1, nstruc
-           do ip = 1, abs(npstru( is ))
-              write (100,*) xstruc(ip,is)*1000, & 
-     &             ystruc(ip,is)*1000
-           enddo
-           write (100,*) ''
-        enddo
-        close(UNIT=100)
-
-      endif                     ! npx.gt.0
-
-      enddo                     ! end setup loop
-
-!
-!..12.0  Grid the regions
-!
-      if(npx.gt.0) then
-
-        CALL MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord, & 
-     &    separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
-     &    xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
-     &    np1,ptx,pty,nivx,nivy,nivtot,nbniv, & 
-     &    a00,a10,a01,a11,fctpx,limcfg,diag,par)
+      subroutine carre_finalize(equ, struct, grid)
+        type(CarreEquilibrium), intent(in) :: equ
+        type(CarreStructures), intent(in) :: struct
+        type(CarreGrid), intent(in) :: grid
 
 
 !*
@@ -415,10 +222,13 @@
 !..13.0  Plot the structures, the separatrices, and the limiting level
 !        lines for each region, together with the resulting grid
 !
+      if(equ%npx.gt.0) then
 
-        call trace(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot, & 
-     &           nstruc,npstru,xstruc,ystruc, & 
-     &           nivx,nivy,nivtot,nbniv,np1,par%npr,xmail,ymail,nreg)
+        call trace(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy,&
+            & equ%ptsep,equ%npx,equ%nptot, & 
+     &           struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+     &           struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
+     & grid%np1,par%npr,grid%xmail,grid%ymail,grid%nreg)
 
       endif ! nptx.gt.0
 
@@ -429,5 +239,7 @@
 
       call csioCloseFile()
 
-      STOP
+      end subroutine carre_finalize
+
+
       END

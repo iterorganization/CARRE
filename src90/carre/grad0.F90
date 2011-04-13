@@ -1,19 +1,17 @@
 
 !***********************************************************************
-      SUBROUTINE GRAD0(nxmax,nymax,nx,ny,x,y,gradmx, & 
-     &          pointx,pointy,ii,jj,npxtot,a00,a10,a01,a11)
+      SUBROUTINE GRAD0(equ,nxmax,nymax,gradmx)
 !***********************************************************************
-      IMPLICIT NONE
+        use carre_types
+        IMPLICIT NONE
 
 !..  Cette sous-routine verifie pour chaque carre si il y a intersection
 !  entre les lignes de niveau psidx=0 et psidy=0 et si oui elle garde
 !  les coordonnees en memoire.
 
 !  arguments
-      INTEGER nxmax,nymax,nx,ny,gradmx,ii(gradmx),jj(gradmx),npxtot
-      REAL*8 pointx(gradmx), pointy(gradmx),x(nx),y(ny) & 
-     &  ,a00(nxmax,nymax,3),a10(nxmax,nymax,3),a01(nxmax,nymax,3) & 
-     &  ,a11(nxmax,nymax,3)
+        type(CarreEquilibrium), intent(inout) :: equ
+        INTEGER nxmax,nymax,gradmx
 
 !  variables locales
       INTEGER i, j
@@ -41,16 +39,16 @@
 
 !..balayage en x et en y.
 
-      npxtot = 0
-      DO 10 j=1, ny-1
-         DO 20 i=1, nx-1
+      equ%npxtot = 0
+      DO 10 j=1, equ%ny-1
+         DO 20 i=1, equ%nx-1
 
 !..recherche des racines.
 
-            aa = (a01(i,j,3)*a11(i,j,2) - a11(i,j,3)*a01(i,j,2))
-            bb = (a00(i,j,3)*a11(i,j,2) - a10(i,j,3)*a01(i,j,2) & 
-     &           +a01(i,j,3)*a10(i,j,2) - a11(i,j,3)*a00(i,j,2))
-            cc = (a00(i,j,3)*a10(i,j,2) - a10(i,j,3)*a00(i,j,2))
+            aa = (equ%a01(i,j,3)*equ%a11(i,j,2) - equ%a11(i,j,3)*equ%a01(i,j,2))
+            bb = (equ%a00(i,j,3)*equ%a11(i,j,2) - equ%a10(i,j,3)*equ%a01(i,j,2) & 
+     &           +equ%a01(i,j,3)*equ%a10(i,j,2) - equ%a11(i,j,3)*equ%a00(i,j,2))
+            cc = (equ%a00(i,j,3)*equ%a10(i,j,2) - equ%a10(i,j,3)*equ%a00(i,j,2))
 
             IF (4.*aa*cc .LT. bb*bb) THEN
 
@@ -63,45 +61,45 @@
                ELSE IF (bb.ne.0.) THEN
                   y1 = -cc/bb
                ELSE
-                  y1 = 2.*y(1)-y(2)
+                  y1 = 2.*equ%y(1)-equ%y(2)
                ENDIF
 
 !..Test pour savoir si le carre contient une de ces racines.
 
-               IF (y1.GE.y(j).AND.y1.LE.y(j+1)) THEN
-                  if(a10(i,j,2)+a11(i,j,2)*y1.ne.0.) then
-                    x1 = (-a00(i,j,2) - a01(i,j,2)*y1)/(a10(i,j,2) & 
-     &                   + a11(i,j,2)*y1)
+               IF (y1.GE.equ%y(j).AND.y1.LE.equ%y(j+1)) THEN
+                  if(equ%a10(i,j,2)+equ%a11(i,j,2)*y1.ne.0.) then
+                    x1 = (-equ%a00(i,j,2) - equ%a01(i,j,2)*y1)/(equ%a10(i,j,2) & 
+     &                   + equ%a11(i,j,2)*y1)
                   else
-                    x1 = 2.*x(1)-x(2)
+                    x1 = 2.*equ%x(1)-equ%x(2)
                   endif
-                  IF (x1.GE.x(i).AND.x1.LE.x(i+1)) THEN
+                  IF (x1.GE.equ%x(i).AND.x1.LE.equ%x(i+1)) THEN
 
 !..Sauvegarde de chaque point ou le gradient s'annule.
 
-                     npxtot = npxtot + 1
-                     pointx(npxtot) = x1
-                     pointy(npxtot) = y1
-                     ii(npxtot) = i
-                     jj(npxtot) = j
+                     equ%npxtot = equ%npxtot + 1
+                     equ%pointx(equ%npxtot) = x1
+                     equ%pointy(equ%npxtot) = y1
+                     equ%ii(equ%npxtot) = i
+                     equ%jj(equ%npxtot) = j
 
                   ENDIF
                ENDIF
 
-               IF (y2.GE.y(j).AND.y2.LE.y(j+1).AND.aa.NE.0.) THEN
-                  if(a10(i,j,2)+a11(i,j,2)*y2.ne.0.) then
-                    x2 = (-a00(i,j,2)-(a01(i,j,2)*y2))/(a10(i,j,2) & 
-     &                   +(a11(i,j,2)*y2))
+               IF (y2.GE.equ%y(j).AND.y2.LE.equ%y(j+1).AND.aa.NE.0.) THEN
+                  if(equ%a10(i,j,2)+equ%a11(i,j,2)*y2.ne.0.) then
+                    x2 = (-equ%a00(i,j,2)-(equ%a01(i,j,2)*y2))/(equ%a10(i,j,2) & 
+     &                   +(equ%a11(i,j,2)*y2))
                   else
-                    x2 = 2.*x(1)-x(2)
+                    x2 = 2.*equ%x(1)-equ%x(2)
                   endif
-                  IF (x2.GE.x(i).AND.x2.LE.x(i+1)) THEN
+                  IF (x2.GE.equ%x(i).AND.x2.LE.equ%x(i+1)) THEN
 
-                     npxtot = npxtot + 1
-                     pointx(npxtot) = x2
-                     pointy(npxtot) = y2
-                     ii(npxtot) = i
-                     jj(npxtot) = j
+                     equ%npxtot = equ%npxtot + 1
+                     equ%pointx(equ%npxtot) = x2
+                     equ%pointy(equ%npxtot) = y2
+                     equ%ii(equ%npxtot) = i
+                     equ%jj(equ%npxtot) = j
 
                   ENDIF
                ENDIF

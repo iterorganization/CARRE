@@ -84,25 +84,12 @@
 !     Write equlibrium and limiter CPO 
 #ifdef USE_ITMCARRE
 
-      allocate(cpolimiter%datainfo%dataprovider(1))
-      cpolimiter%datainfo%dataprovider="IPP"
-!!$      allocate(cpolimiter(1)%codeparam%codename(1))
-!!$      cpolimiter(1)%codeparam%codename(1)="ITMFCRR"
-!!$      cpolimiter(1)%time= 0.0D0
-      
       call fillLimiterCpo( cpolimiter )
-
       allocate(cpoequil(1))
-      allocate(cpoequil(1)%datainfo%dataprovider(1))
-      cpoequil(1)%datainfo%dataprovider="IPP"
-      allocate(cpoequil(1)%codeparam%codename(1))
-      cpoequil(1)%codeparam%codename(1)="ITMFCRR"
-      cpoequil(1)%time= 0.0D0
-
       call fillEquilibriumCpo( cpoequil(1) )
 
       call open_ual(idx)
-      !call euitm_put(idx,"equilibrium",cpoequil)
+      call euitm_put(idx,"equilibrium",cpoequil)
       call euitm_put(idx,"limiter",cpolimiter)
 
       call close_ual(idx)
@@ -153,6 +140,11 @@ contains
     ! internal
     integer :: k, j, l, i
 
+    ! general information
+    allocate(cpo%datainfo%dataprovider(1))
+    cpo%datainfo%dataprovider="FCRR"
+
+    ! limiter structure information
     allocate( cpo % limiter_unit( nstr ) )
 
     k = 0
@@ -186,13 +178,20 @@ contains
   subroutine fillEquilibriumCpo( cpo )
     type(type_equilibrium) :: cpo
 
-    ! internal
-    integer :: ix, iy
 #include <FCRCOM.F>
 
+    ! general information
+    allocate(cpo%datainfo%dataprovider(1))
+    cpo%datainfo%dataprovider="FCRR"
+    allocate(cpo%codeparam%codename(1))
+    cpo%codeparam%codename(1)="FCRR"
+    cpo % time = 0.0
+
+    ! equilibrium information
     cpo % global_param % mag_axis % bphi = rbtor
 
-    cpo % profiles_2d % grid_type = '1' ! Rectangular R,Z grid
+    allocate( cpo % profiles_2d % grid_type(1) )
+    cpo % profiles_2d % grid_type(1) = '1' ! Rectangular R,Z grid
     allocate( cpo % profiles_2d % grid % dim1( nr ) )
     allocate( cpo % profiles_2d % grid % dim2( nz ) )
     allocate( cpo % profiles_2d % psi( nr, nz ) )

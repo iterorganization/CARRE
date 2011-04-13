@@ -1,4 +1,5 @@
-      SUBROUTINE DERIVE(nx, ny, x, y, psi, psidx, psidy)
+      SUBROUTINE DERIVE(equ)
+
 !
 !  version : 07.07.97 19:37
 !
@@ -7,6 +8,8 @@
 !  derivee selon x et la derivee selon y.
 !======================================================================
 
+        use carre_types
+
       IMPLICIT NONE
 
 !ank-970707: dimensions from the file
@@ -14,9 +17,10 @@
 #include <CARREDIM.F>
 
 !  arguments
-      INTEGER nx, ny
-      REAL*8 psi(nxmax,nymax), psidx(nxmax,nymax), psidy(nxmax,nymax), & 
-     &  x(nx),y(ny)
+      type(CarreEquilibrium), intent(inout) :: equ
+!!$      INTEGER nx, ny
+!!$      REAL*8 psi(nxmax,nymax), psidx(nxmax,nymax), psidy(nxmax,nymax), & 
+!!$     &  x(nx),y(ny)
 
 !  variables locales
       INTEGER i, j, nxymax
@@ -46,23 +50,23 @@
 
 !..Boucle sur toutes les lignes.
 
-      DO 10 j=1, ny
+      DO 10 j=1, equ%ny
 
 !..Copie du vecteur (ligne) dans un vecteur temporaire.
 
-         DO 15 i=1, nx
-            tmp(i) = psi(i,j)
+         DO 15 i=1, equ%nx
+            tmp(i) = equ%psi(i,j)
    15    CONTINUE
 
 !..Calcul de la derivee de ce vecteur.
 
-         CALL DERIV(nxmax, x, tmp, tmpp, nx)
+         CALL DERIV(nxmax, equ%x, tmp, tmpp, equ%nx)
 
 !..Copie du vecteur de derivees par rapport a x temporaire dans le
 !  vecteur de derivee par rapport a X: psidx
 
-         DO 20 i=1, nx
-            psidx(i,j) = tmpp(i)
+         DO 20 i=1, equ%nx
+            equ%psidx(i,j) = tmpp(i)
    20    CONTINUE
 
    10 CONTINUE
@@ -73,23 +77,23 @@
 
 !..Boucle sur toutes les colonnes.
 
-      DO 30 i=1, nx
+      DO 30 i=1, equ%nx
 
 !..Copie du vecteur (colonne) dans un vecteur temporaire.
 
-         DO 35 j=1, ny
-            tmp(j) = psi(i,j)
+         DO 35 j=1, equ%ny
+            tmp(j) = equ%psi(i,j)
    35    CONTINUE
 
 !..Calcul de la derivee de ce vecteur.
 
-         CALL DERIV(nymax, y, tmp, tmpp, ny)
+         CALL DERIV(nymax, equ%y, tmp, tmpp, equ%ny)
 
 !..Copie du vecteur de derivees par rapport a Y temporaire dans le
 !  vecteur de derivee par rapport a Y: psidy
 
-         DO 40 j=1, ny
-            psidy(i,j) = tmpp(j)
+         DO 40 j=1, equ%ny
+            equ%psidy(i,j) = tmpp(j)
    40    CONTINUE
 
    30 CONTINUE

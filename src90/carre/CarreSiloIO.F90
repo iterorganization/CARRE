@@ -9,8 +9,7 @@ module CarreSiloIO
 #endif
   implicit none
 
-
-  include "CARREDIM.F"
+#include <CARREDIM.F>
   
   integer :: iReg = 0, iSurf = 0, iRelax = 0
   integer :: csioDbfile

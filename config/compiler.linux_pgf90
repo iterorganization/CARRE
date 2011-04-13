@@ -23,7 +23,7 @@ LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
 LDFLAGS 	+= ${NCARG}
 endif
 
-ifdef NOUSE_MSCL
+ifndef NOUSE_MSCL
 LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
 endif
 

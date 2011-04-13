@@ -4,7 +4,7 @@
 !  version : 07.07.97 18:38
 !
 !***********************************************************************
-      use carre_io
+      use carre_types
       IMPLICIT NONE
 
 !..  Cette sous-routine remplace la valeur d'une variable par une

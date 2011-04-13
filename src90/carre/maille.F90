@@ -16,7 +16,7 @@
     
       use CarreSiloIO
       use CarreDiagnostics
-      use carre_io
+      use carre_types
   
       IMPLICIT NONE
   

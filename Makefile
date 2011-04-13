@@ -6,13 +6,11 @@ CPP	= /usr/lib/cpp
 # Source form: src is old fixed form source (no longer maintained), src90 is current free form source
 SRCDIR = src90
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/cntour:${SRCDIR}/graphe:${SRCDIR}/trans:${SRCDIR}/fcrr
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
-EXCLUDELIST = carre.o fcrr.o tradui.o euitm_routines.o itm_test_limiter1.o itm_test_limiter2.o itm_test_limiter.o
-MAINLIST = carre.o tradui.o fcrr.o fcrblkd.o 
-
+EXCLUDELIST = carre.o fcrr.o tradui.o euitm_routines.o itmcarre_wrapper.o
 
 DEFINES = ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL}
 
@@ -24,13 +22,13 @@ include LISTOBJ
 # If we're compiling for the ITM, we don't want graphics output and most utilities
 # But we want the UAL library
 ifdef USE_ITMCARRE
-#ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
 USE_NCARG = 
 USE_SILO = 
 
 EXCLUDELIST +=
 ALLTARGETS = ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared
+
 
 # Some variables are expected to be set up properly by the ITMv1 script
 # -${UAL} is the path to the UAL library files
@@ -41,6 +39,7 @@ endif
 # NCAR graphics, used for runtime plotting
 ifdef USE_NCARG
 EXCLUDELIST += bidon.o
+VPATH +=:${SRCDIR}/cntour:${SRCDIR}/graphe
 else
 VPATH +=:${SRCDIR}/dummy
 endif
@@ -58,7 +57,6 @@ USOLLIBS += -L${USOLLIBDIR}/silo/lib -lsiloh5
 # HDF5
 INCLUDE += -I ${USOLLIBDIR}/hdf5/include
 USOLLIBS += -L${USOLLIBDIR}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
-VPATH += :${SRCDIR}/usol
 else
 EXCLUDELIST += SiloIO.o
 endif
@@ -86,7 +84,6 @@ $(OBJECTCODE)/%.o : %.F
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
 $(OBJECTCODE)/%.o : %.F90
-	echo ${DEFINES}
 	- /bin/rm -f ${OBJECTCODE}/$*.f
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f90; \
 	case $< in \
@@ -128,12 +125,16 @@ ${OBJECTCODE}/fcrr: ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/l
 	rm -f ${OBJECTCODE}/fcrr 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
 
+${OBJECTCODE}/itmcarre_wrapper: ${OBJECTCODE}/itmcarre_wrapper.o ${OBJECTCODE}/libcarre.a Makefile
+	rm -f ${OBJECTCODE}/itmcarre_wrapper 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/itmcarre_wrapper ${OBJECTCODE}/itmcarre_wrapper.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
+
 ${OBJECTCODE}/libcarre.a: ${DEST}
 	ar r $@ $?
 	ranlib $@
 
 clean:
-	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f ${OBJECTCODE}/*.f90 ${OBJECTCODE}/*.mod ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f ${OBJECTCODE}/*.f90 ${OBJECTCODE}/*.mod ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr ${OBJECTCODE}/itmcarre_wrapper
 
 neat:
 	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f
