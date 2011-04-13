@@ -1,10 +1,11 @@
-      SUBROUTINE RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
+      SUBROUTINE RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, & 
      &             dpmin,dpmax,drmin,drmax,distxo,iusor,correct)
 !
 !  version : 07.07.97 18:37
 !
 !======================================================================
+      use carre_io
+
       IMPLICIT NONE
 
 !..  Cette sous-routine imprime a l'ecran un tableau contenant tous les
@@ -16,10 +17,11 @@
 #include <CARREDIM.F>
 
 !  arguments
-      INTEGER nptseg(*),repart,npr(*),nreg,nsep,npx,iusor
-      REAL*8 deltp1(*),deltpn(*),deltr1(*),deltrn(*),pntrat,lg(*), & 
+      type(CarreParameters), intent(in) :: par
+      INTEGER nreg,nsep,npx,iusor
+      REAL*8 lg(*), & 
      &       distnv(5,*),difpsi,dpmin(*),dpmax(*),drmin(*),drmax(*), & 
-     &       tgarde(4),distxo
+     &       distxo
       LOGICAL correct
 
 !  variables en common
@@ -44,7 +46,7 @@
   110 FORMAT(/T2,A1,T6,A9,T18,A5,T29,A9,T41,A9,T54,A6,T66,A6/75('='))
 
       DO 12 i=1, nsep
-         write(iusor,114)i,nptseg(i),lg(i),deltp1(i),deltpn(i),dpmin(i), & 
+         write(iusor,114)i,par%nptseg(i),lg(i),par%deltp1(i),par%deltpn(i),dpmin(i), & 
      &             dpmax(i)
   114    FORMAT(T2,I1,T8,I3,T15,1p5E12.4)
    12 CONTINUE
@@ -59,13 +61,13 @@
         write(iusor,120) 'RADIAL DISTRIBUTIONS FOR EACH REGION:'
       endif
 
-      IF (repart .EQ. 1) THEN
+      IF (par%repart .EQ. 1) THEN
         if(sellan(1:8).eq.'francais') then
          write(iusor,121) 'Repartition selon la distance:', & 
-     &     ' repart=',repart
+     &     ' repart=',par%repart
         elseif(sellan(1:7).eq.'english') then
          write(iusor,221) 'Distribution in displacement along plates:', & 
-     &     ' repart=',repart
+     &     ' repart=',par%repart
         endif
   121    FORMAT(T14,A,i5)
   221    FORMAT(T14,2A,i5)
@@ -75,22 +77,22 @@
   122    FORMAT(/T2,A6,T9,A6,T17,A8,T29,A9,T41,A9,T54,A6,T66,A6/ & 
      &            75('='))
 
-      ELSE IF (repart .EQ. 2) THEN
+      ELSE IF (par%repart .EQ. 2) THEN
         if(sellan(1:8).eq.'francais') then
-          write(iusor,121) 'Repartition selon psi: repart=',repart
+          write(iusor,121) 'Repartition selon psi: repart=',par%repart
           write(iusor,124)'region','npr(i)','difference','deltr1(i)', & 
      &      'deltrn(i)','drmin','drmax'
   124     FORMAT(/T2,A6,T9,A6,T17,A10,T29,A9,T41,A9,T54,A6,T66,A6/ & 
      &            75('='))
         elseif(sellan(1:7).eq.'english') then
-          write(iusor,121) 'Distribution in psi: repart=',repart
+          write(iusor,121) 'Distribution in psi: repart=',par%repart
           write(iusor,124)'region','npr(i)','  width   ','deltr1(i)', & 
      &      'deltrn(i)','drmin','drmax'
         endif
       ENDIF
 
       DO 26 i=1, nreg-1
-         write(iusor,128)i,npr(i),distnv(repart,i),deltr1(i),deltrn(i), & 
+         write(iusor,128)i,par%npr(i),distnv(par%repart,i),par%deltr1(i),par%deltrn(i), & 
      &            drmin(i),drmax(i)
   128    FORMAT(T2,I1,T8,I3,T15,1p5E12.4)
    26 CONTINUE
@@ -107,16 +109,16 @@
      &       'pntrat max.=',F11.8)
       endif
 
-      IF (repart .EQ. 1) THEN
+      IF (par%repart .EQ. 1) THEN
          write(iusor,138)'pntrat','npr(i)','deltr1(i)','deltrn(i)', & 
      &            'drmin','drmax'
   138    FORMAT(/T2,A6,T9,A6,T17,A9,T29,A9,T41,A6,T54,A6/75('='))
 
-         write(iusor,140)pntrat,npr(nreg),deltr1(i),deltrn(i),drmin(i), & 
+         write(iusor,140)par%pntrat,par%npr(nreg),par%deltr1(i),par%deltrn(i),drmin(i), & 
      &            drmax(i)
   140    FORMAT(/T2,F6.3,T9,I3,T15,1p4E12.4)
 
-      ELSE IF (repart .EQ. 2) THEN
+      ELSE IF (par%repart .EQ. 2) THEN
 
          if(sellan(1:8).eq.'francais') then
            write(iusor,148)'pntrat','npr(i)','difference','deltr1(i)', & 
@@ -128,8 +130,8 @@
   148    FORMAT(/T2,A6,T9,A6,T17,A,T29,A9,T41,A9,T54,A6,T66,A6/ & 
      &            75('='))
 
-         write(iusor,150)pntrat,npr(nreg),difpsi,deltr1(nreg), & 
-     &      deltrn(nreg),drmin(nreg),drmax(nreg)
+         write(iusor,150)par%pntrat,par%npr(nreg),difpsi,par%deltr1(nreg), & 
+     &      par%deltrn(nreg),drmin(nreg),drmax(nreg)
   150    FORMAT(T2,F6.3,T9,I3,T15,1p5E12.4)
 
       ENDIF
@@ -150,7 +152,7 @@
          write(iusor,154) 'tgarde(1)','tgarde(2)'
   154    FORMAT(/T2,A9,T16,A9/75('='))
 
-         write(iusor,156) tgarde(1),tgarde(2)
+         write(iusor,156) par%tgarde(1),par%tgarde(2)
   156    FORMAT(T2,F8.5,T17,F8.5)
 
       ELSE
@@ -158,7 +160,7 @@
          write(iusor,158)'tgarde(1)','tgarde(2)','tgarde(3)','tgarde(4)'
   158    FORMAT(/T2,A9,T16,A9,T31,A9,T46,A9/75('='))
 
-         write(iusor,160) tgarde(1),tgarde(2),tgarde(3),tgarde(4)
+         write(iusor,160) par%tgarde(1),par%tgarde(2),par%tgarde(3),par%tgarde(4)
   160    FORMAT(T2,F8.5,T17,F8.5,T32,F8.5,T47,F8.5)
       ENDIF
 
@@ -203,7 +205,7 @@
      &   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
           endif
         endif
-        if (nptseg(i).le.2) then
+        if (par%nptseg(i).le.2) then
           correct=.false.
           if(sellan(1:8).eq.'francais') then
             write(6,2811) i
@@ -238,18 +240,18 @@
       enddo
       do i = 1, nreg-1
         if (drmin(i)*drmax(i).le.0.0 .or. & 
-     &      drmin(i)*distnv(repart,i).le.0.0 .or. & 
-     &      drmax(i)*distnv(repart,i).le.0.0) then
+     &      drmin(i)*distnv(par%repart,i).le.0.0 .or. & 
+     &      drmax(i)*distnv(par%repart,i).le.0.0) then
           correct = .false.
           if(sellan(1:8).eq.'francais') then
-            WRITE(6,291) i, drmin(i), drmax(i), distnv(repart,i)
+            WRITE(6,291) i, drmin(i), drmax(i), distnv(par%repart,i)
   291       FORMAT(//T2,'Donnees invalides pour la region',i2,'!'// & 
      &   T2,'Les nombres drmin, drmax et difference doivent ', & 
      &   'avoir le meme signe.'// & 
      &   T2,'Modifiez deltr1 et deltrn en consequence.'// & 
      &   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
           elseif(sellan(1:7).eq.'english') then
-            WRITE(6,290) i, drmin(i), drmax(i), distnv(repart,i)
+            WRITE(6,290) i, drmin(i), drmax(i), distnv(par%repart,i)
   290       FORMAT(//T2,'Invalid data for region',i2,'!'// & 
      &   T2, & 
      &   'The numbers drmin, drmax and width must have the same sign.'// & 
@@ -280,16 +282,16 @@
         endif
       endif
       do i = 1, 2*max(1,npx)
-        if (tgarde(i).lt.0.0) then
+        if (par%tgarde(i).lt.0.0) then
           correct = .false.
           if(sellan(1:8).eq.'francais') then
-            WRITE(6,3011) i, tgarde(i)
+            WRITE(6,3011) i, par%tgarde(i)
  3011       FORMAT(//T2,'Donnees invalides pour la plaque',i2,'!'// & 
      &     T2,'La longueur tgarde doit etre positive ou nulle.'// & 
      &     T2,'Modifiez tgarde en consequence.'// & 
      &     T2,'tgarde = ',1pe11.4)
           elseif(sellan(1:7).eq.'english') then
-            WRITE(6,3000) i, tgarde(i)
+            WRITE(6,3000) i, par%tgarde(i)
  3000       FORMAT(//'Invalid data for plate',i2,'!'// & 
      &     T2,'The length tgarde must be positive or zero.'// & 
      &     T2,'Modify tgarde accordingly.'// & 

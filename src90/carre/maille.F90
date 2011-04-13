@@ -163,7 +163,7 @@
          call read_code_parameters(par, distxo)
 
          correct = .false.
-         do while (correct)
+         do while (.not. correct)
 
              !..Calculate the psi difference between the penetration values
 
@@ -323,7 +323,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+     &              np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
      &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
      &              a00,a10,a01,a11,par%repart, & 
      &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -386,7 +386,7 @@
      &                 npstru(inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
-         DO 25 ipas=1, npr(ireg)-1
+         DO 25 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -398,7 +398,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &              np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &              a00,a10,a01,a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -434,7 +434,7 @@
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         DO 32 ipas=1, npr(ireg)-1
+         DO 32 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -446,7 +446,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &       pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &       a00,a10,a01,a11,par%repart, & 
      &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
@@ -507,7 +507,7 @@
          call read_code_parameters(par, distxo)
 
          correct = .false.
-         do while (correct)
+         do while (.not. correct)
 
              !..Calculate the psi difference between the penetration values
 
@@ -550,26 +550,26 @@
 
              !..Radial direction
 
-             CALL NUNIFO(npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
                  &               spacer(1,1),drmin(1),drmax(1))
 
-             CALL NUNIFO(npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+             CALL NUNIFO(par%npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
                  &               spacer(1,2),drmin(2),drmax(2))
 
-             CALL NUNIFO(npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+             CALL NUNIFO(par%npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
                  &               spacer(1,3),drmin(3),drmax(3))
 
-             CALL NUNIFO(npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+             CALL NUNIFO(par%npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
                  &               spacer(1,4),drmin(4),drmax(4))
 
              IF (par%repart .EQ. 1) THEN
 
-                 CALL NUNIFO(npr(5),par%pntrat,par%deltr1(5),par%deltrn(5), & 
+                 CALL NUNIFO(par%npr(5),par%pntrat,par%deltr1(5),par%deltrn(5), & 
                      &                  spacer(1,5),drmin(5),drmax(5))
 
              ELSE IF (par%repart .EQ. 2) THEN
 
-                 CALL NUNIFO(npr(5),difpsi,par%deltr1(5),par%deltrn(5), & 
+                 CALL NUNIFO(par%npr(5),difpsi,par%deltr1(5),par%deltrn(5), & 
                      &                  spacer(1,5),drmin(5),drmax(5))
 
              ENDIF
@@ -694,7 +694,7 @@
      &                 npstru(inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
-         DO 57 ipas=1, npr(ireg)-1
+         DO 57 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -706,7 +706,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+     &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
      &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
      &               a00,a10,a01,a11,par%repart, & 
      &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -769,7 +769,7 @@
      &                 npstru(inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
-         DO 67 ipas=1, npr(ireg)-1
+         DO 67 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -781,7 +781,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -858,7 +858,7 @@
      &                 npstru(inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
-         DO 77 ipas=1, npr(ireg)-1
+         DO 77 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -870,7 +870,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -933,7 +933,7 @@
      &                 npstru(inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
-         DO 87 ipas=1, npr(ireg)-1
+         DO 87 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -946,7 +946,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -994,7 +994,7 @@
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         DO 97 ipas=1, npr(ireg)-1
+         DO 97 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -1006,7 +1006,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &       pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &       a00,a10,a01,a11,par%repart, & 
      &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
@@ -1118,7 +1118,7 @@
             call read_code_parameters(par, distxo)
 
             correct = .false.
-            do while (correct)
+            do while (.not. correct)
 
                 !..Calculate the psi difference between the penetration values
 
@@ -1154,35 +1154,35 @@
 
                 !..Calculate the intervals, dmin and dmax, in the radial direction
 
-                CALL NUNIFO(npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+                CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
                     &               spacer(1,1),drmin(1),drmax(1))
 
-                CALL NUNIFO(npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+                CALL NUNIFO(par%npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
                     &               spacer(1,2),drmin(2),drmax(2))
 
-                CALL NUNIFO(npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+                CALL NUNIFO(par%npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
                     &               spacer(1,3),drmin(3),drmax(3))
 
-                CALL NUNIFO(npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+                CALL NUNIFO(par%npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
                     &               spacer(1,4),drmin(4),drmax(4))
 
-                CALL NUNIFO(npr(5),distnv(par%repart,5),par%deltr1(5),par%deltrn(5), & 
+                CALL NUNIFO(par%npr(5),distnv(par%repart,5),par%deltr1(5),par%deltrn(5), & 
                     &               spacer(1,5),drmin(5),drmax(5))
 
                 IF (par%repart .EQ. 1) THEN
 
-                    CALL NUNIFO(npr(6),par%pntrat,par%deltr1(6),par%deltrn(6), & 
+                    CALL NUNIFO(par%npr(6),par%pntrat,par%deltr1(6),par%deltrn(6), & 
                         &                  spacer(1,6),drmin(6),drmax(6))
 
                 ELSE IF (par%repart .EQ. 2) THEN
 
-                    CALL NUNIFO(npr(6),difpsi,par%deltr1(6),par%deltrn(6), & 
+                    CALL NUNIFO(par%npr(6),difpsi,par%deltr1(6),par%deltrn(6), & 
                         &                  spacer(1,6),drmin(6),drmax(6))
 
                 ENDIF
                 !rm  augmenter ce test
-                if(npr(1).ne.npr1) then
-                    npr1=npr(1)
+                if(par%npr(1).ne.npr1) then
+                    npr1=par%npr(1)
 
                     !.3.1.1. Appel a la routine qui trouve le point sur la boucle de la
                     !        separatrice interieure ou on doit diviser cette separatrice
@@ -1276,7 +1276,7 @@
 
                     call trc_stk_in('maille','*114')
                     CALL DOUBLD(bouclx,boucly,xn,yn,nn,spacer(1,1), & 
-                        &        npr(1),inddef(idef),xext,yext,xptxex,yptxex,xpto, & 
+                        &        par%npr(1),inddef(idef),xext,yext,xptxex,yptxex,xpto, & 
                         &        ypto,nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
                         &        ystruc,a00,a10,a01,a11,par%repart, & 
                         &        xcrb2,ycrb2,npcrb2)
@@ -1539,7 +1539,7 @@
      &                 npstru(inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
-         DO 145 ipas=1, npr(ireg)-1
+         DO 145 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -1570,7 +1570,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -1580,13 +1580,13 @@
 
          IF (ptxint .EQ. 1) THEN
 
-            xmail(par%nptseg(1)+par%nptseg(3)-1,npr(1),1) = xptxex
-            ymail(par%nptseg(1)+par%nptseg(3)-1,npr(1),1) = yptxex
+            xmail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = xptxex
+            ymail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = yptxex
 
          ELSE IF (ptxint .EQ. 2) THEN
 
-            xmail(par%nptseg(5)+par%nptseg(3)-1,npr(1),1) = xptxex
-            ymail(par%nptseg(5)+par%nptseg(3)-1,npr(1),1) = yptxex
+            xmail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = xptxex
+            ymail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = yptxex
 
          ENDIF
 
@@ -1605,8 +1605,8 @@
 
             DO 150 ipas=1,par%nptseg(1)+par%nptseg(3)-2
                np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
+               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
+               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
   150       CONTINUE
 
             DO 151 ipas=1, par%nptseg(5)
@@ -1619,8 +1619,8 @@
 
             DO 152 ipas=1,par%nptseg(5)+par%nptseg(3)-2
                np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
+               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
+               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
   152       CONTINUE
 
             DO 153 ipas=1, par%nptseg(1)
@@ -1671,7 +1671,7 @@
      &                 npstru(inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
-         DO 157 ipas=1, npr(ireg)-1
+         DO 157 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -1683,7 +1683,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -1746,7 +1746,7 @@
      &                 npstru(inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
-         DO 167 ipas=1, npr(ireg)-1
+         DO 167 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -1758,7 +1758,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -1779,8 +1779,8 @@
             DO 170 ipas=par%nptseg(1)+par%nptseg(2)+par%nptseg(3)+par%nptseg(4)-3, & 
      &                             par%nptseg(1)+par%nptseg(3), -1
                np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
+               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
+               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
   170       CONTINUE
 
             DO 171 ipas=1, par%nptseg(6)
@@ -1794,8 +1794,8 @@
             DO 172 ipas=par%nptseg(5)+par%nptseg(6)+par%nptseg(3)+par%nptseg(4)-3, & 
      &                             par%nptseg(5)+par%nptseg(3), -1
                np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,npr(1),1)
+               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
+               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
   172       CONTINUE
 
             DO 173 ipas=1, par%nptseg(2)
@@ -1846,7 +1846,7 @@
      &                 npstru(inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
-         DO 177 ipas=1, npr(ireg)-1
+         DO 177 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -1858,7 +1858,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -1920,7 +1920,7 @@
      &                 npstru(inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
-         DO 187 ipas=1, npr(ireg)-1
+         DO 187 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -1932,7 +1932,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &               a00,a10,a01,a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -1973,7 +1973,7 @@
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         DO 197 ipas=1, npr(ireg)-1
+         DO 197 ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -1986,7 +1986,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &      pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &      a00,a10,a01,a11,par%repart, & 
      &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
@@ -2037,7 +2037,7 @@
          call read_code_parameters(par, distxo)
 
          correct = .false.
-         do while (correct)
+         do while (.not. correct)
 
              !..Calculate the psi difference between the penetration values
 
@@ -2066,17 +2066,17 @@
 
              !..Radial direction
 
-             CALL NUNIFO(npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
                  &               spacer(1,1),drmin(1),drmax(1))
 
              IF (par%repart .EQ. 1) THEN
 
-                 CALL NUNIFO(npr(2),par%pntrat,par%deltr1(2),par%deltrn(2), & 
+                 CALL NUNIFO(par%npr(2),par%pntrat,par%deltr1(2),par%deltrn(2), & 
                      &                  spacer(1,2),drmin(2),drmax(2))
 
              ELSE IF (par%repart .EQ. 2) THEN
 
-                 CALL NUNIFO(npr(2),difpsi,par%deltr1(2),par%deltrn(2), & 
+                 CALL NUNIFO(par%npr(2),difpsi,par%deltr1(2),par%deltrn(2), & 
                      &                  spacer(1,2),drmin(2),drmax(2))
 
              ENDIF
@@ -2156,7 +2156,7 @@
 !        print*,'dans maille: sens=',sens
 !***
 
-         DO ipas=1, npr(ireg)-1
+         DO ipas=1, par%npr(ireg)-1
 
             pas(ipas) = spacer(ipas,ireg)
 
@@ -2173,7 +2173,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny, & 
+              &              np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
               &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
               &              a00,a10,a01,a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
@@ -2206,7 +2206,7 @@
          ENDDO
 
 !..Definition des pas pour le balayage vers le centre
-         DO ipas=1, npr(ireg)-1
+         DO ipas=1, par%npr(ireg)-1
             pas(ipas) = spacer(ipas,ireg)
 !***
 !           print*,'ipas, pas=',ipas,pas(ipas)
@@ -2222,7 +2222,7 @@
          print*, 'ireg=', ireg
 !---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &      pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
      &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
      &      a00,a10,a01,a11,par%repart, & 
      &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
@@ -2247,8 +2247,9 @@
 CONTAINS
 
   subroutine read_code_parameters(par, distxo)
+    implicit none
     type(CarreParameters), intent(inout) :: par
-    real*8, intent(in) :: distxo
+    real*8, intent(inout) :: distxo
 
     ! internal
     integer :: ient,isor,ifail
@@ -2259,9 +2260,7 @@ CONTAINS
 
          ient = 9
          isor = 0
-         CALL CHANGE(par%nptseg,par%deltp1,par%deltpn,par%repart,&
-             & par%npr,par%deltr1,par%deltrn,&
-             & par%pntrat,par%tgarde,distxo,ient,isor,ifail)
+         CALL CHANGE(par,distxo,ient,isor,ifail)
 
 !..Check whether all the data have been read from the file
 
@@ -2289,12 +2288,11 @@ CONTAINS
 
 
   subroutine check_and_modify_code_parameters(par, correct)
+    implicit none
     type(CarreParameters), intent(inout) :: par
     logical, intent(out) :: correct
 
-         CALL RAPPEL(par%nptseg,par%deltp1,par%deltpn,par%repart,&
-             & par%npr,par%deltr1,par%deltrn, &
-             & par%pntrat,par%tgarde,&
+         CALL RAPPEL(par,&
              & lg,difpsi,distnv,nreg,nsep,npx,&
              & dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
@@ -2333,9 +2331,7 @@ CONTAINS
             ient = 5
             isor = 6
             pntrat_old = par%pntrat
-            CALL CHANGE(par%nptseg,par%deltp1,par%deltpn,par%repart,&
-                & par%npr,par%deltr1,par%deltrn, & 
-                & par%pntrat,par%tgarde,distxo,ient,isor,ifail)
+            CALL CHANGE(par,distxo,ient,isor,ifail)
             if (par%pntrat.ne.pntrat_old) then
 
             call endpag
@@ -2349,9 +2345,7 @@ CONTAINS
             ! parameters have been changed and state has to be recomputed
             !GO TO 3 
          else
-            CALL RAPPEL(par%nptseg,par%deltp1,par%deltpn,par%repart,&
-                & npr,par%deltr1,par%deltrn, & 
-     &             par%pntrat,par%tgarde,lg,difpsi,distnv,nreg,nsep,npx, & 
+            CALL RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, & 
      &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
 
             CALL SORTIE(nsep,nreg,np1, & 
