@@ -20,7 +20,7 @@ program itmcarre_wrapper
 
   ! call itmcarre
   call logmsg( LOGDEBUG, "itmcarre_wrapper: main computation" )
-  call itmcarre(equcpo, limcpo, edgecpo )
+  call itmcarre_main(equcpo, limcpo, edgecpo )
 
   ! write output cpos to UAL
   call logmsg( LOGDEBUG, "itmcarre_wrapper: writing cpos" )

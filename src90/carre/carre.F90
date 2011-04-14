@@ -104,9 +104,8 @@
         ! internal
         REAL*8 zero,rmax,zmax
         PARAMETER ( zero=0.)
-        INTEGER i, j, ierror, iflag, & 
-            & itmp, is, ip
-        character lign80*80,nomstr(strumx)*80
+        INTEGER i, j, ierror, iflag           
+        character lign80*80
 
 
 !..1.0  Initialisation des variables par defaut et de la bibliotheque

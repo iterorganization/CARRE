@@ -15,7 +15,7 @@ module itmcarre
 contains
 
 
-  subroutine itmcarre(equcpo, limcpo, edgecpo )
+  subroutine itmcarre_main(equcpo, limcpo, edgecpo )
         
     type(type_equilibrium), intent(in), pointer :: equcpo(:)
     type(type_limiter), intent(in) :: limcpo
@@ -57,7 +57,7 @@ contains
     call logmsg( LOGDEBUG, "itmcarre: writing edge CPO" )
     allocate( edgecpo(1) )
 
-  end subroutine itmcarre
+  end subroutine itmcarre_main
   
 
 
@@ -65,10 +65,6 @@ contains
   subroutine read_equilibrium( equcpo, equ )
     type(type_equilibrium), intent(in) :: equcpo
     type(CarreEquilibrium), intent(out) :: equ
-
-
-    ! internal
-    integer :: ix, iy
 
     call assert( equcpo % profiles_2d % grid_type(1) == '1', &
         & "read_equilibrium: Equ. CPO not in right format: no rect. grid" )

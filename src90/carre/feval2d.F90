@@ -16,7 +16,6 @@
       real*8 x(nxmax),y(nymax),px,py, & 
      &     a00(nxmax,nymax),a10(nxmax,nymax), & 
      &     a01(nxmax,nymax),a11(nxmax,nymax)
-      real*8 f
 
 !  variables locales
 
