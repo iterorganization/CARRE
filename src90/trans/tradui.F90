@@ -14,7 +14,8 @@
       use euITM_schemas  
       use euITM_routines
 #endif
-      
+      use carre_types
+
       implicit none
 
 !ank-970707: dimensions from the file
@@ -25,12 +26,11 @@
       integer nxmx,nymx,ncutmx,nisomx
       parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1)
       integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), & 
-     &        nptseg(10),repart,npr(10),ifail,nx,ny, & 
+     &        ifail,nx,ny, & 
      &        ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1)
       real*8 r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx), & 
      &  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
-     &  psidym(npmamx,nrmamx,nregmx),deltp1(10),deltpn(10),deltr1(10), & 
-     &  deltrn(10),tgarde(4),distxo,pntrat
+     &  psidym(npmamx,nrmamx,nregmx),distxo
       real*8 crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), & 
      &  bb(-1:nxmx,-1:nymx,0:3),b0r0, & 
      &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), & 
@@ -42,6 +42,8 @@
       integer :: leftcut(ncutmx),rightcut(ncutmx),bottomcut(ncutmx),topcut(ncutmx)
       integer, allocatable, dimension(:,:) :: leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy
       integer, parameter :: PERIODIC_BC = 0
+
+      type(CarreParameters) :: par
 
 #ifdef USE_ITMCARRE      
       type(B2ITMGridMap) :: b2gd
@@ -99,8 +101,7 @@
 !* 2.   Read the parameters used to create the grid
 
       distxo=1.0e30
-      call change(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn, & 
-     &                  pntrat,tgarde,distxo,nin,nout,ifail)
+      call change(par,nin,nout,ifail)
 
 !* 3.   Read the grid
 
@@ -127,7 +128,7 @@
 !
       if(isel.eq.1) then
 !
-        call ecrim1(nout,nfin,r,z,nptseg,nreg,nppol,nprad,npmamx, & 
+        call ecrim1(nout,nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, & 
      &  nrmamx)
 !
 ! B2.5 Format
@@ -136,7 +137,7 @@
 !
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
      &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+     &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
      &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
@@ -148,7 +149,7 @@
 !
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
      &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+     &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
      &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
@@ -160,7 +161,7 @@
 !
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
      &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+     &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
      &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
 !<<<
 !        write(0,*) 'call b2agbb'
@@ -182,7 +183,7 @@
 !
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
      &   r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &   nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+     &   par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
      &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &   crx,cry,psidx,psidy,nxmx,nymx)
@@ -198,7 +199,7 @@
               ! assemble the crx, cry arrays
               call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
                    &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-                   &    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+                   &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
                    &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
               
               ! allocate connectivity arrays 

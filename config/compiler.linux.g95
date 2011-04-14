@@ -26,7 +26,7 @@ ifneq ($(NOUSE_MSCL),-DNOUSE_MSCL)
 LDFLAGS 	+= -lmscl
 endif
 
-ifeq ($(USE_ITMCARRE),-DUSE_ITMCARRE)
+ifdef USE_ITMCARRE
   INCLUDE+= -I ${UAL}/include/amd64_g95
   LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_g95
 
