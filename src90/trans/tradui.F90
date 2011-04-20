@@ -244,14 +244,14 @@
 
               cpoedge(1)%grid = itmgrid
 
-              shot =11
+              shot =12
               run = 1
               refshot = 10
               refrun =0
               treename = 'euitm'
 
-              call euitm_create(treename, shot, run, refshot, refrun, idx)
-              !call euitm_open(treename,shot,run,idx)
+              call euitm_create_hdf5(treename, shot, run, refshot, refrun, idx)
+              !call euitm_open_hdf5(treename,shot,run,idx)
               call euitm_put(idx,"edge",cpoedge)
               call euitm_deallocate(cpoedge)
 #endif      

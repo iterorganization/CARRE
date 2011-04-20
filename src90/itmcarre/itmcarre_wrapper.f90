@@ -3,6 +3,7 @@ program itmcarre_wrapper
   use euITM_schemas
   use euITM_routines
   use itmcarre
+  use b2mod_ual
 
   use Logging
 
@@ -13,6 +14,9 @@ program itmcarre_wrapper
   type(type_edge), pointer :: edgecpo(:)
 
   integer :: idx
+
+  ! open ual
+  call open_ual(idx)
 
   ! read input cpos from UAL
   call logmsg( LOGDEBUG, "itmcarre_wrapper: reading cpos" )
@@ -26,37 +30,19 @@ program itmcarre_wrapper
   call logmsg( LOGDEBUG, "itmcarre_wrapper: writing cpos" )
   call write_ual(idx, edgecpo)
 
+  ! close ual
+  call close_ual(idx)
+
 contains
 
   subroutine read_ual(idx, equcpo, limcpo)
-    integer, intent(out) :: idx
+    integer, intent(in) :: idx
     type(type_equilibrium), intent(out), pointer :: equcpo(:)
     type(type_limiter), intent(out) :: limcpo
-
-    ! internal
-    integer :: shot, run, refshot, refrun
-    character(len=5)::treename
-
-    namelist /b2_ual_write_namelist/ treename, shot, run, refshot, refrun
-
-    ! default values
-    shot = 2
-    run = 1
-    refshot = 1
-    refrun = 0
-    treename = 'euitm'
-
-!!$    ! read namelist from configuration file
-!!$    read (ninp(0),b2_ual_write_namelist)
-!!$    write (nout(0),b2_ual_write_namelist)
-
-    ! establish UAL access
-
-    call euitm_open(treename,shot,run,idx)
-    call euitm_get(idx,"equilibrium",equcpo) 
-    write(*,*) 'This CPO has ', size(equcpo),' time slices'
-    call euitm_get(idx,"limiter",limcpo) 
-
+    
+    call euitm_get(idx,"equilibrium",equcpo)
+    call euitm_get(idx,"limiter",limcpo)
+    call logmsg( LOGDEBUG, "itmcarre_wrapper: equilibrium cpo #"//int2str(size(equcpo)) )
   end subroutine read_ual
 
   subroutine write_ual(idx, edgecpo)
@@ -65,13 +51,5 @@ contains
 
     call euitm_put(idx,"edge",edgecpo)
   end subroutine write_ual
-
-  subroutine close_ual(idx)
-    integer, intent(in) :: idx
-
-    call euitm_close(idx)
-  end subroutine close_ual
-
-
 
 end program itmcarre_wrapper

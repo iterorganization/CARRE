@@ -1,7 +1,8 @@
       SUBROUTINE SORTIE(nsep,nreg,np1, & 
      &    distxo,xmail,ymail, & 
      &    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero, & 
-     &    fctpx,diag,par)
+     &    fctpx,diag,par,psim,psidxm,psidym)
+
 !
 !  version : 07.07.97 19:08
 !
@@ -26,7 +27,10 @@
      &     distxo,x(nxmax),y(nymax), & 
      &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
      &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
-     &     ptx(npx+1),pty(npx+1),fctpx(npx+1)
+     &     ptx(npx+1),pty(npx+1),fctpx(npx+1), &
+     &  psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
+     &  psidym(npmamx,nrmamx,nregmx)
+
       logical racord
       type(CarreDiag), intent(in) :: diag
       type(CarreParameters), intent(in) :: par
@@ -157,19 +161,20 @@
 
             DO 32 j=1, par%npr(ireg)
             do 31 i=1,np1(ireg)
-               xx = xmail(i,j,ireg)
-               yy = ymail(i,j,ireg)
-               ii = ifind(xx,x,nx,1)
-               jj = ifind(yy,y,ny,1)
-               psimai = a00(ii,jj,1)+a10(ii,jj,1)*xx+a01(ii,jj,1)*yy & 
-     &                + a11(ii,jj,1)*xx*yy
-               psidx = a00(ii,jj,2)+a10(ii,jj,2)*xx+a01(ii,jj,2)*yy & 
-     &                + a11(ii,jj,2)*xx*yy
-               psidy = a00(ii,jj,3)+a10(ii,jj,3)*xx+a01(ii,jj,3)*yy & 
-     &                + a11(ii,jj,3)*xx*yy
+                ! psi interpolation moved up into maille
+!!$               xx = xmail(i,j,ireg)
+!!$               yy = ymail(i,j,ireg)
+!!$               ii = ifind(xx,x,nx,1)
+!!$               jj = ifind(yy,y,ny,1)
+!!$               psimai = a00(ii,jj,1)+a10(ii,jj,1)*xx+a01(ii,jj,1)*yy & 
+!!$     &                + a11(ii,jj,1)*xx*yy
+!!$               psidx = a00(ii,jj,2)+a10(ii,jj,2)*xx+a01(ii,jj,2)*yy & 
+!!$     &                + a11(ii,jj,2)*xx*yy
+!!$               psidy = a00(ii,jj,3)+a10(ii,jj,3)*xx+a01(ii,jj,3)*yy & 
+!!$     &                + a11(ii,jj,3)*xx*yy
 
-               WRITE(10,109)xmail(i,j,ireg),ymail(i,j,ireg),psimai, & 
-     &           psidx,psidy
+               WRITE(10,109)xmail(i,j,ireg),ymail(i,j,ireg),psim(i,j,ireg), & 
+     &           psidxm(i,j,ireg),psidym(i,j,ireg)
 ! 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
   109          FORMAT(1p5E16.8)
 

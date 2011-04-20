@@ -193,7 +193,9 @@ contains
             &    struct%xstruc,struct%ystruc,struct%inddef,&
             & grid%nreg,grid%xn,grid%yn,grid%xmail,grid%ymail, & 
             &    grid%np1,equ%ptx,equ%pty,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, & 
-            &    equ%a00,equ%a10,equ%a01,equ%a11,equ%fctpx,equ%limcfg,diag,par)
+            &    equ%a00,equ%a10,equ%a01,equ%a11,equ%fctpx,equ%limcfg,diag,par,&
+            & grid%psim, grid%psidxm, grid%psidym)
+
     end if
 
   end subroutine carre_main_computation

@@ -2,7 +2,8 @@
      &     separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
      &     xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
      &     np1,ptx,pty,nivx,nivy,nivtot,nbniv, & 
-     &     a00,a10,a01,a11,fctpx,limcfg,diag,par)
+     &     a00,a10,a01,a11,fctpx,limcfg,diag,par,&
+     &     psim, psidxm, psidym)
   !
 !  version : 23.06.98 19:53
 !
@@ -36,7 +37,10 @@
      &  xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*),distnv(5,5), & 
      &  nivx(npnimx,nivmx),nivy(npnimx,nivmx),fctpx(npx+1), & 
      &  a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3),&
+     &  psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
+     &  psidym(npmamx,nrmamx,nregmx)
+
       type(CarreDiag), intent(inout) :: diag
       type(CarreParameters), intent(inout) :: par
 
@@ -47,7 +51,7 @@
       !  variables locales
       INTEGER isep,ipas,ireg,ipx,sens,nn,idef, & 
      &  nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
-     &  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
+     &  ,ptxext,i,j,nbcl(2),nnlast,npr1,nmail,imail
       REAL*8 dist,x2,y2,lg(10), & 
      &  xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
      &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, & 
@@ -2231,11 +2235,30 @@
       ENDIF
 !======================================================================
 
+!  6. Compute psi and grad psi at the grid points
+
+      do ireg=1, nreg
+          do j=1, par%npr(ireg)
+              do i= 1,np1(ireg)
+                  xx = xmail(i,j,ireg)
+                  yy = ymail(i,j,ireg)
+                  ii = ifind(xx,x,nx,1)
+                  jj = ifind(yy,y,ny,1)
+                  psim(i,j,ireg) = a00(ii,jj,1)+a10(ii,jj,1)*xx+a01(ii,jj,1)*yy & 
+                      & + a11(ii,jj,1)*xx*yy
+                  psidxm(i,j,ireg) = a00(ii,jj,2)+a10(ii,jj,2)*xx+a01(ii,jj,2)*yy & 
+                      & + a11(ii,jj,2)*xx*yy
+                  psidym(i,j,ireg) = a00(ii,jj,3)+a10(ii,jj,3)*xx+a01(ii,jj,3)*yy & 
+                      & + a11(ii,jj,3)*xx*yy
+              end do
+          end do
+      end do
+
 !..5.  Write the grid data into a file
 
       CALL SORTIE(nsep,nreg,np1, & 
      &  distxo,xmail,ymail,nx,ny, & 
-     &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx,diag,par)
+     &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx,diag,par,psim,psidxm,psidym)
 
 !c<<<
 !      write(0,*) '<=== Leaving maille'

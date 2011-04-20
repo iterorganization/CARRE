@@ -80,16 +80,19 @@ module carre_types
   type CarreGrid
 !.. nreg  : number of the grid regions depending on the configuration
 !.. np1   : numbers of the grid points in poloidal direction
-!           (region index)
+!           (region index) (eventually derived from par%nptseg)
 !.. xmail,ymail: grid point coordinates
 !                (poloidal, radial, region)
 !.. xn,yn : working array for coordinates along a parametrised curve
+!.. psim : value of psi interpolated to grid points
+!.. psidxm, psidym: grad psi interpolated to grid points
       integer :: nreg, np1(nregmx)
 
       REAL*8  & 
-     &   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
-     &   ymail(npmamx,nrmamx,nregmx)
-
+     & xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
+     & ymail(npmamx,nrmamx,nregmx), &
+     & psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
+     & psidym(npmamx,nrmamx,nregmx)
   end type CarreGrid
 
   type CarreStructures

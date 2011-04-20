@@ -219,11 +219,14 @@
             write(*,*) 'No X-point - limiter configuration'
           end if
 
+#ifndef EUITM
           write(*,*)
           write(*,*) 'Do you accept the selection (y/n)?'
           read(*,'(a)') rep
           ex=rep.eq.'y'.or.rep.eq.'Y'
           if(.not.ex) go to 20
+#endif
+
 !
 !*** The configuration is accepted. Set the Carre variables
 !
