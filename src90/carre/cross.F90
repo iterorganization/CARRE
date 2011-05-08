@@ -30,6 +30,9 @@
 
 !..Calcul du determinant de la matrice.
 
+!!$              -(b1 - a1) * (d2 - c2) + &
+!!$                   &  (b2 - a2) * (d1 - c1)
+
          determ = (-(xx(2) - xx(1))) * (yst(i+1) - yst(i)) + & 
      &                   (yy(2) - yy(1)) * (xst(i+1) - xst(i))
 

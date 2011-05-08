@@ -93,6 +93,14 @@ module carre_types
      & ymail(npmamx,nrmamx,nregmx), &
      & psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
      & psidym(npmamx,nrmamx,nregmx)
+
+      ! Logical flag for face/structure intersection. True means
+      ! The specific face is intersected by a structure segment.
+      ! Dimensions:
+      ! 1: face number, 2: poloidal cell index
+      ! 3: radial cell index, 4: region number
+      logical, allocatable :: faceISec(:,:,:,:)
+      real*R8, allocatable :: faceISecP(:,:,:
   end type CarreGrid
 
   type CarreStructures

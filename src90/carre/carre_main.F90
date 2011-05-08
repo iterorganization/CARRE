@@ -64,7 +64,7 @@ contains
         &            equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg)
 
     !     when using virtual targets, needs two passes through the setup
-    !     steps 8 to 10
+    !     steps 8 to 10.
 
     do isetup = 1, 2
         !
@@ -137,7 +137,11 @@ contains
                 &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
                 &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
 
+
+            ! If no virtual targets are to be created, exit loop and go directly to grid generation           
             if ( .not. dovirtualtargets ) exit
+            ! If we arrive here the second time, the virtual targets have been created and the
+            ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
             if ( isetup == 2 ) exit
 
             !..   10.1  Set up virtual targets
@@ -165,7 +169,7 @@ contains
                 & equ%npx,equ%ptx,equ%pty, & 
                 & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
 
-            !..   10.2.1 Write out resulting structures
+            !..   10.2.1 Diagnostics: Write out resulting structures
 
             open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
             do is = 1, struct%nstruc
@@ -199,5 +203,85 @@ contains
     end if
 
   end subroutine carre_main_computation
+
+
+  
+  subroutine carre_postprocess
+    
+    ! Identify cells that are intersected by vessel structure
+        
+
+    
+    ! Mark cells to be inside/outside of vessel
+
+    ! 
+
+  end subroutine carre_postprocess
+
+
+
+  
+  subroutine intersect(xx,yy,xst,yst,doesIntersect,iSegment,ipx,ipy)
+
+    !..  Cette fonction verifie si un segment traverse un segment de
+    !  structure autre que celui sur lequel on est en train de marcher.
+
+    !  arguments
+    REAL*8, intent(in) :: xx(2),yy(2),xst(:),yst(:)
+    
+    logical, intent(out) :: doesIntersect
+    integer, intent(out), optional :: iSegment
+    REAL*8, intent(out), optional :: ipx, ipy
+
+    !  variables locales
+    INTEGER i
+    REAL*8 mult1,mult2,determ
+
+    !=========================
+    !.. xst,yst: tableaux des coordonnees des points de la structure.
+    !.. n  : nombre de points de la structure.
+    !.. xx,yy: tableaux des coordonnees contenant les 2 points du segment.
+    !.. ind: indice du segment de structure.
+    !.. determ: determinant de la matrice des deux equations.
+    !.. mult1: facteur multiplicatif du segment de courbe.
+    !.. mult2: facteur multiplicatif du segment de structure.
+    !=========================
+
+    !..Boucle sur la structure.
+    DO i=1, size(xst)-1
+            !..Calcul du determinant de la matrice.
+            determ = (-(xx(2) - xx(1))) * (yst(i+1) - yst(i)) + & 
+                 &                   (yy(2) - yy(1)) * (xst(i+1) - xst(i))
+            
+            !..Si determinant non nul, alors il y a solution.            
+            IF (determ .NE. 0.) THEN
+
+                    !..Facteur multiplicatif du segment de courbe avec la methode de Cramer.                    
+                    mult1 = ((-(xst(i)-xx(1))) * (yst(i+1)-yst(i)) + & 
+                         &              (yst(i)-yy(1)) * (xst(i+1)-xst(i)))/determ
+                    
+                    !..Pour avoir intersection, il faut que mult1 soit entre 0 et 1
+                    IF ((mult1.GT.0.).AND.(mult1.LT.1.)) THEN
+
+                            !..Fact. mult. du segment de structure.
+                            mult2= ((xx(2)-xx(1)) * (yst(i)-yy(1)) - & 
+                                 &                (yy(2)-yy(1)) * (xst(i)-xx(1)))/determ
+
+                            !..Intersection si mult2 entre 0 et 1
+                            IF ((mult2.GT.0.).AND.(mult2.LT.1.)) THEN
+                                    doesIntersect = .true.
+                                    if (present(iSegment)) iSegment = i
+                                    if (present(ipx) .and. present(ipy)) then
+                                            ipx = xx(1) + mult1 * (xx(2) - xx(1))
+                                            ipy = yy(1) + mult1 * (yy(2) - yy(1))
+                                    end if
+                                    return
+                            ENDIF
+                    ENDIF
+            ENDIF
+    END DO
+    
+    doesIntersect = .FALSE.
+  END subroutine intersect
 
 end module carre_main
