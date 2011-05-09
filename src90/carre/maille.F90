@@ -2391,9 +2391,12 @@ CONTAINS
             CALL RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, & 
      &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
 
+
             CALL SORTIE(nsep,nreg,np1, & 
-                &  distxo,xmail,ymail,nx,ny, & 
-                &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par)
+                 &  distxo,xmail,ymail,nx,ny, & 
+                 &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par,&
+                 &  psim,psidxm,psidym)
+
          ENDIF
 
 !..Save the chosen parameters

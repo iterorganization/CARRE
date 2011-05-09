@@ -1,10 +1,9 @@
 
-DEFINES 	= 
 
 FC		= ifort
 CPP		= /lib/cpp -C -traditional
 
-ifdef SOLPS_DEBUG
+ifdef CARRE_DEBUG
 FFLAGS 		= -g -check all -check noarg_temp_created -warn all -warn interfaces -warn notruncated_source -warn nounused -gen-interfaces -debug all -p -C
 FFLAGS	       += -module ${OBJECTCODE}/
 LDFLAGS		= -check all -warn all -gen-interfaces -debug all -warn interfaces
@@ -17,11 +16,11 @@ DBLPAD		=
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-#ifdef USE_NCARG
+ifdef USE_NCARG
 LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
 LDFLAGS 	+= ${NCARG}
-#endif
+endif
 
-#ifndef NOUSE_MSCL
-LDFLAGS 	+= -lmscl
-#endif
+ifndef NOUSE_MSCL
+LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
+endif

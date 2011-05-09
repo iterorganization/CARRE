@@ -2,6 +2,9 @@ module carre_main
 
   use carre_types
   use CarreDiagnostics
+  use SiloIO
+  use CarreSiloIO
+  use itm_string
 
   implicit none
 
@@ -9,7 +12,7 @@ module carre_main
 
   private
 
-  public carre_main_computation
+  public carre_main_computation, carre_postprocess
 
 contains
 
@@ -30,7 +33,7 @@ contains
     REAL*8, PARAMETER :: stp0=0.01, stpmin=0.001
 
     logical dovirtualtargets
-    parameter (dovirtualtargets=.false.)
+    parameter (dovirtualtargets=.true.)
 
 
     !
@@ -206,15 +209,120 @@ contains
 
 
   
-  subroutine carre_postprocess
+  subroutine carre_postprocess(par, grid, struct)
     
-    ! Identify cells that are intersected by vessel structure
-        
+    type(CarreParameters), intent(in) :: par
+    type(CarreGrid), intent(inout) :: grid
+    type(CarreStructures), intent(in) :: struct
 
+    ! internal
+    integer :: iReg, iPol, iRad, iFace
+    double precision :: xx(2), yy(2)
+    double precision :: faceLabel(npmamx,nrmamx,nregmx)
+
+    ! Identify cells that are intersected by vessel structure
+
+    faceLabel = 0.0
+
+    do iReg = 1, grid%nreg
+            
+            do iPol = 1, grid%np1(iReg) - 1
+                    do iRad = 1, par%npr(iReg) - 1
+
+                            do iFace = 1, 4
+
+                                    ! fill xx, yy
+                                    call getFace(iFace)
+
+                                    call intersect_structure( xx, yy, &
+                                         & struct, grid%faceISec(iFace, iPol, iRad, iReg), &
+                                         & ipx = grid%faceISecPx(iFace, iPol, iRad, iReg), &
+                                         & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )
+                                    
+
+                                    if (grid%faceISec(iFace, iPol, iRad, iReg)) then
+                                            faceLabel(iPol, iRad, iReg) = &
+                                                 & faceLabel(iPol, iRad, iReg) + 2 ** (iFace - 1)
+                                    end if
+                            end do
+
+                    end do
+            end do
+    end do         
     
     ! Mark cells to be inside/outside of vessel
 
-    ! 
+    ! write results
+    call csioOpenFile('carrePostProces')
+
+    do iReg = 1, grid%nreg
+            call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
+                 & grid%np1(iReg), par%npr(iReg), &
+                 & grid%xmail(1:grid%np1(iReg), 1:par%npr(iReg), iReg), &
+                 & grid%ymail(1:grid%np1(iReg), 1:par%npr(iReg), iReg) )
+
+            call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
+                 & 'facelabel'//int2str(iReg), &
+                 & faceLabel(1:grid%np1(iReg)-1, 1:par%npr(iReg)-1, iReg), &
+                 & DB_ZONECENT )
+    end do
+
+
+  contains
+
+    subroutine getFace(iFace)
+      integer, intent(in) :: iFace
+
+      select case (iFace)
+      case(1) ! Left face of cell
+              xx(1) = grid%xmail(iPol, iRad, iReg)
+              yy(1) = grid%ymail(iPol, iRad, iReg)
+              xx(2) = grid%xmail(iPol, iRad + 1, iReg)
+              yy(2) = grid%ymail(iPol, iRad + 1, iReg)
+      case(2) ! Bottom face of cell
+              xx(1) = grid%xmail(iPol, iRad, iReg)
+              yy(1) = grid%ymail(iPol, iRad, iReg)
+              xx(2) = grid%xmail(iPol + 1, iRad, iReg)
+              yy(2) = grid%ymail(iPol + 1, iRad, iReg)              
+      case(3) ! Right face of cell
+              xx(1) = grid%xmail(iPol + 1, iRad, iReg)
+              yy(1) = grid%ymail(iPol + 1, iRad, iReg)
+              xx(2) = grid%xmail(iPol + 1, iRad + 1, iReg)
+              yy(2) = grid%ymail(iPol + 1, iRad + 1, iReg)
+      case(4) ! Top face of cell
+              xx(1) = grid%xmail(iPol, iRad + 1, iReg)
+              yy(1) = grid%ymail(iPol, iRad + 1, iReg)
+              xx(2) = grid%xmail(iPol + 1, iRad + 1, iReg)
+              yy(2) = grid%ymail(iPol + 1, iRad + 1, iReg)
+      end select
+      
+    end subroutine getFace
+
+    subroutine intersect_structure(xx, yy, struct, doesIntersect, iStruct, &
+         & iSegment, ipx, ipy)
+
+      REAL*8, intent(in) :: xx(2),yy(2)     
+      type(CarreStructures), intent(in) :: struct
+      logical, intent(out) :: doesIntersect
+      integer, intent(out), optional :: iSegment, iStruct
+      REAL*8, intent(out), optional :: ipx, ipy
+
+      ! internal      
+      integer :: is
+
+      do is = 1, struct%rnstruc
+              call intersect(xx, yy, &
+                   & struct%rxstruc(1:struct%rnpstru(is), is), &
+                   & struct%rystruc(1:struct%rnpstru(is), is),&
+                   & doesIntersect, iSegment, ipx, ipy)
+              if (present(iStruct)) iStruct = is
+              if (doesIntersect) return
+      end do
+
+      doesIntersect = .false.
+      if (present(iStruct)) iStruct = GRID_UNDEFINED
+
+    end subroutine intersect_structure
 
   end subroutine carre_postprocess
 
@@ -282,6 +390,7 @@ contains
     END DO
     
     doesIntersect = .FALSE.
+    if (present(iSegment)) iSegment = GRID_UNDEFINED
   END subroutine intersect
 
 end module carre_main

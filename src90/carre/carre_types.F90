@@ -1,9 +1,12 @@
 module carre_types
   implicit none
 
-  private
+  private 
 
 #include <CARREDIM.F>
+
+  integer, parameter, public :: GRID_UNDEFINED = 0
+  
 
   type CarreParameters
 !.. nptseg: number of points along differents segments of separatrix
@@ -86,23 +89,24 @@ module carre_types
 !.. xn,yn : working array for coordinates along a parametrised curve
 !.. psim : value of psi interpolated to grid points
 !.. psidxm, psidym: grad psi interpolated to grid points
-      integer :: nreg, np1(nregmx)
+          integer :: nreg, np1(nregmx)
 
-      REAL*8  & 
-     & xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
-     & ymail(npmamx,nrmamx,nregmx), &
-     & psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
-     & psidym(npmamx,nrmamx,nregmx)
-
-      ! Logical flag for face/structure intersection. True means
-      ! The specific face is intersected by a structure segment.
-      ! Dimensions:
-      ! 1: face number, 2: poloidal cell index
-      ! 3: radial cell index, 4: region number
-      logical, allocatable :: faceISec(:,:,:,:)
-      real*R8, allocatable :: faceISecP(:,:,:
+          REAL*8  & 
+               & xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
+               & ymail(npmamx,nrmamx,nregmx), &
+               & psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
+               & psidym(npmamx,nrmamx,nregmx)
+          
+          ! Logical flag for face/structure intersection. True means
+          ! The specific face is intersected by a structure segment.
+          ! Dimensions:
+          ! 1: face number, 2: poloidal cell index
+          ! 3: radial cell index, 4: region number
+          logical :: faceISec(4,npmamx,nrmamx,nregmx)
+          double precision :: faceISecPx(4,npmamx,nrmamx,nregmx)
+          double precision :: faceISecPy(4,npmamx,nrmamx,nregmx)
   end type CarreGrid
-
+  
   type CarreStructures
 !.. nstruc: number of structures
 !.. npstru: number of points per structure

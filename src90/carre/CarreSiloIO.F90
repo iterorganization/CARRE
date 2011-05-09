@@ -29,11 +29,12 @@ module CarreSiloIO
 
 contains
  
-  subroutine csioOpenFile()
+  subroutine csioOpenFile(name)
+    character(len(filename)), intent(in), optional :: name
 
     call csioCloseFile()
 
-    call csioSetFilename()    
+    call csioSetFilename(name)
 #ifdef USE_SILO           
     call siloOpen( filename, csioDbfile )
 #endif
@@ -78,10 +79,16 @@ contains
   end subroutine csioSetRelax
 
 
-  subroutine csioSetFilename()
-    write ( filename, '(a5,i2.2,i3.3,i5.5)' ) 'carre', ireg, isurf, irelax
-  end subroutine csioSetFilename
+  subroutine csioSetFilename(name)
+    character(len(filename)), intent(in), optional :: name
 
+    if (present(name)) then 
+            call csioCloseFile()
+            filename = name
+    else
+            write ( filename, '(a5,i2.2,i3.3,i5.5)' ) 'carre', ireg, isurf, irelax
+    end if
+  end subroutine csioSetFilename
 
 
   !> Get a description of a line segment grid as expected by siloWriteLineSegmentGrid

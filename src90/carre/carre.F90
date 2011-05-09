@@ -87,6 +87,9 @@ PROGRAM CARRE
 
   call carre_main_computation(equ, struct, par, grid, diag)
 
+  ! Postprocess
+  call carre_postprocess(par, grid, struct)
+
   ! Finalize Carre 
   call carre_finalize(equ, struct, grid)
 
