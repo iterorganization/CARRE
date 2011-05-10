@@ -66,7 +66,7 @@
 
       integer, parameter :: MODE_TARGET = 1
       integer, parameter :: MODE_VESSEL = 2
-      integer :: mode = MODE_TARGET
+      integer :: mode = MODE_VESSEL
 
 !  procedures
       real*8 feval2d, angle, dist, norm

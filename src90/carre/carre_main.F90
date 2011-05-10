@@ -218,11 +218,12 @@ contains
     ! internal
     integer :: iReg, iPol, iRad, iFace
     double precision :: xx(2), yy(2)
-    double precision :: faceLabel(npmamx,nrmamx,nregmx)
+    integer :: faceLabel(npmamx-1,nrmamx-1,nregmx)
 
     ! Identify cells that are intersected by vessel structure
 
-    faceLabel = 0.0
+    faceLabel = 0
+    grid%cellflag = GRID_UNDEFINED
 
     do iReg = 1, grid%nreg
             
@@ -239,7 +240,6 @@ contains
                                          & ipx = grid%faceISecPx(iFace, iPol, iRad, iReg), &
                                          & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )
                                     
-
                                     if (grid%faceISec(iFace, iPol, iRad, iReg)) then
                                             faceLabel(iPol, iRad, iReg) = &
                                                  & faceLabel(iPol, iRad, iReg) + 2 ** (iFace - 1)
@@ -249,8 +249,21 @@ contains
                     end do
             end do
     end do         
-    
+
+    ! Translate the facelabel array into cell flags
+    ! First assume all boundary cells are problematic
+    where (facelabel /= GRID_UNDEFINED) grid%cellflag = GRID_BOUNDARY_REFINE
+    ! Then figure out which ones are ok (the ones where opposite faces
+    ! are intersected)
+    where (facelabel == 5) grid%cellflag = GRID_BOUNDARY
+    where (facelabel == 10) grid%cellflag = GRID_BOUNDARY
+   
     ! Mark cells to be inside/outside of vessel
+
+    ! For region, find a cell next to x-point (which will be on the inside)
+    ! Walk away from there (recursively?) until all cells are marked
+    ! For limiter, just take a cell on the core boundary.
+    !call labelCells(par, equ, grid)    
 
     ! write results
     call csioOpenFile('carrePostProces')
@@ -263,7 +276,11 @@ contains
 
             call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
                  & 'facelabel'//int2str(iReg), &
-                 & faceLabel(1:grid%np1(iReg)-1, 1:par%npr(iReg)-1, iReg), &
+                 & real(faceLabel(1:grid%np1(iReg)-1, 1:par%npr(iReg)-1, iReg),rKind), &
+                 & DB_ZONECENT )
+            call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
+                 & 'cellflag'//int2str(iReg), &
+                 & real(grid%cellflag(1:grid%np1(iReg)-1, 1:par%npr(iReg)-1, iReg),rKind), &
                  & DB_ZONECENT )
     end do
 
@@ -313,7 +330,7 @@ contains
       do is = 1, struct%rnstruc
               call intersect(xx, yy, &
                    & struct%rxstruc(1:struct%rnpstru(is), is), &
-                   & struct%rystruc(1:struct%rnpstru(is), is),&
+                   & struct%rystruc(1:struct%rnpstru(is), is), &
                    & doesIntersect, iSegment, ipx, ipy)
               if (present(iStruct)) iStruct = is
               if (doesIntersect) return
@@ -325,8 +342,6 @@ contains
     end subroutine intersect_structure
 
   end subroutine carre_postprocess
-
-
 
   
   subroutine intersect(xx,yy,xst,yst,doesIntersect,iSegment,ipx,ipy)

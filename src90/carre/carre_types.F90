@@ -6,7 +6,12 @@ module carre_types
 #include <CARREDIM.F>
 
   integer, parameter, public :: GRID_UNDEFINED = 0
-  
+
+  ! Grid cell labels
+  integer, parameter, public :: GRID_INTERNAL = 1
+  integer, parameter, public :: GRID_EXTERNAL = 2
+  integer, parameter, public :: GRID_BOUNDARY = 3
+  integer, parameter, public :: GRID_BOUNDARY_REFINE = 4
 
   type CarreParameters
 !.. nptseg: number of points along differents segments of separatrix
@@ -105,6 +110,9 @@ module carre_types
           logical :: faceISec(4,npmamx,nrmamx,nregmx)
           double precision :: faceISecPx(4,npmamx,nrmamx,nregmx)
           double precision :: faceISecPy(4,npmamx,nrmamx,nregmx)
+          
+          integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
+
   end type CarreGrid
   
   type CarreStructures
