@@ -19,7 +19,7 @@ module carre_types
 !           1=absolute distance, 2=difference in psi
 !.. tgarde: guard length for each divertor target
 !.. npr   : numbers of the grid points in radial direction
-!           (region index)
+!           (region index) as requested in configuration
 !.. pntrat: penetration value of the X-point relative to the O-point
 !.. deltp1,deltpn: values of the first and last intervals for each sep.
 !.. deltr1,deltrn: values of the first and last intervals for each reg.
@@ -112,6 +112,7 @@ module carre_types
           double precision :: faceISecPy(4,npmamx,nrmamx,nregmx)
           
           integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
+          integer :: faceflag(npmamx-1,nrmamx-1,nregmx)
 
   end type CarreGrid
   

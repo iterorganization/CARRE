@@ -27,6 +27,7 @@
 !***  nrmamx      : max. number of the radial mesh points
 !***  nregmx      : max. number of regions
 !***  npnimx      : max. number of points in the tracing curve (?)
+!***                (for curves tracing contour lines)
 !***  nbdmx       : max. number of divertor plates (?)
 !***
 !.. npnimx: nombre maximum de points dans une courbe quelconque a

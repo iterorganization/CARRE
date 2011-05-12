@@ -19,11 +19,14 @@ module CarreSiloIO
 
   integer :: csioStrucNSeg
   real(rKind), allocatable, dimension(:,:,:) :: csioStrucSegments
+  integer :: csioVirtualStrucNSeg
+  real(rKind), allocatable, dimension(:,:,:) :: csioVirtualStrucSegments
 
   private
   public csioOpenFile, csioCloseFile
   public csioSetRegion, csioSetSurface, csioSetRelax, csioSetFilename, csioGetStructureSegments
   public csioStrucNSeg, csioStrucSegments
+  public csioVirtualStrucNSeg, csioVirtualStrucSegments
 
   public csioDbfile
 
@@ -40,11 +43,14 @@ contains
 #endif
     fileopen = .true.
 
-    if ( allocated( csioStrucSegments ) ) then
 #ifdef USE_SILO           
+    if ( allocated( csioStrucSegments ) ) then
             call siloWriteLineSegmentGrid( csioDbfile, "structure", csioStrucNSeg, csioStrucSegments )            
-#endif
     end if
+    if ( allocated( csioVirtualStrucSegments ) ) then
+            call siloWriteLineSegmentGrid( csioDbfile, "virtualstructure", csioVirtualStrucNSeg, csioVirtualStrucSegments )
+    end if
+#endif
 
   end subroutine csioOpenFile
 

@@ -1,11 +1,19 @@
-      SUBROUTINE CRBNIV(ii,jj,k,idir,nxmax,nymax,nx,ny,x,y,f,niv, & 
-     &        crbx,crby,npnimx,strumx,npstmx,nstruc,npstru, & 
-     &        xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque,x0,y0)
+module carre_niveau
+
+  implicit none
+
+#include <CARREDIM.F>
+  
+contains
+
+      SUBROUTINE CRBNIV(ii,jj,k,idir,nx,ny,x,y,f,niv, & 
+          & crbx,crby,&
+          & nstruc,npstru, & 
+          & xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque,x0,y0)
 !
 !  version : 12.05.97 14:05
 !
       IMPLICIT NONE
-
 
 !*** This sub-routine calculates the positions of the successive points
 !*** on a specified level line. It stops when the line crosses a
@@ -14,12 +22,24 @@
 !*** limiting curves.
 
 !  arguments
-      INTEGER ii,jj,k,idir,nxmax,nymax,nx,ny,npnimx,plaque, & 
-     &     strumx,npstmx,nstruc,npstru(strumx),indstr,nbcrb,nt(2)
-      REAL*8 x(nxmax),y(nymax),f(nxmax,nymax),niv,crbx(npnimx), & 
-     &     crby(npnimx),xstruc(npstmx,strumx), & 
-     &     ystruc(npstmx,strumx),xt(npnimx,2),yt(npnimx,2), & 
-     &     x0,y0
+      INTEGER, intent(in) :: nx,ny 
+      INTEGER, intent(inout) :: ii, jj, idir, k
+      !INTEGER, intent(out) ::
+
+      REAL*8, intent(in) :: x(nxmax),y(nymax),f(nxmax,nymax),niv
+      REAL*8, intent(inout) :: crbx(npnimx), crby(npnimx)
+
+      ! Optional arguments
+      ! Optional groups: 
+      ! -starting point test: x0, y0
+      ! -structure intersection: xstruc, ystruc, nstruc, npstru, plaque, indstr
+      ! -limiting line intersection: xt, yt, nt
+
+      INTEGER, intent(in), optional :: plaque, nstruc,npstru(strumx),nbcrb
+      INTEGER, intent(out), optional :: indstr, nt(2)
+
+      REAL*8, intent(in), optional :: xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
+          & xt(npnimx,2),yt(npnimx,2), x0,y0
 
 !  variables locales
       LOGICAL trvers2
@@ -122,11 +142,15 @@
             end do
 
             IF (trvers2) THEN
+                ! If intersected a limiting curve, undo the last point
+                ! and try next face
                 k=k-1
             ELSE
-               j=j+1
-               dir=2
-               GO TO 50
+                ! Didn't intersect a limiting curve.
+                ! Move to next cell, update search direction, jump down to further processing.
+                j=j+1
+                dir=2
+                GO TO 50
             ENDIF
 
          ENDIF
@@ -325,4 +349,8 @@
         enddo
       endif
       go to 10
-      END
+
+  END subroutine crbniv
+
+
+end module carre_niveau

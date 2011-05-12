@@ -120,8 +120,8 @@
 
 !..Calcul de la fonction pour le premier point de la courbe de reference
 
-      ii=ifind(xn(1,1),x,nx,1)
-      jj=ifind(yn(1,1),y,ny,1)
+      ii=ifind(xn(1,1),x(1:nx),nx,1)
+      jj=ifind(yn(1,1),y(1:ny),ny,1)
 
       fctini=a00(ii,jj,1) + a10(ii,jj,1)*xn(1,1) + & 
      &       a01(ii,jj,1)*yn(1,1) + a11(ii,jj,1)*xn(1,1)*yn(1,1)
@@ -273,9 +273,11 @@
          npcrb(2)=0
 
 !..Recherche du deuxieme point.
-
+!..Looking for the second (end) point of this poloidal grid line.
+!..Do this by tracing the level line for the current psi value until
+!..it hits a structure or limiting curve. 
          dir=0
-
+!..Compute the level line in direction 0 and figure out what happened later
          CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
      &            valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
@@ -292,7 +294,8 @@
 !  direction.
 !  We must ensure that stepping along the contour line starts
 !  in the right direction
-
+!  From the first computation of the level line, now figure out
+!  what the proper direction is.
          ecart1=SQRT((x2 - xstruc(ind,plaque))**2 + & 
      &               (y2 - ystruc(ind,plaque))**2)
          ecart2=SQRT((x2 - xstruc(ind+1,plaque))**2 + & 
@@ -368,7 +371,7 @@
 
 !..Pour les points successifs, on poursuit jusqu'a ce qu'on frappe une
 !  structure.
-
+!..Now we have the right direction, so compute the level line again.
          CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
      &            valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 

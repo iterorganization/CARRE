@@ -21,6 +21,7 @@ PROGRAM CARRE
   use CarreSiloIO
   use carre_types
   use carre_main
+  use carre_postprocess
 
   IMPLICIT NONE
 
@@ -88,7 +89,7 @@ PROGRAM CARRE
   call carre_main_computation(equ, struct, par, grid, diag)
 
   ! Postprocess
-  call carre_postprocess(par, grid, struct)
+  call carre_postprocess_computation(par, equ, grid, struct)
 
   ! Finalize Carre 
   call carre_finalize(equ, struct, grid)
