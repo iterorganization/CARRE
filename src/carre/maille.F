@@ -2718,10 +2718,10 @@ c----------------------------------------------------------------------
 
          nn1=0
 
-         DO 391 ipas=1,nptot(ptsep(3,ipx),ipx)
+         DO 391 ipas=1,nivtot(1)
             nn1=nn1+1
-            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+            xn(nn1)=nivx(ipas,1)
+            yn(nn1)=nivy(ipas,1)
   391    CONTINUE
 
          call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
