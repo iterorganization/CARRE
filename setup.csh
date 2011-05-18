@@ -12,7 +12,7 @@ endif
 setenv USE_ITMCARRE '-DUSE_ITMCARRE'
 
 #setenv SOLPS_LIB '/afs/efda-itm.eu/user/k/klingshi/SCRATCH/solps5.0/src/lib/linux_pgf90_GW/'
-setenv SOLPS_LIB '/home/hajo/svn/solps5.0/src/lib/linux.ifort64/'
+setenv SOLPS_LIB '/home/hajo/svn/solps5.0/src/lib/'$OBJECTCODE
 setenv NCARG_ROOT '/home/hajo/workspace-local/solps5.0/src/NCARG/linux.ifort64'
 setenv NCARG '-L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm'
 
