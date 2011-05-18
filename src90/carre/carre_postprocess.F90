@@ -2,9 +2,12 @@ module carre_postprocess
 
   use carre_types
   use CarreDiagnostics
+  use itm_string
+
+#ifdef USE_SILO
   use SiloIO
   use CarreSiloIO
-  use itm_string
+#endif
 
   implicit none
 
@@ -81,6 +84,7 @@ contains
     ! Fix broken cells by modifying the grid accordingly
     call fixCells(par, equ, struct, grid)
 
+#ifdef USE_SILO
     ! write results
     call csioOpenFile('carrePostProces')
 
@@ -99,7 +103,7 @@ contains
             & real(grid%cellflag(1:grid%np1(iReg)-1, 1:par%npr(iReg)-1, iReg),rKind), &
             & DB_ZONECENT )
     end do
-
+#endif
 
   contains
 

@@ -21,9 +21,7 @@ include LISTOBJ
 # ITM-CARRE
 # If we're compiling for the ITM, we don't want graphics output and most utilities
 # But we want the UAL library
-ifdef USE_ITMCARRE
-USE_NCARG = 
-USE_SILO = 
+ifdef USE_ITMCARRE 
 
 EXCLUDELIST +=
 ALLTARGETS += ${OBJECTCODE}/itmcarre_wrapper

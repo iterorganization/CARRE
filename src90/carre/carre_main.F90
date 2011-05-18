@@ -2,8 +2,6 @@ module carre_main
 
   use carre_types
   use CarreDiagnostics
-  use SiloIO
-  use CarreSiloIO
   use itm_string
 
   implicit none
@@ -172,8 +170,10 @@ contains
 !!$                & equ%npx,equ%ptx,equ%pty, & 
 !!$                & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
 
+#ifdef USE_SILO
             call csioGetStructureSegments( struct%nstruc, struct%npstru, &
                  & struct%xstruc, struct%ystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
+#endif
 
             !..   10.2.1 Diagnostics: Write out resulting structures
 
