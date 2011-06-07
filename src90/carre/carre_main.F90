@@ -3,6 +3,7 @@ module carre_main
   use carre_types
   use CarreDiagnostics
   use itm_string
+  use CarreSiloIO
 
   implicit none
 

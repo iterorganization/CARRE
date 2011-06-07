@@ -15,6 +15,7 @@
 !*** according to the CARRE conventions, i.e. from right to left, from
 !*** top to bottom.
 !=======================================================================
+      use carre_niveau
 
       implicit none
 !ank-970707: dimensions from the file
@@ -44,7 +45,7 @@
       logical milieu
       real*8 interp
       intrinsic int,mod
-      external crbniv,insert,interp,milieu,orddef
+      external insert,interp,milieu,orddef
 !=======================================================================
 
 !..Initialisation
@@ -143,9 +144,9 @@
 
 !..Call the routine which traces the line and stores the points
 
-              call crbniv(iref,jref,k,idir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &                fctpx(ipx),separx(1,isep,ipx),separy(1,isep,ipx) & 
-     &                ,npnimx,strumx,npstmx,nstruc,npstru,xstruc, & 
+              call crbniv(iref,jref,k,idir,nx,ny,x,y,psi, & 
+     &                fctpx(ipx),separx(1,isep,ipx),separy(1,isep,ipx), & 
+     &                nstruc,npstru,xstruc, & 
      &                ystruc,indstr,xstruc,ystruc,nt,1,plaque, & 
      &                ptx(ipx),pty(ipx))
 

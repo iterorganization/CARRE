@@ -12,6 +12,7 @@
 #endif
       use CarreDiagnostics
       use CarreSiloIO
+      use carre_niveau
 
       IMPLICIT NONE
 
@@ -73,7 +74,7 @@
       INTEGER ifind
       REAL*8 aazero,long,nulort,ruban
       INTRINSIC MOD,int,abs
-      EXTERNAL aazero,long,COORD1,ifind,CRBNIV,nulort,UNTANG,ruban
+      EXTERNAL aazero,long,COORD1,ifind,nulort,UNTANG,ruban
 !
 !  remarque: cette routine doit etre appelee apres frtier ou, dans le
 !            cas d'une configuration limiteur, apres limfnd car elle
@@ -215,8 +216,8 @@
 !***
 !         print*,'call crbniv1 - mailcn'
 !***
-          CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &            valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
+          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+     &            valfct,xn(1,inouv),yn(1,inouv), & 
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
@@ -238,8 +239,8 @@
 !         print*,'call crbniv2 - mailcn'
 !***
 
-          CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &            valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
+          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+     &            valfct,xn(1,inouv),yn(1,inouv), & 
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 

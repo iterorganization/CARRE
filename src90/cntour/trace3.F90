@@ -7,6 +7,8 @@
 !======================================================================
 !
 !  version : 07.07.97 20:15
+
+      use carre_niveau
 !
       implicit none
 
@@ -125,9 +127,9 @@
 !***
 !         print*,'call crbniv1 - mailcn'
 !***
-          CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &            fctfin,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
-     &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
+          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+     &            fctfin,xn(1,inouv),yn(1,inouv),nstruc, & 
+     &            npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
 !..Il faut s'assurer que la ligne de niveau part dans la bonne
@@ -148,9 +150,9 @@
 !         print*,'call crbniv2 - mailcn'
 !***
 
-          CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &            fctfin,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
-     &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
+          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+     &            fctfin,xn(1,inouv),yn(1,inouv),nstruc, & 
+     &            npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
 !..Le dernier point de la courbe est egal au premier.

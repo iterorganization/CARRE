@@ -13,6 +13,9 @@
 !*** split into two separatrices (thus forcing a mesh point to be at
 !*** the outer X-point)
 !======================================================================
+      use carre_niveau
+
+
       IMPLICIT NONE
 
 !======================================================================
@@ -65,7 +68,7 @@
       REAL*8 aazero,long,nulort,ruban
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort, & 
+      EXTERNAL aazero,long,COORD,indsgm,ifind,nulort, & 
      &         UNTANG,SAUTE,chgdir,in,cross,ruban,drctio & 
      &        ,trc_stk_in,trc_stk_out,trc_stk
 !======================================================================
@@ -259,9 +262,9 @@
 
          dir=0
 
-         CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &             valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
-     &             nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, & 
+         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+     &             valfct,xn(1,inouv),yn(1,inouv),nstruc, & 
+     &             npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, & 
      &             nbcrb,plaque,x2,y2)
 
 !..Make sure that the level line departs in the right direction
@@ -406,9 +409,9 @@
 
 !..Continue with successive points until striking a structure
 
-         CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &             valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
-     &             nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, & 
+         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+     &             valfct,xn(1,inouv),yn(1,inouv),nstruc, & 
+     &             npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, & 
      &             nbcrb,plaque,x2,y2)
 
 !..Definition de xn2 et yn2 pour le bloc common comort.

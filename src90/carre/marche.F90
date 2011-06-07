@@ -15,6 +15,7 @@
 ! final level line which goes from one target to another without
 ! hitting a structure.
 !======================================================================
+      use carre_niveau
 
       IMPLICIT NONE
 
@@ -44,7 +45,7 @@
       INTEGER ifind,indsgm
       LOGICAL in, chgdir, cross
       INTRINSIC MOD,SQRT
-      EXTERNAL chgdir,CRBNIV,cross,ifind,in,indsgm
+      EXTERNAL chgdir,cross,ifind,in,indsgm
 
 !=========================
 !.. plaque: indice de la structure (plaque) sur laquelle on marche.
@@ -288,8 +289,8 @@
       echec = .FALSE.
       dir = 0
       k = 1
-      CALL CRBNIV(ii,jj,k,dir,nxmax,nymax,nx,ny,x,y,psi,psi2, & 
-     &            niv1x,niv1y,npnimx,strumx,npstmx, & 
+      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
+     &            niv1x,niv1y, & 
      &            nstruc,npstru,xstruc,ystruc, & 
      &            indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
 !***
@@ -329,8 +330,8 @@
             ii = ii - MOD(dir-2,2)
             jj = jj - MOD(dir-3,2)
 
-            CALL CRBNIV(ii,jj,k,dir,nxmax,nymax,nx,ny,x,y,psi,psi2, & 
-     &             niv1x,niv1y,npnimx,strumx,npstmx,nstruc,npstru, & 
+            CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
+     &             niv1x,niv1y,nstruc,npstru, & 
      &             xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
             if(indstr.ne.0 .and. indstr.ne.fraplq) indlim=indstr
 !***
@@ -421,8 +422,8 @@
 
       IF (.NOT.(echec)) THEN
 
-         CALL CRBNIV(ii,jj,k,dir,nxmax,nymax,nx,ny,x,y,psi,psi2, & 
-     &          niv1x,niv1y,npnimx,strumx,npstmx,nstruc,npstru,xstruc, & 
+         CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
+     &          niv1x,niv1y,nstruc,npstru,xstruc, & 
      &          ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
          if(indstr.ne.0 .and. indstr.ne.fraplq) indlim=indstr
 !***

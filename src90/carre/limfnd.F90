@@ -11,6 +11,8 @@
 !  that point. Finally, it parametrises the separatrix (the flux surface
 !  which goes through (ptx,pty) in curve nivx(*,1,1),nivy(*,1,1).
 !======================================================================
+      use carre_niveau
+
       implicit none
 
 !ank-970707: dimensions from the file
@@ -44,7 +46,7 @@
 !  procedures
       integer ifind,horair
       real*8 aire,plqdst
-      external aire,crbniv,horair,ifind,plqdst
+      external aire,horair,ifind,plqdst
       intrinsic sqrt
 !
 !  calculation
@@ -119,13 +121,13 @@
 
       nivx(k,idniv)=x0
       nivy(k,idniv)=y0
-      CALL CRBNIV(ii,jj,k,dir,nxmax,nymax,nx,ny,x,y,psi,psi2, & 
-     &  nivx(1,idniv),nivy(1,idniv),npnimx,strumx,npstmx, & 
+      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
+     &  nivx(1,idniv),nivy(1,idniv), & 
      &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
       call insert(indlim,inddef,nbdef,ipx)
       indplq(idniv,ipx) = indlim
-      CALL CRBNIV(ii,jj,k,dir,nxmax,nymax,nx,ny,x,y,psi,psi2, & 
-     &  nivx(1,idniv),nivy(1,idniv),npnimx,strumx,npstmx, & 
+      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
+     &  nivx(1,idniv),nivy(1,idniv), & 
      &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
       nivtot(idniv)=k
       call insert(indlim,inddef,nbdef,ipx)

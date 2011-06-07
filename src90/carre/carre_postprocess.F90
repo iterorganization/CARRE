@@ -3,6 +3,7 @@ module carre_postprocess
   use carre_types
   use CarreDiagnostics
   use itm_string
+  use carre_niveau
 
 #ifdef USE_SILO
   use SiloIO
@@ -362,6 +363,13 @@ contains
         ! call findFaceForPoint(grid, px, py, liFcP, liFcP)
     end if
 
+    ! Find level line going through the poloidally aligned face
+
+    ! Recompute intersection of the poloidal line with the structure
+    ! to guarantee the new point lies on the level line.
+
+
+
     ! Add space for new grid points. Shift liFcP + 1 : end up by one
     ! TODO: test that we don't run out of space   
     grid%xmail(liFcP + 2 : grid%np1(iReg) + 1, :, iReg) = &
@@ -551,14 +559,14 @@ contains
     ! Now call crbniv in all four directions starting from this point
     do iDir = 1, 4
 
-        CALL CRBNIV(ii,jj,lNpNiv,iDir,nxmax,nymax,&
-            & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
-            & valNiv,xn,yn,npnimx,strumx,npstmx, & 
-            & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
-            & indstr, &
-            & xcrb,ycrb,npcrb,0, & 
-            & plaque, xFrom, yFrom)
-
+!!$        CALL CRBNIV(ii,jj,lNpNiv,iDir,nxmax,nymax,&
+!!$            & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
+!!$            & valNiv,xn,yn,npnimx,strumx,npstmx, & 
+!!$            & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
+!!$            & indstr, &
+!!$            & xcrb,ycrb,npcrb,0, & 
+!!$            & plaque, xFrom, yFrom)
+       
         ! For the resulting level line, compute distance to (xTo, yTo)
         ! and do bookkeeping to find the one which comes closest.
 

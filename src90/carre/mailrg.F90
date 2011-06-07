@@ -9,6 +9,7 @@
 !======================================================================
       use CarreSiloIO
       use CarreDiagnostics
+      use carre_niveau
 #ifdef USE_SILO
       use SiloIO
 #endif
@@ -81,7 +82,7 @@
       REAL*8 aazero,long,nulort,ruban
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort, & 
+      EXTERNAL aazero,long,COORD,indsgm,ifind,nulort, & 
      &         UNTANG,SAUTE,chgdir,in,cross,ruban,clort,drctio
 !======================================================================
 !..calculs
@@ -278,8 +279,8 @@
 !..it hits a structure or limiting curve. 
          dir=0
 !..Compute the level line in direction 0 and figure out what happened later
-         CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &            valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
+         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+              &            valfct,xn(1,inouv),yn(1,inouv), & 
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 !***
@@ -372,8 +373,8 @@
 !..Pour les points successifs, on poursuit jusqu'a ce qu'on frappe une
 !  structure.
 !..Now we have the right direction, so compute the level line again.
-         CALL CRBNIV(ii,jj,nn(inouv),dir,nxmax,nymax,nx,ny,x,y,psi, & 
-     &            valfct,xn(1,inouv),yn(1,inouv),npnimx,nstruc,npstmx, & 
+         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
+     &            valfct,xn(1,inouv),yn(1,inouv), & 
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
