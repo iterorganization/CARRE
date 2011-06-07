@@ -39,7 +39,7 @@ contains
        & nstruc,npstru, & 
        & xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque, &
        & x0,y0, &
-       & xEnd, yEnd)
+       & xEnd, yEnd, foundEndPoint)
 
     IMPLICIT NONE
 
@@ -53,12 +53,22 @@ contains
     REAL*8, intent(inout) :: crbx(npnimx), crby(npnimx)
 
 
-    INTEGER, intent(in), optional :: plaque, nstruc,npstru(:),nbcrb
-    INTEGER, intent(out), optional :: indstr, nt(2)
+    ! structure test parameters
+    INTEGER, intent(in), optional :: plaque, nstruc,npstru(:)
+    INTEGER, intent(out), optional :: indstr
+    REAL*8, intent(in), optional :: xstruc(npstmx,strumx), ystruc(npstmx,strumx)
 
-    REAL*8, intent(in), optional :: xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
-         & xt(npnimx,2),yt(npnimx,2), x0,y0
+    ! limit curve parameters
+    INTEGER, intent(in), optional :: nbcrb
+    INTEGER, intent(out), optional ::  nt(2)
+    REAL*8, intent(in), optional :: xt(npnimx,2),yt(npnimx,2)
+
+    ! start point
+    REAL*8, intent(in), optional :: x0,y0 
+
+    ! end point
     REAL*8, intent(in), optional :: xEnd, yEnd
+    logical, intent(out), optional :: foundEndPoint
 
     !  variables locales
     LOGICAL trvers2
@@ -66,12 +76,14 @@ contains
     REAL*8 determ,mult1,mult2,dist,proxim
     parameter(proxim=1.e-8,ngrace=3)
     logical :: stepDone
-
+    logical :: testEndPoint, testStartPoint, testStructures, testLimitingCurves
+    integer :: iEnd, jEnd
     !  procedures
     LOGICAL milieu, trvers
     REAL*8 interp
+    integer ifind
     INTRINSIC ABS,SQRT
-    EXTERNAL interp,milieu,trvers
+    EXTERNAL interp,milieu,trvers,ifind
 
     !=========================
     !.. f    :<=> psi.
@@ -107,6 +119,18 @@ contains
 
     indstr = 0
 
+    testStartPoint = present(x0) .and. present(y0)
+    testStructures = present(plaque) .and. present(nstruc) .and. present(npstru) &
+         & .and. present(indstr) .and. present(xstruc) .and. present(ystruc)
+    testLimitingCurves = present(nbcrb) .and. present(nt) .and. present(xt) &
+         & .and. present(yt) 
+    testEndPoint = present(xEnd) .and. present(yEnd) .and. present(foundEndPoint)
+    if ( testEndPoint ) then
+       iEnd = ifind(xEnd, x(1:nx), nx, 1)
+       jEnd = ifind(yEnd, y(1:ny), ny, 1)
+       foundEndPoint = .false.
+    end if
+
     !.. 1   Look for the next point.
 
     !..Inside a cell with the corners are            3.  .4
@@ -122,6 +146,19 @@ contains
 
     ! Build the level line segment by segment
     do 
+       
+       ! If an end point is given, check whether it is in the current cell.
+       ! If yes, close the level line.
+       if (testEndPoint) then
+          if ( i == iEnd .and. j == jEnd ) then
+             k = k + 1
+             crbx(k) = xEnd
+             crby(k) = yEnd
+             foundEndPoint = .true.
+             return
+          end if
+       end if
+
 
        ! We want to do a step along the niveau line
        stepDone = .false.
@@ -134,11 +171,13 @@ contains
              crby(k) =interp(y(j),y(j+1),f(i+1,j),f(i+1,j+1),niv)
 
              trvers2=.false.
-             do iCrb = 1, nbcrb             
-                trvers2 = trvers2 .or. &
-                     & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
-                     &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
-             end do
+             if (testLimitingCurves) then
+                do iCrb = 1, nbcrb             
+                   trvers2 = trvers2 .or. &
+                        & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
+                        &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
+                end do
+             end if
 
              IF (trvers2) THEN
                 k=k-1
@@ -160,11 +199,13 @@ contains
              crby(k) = y(j+1)
 
              trvers2=.false.
+             if (testLimitingCurves) then
              do iCrb = 1, nbcrb             
                 trvers2 = trvers2 .or. &
                      & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
                      &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
              end do
+             end if
 
              IF (trvers2) THEN
                 ! If intersected a limiting curve, undo the last point
@@ -190,11 +231,13 @@ contains
              crby(k) =interp(y(j),y(j+1),f(i,j),f(i,j+1),niv)
 
              trvers2=.false.
+             if (testLimitingCurves) then
              do iCrb = 1, nbcrb             
                 trvers2 = trvers2 .or. &
                      & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
                      &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
              end do
+             end if
 
              IF (trvers2) THEN
                 k=k-1
@@ -215,11 +258,13 @@ contains
              crby(k) = y(j)
 
              trvers2=.false.
+             if (testLimitingCurves) then
              do iCrb = 1, nbcrb             
                 trvers2 = trvers2 .or. &
                      & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
                      &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
              end do
+             end if
 
              IF (trvers2) THEN
                 k=k-1
@@ -252,11 +297,13 @@ contains
 
        !  if the found point coincides with the starting point, it is rejected
        !  and the calculation continues
-       dist=sqrt((x0-crbx(k))**2+(y0-crby(k))**2)
-       if(dist.lt.proxim) then
-          k=k-1
-          cycle ! back to beginning of segment loop
-       endif
+       if (testStartPoint) then
+          dist=sqrt((x0-crbx(k))**2+(y0-crby(k))**2)
+          if(dist.lt.proxim) then
+             k=k-1
+             cycle ! back to beginning of segment loop
+          endif
+       end if
 
        !..If idir.le.0, then find only one point, change the sign of idir,
        !  and return
@@ -276,6 +323,7 @@ contains
        ENDIF
 
        !.. 2   Check whether this segment of the level line crosses a structure
+       if (testStructures) then
 
        !..Loop over the structures
 
@@ -348,6 +396,7 @@ contains
           ENDIF
 
        end do ! end loop over structures to check intersection of latest line segment with structures
+       end if
 
        !
        !.. 3   Test pour savoir si la ligne de niveau est soit arrive au bord
