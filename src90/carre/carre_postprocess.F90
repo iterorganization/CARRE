@@ -317,11 +317,20 @@ contains
                     end if
 
                     if (isecTopFace) then
-                        ! add a radial line at intersection point
+                       ! Add a radial line through the intersection point
+                       ! of this face with the structure. Note that the
+                       ! intersection point known at this point 
+                       ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
+                       !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
+                       ! is inaccurate and will be recomputed 
                         call addRadialLine( par, equ, struct, grid, &
-                            & grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg), &
-                            & grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg), &
-                            & iReg, ip, ir + 1 )
+                             & iReg, &
+                             & grid%xmail(ip, ir+1, iReg), grid%ymail(ip, ir+1, iReg), &
+                             & grid%xmail(ip+1, ir+1, iReg), grid%ymail(ip+1, ir+1, iReg), &
+                             & grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg), &
+                             & grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg), &
+                             & recomputeIntersection = .true., & 
+                             & iFcP = ip, iFcR = ir + 1 )
 
                     end if
                 end if
@@ -333,25 +342,38 @@ contains
   end subroutine fixCells
 
 
-  !> Add a radial grid line to a grid which exactly goes through
-  !> the point (px, py). This point has to be positioned exactly on a 
-  !> poloidally/x-aligned face.
-  !> The region index iReg in which the point is located has to be given. 
+  !> Add a radial grid line to a grid region, starting at the face
+  !> given by the points (fcFromX,fcFromY) and (fcToX,fcToY).
+  !> The new radial grid line should go through the the point (px, py).
+  !> (This point has to be positioned exactly on a  poloidally/x-aligned face).
+  !> If recomputeIntersection is true, (px,py) will be recomputed as the intersection
+  !> of the face with a structure. 
+  !> The region index iReg in which the face is located has to be given. 
   !> Optionally, the indices of the face (ip,ir) can be given, where
-  !> (ip,ir) is the left point of the face. 
-  subroutine addRadialLine( par, equ, struct, grid, px, py, iReg, iFcP, iFcR )
+  !> (ip,ir) is the left point (start point) of the face. 
+  recursive subroutine addRadialLine( par, equ, struct, grid, &
+       & iReg, &
+       & fcFromX, fcFromY, fcToX, fcToY,&
+       & px, py, &
+       & recomputeIntersection, &
+       & iFcP, iFcR )
     type(CarreParameters), intent(in) :: par
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
-    double precision, intent(in) :: px, py
     integer, intent(in) :: iReg
+    double precision, intent(in) :: fcFromX, fcFromY, fcToX, fcToY
+    double precision, intent(in) :: px, py
+    logical, intent(in), optional :: recomputeIntersection
     integer, intent(in), optional :: iFcP, iFcR
 
     ! internal
     integer :: ip, ir
     integer :: liFcP, liFcR  ! local copies of dummy arguments iFcP, iFcR
     double precision :: npx(par%npr(iReg)), npy(par%npr(iReg))
+
+    double precision :: llx(npnimx), lly(npnimx)
+    integer :: llNp
 
     ! Coordinates of starting face
     if (present(iFcP) .and. present(iFcR)) then
@@ -363,11 +385,15 @@ contains
         ! call findFaceForPoint(grid, px, py, liFcP, liFcP)
     end if
 
-    ! Find level line going through the poloidally aligned face
+    ! Find poloidal level line going through the poloidally aligned face
+    call findLevelLineForPoints( equ, &
+         & fcFromX, fcFromY, fcToX, fcToY, &
+         & llX, llY, llNp )
 
-    ! Recompute intersection of the poloidal line with the structure
+    return
+
+    ! Recompute intersection of the poloidal level line with the structure
     ! to guarantee the new point lies on the level line.
-
 
 
     ! Add space for new grid points. Shift liFcP + 1 : end up by one
@@ -401,6 +427,7 @@ contains
 
     ! For points on boundary of region, insert
     ! radial line starting at this point in all other regions
+    ! -> recursive call to addRadialLine
 
 
   end subroutine addRadialLine
@@ -528,7 +555,7 @@ contains
 !!$    RETURN
   end subroutine insertPoints
 
-
+  ! TODO: obsolete
   subroutine findLevelLine( equ, struct, xFrom, yFrom, xTo, yTo, nivX, nivY, npNiv )
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct

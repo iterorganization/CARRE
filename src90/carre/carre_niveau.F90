@@ -1,12 +1,14 @@
 module carre_niveau
 
+  use carre_types
+
   implicit none
 
 #include <CARREDIM.F>
 
   private
 
-  public crbniv
+  public crbniv, findLevelLineForPoints
 
 contains
 
@@ -117,18 +119,21 @@ contains
 
     !..Initialisation
 
-    indstr = 0
-
     testStartPoint = present(x0) .and. present(y0)
     testStructures = present(plaque) .and. present(nstruc) .and. present(npstru) &
          & .and. present(indstr) .and. present(xstruc) .and. present(ystruc)
     testLimitingCurves = present(nbcrb) .and. present(nt) .and. present(xt) &
          & .and. present(yt) 
     testEndPoint = present(xEnd) .and. present(yEnd) .and. present(foundEndPoint)
+
     if ( testEndPoint ) then
        iEnd = ifind(xEnd, x(1:nx), nx, 1)
        jEnd = ifind(yEnd, y(1:ny), ny, 1)
        foundEndPoint = .false.
+    end if
+
+    if (testStructures) then
+       indstr = 0
     end if
 
     !.. 1   Look for the next point.
@@ -424,6 +429,83 @@ contains
     end do
 
   END subroutine crbniv
+
+
+  !> High-level routine to fine a level line connecting two points.
+  !> (xFrom, yFrom)->(xTo, yTo). It is assumed that both points
+  !> do lie on the same level line. If there are multiple possible 
+  !> connection lines between the points, the shortest one is returned.
+  subroutine findLevelLineForPoints( equ, &
+         & xFrom, yFrom, xTo, yTo, &
+         & nivx, nivy, npNiv )
+    type(CarreEquilibrium), intent(in) :: equ
+    double precision, intent(in) :: xFrom, yFrom, xTo, yTo
+    double precision, intent(out) :: nivx(npnimx), nivy(npnimx)
+    integer, intent(out) :: npNiv
+
+    ! internal
+    integer :: ii, jj, npNivTmp, iDir, iDirStart
+    double precision :: valNiv, length, maxLength
+    double precision :: nivxTmp(npnimx), nivyTmp(npnimx)
+    logical :: foundEndPoint
+
+    ! external
+    integer :: ifind
+    double precision :: long
+    external :: ifind, long
+    logical :: foundLevelLine
+
+    ! Find the cell of the starting point    
+    ii = ifind(xFrom, equ%x(1:equ%nx), equ%nx, 1)
+    jj = ifind(yFrom, equ%y(1:equ%ny), equ%ny, 1)
+        
+    ! Compute psi value at this point
+    valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + & 
+         & equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom   
+
+    maxLength = huge(maxLength)
+    foundLevelLine = .false.
+
+    ! Now call crbniv in all four directions starting from this point
+    do iDirStart = 1, 4
+
+       ! set up start of niveau line
+       npNivTmp = 1
+       nivxTmp(1) = xFrom
+       nivyTmp(1) = yFrom
+
+       iDir = iDirStart ! need to do this because iDir can be changed in crbniv...
+       CALL CRBNIV(ii,jj,npNivTmp,iDir,&
+            & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
+            & valNiv,nivxTmp,nivyTmp, &
+            & x0=xFrom,y0=yFrom,xEnd=xTo,yEnd=yTo,&
+            & foundEndPoint=foundEndPoint)
+       foundLevelLine = foundLevelLine .or. foundEndPoint
+
+       ! For the resulting level line, compute length
+       ! and do bookkeeping to find the shortest
+       length = long(nivxTmp(1:npNivTmp), nivyTmp(1:npNivTmp), npNivTmp)
+
+       if (length < maxLength) then
+          maxLength = length
+          npniv = npNivTmp
+          nivx = nivxTmp
+          nivy = nivyTmp
+       end if
+    end do
+
+    if (.not. foundLevelLine) then
+       stop 'findLevelLineForPoints: unable to find connecting level line'
+    end if
+
+    write (*,*) 'findLevelLineForPoints: found level line, length=', maxLength, &
+         & ' with ', npNiv, ' points'
+    write (*,*) 'findLevelLineForPoints: distance of points is: ',&
+         & sqrt( (xTo - xFrom) ** 2 + (yTo - yFrom) ** 2 )
+    
+
+  end subroutine findLevelLineForPoints
+
 
 
 end module carre_niveau
