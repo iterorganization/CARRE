@@ -138,26 +138,30 @@ contains
 
   end subroutine carre_postprocess_computation
 
-  !> Compute intersection of a face with a structure
+  !> Compute intersection of a line segment curve with the structure elements
   subroutine intersect_structure(xx, yy, struct, doesIntersect, iStruct, &
       & iSegment, ipx, ipy)
 
-    REAL*8, intent(in) :: xx(2),yy(2)     
+    REAL*8, intent(in) :: xx(:),yy(:)     
     type(CarreStructures), intent(in) :: struct
     logical, intent(out) :: doesIntersect
     integer, intent(out), optional :: iSegment, iStruct
     REAL*8, intent(out), optional :: ipx, ipy
 
     ! internal      
-    integer :: is
+    integer :: iSeg, is
 
-    do is = 1, struct%rnstruc
-        call intersect(xx, yy, &
-            & struct%rxstruc(1:abs(struct%rnpstru(is)), is), &
-            & struct%rystruc(1:abs(struct%rnpstru(is)), is), &
-            & doesIntersect, iSegment, ipx, ipy)
-        if (present(iStruct)) iStruct = is
-        if (doesIntersect) return
+    ! check for every segment in the line for intersection with every structure
+    do iSeg = 1, size(xx) - 1
+       do is = 1, struct%rnstruc
+          call intersect(xx(iSeg:iSeg+1), yy(iSeg:iSeg+1), &
+               & struct%rxstruc(1:abs(struct%rnpstru(is)), is), &
+               & struct%rystruc(1:abs(struct%rnpstru(is)), is), &
+               & doesIntersect, iSegment, ipx, ipy)
+          if (present(iStruct)) iStruct = is
+          if (doesIntersect) return
+       end do
+       
     end do
 
     doesIntersect = .false.
@@ -375,6 +379,9 @@ contains
     double precision :: llx(npnimx), lly(npnimx)
     integer :: llNp
 
+    logical :: doesIntersect
+    double precision :: newPx, newPy
+
     ! Coordinates of starting face
     if (present(iFcP) .and. present(iFcR)) then
         ! If given: use directly
@@ -390,11 +397,13 @@ contains
          & fcFromX, fcFromY, fcToX, fcToY, &
          & llX, llY, llNp )
 
-    return
-
     ! Recompute intersection of the poloidal level line with the structure
     ! to guarantee the new point lies on the level line.
-
+    call intersect_structure(llX, llY, struct, doesIntersect, ipx=newPx, ipy=newPy)
+    
+    if (.not. doesIntersect) stop 'addRadialLine: did not find intersection point!'
+    write (*,*) 'addRadialLine: old intersection', px, py
+    write (*,*) 'addRadialLine: new intersection', newPx, newPy
 
     ! Add space for new grid points. Shift liFcP + 1 : end up by one
     ! TODO: test that we don't run out of space   
@@ -446,14 +455,13 @@ contains
     double precision :: nivNewX(npnimx), nivNewY(npnimx)
     integer :: npNivRef, npNivNew
 
-    ! We need the level lines for both poloidal grid lines
-    call findLevelLine(equ, struct, refx(1), refy(1), &
-        & refx(size(refx)), refy(size(refy)), &
-        & nivRefX, nivRefY, npNivRef )
-
+!!$    ! We need the level lines for both poloidal grid lines
+!!$    call findLevelLine(equ, struct, refx(1), refy(1), &
+!!$        & refx(size(refx)), refy(size(refy)), &
+!!$        & nivRefX, nivRefY, npNivRef )
+!!$
     newx = 0.0
     newy = 0.0
-
 
 !!$    !..On definit maintenant les points de maille de la nouvelle ligne
 !!$    !  de niveau a partir de ceux de la precedente.
@@ -555,61 +563,6 @@ contains
 !!$    RETURN
   end subroutine insertPoints
 
-  ! TODO: obsolete
-  subroutine findLevelLine( equ, struct, xFrom, yFrom, xTo, yTo, nivX, nivY, npNiv )
-    type(CarreEquilibrium), intent(in) :: equ
-    type(CarreStructures), intent(in) :: struct
-    double precision, intent(in) :: xFrom, yFrom, xTo, yTo
-    double precision, intent(out) :: nivX(npnimx), nivY(npnimx)
-    integer, intent(out) :: npNiv   
-
-    ! internal
-    integer :: ii, jj, lNpNiv, indstr, iDir
-    double precision :: valNiv, xn(npnimx), yn(npnimx)   
-
-    ! dummy fields for limiting curves & targets
-    double precision :: xcrb(npnimx,2), ycrb(npnimx,2), d
-    integer :: npcrb(2), plaque
-
-    ! external
-    integer :: ifind
-    external :: ifind
-
-    ! first find cell in grid psi where xFrom, yFrom is located
-    ii = ifind(xFrom, equ%x(1:equ%nx), equ%nx, 1)
-    jj = ifind(yFrom, equ%y(1:equ%ny), equ%ny, 1)
-        
-    ! Compute psi value at this point
-    valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + & 
-        &       equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom   
-
-    ! Now call crbniv in all four directions starting from this point
-    do iDir = 1, 4
-
-!!$        CALL CRBNIV(ii,jj,lNpNiv,iDir,nxmax,nymax,&
-!!$            & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
-!!$            & valNiv,xn,yn,npnimx,strumx,npstmx, & 
-!!$            & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
-!!$            & indstr, &
-!!$            & xcrb,ycrb,npcrb,0, & 
-!!$            & plaque, xFrom, yFrom)
-       
-        ! For the resulting level line, compute distance to (xTo, yTo)
-        ! and do bookkeeping to find the one which comes closest.
-
-        d = distanceToCurve(xn(1:lNpNiv), yn(1:lNpNiv), xTo, yTo)
-        write (*,*) "findLevelLine: from ", xFrom, yFrom, " to ", &
-            & xTo, yTo, ": level line iDir ", iDir, ", distance is ", d
-
-    end do
-  
-    ! return the level line 
-    nivx = 0.0
-    nivy = 0.0
-    npNiv = 0
-
-  end subroutine findLevelLine
-
   
   !> Compute minimum distance of a point to a curve, by 
   !> computing the minimum distance to all points of the curve.
@@ -634,10 +587,13 @@ contains
   end FUNCTION distanceToCurve
 
 
+  !> Compute intersection of a line segment with one structure
+  !> xst,yst: tableaux des coordonnees des points de la structure.
+  !> xx,yy: tableaux des coordonnees contenant les 2 points du segment.
+  !> doesIntersect: flag indicating whether intersection found
+  !> iSegment: index of segment intersected
+  !> ipx, ipy: intersection point (if found)
   subroutine intersect(xx,yy,xst,yst,doesIntersect,iSegment,ipx,ipy)
-
-    !..  Cette fonction verifie si un segment traverse un segment de
-    !  structure autre que celui sur lequel on est en train de marcher.
 
     !  arguments
     REAL*8, intent(in) :: xx(2),yy(2),xst(:),yst(:)
@@ -645,20 +601,13 @@ contains
     logical, intent(out) :: doesIntersect
     integer, intent(out), optional :: iSegment
     REAL*8, intent(out), optional :: ipx, ipy
-
     !  variables locales
     INTEGER i
-    REAL*8 mult1,mult2,determ
-
-    !=========================
-    !.. xst,yst: tableaux des coordonnees des points de la structure.
-    !.. n  : nombre de points de la structure.
-    !.. xx,yy: tableaux des coordonnees contenant les 2 points du segment.
-    !.. ind: indice du segment de structure.
     !.. determ: determinant de la matrice des deux equations.
     !.. mult1: facteur multiplicatif du segment de courbe.
     !.. mult2: facteur multiplicatif du segment de structure.
-    !=========================
+    REAL*8 mult1,mult2,determ
+
 
     !..Boucle sur la structure.
     DO i=1, size(xst)-1
@@ -697,9 +646,6 @@ contains
     doesIntersect = .FALSE.
     if (present(iSegment)) iSegment = GRID_UNDEFINED
   END subroutine intersect
-
-
-
 
 
 end module carre_postprocess
