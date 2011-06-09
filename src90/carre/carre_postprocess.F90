@@ -4,6 +4,7 @@ module carre_postprocess
   use CarreDiagnostics
   use itm_string
   use carre_niveau
+  use itm_assert
 
 #ifdef USE_SILO
   use SiloIO
@@ -13,6 +14,7 @@ module carre_postprocess
   implicit none
 
 #include <CARREDIM.F>
+#include <COMRLX.F>
 
   private
 
@@ -401,9 +403,8 @@ contains
     ! to guarantee the new point lies on the level line.
     call intersect_structure(llX, llY, struct, doesIntersect, ipx=newPx, ipy=newPy)
     
-    if (.not. doesIntersect) stop 'addRadialLine: did not find intersection point!'
-    write (*,*) 'addRadialLine: old intersection', px, py
-    write (*,*) 'addRadialLine: new intersection', newPx, newPy
+    if (.not. doesIntersect) stop 'addRadialLine: did not find intersection of face with a structure!'
+    write (*,*) 'addRadialLine: old intersection ', px, py, ', new intersection ', newPx, newPy
 
     ! Add space for new grid points. Shift liFcP + 1 : end up by one
     ! TODO: test that we don't run out of space   
@@ -414,8 +415,8 @@ contains
     grid%np1(iReg) = grid%np1(iReg) + 1
 
     ! Place given point    
-    grid%xmail(liFcP + 1, liFcR, iReg) = px
-    grid%ymail(liFcP + 1, liFcR, iReg) = py
+    grid%xmail(liFcP + 1, liFcR, iReg) = newPx
+    grid%ymail(liFcP + 1, liFcR, iReg) = newPy
 
     ! For this region iReg: compute new radial points by moving
     ! away from the given point in both directions
@@ -443,62 +444,81 @@ contains
 
 
   !> Starting from a given (reference) poloidal grid line, place points on the
-  !> adjacent grid line. Of the adjacent grid line, the first
-  !> and last point should be given
-  subroutine insertPoints(equ, struct, refx, refy, newx, newy)
+  !> adjacent grid line. On the reference grid line, all points must be given.
+  !> On the adjacent grid line, the first and last point must be given
+  !> The points are distributed using the relaxation scheme for the criterion set.
+  subroutine insertPoints(equ, refx, refy, newx, newy)
     type(CarreEquilibrium), intent(in) :: equ
-    type(CarreStructures), intent(in) :: struct
     double precision, intent(in) :: refx(:), refy(:)
     double precision, intent(out) :: newx(size(refx)), newy(size(refy))
 
+    ! internal
     double precision :: nivRefX(npnimx), nivRefY(npnimx)
     double precision :: nivNewX(npnimx), nivNewY(npnimx)
     integer :: npNivRef, npNivNew
 
-!!$    ! We need the level lines for both poloidal grid lines
-!!$    call findLevelLine(equ, struct, refx(1), refy(1), &
-!!$        & refx(size(refx)), refy(size(refy)), &
-!!$        & nivRefX, nivRefY, npNivRef )
-!!$
-    newx = 0.0
-    newy = 0.0
+    ! coordinates of points on reference and new grid line
+    double precision :: lRef(npnimx), lNew(npnimx)
+    
+    double precision :: lengthRef, lengthNew, curDist
+    integer :: ipol
 
-!!$    !..On definit maintenant les points de maille de la nouvelle ligne
-!!$    !  de niveau a partir de ceux de la precedente.
-!!$
-!!$    dernie=0.0
-!!$    ll=long(xn2,yn2,npni2)
-!!$
-!!$    d1=0.
-!!$    ipol1=2
-!!$    ipoln=nppol-1
-!!$    !
-!!$    !  1.   on dispose d'abord les points proportionellement a ceux de la
-!!$    !       ligne precedente
-!!$    l1(1)=zero
-!!$    l1(nppol)=ll
-!!$    l0(1)=zero
-!!$    if(ir.eq.2) l0(nppol)=ll1
-!!$    do ipol=ipol1,ipoln
-!!$        d1=ruban(xn(1,ianc),yn(1,ianc),nn(ianc),mailx(ipol,ir-1), & 
-!!$            &          maily(ipol,ir-1),d1)
-!!$        if(ir.eq.2) l0(ipol)=d1
-!!$        !            l1(ipol)=(d1/ll1)*ll
-!!$        l1(ipol)=(l0(ipol)/l0(nppol))*ll
-!!$        CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),l1(ipol), & 
-!!$            &               mailx(ipol,ir),maily(ipol,ir))
-!!$    enddo
-!!$    !
-!!$    mailx(nppol,ir)=xn(nn(inouv),inouv)
-!!$    maily(nppol,ir)=yn(nn(inouv),inouv)
-!!$    !
-!!$    if(nrelax.gt.0) then
-!!$        !
-!!$        !  2.   on initialise la fonction qui doit s'annuler pour une
-!!$        !       distribution orthogonale
-!!$        call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-!!$            & maily(1,ir),ort1,nppol,pasmin,garde1,garde2,l0,l1, & 
-!!$            & ortpur,propo,varr)
+    ! some sanity checks
+    call assert(size(refx) == size(refy))
+
+    ! We need the level lines for both sections of poloidal grid lines
+    call findLevelLineForPoints( equ, &
+         & refx(1), refy(1), refx(ubound(refx)), refy(ubound(refx)), &
+         & nivRefX, nivRefY, npNivRef )
+    call findLevelLineForPoints( equ, &
+         & newx(1), newy(1), newx(ubound(newx)), newy(ubound(newx)), &
+         & nivNewX, nivNewY, npNivNew )
+
+
+    !..On definit maintenant les points de maille de la nouvelle ligne
+    !  de niveau a partir de ceux de la precedente.
+    !..We now place the grid points of the new grid line according
+    !  to the spacing of the grid points on the reference grid line
+
+    lengthRef=long(nivRefX,nivRefY,npNivRef)
+    lengthNew=long(nivNewX,nivNewY,npNivNew)
+
+    ! Compute coordinates (distance to first point) of given points on reference line
+    ! First point is at zero
+    lRef(1) = 0.0_R8
+    ! for all other points we compute the distance
+    curDist = 0.0_R8
+    do ipol = 2, ubound(refx) - 1
+       ! Giving curDist as a parameter is a safety check that we don't get a 
+       ! point postioned "before", i.e. closer to the start point than the previous one
+       lRef(iPol) = ruban(nivRefX(1:npNivRef), nivRefY(1:npNivRef), npNivRef,&
+            & refx(ipol), refy(ipol), curDist)       
+       curDist = lRef(iPol)
+    end do
+    ! Last point is at end of reference line
+    lRef(ubound(newx)) = lengthRef 
+
+    ! Place an initial distribution of points on the new grid line
+    do ipol = 2, ubound(newx) - 1
+       lNew(ipol)=(lRef(ipol)/lengthRef)*lengthNew
+       CALL COORD( nivNewX(1:npNivNew), nivNewY(1:npNivNew), npNivNew, &
+            & lNew(ipol), & 
+            & newx(ipol), newy(ipol) )
+    enddo
+    ! (first and last point must already be set correctly...)
+
+    ! Optimize distribution of grid points according to the criteria,
+    ! using the signed relaxation method 
+
+    ! nrelax is coming from COMRLX.F...it's not a constant! Can be modified by user.
+    if(nrelax.gt.0) then
+       !  2.   on initialise la fonction qui doit s'annuler pour une
+       !       distribution orthogonale
+       !  We compute the grid quality criterion for the initiali point distribution
+       call clort( refx, maily(1,ir-1),&
+            & mailx(1,ir), maily(1,ir), &
+            & ort1, nppol, pasmin, garde1, garde2, l0, l1, & 
+            & ortpur,propo,varr)
 !!$
 !!$        !
 !!$        !  3.   on procede a un premier deplacement des noeuds

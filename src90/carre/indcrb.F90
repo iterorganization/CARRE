@@ -12,6 +12,10 @@
 !  tel que la distance parcourue jusqu'a cet indice est inferieure ou
 !  egale a la distance d
 
+! The parameter d gives a minimum distance from the starting point
+! from which on the distance computation is started.
+
+
 !  arguments
       INTEGER n
       REAL*8 vx(n),vy(n),x,y,d
