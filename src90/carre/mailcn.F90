@@ -13,6 +13,7 @@
       use CarreDiagnostics
       use CarreSiloIO
       use carre_niveau
+      use carre_criteria
 
       IMPLICIT NONE
 

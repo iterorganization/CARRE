@@ -4,6 +4,7 @@ module carre_postprocess
   use CarreDiagnostics
   use itm_string
   use carre_niveau
+  use carre_criteria
   use itm_assert
 
 #ifdef USE_SILO
@@ -304,8 +305,10 @@ contains
 
 
     ! internal
-    integer :: iReg, ip, ir
+    integer :: iReg, ip, ir, iBrokenCell
     logical :: isecTopFace, isecBotFace
+
+    iBrokenCell = 0
 
     do iReg = 1, grid%nreg
         do ip = 1, grid%np1(iReg) - 1
@@ -323,6 +326,10 @@ contains
                     end if
 
                     if (isecTopFace) then
+                       ! Debug plotting: abuse region number for current cell
+                       iBrokenCell = iBrokenCell + 1
+                       call csioSetRegion(iBrokenCell)
+
                        ! Add a radial line through the intersection point
                        ! of this face with the structure. Note that the
                        ! intersection point known at this point 
@@ -414,16 +421,23 @@ contains
         & grid%ymail(liFcP + 1 : grid%np1(iReg), :, iReg)
     grid%np1(iReg) = grid%np1(iReg) + 1
 
-    ! Place given point    
-    grid%xmail(liFcP + 1, liFcR, iReg) = newPx
-    grid%ymail(liFcP + 1, liFcR, iReg) = newPy
+    ! copy liFcP notes to liFcP + 1 nodes to have something sensible for plotting
+    grid%xmail(liFcP + 1, :, iReg) = grid%xmail(liFcP, :, iReg)
+    grid%ymail(liFcP + 1, :, iReg) = grid%ymail(liFcP, :, iReg)
+
+    ! Place given point on reference grid line
+    grid%xmail(liFcP + 1, liFcR - 1, iReg) = newPx
+    grid%ymail(liFcP + 1, liFcR - 1, iReg) = newPy
 
     ! For this region iReg: compute new radial points by moving
     ! away from the given point in both directions
 
+    nrelax = 0    
+
     ! Positive direction
     do ir = iFcR + 1, par%npr(iReg)       
-        call insertPoints( equ, struct, &
+        call csioSetSurface(ir)
+        call insertPoints( equ, &
             & grid%xmail(liFcP:liFcP+2, iFcR-1, iReg), &
             & grid%ymail(liFcP:liFcP+2, iFcR-1, iReg), &
             & grid%xmail(liFcP:liFcP+2, iFcR, iReg), &
@@ -458,21 +472,47 @@ contains
     integer :: npNivRef, npNivNew
 
     ! coordinates of points on reference and new grid line
-    double precision :: lRef(npnimx), lNew(npnimx)
-    
+    ! (in distance from beginning of niveau line)
+    double precision :: lRef(npnimx), lNew(npnimx), lNewModified(npnimx)    
+
     double precision :: lengthRef, lengthNew, curDist
-    integer :: ipol
+    integer :: ipol, i
+
+    ! Criteria values
+    double precision, dimension(size(refx)) :: critNew, critModified
+
+    ! debug plotting
+    double precision :: tmpMailx(size(refx),2), tmpMaily(size(refy),2)    
+
+    ! externals
+    double precision :: long, ruban
+    external :: long, ruban
 
     ! some sanity checks
     call assert(size(refx) == size(refy))
 
     ! We need the level lines for both sections of poloidal grid lines
     call findLevelLineForPoints( equ, &
-         & refx(1), refy(1), refx(ubound(refx)), refy(ubound(refx)), &
+         & refx(1), refy(1), refx(size(refx)), refy(size(refx)), &
          & nivRefX, nivRefY, npNivRef )
     call findLevelLineForPoints( equ, &
-         & newx(1), newy(1), newx(ubound(newx)), newy(ubound(newx)), &
+         & newx(1), newy(1), newx(size(newx)), newy(size(newx)), &
          & nivNewX, nivNewY, npNivNew )
+
+    ! Write out intermediate grid stage
+    call csioSetRelax( 0 )
+
+    call csioOpenFile()
+    tmpMailx(:,1) = refx
+    tmpMailx(:,2) = newx
+    tmpMaily(:,1) = refy
+    tmpMaily(:,2) = newy
+    call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", nivRefX(1:npNivRef), nivRefY(1:npNivRef) )
+    call siloWriteLineSegmentGridFromPoints( csioDbfile, "newLine", nivNewX(1:npNivNew), nivNewY(1:npNivNew) )
+    call siloWriteQuadGrid( csioDbfile, "region", &
+         & size(newx), 2, &
+         & tmpMailx, tmpMaily )            
+    call csioCloseFile()
 
 
     !..On definit maintenant les points de maille de la nouvelle ligne
@@ -485,10 +525,10 @@ contains
 
     ! Compute coordinates (distance to first point) of given points on reference line
     ! First point is at zero
-    lRef(1) = 0.0_R8
+    lRef(1) = 0d0
     ! for all other points we compute the distance
-    curDist = 0.0_R8
-    do ipol = 2, ubound(refx) - 1
+    curDist = 0d0
+    do ipol = 2, size(refx) - 1
        ! Giving curDist as a parameter is a safety check that we don't get a 
        ! point postioned "before", i.e. closer to the start point than the previous one
        lRef(iPol) = ruban(nivRefX(1:npNivRef), nivRefY(1:npNivRef), npNivRef,&
@@ -496,91 +536,99 @@ contains
        curDist = lRef(iPol)
     end do
     ! Last point is at end of reference line
-    lRef(ubound(newx)) = lengthRef 
+    lRef(size(newx)) = lengthRef 
 
     ! Place an initial distribution of points on the new grid line
-    do ipol = 2, ubound(newx) - 1
+    lNew(1) = 0d0
+    do ipol = 2, size(newx) - 1
        lNew(ipol)=(lRef(ipol)/lengthRef)*lengthNew
        CALL COORD( nivNewX(1:npNivNew), nivNewY(1:npNivNew), npNivNew, &
             & lNew(ipol), & 
             & newx(ipol), newy(ipol) )
     enddo
-    ! (first and last point must already be set correctly...)
+    lNew(size(newx)) = lengthNew
+    ! (first and last point in nivNewX must already be set correctly...)
 
     ! Optimize distribution of grid points according to the criteria,
     ! using the signed relaxation method 
 
-    ! nrelax is coming from COMRLX.F...it's not a constant! Can be modified by user.
+    ! nrelax is coming from COMRLX.F. It's not a constant, can be modified by user I/O.
     if(nrelax.gt.0) then
-       !  2.   on initialise la fonction qui doit s'annuler pour une
-       !       distribution orthogonale
-       !  We compute the grid quality criterion for the initiali point distribution
-       call clort( refx, maily(1,ir-1),&
-            & mailx(1,ir), maily(1,ir), &
-            & ort1, nppol, pasmin, garde1, garde2, l0, l1, & 
-            & ortpur,propo,varr)
-!!$
-!!$        !
-!!$        !  3.   on procede a un premier deplacement des noeuds
-!!$        l2(1)=zero
-!!$        l2(nppol)=l1(nppol)
-!!$        diag%segt(ir,ireg)=l2(nppol)
-!!$        do ipol=ipol1,ipoln
-!!$            if(ort1(ipol).gt.zero) then
-!!$                l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol+1)
-!!$            else
-!!$                l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol-1)
-!!$            endif
-!!$            call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol), & 
-!!$                & mailx(ipol,ir),maily(ipol,ir))
-!!$
-!!$            diag%somort(ir,ireg)= diag%somort(ir,ireg)+(ort1(ipol)/nppol)
-!!$            diag%somortpur(ir,ireg)= diag%somortpur(ir,ireg)+(ortpur(ipol)/nppol)
-!!$            diag%sompropo(ir,ireg)= diag%sompropo(ir,ireg)+(propo(ipol)/nppol)
-!!$            diag%somvarr(ir,ireg)= diag%somvarr(ir,ireg)+(varr(ipol)/nppol)
-!!$        enddo
-!!$        !
-!!$        !  4.   on relaxe les points de facon iterative pour realiser la
-!!$        !       meilleure orthogonalite possible
-!!$        do i=1,nrelax
-!!$            call csioSetRelax( i )
-!!$
-!!$            call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-!!$                & maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2, & 
-!!$                & ortpur,propo,varr)
-!!$
-!!$            ortmax=zero
-!!$            do ipol=ipol1,ipoln
-!!$                if(abs(ort2(ipol)).gt.rlcept) then
-!!$                    del=-ort2(ipol)*(l2(ipol)-l1(ipol)) & 
-!!$                        & /(ort2(ipol)-ort1(ipol))
-!!$                    if(del.gt.zero) then
-!!$                        del=min(del,relax*(l2(ipol+1)-l2(ipol)))
-!!$                    else
-!!$                        del=max(del,relax*(l2(ipol-1)-l2(ipol)))
-!!$                    endif
-!!$                    if(del.ne.zero) then
-!!$                        l1(ipol)=l2(ipol)
-!!$                        ort1(ipol)=ort2(ipol)
-!!$                        l2(ipol)=l1(ipol)+del
-!!$                    endif
-!!$                    call coord(xn(1,inouv),yn(1,inouv),nn(inouv), & 
-!!$                        & l2(ipol),mailx(ipol,ir),maily(ipol,ir))
-!!$                endif
-!!$                ortmax=max(ortmax,abs(ort2(ipol)))
-!!$            enddo
-!!$
-!!$            if(ortmax <= rlcept) exit
-!!$        enddo
-!!$        
-!!$        if(ortmax > rlcept) then
-!!$            ! The relaxation failed to produce good results with the
-!!$            ! given number of iterations
-!!$        end if
-!!$
-!!$    endif
-!!$
-!!$    RETURN
+       ! 2.   on initialise la fonction qui doit s'annuler pour une
+       !      distribution orthogonale
+       ! We compute the grid quality criterion for the initiali point distribution.
+       ! Like nrelax, pasmin, l0 and l1 come from the COMRLX common block
+       ! The two zeros in the clort call are the guard lengths. We effectively 
+       ! disable the "proportional distribution" criterion here.
+       call clort( refx, refy,&
+            & newx, newy, &
+            & critNew, size(refx), &
+            & pasmin, 0d0, 0d0, lRef, lNew )
+
+       
+       !  3. on procede a un premier deplacement des noeuds
+       !     We relax the node position one time by moving them slightly in the right direction
+       lNewModified(1)=0d0
+       lNewModified(size(newx))=lNew(size(newx))
+       !diag%segt(ir,ireg)=l2(nppol)
+       do ipol=ipol1,ipoln
+          if(critNew(ipol).gt.0d0) then
+             lNewModified(ipol)=0.9*lNew(ipol)+0.1*lNew(ipol+1)
+          else
+             lNewModified(ipol)=0.9*lNew(ipol)+0.1*lNew(ipol-1)
+          endif
+          call coord(nivNewX(1:npNivNew), nivNewY(1:npNivNew),&
+               & npNivNew,lNewModified(iPol), & 
+               & newx(ipol),newy(ipol) )
+           
+          !diag%somort(ir,ireg)= diag%somort(ir,ireg)+(critNew(ipol)/nppol)
+          !diag%somortpur(ir,ireg)= diag%somortpur(ir,ireg)+(ortpur(ipol)/nppol)
+          !diag%sompropo(ir,ireg)= diag%sompropo(ir,ireg)+(propo(ipol)/nppol)
+          !diag%somvarr(ir,ireg)= diag%somvarr(ir,ireg)+(varr(ipol)/nppol)
+       enddo
+
+       ! 4. on relaxe les points de facon iterative pour realiser la
+       !    meilleure orthogonalite possible
+       !    We relax the node positions to get the best criteria match possible 
+       do i=1,nrelax
+
+          call clort( refx, refy,&
+               & newx, newy, &
+               & critModified, size(refx), &
+               & pasmin, 0d0, 0d0, lRef, lNewModified )
+
+          do ipol=ipol1,ipoln
+             if(abs(critModified(ipol)).gt.rlcept) then
+                ! criterion for current node too big: move node
+                del=-critModified(ipol)*(lNewModified(ipol)-lNew(ipol)) & 
+                     & /(critModified(ipol)-critNew(ipol))
+                if(del.gt.0d0) then
+                   del=min(del,relax*(lNewModified(ipol+1)-lNewModified(ipol)))
+                else
+                   del=max(del,relax*(lNewModified(ipol-1)-lNewModified(ipol)))
+                endif
+                if(del.ne.0d0) then
+                   lNew(ipol)=lNewModified(ipol)
+                   critNew(ipol)=critModified(ipol)
+                   lNewModified(ipol)=lNewModified(ipol)+del
+                endif
+                call coord(nivNewX(1:npNivNew), nivNewY(1:npNivNew),&
+                     & npNivNew,lNewModified(iPol), & 
+                     & newx(ipol),newy(ipol) )
+
+             endif
+          enddo
+            
+                 
+          if(maxval(abs(critNew)) <= rlcept) exit
+       enddo
+       
+       if(ortmax > rlcept) then
+          ! The relaxation failed to produce good results with the
+          ! given number of iterations
+       end if
+       
+    endif
   end subroutine insertPoints
 
   

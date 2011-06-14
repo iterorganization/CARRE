@@ -10,6 +10,7 @@
       use CarreSiloIO
       use CarreDiagnostics
       use carre_niveau
+      use carre_criteria
 #ifdef USE_SILO
       use SiloIO
 #endif
@@ -83,7 +84,7 @@
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,long,COORD,indsgm,ifind,nulort, & 
-     &         UNTANG,SAUTE,chgdir,in,cross,ruban,clort,drctio
+     &         UNTANG,SAUTE,chgdir,in,cross,ruban,drctio
 !======================================================================
 !..calculs
 !
