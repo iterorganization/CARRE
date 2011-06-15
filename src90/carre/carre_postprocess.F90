@@ -328,7 +328,7 @@ contains
                     if (isecTopFace) then
                        ! Debug plotting: abuse region number for current cell
                        iBrokenCell = iBrokenCell + 1
-                       call csioSetRegion(iBrokenCell)
+                       call csioSetRegion(1000 + iBrokenCell)
 
                        ! Add a radial line through the intersection point
                        ! of this face with the structure. Note that the
@@ -391,6 +391,8 @@ contains
     logical :: doesIntersect
     double precision :: newPx, newPy
 
+    integer :: iSurface
+
     ! Coordinates of starting face
     if (present(iFcP) .and. present(iFcR)) then
         ! If given: use directly
@@ -426,27 +428,37 @@ contains
     grid%ymail(liFcP + 1, :, iReg) = grid%ymail(liFcP, :, iReg)
 
     ! Place given point on reference grid line
-    grid%xmail(liFcP + 1, liFcR - 1, iReg) = newPx
-    grid%ymail(liFcP + 1, liFcR - 1, iReg) = newPy
+    grid%xmail(liFcP + 1, liFcR, iReg) = newPx
+    grid%ymail(liFcP + 1, liFcR, iReg) = newPy
 
     ! For this region iReg: compute new radial points by moving
     ! away from the given point in both directions
 
+    ! DEBUG: no relaxation inside insertPoints for now...
     nrelax = 0    
 
+
+    iSurface = 0
     ! Positive direction
     do ir = iFcR + 1, par%npr(iReg)       
-        call csioSetSurface(ir)
-        call insertPoints( equ, &
-            & grid%xmail(liFcP:liFcP+2, iFcR-1, iReg), &
-            & grid%ymail(liFcP:liFcP+2, iFcR-1, iReg), &
-            & grid%xmail(liFcP:liFcP+2, iFcR, iReg), &
-            & grid%ymail(liFcP:liFcP+2, iFcR, iReg) )
+       iSurface = iSurface + 1
+       call csioSetSurface(iSurface)
+       call insertPoints( equ, &
+            & grid%xmail(liFcP:liFcP+2, ir-1, iReg), &
+            & grid%ymail(liFcP:liFcP+2, ir-1, iReg), &
+            & grid%xmail(liFcP:liFcP+2, ir, iReg), &
+            & grid%ymail(liFcP:liFcP+2, ir, iReg) )
     end do
 
     ! Negative direction
     do ir = iFcR - 1, 1, -1 
-
+       iSurface = iSurface + 1
+       call csioSetSurface(iSurface)
+       call insertPoints( equ, &
+            & grid%xmail(liFcP:liFcP+2, ir + 1, iReg), &
+            & grid%ymail(liFcP:liFcP+2, ir + 1, iReg), &
+            & grid%xmail(liFcP:liFcP+2, ir, iReg), &
+            & grid%ymail(liFcP:liFcP+2, ir, iReg) )
     end do
 
     ! For points on boundary of region, insert
@@ -482,7 +494,7 @@ contains
     double precision, dimension(size(refx)) :: critNew, critModified
 
     ! debug plotting
-    double precision :: tmpMailx(size(refx),2), tmpMaily(size(refy),2)    
+    double precision :: tmpMailx(size(refx),2), tmpMaily(size(refy),2)
 
     ! externals
     double precision :: long, ruban
@@ -499,6 +511,40 @@ contains
          & newx(1), newy(1), newx(size(newx)), newy(size(newx)), &
          & nivNewX, nivNewY, npNivNew )
 
+    !..On definit maintenant les points de maille de la nouvelle ligne
+    !  de niveau a partir de ceux de la precedente.
+    !..We now place the grid points of the new grid line according
+    !  to the spacing of the grid points on the reference grid line
+
+    lengthRef=long(nivRefX(1:npNivRef),nivRefY(1:npNivRef),npNivRef)
+    lengthNew=long(nivNewX(1:npNivNew),nivNewY(1:npNivNew),npNivNew)
+
+    ! Compute coordinates (distance to first point) of given points on reference line
+    ! First point is at zero
+    lRef(1) = 0d0
+    ! for all other points we compute the distance
+    curDist = 0d0
+    do ipol = 2, size(refx) - 1
+       ! Giving curDist as a parameter is a safety check that we don't get a 
+       ! point postioned "before", i.e. closer to the start point than the previous one
+       lRef(iPol) = ruban(nivRefX(1:npNivRef), nivRefY(1:npNivRef), npNivRef,&
+            & refx(ipol), refy(ipol), curDist)       
+       curDist = lRef(iPol)
+       call assert(lRef(iPol) <= lengthRef, "insertPoints: length computation broken" )
+    end do
+    ! Last point is at end of reference line
+    lRef(size(newx)) = lengthRef 
+
+    ! Place an initial distribution of points on the new grid line
+    lNew(1) = 0d0
+    do ipol = 2, size(newx) - 1
+       lNew(ipol)=(lRef(ipol)/lengthRef)*lengthNew
+       CALL COORD( nivNewX(1:npNivNew), nivNewY(1:npNivNew), npNivNew, &
+            & lNew(ipol), newx(ipol), newy(ipol) )
+    enddo
+    lNew(size(newx)) = lengthNew
+    ! (first and last point in nivNewX must already be set correctly...)
+
     ! Write out intermediate grid stage
     call csioSetRelax( 0 )
 
@@ -513,41 +559,6 @@ contains
          & size(newx), 2, &
          & tmpMailx, tmpMaily )            
     call csioCloseFile()
-
-
-    !..On definit maintenant les points de maille de la nouvelle ligne
-    !  de niveau a partir de ceux de la precedente.
-    !..We now place the grid points of the new grid line according
-    !  to the spacing of the grid points on the reference grid line
-
-    lengthRef=long(nivRefX,nivRefY,npNivRef)
-    lengthNew=long(nivNewX,nivNewY,npNivNew)
-
-    ! Compute coordinates (distance to first point) of given points on reference line
-    ! First point is at zero
-    lRef(1) = 0d0
-    ! for all other points we compute the distance
-    curDist = 0d0
-    do ipol = 2, size(refx) - 1
-       ! Giving curDist as a parameter is a safety check that we don't get a 
-       ! point postioned "before", i.e. closer to the start point than the previous one
-       lRef(iPol) = ruban(nivRefX(1:npNivRef), nivRefY(1:npNivRef), npNivRef,&
-            & refx(ipol), refy(ipol), curDist)       
-       curDist = lRef(iPol)
-    end do
-    ! Last point is at end of reference line
-    lRef(size(newx)) = lengthRef 
-
-    ! Place an initial distribution of points on the new grid line
-    lNew(1) = 0d0
-    do ipol = 2, size(newx) - 1
-       lNew(ipol)=(lRef(ipol)/lengthRef)*lengthNew
-       CALL COORD( nivNewX(1:npNivNew), nivNewY(1:npNivNew), npNivNew, &
-            & lNew(ipol), & 
-            & newx(ipol), newy(ipol) )
-    enddo
-    lNew(size(newx)) = lengthNew
-    ! (first and last point in nivNewX must already be set correctly...)
 
     ! Optimize distribution of grid points according to the criteria,
     ! using the signed relaxation method 

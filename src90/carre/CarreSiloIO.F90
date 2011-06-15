@@ -3,6 +3,7 @@ module CarreSiloIO
   ! Carre-specific Silo IO routines
 
   use Logging 
+  use Helper
   use KindDefinitions , only: iKind, rKind
 #ifdef USE_SILO           
   use SiloIO
@@ -15,7 +16,7 @@ module CarreSiloIO
   integer :: csioDbfile
   logical :: fileopen = .false.
 
-  character(5+2+3+5), save :: filename = 'carre0100100001'
+  character(5+4+3+3), save :: filename = 'carre000100100001'
 
   integer :: csioStrucNSeg
   real(rKind), allocatable, dimension(:,:,:) :: csioStrucSegments
@@ -38,7 +39,8 @@ contains
     call csioCloseFile()
 
     call csioSetFilename(name)
-#ifdef USE_SILO           
+#ifdef USE_SILO
+    call logmsg(LOGDEBUG, "CarreSiloIO.csioOpenFile: opening file "//filename)
     call siloOpen( filename, csioDbfile )
 #endif
     fileopen = .true.
@@ -56,8 +58,10 @@ contains
 
   subroutine csioCloseFile()
     if ( fileopen ) then 
-#ifdef USE_SILO           
-            call siloClose( csioDbfile )
+       
+#ifdef USE_SILO       
+       call logmsg(LOGDEBUG, "CarreSiloIO.csioCloseFile: closing file "//filename)    
+       call siloClose( csioDbfile )
 #endif
             fileopen = .false.
     end if
@@ -66,6 +70,7 @@ contains
   subroutine csioSetRegion( diReg )
     integer, intent(in) :: diReg
    
+    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetRegion: region "//int2str(diReg))    
     iReg = diReg
     call csioCloseFile()
   end subroutine csioSetRegion
@@ -73,6 +78,7 @@ contains
   subroutine csioSetSurface( diSurf )
     integer, intent(in) :: diSurf
 
+    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetSurface: surface "//int2str(diSurf))    
     iSurf = diSurf
     call csioCloseFile()
   end subroutine csioSetSurface
@@ -80,6 +86,7 @@ contains
   subroutine csioSetRelax( diRelax )
     integer, intent(in) :: diRelax
 
+    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetRelax: relaxation "//int2str(diRelax))    
     iRelax = diRelax
     call csioCloseFile()
   end subroutine csioSetRelax
@@ -92,7 +99,7 @@ contains
             call csioCloseFile()
             filename = name
     else
-            write ( filename, '(a5,i2.2,i3.3,i5.5)' ) 'carre', ireg, isurf, irelax
+            write ( filename, '(a5,i4.4,i3.3,i3.3)' ) 'carre', ireg, isurf, irelax
     end if
   end subroutine csioSetFilename
 
