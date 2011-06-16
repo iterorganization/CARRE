@@ -129,8 +129,8 @@ contains
     if ( testEndPoint ) then
        iEnd = ifind(xEnd, x(1:nx), nx, 1)
        jEnd = ifind(yEnd, y(1:ny), ny, 1)
-       foundEndPoint = .false.
     end if
+    if (present(foundEndPoint)) foundEndPoint = .false.
 
     if (testStructures) then
        indstr = 0
@@ -445,7 +445,7 @@ contains
 
     ! internal
     integer :: ii, jj, npNivTmp, iDir, iDirStart
-    double precision :: valNiv, length, maxLength
+    double precision :: valNiv, length, maxLength, lengthFace
     double precision :: nivxTmp(npnimx), nivyTmp(npnimx)
     logical :: foundEndPoint
 
@@ -463,6 +463,8 @@ contains
     valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + & 
          & equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom   
 
+    lengthFace = sqrt( (xTo - xFrom) ** 2 + (yTo - yFrom) ** 2 )
+
     maxLength = huge(maxLength)
     foundLevelLine = .false.
 
@@ -479,30 +481,47 @@ contains
             & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
             & valNiv,nivxTmp,nivyTmp, &
             & x0=xFrom,y0=yFrom,xEnd=xTo,yEnd=yTo,&
-            & foundEndPoint=foundEndPoint)
-       foundLevelLine = foundLevelLine .or. foundEndPoint
+            & foundEndPoint=foundEndPoint)     
 
-       ! For the resulting level line, compute length
-       ! and do bookkeeping to find the shortest
-       length = long(nivxTmp(1:npNivTmp), nivyTmp(1:npNivTmp), npNivTmp)
+       if (foundEndPoint) then
+          ! For the resulting level line, compute length
+          ! and do bookkeeping to find the shortest
+          length = long(nivxTmp(1:npNivTmp), nivyTmp(1:npNivTmp), npNivTmp)
+          
+          ! Heuristic: if the found level line is too large by an order of magnitude, reject it
+          if ( (length/lengthFace) > 10d0 ) then
+             write (*,*) 'findLevelLineForPoints: found level line &
+                  & (length: ', length, ', points: ', npNivTmp, ')',&
+                  & '- REJECTED because too long compared to face (length: ', lengthFace, ')'
+             cycle
+          end if
 
-       if (length < maxLength) then
-          maxLength = length
-          npniv = npNivTmp
-          nivx = nivxTmp
-          nivy = nivyTmp
+          foundLevelLine = .true.
+          
+          if (length < maxLength) then
+             maxLength = length
+             npniv = npNivTmp
+             nivx = nivxTmp
+             nivy = nivyTmp
+          end if
        end if
+
     end do
 
     if (.not. foundLevelLine) then
-       stop 'findLevelLineForPoints: unable to find connecting level line'
-    end if
-
-    write (*,*) 'findLevelLineForPoints: found level line, length=', maxLength, &
-         & ' with ', npNiv, ' points'
-    write (*,*) 'findLevelLineForPoints: distance of points is: ',&
-         & sqrt( (xTo - xFrom) ** 2 + (yTo - yFrom) ** 2 )
-    
+       write (*,*) 'findLevelLineForPoints: WARNING: unable to find connecting level line.&
+            & Substituting direct connection line'
+       npniv = 2
+       nivx(1) = xFrom
+       nivy(1) = yFrom
+       nivx(2) = xTo
+       nivy(2) = yTo
+   else       
+      write (*,*) 'findLevelLineForPoints: distance of points is: ',&
+           & lengthFace, &
+           & ', found level line: length=', maxLength, &
+           & ' with ', npNiv, ' points'
+   end if
 
   end subroutine findLevelLineForPoints
 

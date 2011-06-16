@@ -89,12 +89,17 @@ module carre_types
 !.. nreg  : number of the grid regions depending on the configuration
 !.. np1   : numbers of the grid points in poloidal direction
 !           (region index) (eventually derived from par%nptseg)
+!.. nr    : number of grid points in the radial direction (per region)
+!           Derived from CarreParameters%npr. Caution: the classical
+!           carre code does not use this array, but uses CarraParameters%npr.
+!           CarreGrid%nr is only relevant in the postprocessing, where the
+!           number of poloidal and/or radial grid points is modified.
 !.. xmail,ymail: grid point coordinates
 !                (poloidal, radial, region)
 !.. xn,yn : working array for coordinates along a parametrised curve
 !.. psim : value of psi interpolated to grid points
 !.. psidxm, psidym: grad psi interpolated to grid points
-          integer :: nreg, np1(nregmx)
+          integer :: nreg, np1(nregmx), nr(nregmx)
 
           REAL*8  & 
                & xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
