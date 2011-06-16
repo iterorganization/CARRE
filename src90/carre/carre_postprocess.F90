@@ -91,8 +91,8 @@ contains
     call labelCells(equ, grid)
 
 #ifdef USE_SILO
-    ! write results
-    call csioOpenFile('carrePostProces')
+    ! write results of first postprocessing step
+    call csioOpenFile('carrePostProcS1')
     do iReg = 1, grid%nreg
         call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
             & grid%np1(iReg), grid%nr(iReg), &
@@ -112,6 +112,17 @@ contains
 
     ! Fix broken cells by modifying the grid accordingly
     call fixCells(equ, struct, grid)
+
+#ifdef USE_SILO
+    ! write results of second postprocessing step
+    call csioOpenFile('carrePostProcS2')
+    do iReg = 1, grid%nreg
+        call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
+            & grid%np1(iReg), grid%nr(iReg), &
+            & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
+            & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
+    end do
+#endif
 
 
   contains
@@ -364,6 +375,7 @@ contains
                              & iReg, &
                              & grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg), &
                              & grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg), &
+                             & recomputeIntersection = .true., &
                              & iFcR = irMap(ir, iReg) + 1 )
 
                         ! update grid index map to account for radial line
@@ -416,24 +428,23 @@ contains
   !> of the face with a structure. 
   !> The region index iReg in which the face is located has to be given. 
   !> Optionally, the indices of the face (ip,ir) can be given, where
-  !> (ip,ir) is the left point (start point) of the face. 
+  !> (iFcP,iFcR) is the left point (start point) of the face. 
   recursive subroutine addRadialLine( equ, struct, grid, &
        & iReg, &
        & px, py, &
+       & recomputeIntersection, &
        & iFcP, iFcR )
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
     integer, intent(in) :: iReg
-!!$    double precision, intent(in) :: fcFromX, fcFromY, fcToX, fcToY
     double precision, intent(in) :: px, py
-!!$    logical, intent(in), optional :: recomputeIntersection
+    logical, intent(in), optional :: recomputeIntersection
     integer, intent(in), optional :: iFcP, iFcR
 
     ! internal
     integer :: ip, ir
     integer :: liFcP, liFcR  ! local copies of dummy arguments iFcP, iFcR
-    double precision :: npx(grid%nr(iReg)), npy(grid%nr(iReg))
 
     double precision :: llx(npnimx), lly(npnimx)
     integer :: llNp
@@ -443,39 +454,34 @@ contains
 
     integer :: iSurface
 
-    ! Coordinates of starting face
-!!$    if (present(iFcP) .and. present(iFcR)) then
-!!$        ! If given: use directly
-!!$        liFcP = iFcP
-!!$        liFcR = iFcR
-!!$    else
-!!$        ! If not given: find in current region        
-!!$        ! call findFaceForPoint(grid, px, py, liFcP, liFcR)
-!!$
-!!$    end if
-
+    ! Find face to split
     call findFaceForPoint(grid, px, py, iReg, liFcP, liFcR, alignment, &
          & doPoloidal = .true., doRadial = .false., iRad = iFcR )
-
     ! we expect a poloidal face
-    call assert( alignment == .true. )
+    call assert( alignment )
     ! ...on the given radial line
     call assert( liFcR == iFcR )
 
     ! Find poloidal level line going through the poloidally aligned face
-!!$    call findLevelLineForPoints( equ, &
-!!$         & fcFromX, fcFromY, fcToX, fcToY, &
-!!$         & llX, llY, llNp )
     call findLevelLineForPoints( equ, &
          & grid%xmail(liFcP, liFcR, iReg), grid%ymail(liFcP, liFcR, iReg), &
          & grid%xmail(liFcP+1, liFcR, iReg), grid%ymail(liFcP+1, liFcR, iReg), &
          & llX, llY, llNp )
 
-    ! Recompute intersection of the poloidal level line with the structure
-    ! to guarantee the new point lies on the level line.
-    call intersect_structure(llX, llY, struct, doesIntersect, ipx=newPx, ipy=newPy)
-    
-    if (.not. doesIntersect) stop 'addRadialLine: did not find intersection of face with a structure!'
+    ! If required, recompute intersection of the poloidal level line with the structure
+    ! to guarantee the new point lies on the level line (this is only required for
+    ! the face where the new radial line was emitted from).
+    if (recomputeIntersection) then
+       call intersect_structure(llX(1:llNp), llY(1:llNp), struct, doesIntersect, ipx=newPx, ipy=newPy)
+    end if
+
+    if (.not. doesIntersect) then
+       ! This can happen if multiple radial lines are added in one cell of the original grid,
+       ! and the geometry changed such that the intersection vanishes.
+       write (*,*) 'addRadialLine: did not find intersection of face with a structure! Skipping this radial line.'
+       return
+    end if
+
     write (*,*) 'addRadialLine: old intersection ', px, py, ', new intersection ', newPx, newPy
 
     ! Add space for new grid points. Shift liFcP + 1 : end up by one
@@ -541,6 +547,8 @@ contains
     ! For points on boundary of region, insert
     ! radial line starting at this point in all other regions
     ! -> recursive call to addRadialLine
+    do iRegOther = 1, grid%nReg
+
 
     ! Debug output: entire region grid
     call csioSetSurface(iSurface + 1)
@@ -574,6 +582,7 @@ contains
     double precision :: lRef(npnimx), lNew(npnimx), lNewModified(npnimx)    
 
     double precision :: lengthRef, lengthNew, curDist
+    double precision :: lPasmin, lTgarde
     integer :: ipol, i
 
     ! Criteria values
@@ -649,7 +658,7 @@ contains
     ! Optimize distribution of grid points according to the criteria,
     ! using the signed relaxation method 
 
-    nrelax = 0
+    !nrelax = 0
     ! nrelax is coming from COMRLX.F. It's not a constant, can be modified by user I/O.
     if(nrelax.gt.0) then
        ! 2.   on initialise la fonction qui doit s'annuler pour une
@@ -658,11 +667,12 @@ contains
        ! Like nrelax, pasmin, l0 and l1 come from the COMRLX common block
        ! The two zeros in the clort call are the guard lengths. We effectively 
        ! disable the "proportional distribution" criterion here.
-       pasmin = 0d0
+       lPasmin = 0d0
+       lTgarde = 0d2
        call clort( refx, refy,&
             & newx, newy, &
             & critNew, size(refx), &
-            & pasmin, 0d0, 0d0, lRef, lNew )
+            & lPasmin, lTgarde, lTgarde, lRef, lNew )
        
        !  3. on procede a un premier deplacement des noeuds
        !     We relax the node position one time by moving them slightly in the right direction
@@ -693,7 +703,8 @@ contains
           call clort( refx, refy,&
                & newx, newy, &
                & critModified, size(refx), &
-               & pasmin, 0d0, 0d0, lRef, lNewModified )
+               & lPasmin, lTgarde, lTgarde, lRef, lNewModified )
+
 
           do ipol=2, size(newx) - 1
              if(abs(critModified(ipol)).gt.rlcept) then
