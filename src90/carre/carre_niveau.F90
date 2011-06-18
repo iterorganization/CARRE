@@ -1,6 +1,10 @@
 module carre_niveau
 
   use carre_types
+#ifdef USE_SILO
+  use SiloIO
+  use CarreSiloIO
+#endif
 
   implicit none
 
@@ -9,6 +13,10 @@ module carre_niveau
   private
 
   public crbniv, findLevelLineForPoints
+
+  logical, parameter :: DEBUGFILES_CRBNIV = .false.
+
+  integer, save :: CRBNIV_CALL = 0
 
 contains
 
@@ -28,6 +36,11 @@ contains
   ! -structure intersection: xstruc, ystruc, nstruc, npstru, plaque, indstr
   ! -limiting line intersection: xt, yt, nt, nbcrb
   ! -prescribed end point: stop curve when reaching the given point xEnd, yEnd
+  ! -controlled failure: crbniv can fail to continue a level line, this usually
+  !  happens around the X-point. The default behaviour for this case is to stop
+  !  the program. If allowFail = .true. is given, in case of failure
+  !  the failure status is returned in failed.
+
 
 !!$      SUBROUTINE CRBNIV(ii,jj,k,idir,nxmax,nymax,nx,ny,x,y,f,niv, & 
 !!$     &        crbx,crby,npnimx,strumx,npstmx,nstruc,npstru, & 
@@ -41,7 +54,8 @@ contains
        & nstruc,npstru, & 
        & xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque, &
        & x0,y0, &
-       & xEnd, yEnd, foundEndPoint)
+       & xEnd, yEnd, foundEndPoint, &
+       & allowFail, failed)
 
     IMPLICIT NONE
 
@@ -71,6 +85,10 @@ contains
     ! end point
     REAL*8, intent(in), optional :: xEnd, yEnd
     logical, intent(out), optional :: foundEndPoint
+
+    ! Fail parameters
+    logical, intent(in), optional :: allowFail
+    logical, intent(out), optional :: failed
 
     !  variables locales
     LOGICAL trvers2
@@ -111,6 +129,16 @@ contains
     !.. x0 y0: coordinates of the starting point
     !=========================
 
+    ! Debug output: set up local filenamespace for crbniv
+    if (DEBUGFILES_CRBNIV) then
+       call csioSaveCounters()
+       CRBNIV_CALL = CRBNIV_CALL + 1
+       call csioSetFilenameBase('crbni')
+       call csioSetRelax(0)
+       call csioSetSurface(CRBNIV_CALL)
+       call csioSetRegion(0)
+    end if
+
     !..Copie des arguments en variables locales
 
     dir = ABS(idir)
@@ -136,6 +164,9 @@ contains
        indstr = 0
     end if
 
+    ! Failure handling: first assume everything is ok, set failed state later
+    if (present(failed)) failed = .false.
+
     !.. 1   Look for the next point.
 
     !..Inside a cell with the corners are            3.  .4
@@ -160,6 +191,14 @@ contains
              crbx(k) = xEnd
              crby(k) = yEnd
              foundEndPoint = .true.
+             if (DEBUGFILES_CRBNIV) then
+                !call csioOpenFile('carreCrbnivEndP')
+                call csioOpenFile()
+                call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
+                     & crbx(1:k), crby(1:k) )    
+                call csioCloseFile()
+                call csioRestoreCounters()
+             end if             
              return
           end if
        end if
@@ -286,6 +325,15 @@ contains
        ENDIF
 
        if (.not. stepDone) then
+          
+          ! controlled failure handling?
+          if (present(allowFail)) then
+             if ( allowFail ) then             
+                if (present(failed)) failed = .true.
+                return
+             end if
+          end if
+
           print *,'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
           print *,'The grid you have specified seems to be too fine in ', & 
                &                                               'radial direction'
@@ -293,6 +341,17 @@ contains
           print *,'    to reduce the number of the radial grid points, or'
           print *,'    to use equilibrium data with higher resolution'
           print *
+
+          ! debug output
+          if (DEBUGFILES_CRBNIV) then
+             call csioOpenFile('carreCrbnivStop')
+             call csioOpenFile()
+             call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
+                  & crbx(1:k), crby(1:k) )    
+             call csioCloseFile()
+             call csioRestoreCounters()
+          end if
+
           stop 'in crbniv: nothing found'
        end if
 
@@ -323,6 +382,15 @@ contains
           ii = i
           jj = j
 
+          if (DEBUGFILES_CRBNIV) then
+             !call csioOpenFile('carreCrbnivOneP')
+             call csioOpenFile()
+             call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
+                  & crbx(1:k), crby(1:k) )    
+             call csioCloseFile()
+             call csioRestoreCounters()
+          end if
+          
           RETURN
 
        ENDIF
@@ -397,6 +465,15 @@ contains
 
           !..Return if the level line was intercepted by a structure.
           IF (indstr .NE. 0) THEN
+             if (DEBUGFILES_CRBNIV) then
+                !call csioOpenFile('carreCrbnivStru')
+                call csioOpenFile()
+                call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
+                     & crbx(1:k), crby(1:k) )    
+                call csioCloseFile()
+                call csioRestoreCounters()
+             end if
+
              RETURN
           ENDIF
 
@@ -408,7 +485,18 @@ contains
        !       de la maille, soit revenue a son point de depart.
        !
 
-       if(i.eq.0 .or. i.eq.nx .or. j.eq.0 .or. j.eq.ny) return
+       if(i.eq.0 .or. i.eq.nx .or. j.eq.0 .or. j.eq.ny) then
+          if (DEBUGFILES_CRBNIV) then
+             !call csioOpenFile('carreCrbnivOuts')
+             call csioOpenFile()
+             call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
+                  & crbx(1:k), crby(1:k) )    
+             call csioCloseFile()
+             call csioRestoreCounters()
+          end if
+          
+          return
+       end if
 
        if(k.gt.ngrace) then
           do igrace=1,ngrace

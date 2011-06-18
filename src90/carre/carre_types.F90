@@ -13,6 +13,11 @@ module carre_types
   integer, parameter, public :: GRID_BOUNDARY = 3
   integer, parameter, public :: GRID_BOUNDARY_REFINE = 4
 
+  ! Grid line flags
+  integer, parameter, public :: GRIDLINE_BASELINE = 1
+  integer, parameter, public :: GRIDLINE_REQUIRED = 2
+
+
   type CarreParameters
 !.. nptseg: number of points along differents segments of separatrix
 !.. repart: selector for the radial point distribution
@@ -118,6 +123,9 @@ module carre_types
           
           integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
           integer :: faceflag(npmamx-1,nrmamx-1,nregmx)
+
+          ! logical flags marking grid lines as required
+          integer :: lineFlagRad(nrmamx, nregmx)
 
   end type CarreGrid
   

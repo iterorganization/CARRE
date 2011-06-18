@@ -108,7 +108,7 @@
 !..Parametrisation of the separating curve
 
          nt(1)=0
-       nt(2)=0
+         nt(2)=0
 
          DO 13 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1

@@ -28,6 +28,9 @@ module carre_postprocess
   integer, parameter :: INDEX_FACE_RIGHT = 3
   integer, parameter :: INDEX_FACE_TOP = 4
 
+  logical, parameter :: DEBUGFILES_ADDRADIALLINE = .true.
+  logical, parameter :: DEBUGFILES_INSERTPOINTS = .false.
+
 contains
 
   !> Perform postprocessing on the grid as generated in carre_main.
@@ -49,8 +52,18 @@ contains
     ! to the new derived types yet)
     grid % nr = par % npr
 
-    ! Identify cells that are intersected by vessel structure
+    ! Initialize grid line flags
+    grid%lineFlagRad = GRIDLINE_BASELINE
+    do iReg = 1, grid%nreg
+       ! first and last radial line is required
+       grid%lineFlagRad(1, iReg) = GRIDLINE_REQUIRED
+       grid%lineFlagRad(grid%np1(iReg), iReg) = GRIDLINE_REQUIRED
+    end do
 
+    ! TODO: the grid line going into the x-point is also required...
+
+
+    ! Identify cells that are intersected by vessel structure
     grid%faceflag = 0
     grid%cellflag = GRID_UNDEFINED
 
@@ -107,6 +120,13 @@ contains
             & 'cellflag'//int2str(iReg), &
             & real(grid%cellflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
             & DB_ZONECENT )
+
+    end do
+    ! limiting level lines
+    do iRad = 1, struct%nbniv
+       call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iRad), &
+            & struct%nivx(1:struct%nivtot(iRad), iRad), &
+            & struct%nivy(1:struct%nivtot(iRad), iRad) )
     end do
 #endif
 
@@ -360,10 +380,11 @@ contains
                             & " cell (ipol, irad) ", ip, ir
                     end if
 
+!!$                    if (.false.) then
                     if (isecTopFace) then
                        ! Debug plotting: abuse region number for current cell
                        iBrokenCell = iBrokenCell + 1
-                       call csioSetRegion(1000 + iBrokenCell)
+                       call csioSetRegion(100 + iBrokenCell)
 
                        ! Add a radial line through the intersection point
                        ! of this face with the structure. Note that the
@@ -385,32 +406,31 @@ contains
                         ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
                     end if
 
-!!$                    if (isecBotFace) then
-!!$                       ! Debug plotting: abuse region number for current cell
-!!$                       iBrokenCell = iBrokenCell + 1
-!!$                       call csioSetRegion(1000 + iBrokenCell)
-!!$
-!!$                       ! Add a radial line through the intersection point
-!!$                       ! of this face with the structure. Note that the
-!!$                       ! intersection point known at this point 
-!!$                       ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
-!!$                       !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
-!!$                       ! is inaccurate and will be recomputed 
-!!$                        call addRadialLine( par, equ, struct, grid, &
-!!$                             & iReg, &
-!!$                             & grid%xmail(ipMap(ip, iReg), irMap(ir, iReg), iReg), grid%ymail(ipMap(ip, iReg), irMap(ir, iReg), iReg), &
-!!$                             & grid%xmail(ipMap(ip+1, iReg), irMap(ir, iReg), iReg), grid%ymail(ipMap(ip+1, iReg), irMap(ir, iReg), iReg), &
-!!$                             & grid%faceISecPx(INDEX_FACE_BOTTOM, ip, ir, iReg), &
-!!$                             & grid%faceISecPy(INDEX_FACE_BOTTOM, ip, ir, iReg), &
-!!$                             & recomputeIntersection = .true., & 
-!!$                             & iFcP = ipMap(ip, iReg), iFcR = irMap(ir+1, iReg) )
-!!$
-!!$                        ! update grid index map to account for radial line
-!!$                        ! We added a radial grid line between poloidal points ip and ip + 1
-!!$                        ! TODO: check we don't run out of space...
-!!$                        ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
-!!$                    end if
+                    ! same for the bottom face, if required
+                    if (isecBotFace) then
+                       ! Debug plotting: abuse region number for current cell
+                       iBrokenCell = iBrokenCell + 1
+                       call csioSetRegion(100 + iBrokenCell)
 
+                       ! Add a radial line through the intersection point
+                       ! of this face with the structure. Note that the
+                       ! intersection point known at this point 
+                       ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
+                       !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
+                       ! is inaccurate and will be recomputed 
+                        call addRadialLine( equ, struct, grid, &
+                             & iReg, &
+                             & grid%faceISecPx(INDEX_FACE_BOTTOM, ip, ir, iReg), &
+                             & grid%faceISecPy(INDEX_FACE_BOTTOM, ip, ir, iReg), &
+                             & recomputeIntersection = .true., &
+                             & iFcR = irMap(ir, iReg) )
+
+                        ! update grid index map to account for radial line
+                        ! We added a radial grid line between poloidal points ip and ip + 1
+                        ! Shift all indices bigger than that up by one
+                        ! TODO: check we don't run out of space...
+                        ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
+                    end if
                 end if
 
             end do
@@ -433,23 +453,24 @@ contains
        & iReg, &
        & px, py, &
        & recomputeIntersection, &
-       & iFcP, iFcR )
+       & iFcR )
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
     integer, intent(in) :: iReg
     double precision, intent(in) :: px, py
     logical, intent(in), optional :: recomputeIntersection
-    integer, intent(in), optional :: iFcP, iFcR
+    integer, intent(in), optional :: iFcR
 
     ! internal
-    integer :: ip, ir
+    integer :: ir
     integer :: liFcP, liFcR  ! local copies of dummy arguments iFcP, iFcR
+    integer :: iOtherFcP, iOtherFcR
 
     double precision :: llx(npnimx), lly(npnimx)
-    integer :: llNp
+    integer :: llNp, iRegOther, i
 
-    logical :: doesIntersect, alignment
+    logical :: doesIntersect, alignment, regionHasFace
     double precision :: newPx, newPy
 
     integer :: iSurface
@@ -459,8 +480,8 @@ contains
          & doPoloidal = .true., doRadial = .false., iRad = iFcR )
     ! we expect a poloidal face
     call assert( alignment )
-    ! ...on the given radial line
-    call assert( liFcR == iFcR )
+    ! ...and if requested, on the given radial line
+    if (present(iFcR)) call assert( liFcR == iFcR )
 
     ! Find poloidal level line going through the poloidally aligned face
     call findLevelLineForPoints( equ, &
@@ -473,16 +494,18 @@ contains
     ! the face where the new radial line was emitted from).
     if (recomputeIntersection) then
        call intersect_structure(llX(1:llNp), llY(1:llNp), struct, doesIntersect, ipx=newPx, ipy=newPy)
+       if (.not. doesIntersect) then
+          ! This can happen if multiple radial lines are added in one cell of the original grid,
+          ! and the geometry changed such that the intersection vanishes.
+          write (*,*) 'addRadialLine: did not find intersection of face with a structure! Skipping this radial line.'
+          return
+       end if
+       write (*,*) 'addRadialLine: old intersection ', px, py, ', new intersection ', newPx, newPy
+    else
+       newPx = px
+       newPy = py
     end if
 
-    if (.not. doesIntersect) then
-       ! This can happen if multiple radial lines are added in one cell of the original grid,
-       ! and the geometry changed such that the intersection vanishes.
-       write (*,*) 'addRadialLine: did not find intersection of face with a structure! Skipping this radial line.'
-       return
-    end if
-
-    write (*,*) 'addRadialLine: old intersection ', px, py, ', new intersection ', newPx, newPy
 
     ! Add space for new grid points. Shift liFcP + 1 : end up by one
     ! TODO: test that we don't run out of space   
@@ -501,19 +524,21 @@ contains
     grid%ymail(liFcP + 1, liFcR, iReg) = newPy
     
     ! Debug output
-    call csioSetSurface(0)
-    call csioSetRelax(0)
-    call csioOpenFile()
-    call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", llX(1:llNp), lly(1:llNp) )    
-    call siloWriteQuadGrid( csioDbfile, "region", &
-         & 3, grid%nr(iReg), &
-         & grid%xmail(liFcP:liFcP+2, 1:grid%nr(iReg), iReg), &
-         & grid%ymail(liFcP:liFcP+2, 1:grid%nr(iReg), iReg) )
-    call siloWriteQuadGrid( csioDbfile, "oldIntersection", &
-         & 3, 3, siloFakeGridForPointX(px), siloFakeGridForPointY(py) )
-    call siloWriteQuadGrid( csioDbfile, "newIntersection", &
-         & 3, 3, siloFakeGridForPointX(newPx), siloFakeGridForPointY(newPy) )
-    call csioCloseFile()
+    if (DEBUGFILES_ADDRADIALLINE .and. recomputeIntersection) then
+       call csioSetSurface(0)
+       call csioSetRelax(0)
+       call csioOpenFile()
+       call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", llX(1:llNp), lly(1:llNp) )    
+       call siloWriteQuadGrid( csioDbfile, "region", &
+            & 3, grid%nr(iReg), &
+            & grid%xmail(liFcP:liFcP+2, 1:grid%nr(iReg), iReg), &
+            & grid%ymail(liFcP:liFcP+2, 1:grid%nr(iReg), iReg) )
+       call siloWriteQuadGrid( csioDbfile, "oldIntersection", &
+            & 3, 3, siloFakeGridForPointX(px), siloFakeGridForPointY(py) )
+       call siloWriteQuadGrid( csioDbfile, "newIntersection", &
+            & 3, 3, siloFakeGridForPointX(newPx), siloFakeGridForPointY(newPy) )
+       call csioCloseFile()
+    end if
 
     ! For this region iReg: compute new radial points by moving
     ! away from the given point in both directions
@@ -525,7 +550,7 @@ contains
     iSurface = 0
     do ir = lIFcR + 1, grid%nr(iReg)       
        iSurface = iSurface + 1
-       call csioSetSurface(iSurface)
+       call csioSetSurface(delta=1)
        call insertPoints( equ, &
             & grid%xmail(liFcP:liFcP+2, ir-1, iReg), &
             & grid%ymail(liFcP:liFcP+2, ir-1, iReg), &
@@ -536,7 +561,7 @@ contains
     ! Negative direction
     do ir = lIFcR - 1, 1, -1 
        iSurface = iSurface + 1
-       call csioSetSurface(iSurface)
+       call csioSetSurface(delta=1)
        call insertPoints( equ, &
             & grid%xmail(liFcP:liFcP+2, ir + 1, iReg), &
             & grid%ymail(liFcP:liFcP+2, ir + 1, iReg), &
@@ -544,21 +569,76 @@ contains
             & grid%ymail(liFcP:liFcP+2, ir, iReg) )
     end do
 
+    ! Debug output: entire grid
+    if (DEBUGFILES_ADDRADIALLINE) then
+       call csioSetSurface(delta = 1)
+       call csioSetRelax(0)
+       call csioOpenFile()
+       do i = 1, grid%nreg
+          call siloWriteQuadGrid( csioDbfile, 'region'//int2str(i), &
+               & grid%np1(i), grid%nr(i), &
+               & grid%xmail(1:grid%np1(i), 1:grid%nr(i), i), &
+               & grid%ymail(1:grid%np1(i), 1:grid%nr(i), i) )
+       end do
+       call csioCloseFile()    
+    end if   
+
     ! For points on boundary of region, insert
-    ! radial line starting at this point in all other regions
-    ! -> recursive call to addRadialLine
-    do iRegOther = 1, grid%nReg
+    ! radial lines starting at this point in all other regions
+    ! -> recursive calls to addRadialLine, without recomputing structure intersection
+    do iRegOther = 1, grid%nreg
+       if (iRegOther == iReg) cycle
 
+       ! Boundary face (liFcP,1) -> (liFcP+2,1)
+       ! Is this face in the other region?
+       call findFaceInRegion( grid, iRegOther, &
+            & grid%xmail(liFcP, 1, iReg), &
+            & grid%ymail(liFcP, 1, iReg), &
+            & grid%xmail(liFcP + 2, 1, iReg), &
+            & grid%ymail(liFcP + 2, 1, iReg), &
+            & iFcP=iOtherFcP, iFcR=iOtherFcR, regionHasFace = regionHasFace )
 
+       if (regionHasFace) then
+          write (*,*) 'addRadialLine: region ', iReg, ' extending into region ', iRegOther
+          call addRadialLine( equ, struct, grid, &
+               & iRegOther, &
+               & grid%xmail(liFcP+1, 1, iReg), &
+               & grid%ymail(liFcP+1, 1, iReg), &
+               & recomputeIntersection = .false., iFcR = iOtherFcR ) 
+       end if       
+
+       ! Boundary face (liFcP,nrMax) -> (liFcP+2,nrMax)
+       ! Is this face in the other region?
+       call findFaceInRegion( grid, iRegOther, &
+            & grid%xmail(liFcP, grid%nr(iReg), iReg), &
+            & grid%ymail(liFcP, grid%nr(iReg), iReg), &
+            & grid%xmail(liFcP + 2, grid%nr(iReg), iReg), &
+            & grid%ymail(liFcP + 2, grid%nr(iReg), iReg), &
+            & iFcP=iOtherFcP, iFcR=iOtherFcR, regionHasFace = regionHasFace )
+
+       if (regionHasFace) then
+          write (*,*) 'addRadialLine: region ', iReg, ' extending into region ', iRegOther
+          call addRadialLine( equ, struct, grid, &
+               & iRegOther, &
+               & grid%xmail(liFcP+1, grid%nr(iReg), iReg), &
+               & grid%ymail(liFcP+1, grid%nr(iReg), iReg), &
+               & recomputeIntersection = .false., iFcR = iOtherFcR ) 
+       end if
+    end do
+    
     ! Debug output: entire region grid
-    call csioSetSurface(iSurface + 1)
-    call csioSetRelax(0)
-    call csioOpenFile()
-    call siloWriteQuadGrid( csioDbfile, "region", &
-         & grid%np1(iReg), grid%nr(iReg), &
-         & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
-         & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
-    call csioCloseFile()    
+    if (DEBUGFILES_ADDRADIALLINE) then
+       call csioSetSurface(delta = 1)
+       call csioSetRelax(0)
+       call csioOpenFile()
+       do i = 1, grid%nreg
+          call siloWriteQuadGrid( csioDbfile, 'region'//int2str(i), &
+               & grid%np1(i), grid%nr(i), &
+               & grid%xmail(1:grid%np1(i), 1:grid%nr(i), i), &
+               & grid%ymail(1:grid%np1(i), 1:grid%nr(i), i) )
+       end do
+       call csioCloseFile()    
+    end if
 
   end subroutine addRadialLine
 
@@ -641,19 +721,21 @@ contains
     ! (first and last point in nivNewX must already be set correctly...)
 
     ! Write out intermediate grid stage
-    call csioSetRelax( 0 )
+    if (DEBUGFILES_INSERTPOINTS) then
+       call csioSetRelax( 0 )
 
-    call csioOpenFile()
-    tmpMailx(:,1) = refx
-    tmpMailx(:,2) = newx
-    tmpMaily(:,1) = refy
-    tmpMaily(:,2) = newy
-    call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", nivRefX(1:npNivRef), nivRefY(1:npNivRef) )
-    call siloWriteLineSegmentGridFromPoints( csioDbfile, "newLine", nivNewX(1:npNivNew), nivNewY(1:npNivNew) )
-    call siloWriteQuadGrid( csioDbfile, "region", &
-         & size(newx), 2, &
-         & tmpMailx, tmpMaily )            
-    call csioCloseFile()
+       call csioOpenFile()
+       tmpMailx(:,1) = refx
+       tmpMailx(:,2) = newx
+       tmpMaily(:,1) = refy
+       tmpMaily(:,2) = newy
+       call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", nivRefX(1:npNivRef), nivRefY(1:npNivRef) )
+       call siloWriteLineSegmentGridFromPoints( csioDbfile, "newLine", nivNewX(1:npNivNew), nivNewY(1:npNivNew) )
+       call siloWriteQuadGrid( csioDbfile, "region", &
+            & size(newx), 2, &
+            & tmpMailx, tmpMaily )            
+       call csioCloseFile()
+    end if
 
     ! Optimize distribution of grid points according to the criteria,
     ! using the signed relaxation method 
@@ -667,7 +749,8 @@ contains
        ! Like nrelax, pasmin, l0 and l1 come from the COMRLX common block
        ! The two zeros in the clort call are the guard lengths. We effectively 
        ! disable the "proportional distribution" criterion here.
-       lPasmin = 0d0
+       !lPasmin = pasmin * 1e-1
+       lPasmin = 1e-4
        lTgarde = 0d2
        call clort( refx, refy,&
             & newx, newy, &
@@ -728,19 +811,21 @@ contains
              endif
           enddo
             
-          call csioSetRelax( i )
-          call csioOpenFile()
-          tmpMailx(:,1) = refx
-          tmpMailx(:,2) = newx
-          tmpMaily(:,1) = refy
-          tmpMaily(:,2) = newy
-          call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", nivRefX(1:npNivRef), nivRefY(1:npNivRef) )
-          call siloWriteLineSegmentGridFromPoints( csioDbfile, "newLine", nivNewX(1:npNivNew), nivNewY(1:npNivNew) )
-          call siloWriteQuadGrid( csioDbfile, "region", &
-               & size(newx), 2, &
-               & tmpMailx, tmpMaily )            
-          call csioCloseFile()
-          
+          if (DEBUGFILES_INSERTPOINTS) then
+             call csioSetRelax( i )
+             call csioOpenFile()
+             tmpMailx(:,1) = refx
+             tmpMailx(:,2) = newx
+             tmpMaily(:,1) = refy
+             tmpMaily(:,2) = newy
+             call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", nivRefX(1:npNivRef), nivRefY(1:npNivRef) )
+             call siloWriteLineSegmentGridFromPoints( csioDbfile, "newLine", nivNewX(1:npNivNew), nivNewY(1:npNivNew) )
+             call siloWriteQuadGrid( csioDbfile, "region", &
+                  & size(newx), 2, &
+                  & tmpMailx, tmpMaily )            
+             call csioCloseFile()
+          end if
+
           if(maxval(abs(critNew)) <= rlcept) exit
        enddo
        
@@ -828,8 +913,10 @@ contains
   contains
     
     ! Compute a normalized measure of point-face distance for the purpose
-    ! of finding the face closest to a point. This is not a real distance
-    ! measure!
+    ! of finding the face closest to a point. This is not a proper distance
+    ! measure! Just a simple thing that seems to work, at least for the
+    ! assumption that the (px,py) is really close to the face we are looking
+    ! for, compared to all other faces.
     double precision function normFaceDist(fx1, fy1, fx2, fy2, px, py)      
       double precision, intent(in) :: fx1, fy1, fx2, fy2, px, py
 
@@ -842,6 +929,93 @@ contains
     end function normFaceDist
 
   end subroutine findFaceForPoint
+
+  !> Check whether a given face is part of a region, and return information
+  !> about its location and alignment.
+  !> Alignment, as usual: .true. = poloidal, .false. = radial
+  subroutine findFaceInRegion( grid, iReg, &
+            & xFrom, yFrom, xTo, yTo, &
+            & iFcP, iFcR, regionHasFace, alignment )
+
+    type(CarreGrid), intent(in) :: grid
+    integer, intent(in) :: iReg
+    double precision, intent(in) :: xFrom, yFrom, xTo, yTo
+    integer, intent(out), optional :: iFcP, iFcR
+    logical, intent(out), optional :: regionHasFace, alignment    
+
+    ! internal
+    integer :: ip, ir, ipTo, irTo, iAlign
+    logical :: match, lAlignment
+
+    do ip = 1, grid%np1(iReg)
+       do ir = 1, grid%nr(iReg)
+          
+          do iAlign = 1, 2
+             
+             select case (iAlign)
+             case(1) ! poloidal direction                
+                if (ip == grid%np1(iReg)) cycle
+                ipTo = ip + 1
+                irTo = ir
+                lAlignment = .true.
+             case(2) ! radial direction
+                if (ir == grid%nr(iReg)) cycle
+                ipTo = ip
+                irTo = ir + 1
+                lAlignment = .false.
+             end select
+             
+             ! test face identity, accounting for switched points
+             match = &
+                  & ( identical(grid%xmail(ip, ir, iReg), &
+                  &             grid%ymail(ip, ir, iReg), xFrom, yFrom)&
+                  & .and. &
+                  &   identical(grid%xmail(ipTo, irTo, iReg), &
+                  &             grid%ymail(ipTo, irTo, iReg), xTo, yTo) ) &
+                  & .or. &
+                  &  ( identical(grid%xmail(ip, ir, iReg), &
+                  &              grid%ymail(ip, ir, iReg), xTo, yTo)&
+                  & .and. &
+                  &    identical(grid%xmail(ipTo, irTo, iReg), &
+                  &              grid%ymail(ipTo, irTo, iReg), xFrom, yFrom) )
+             
+             if (match) then
+                ! return results
+                if (present(alignment)) alignment = lAlignment
+                if (present(iFcP)) iFcP = ip
+                if (present(iFcR)) iFcR = ir
+                if (present(regionHasFace)) regionHasFace = .true.
+                return
+             end if
+             
+          end do
+       end do    
+    end do
+
+    ! if we arrive here, nothing was found
+    if (present(iFcP)) iFcP = GRID_UNDEFINED
+    if (present(iFcR)) iFcR = GRID_UNDEFINED
+    if (present(regionHasFace)) regionHasFace = .false.
+
+  contains
+
+    logical function identical( x1, y1, x2, y2 )     
+      double precision, intent(in) :: x1, y1, x2, y2
+
+      ! internal
+      double precision :: dist
+      external :: dist
+
+      double precision, parameter :: ABSTOL = 1e-9
+
+      identical = ( dist(x1, y1, x2, y2) < ABSTOL )
+
+    end function identical
+    
+  end subroutine findFaceInRegion
+
+
+
 
   
   !> Compute minimum distance of a point to a curve, by 

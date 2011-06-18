@@ -3,7 +3,11 @@ module carre_main
   use carre_types
   use CarreDiagnostics
   use itm_string
+  use carre_virtualstructures
+#ifdef USE_SILO
+  use SiloIO
   use CarreSiloIO
+#endif
 
   implicit none
 
@@ -26,7 +30,7 @@ contains
 
 
     ! internal
-    integer :: isetup, i, j, itmp, is, ip
+    integer :: isetup, i, j, itmp, is, ip, iLine
 
 
     REAL*8, PARAMETER :: stp0=0.01, stpmin=0.001
@@ -139,6 +143,19 @@ contains
                 &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
                 &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
 
+#ifdef USE_SILO
+            ! write results of first postprocessing step
+            call csioOpenFile('carreLevelLines')
+
+            ! limiting level lines
+            do iLine = 1, struct%nbniv
+               call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iLine), &
+                    & struct%nivx(1:struct%nivtot(iLine), iLine), &
+                    & struct%nivy(1:struct%nivtot(iLine), iLine) )
+            end do
+#endif
+
+
 
             ! If no virtual targets are to be created, exit loop and go directly to grid generation           
             if ( .not. dovirtualtargets ) exit
@@ -158,12 +175,10 @@ contains
 
             !..   10.1  Set up virtual targets
 
-            CALL VIRTUALTARGETS(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
+            CALL VIRTUALTARGETS(equ, struct, &
+                 & equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
                 &       equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
-                &       struct%rnstruc,struct%rnpstru,struct%rxstruc,struct%rystruc,&
-                &       struct%indplq,struct%inddef,struct%nbdef, & 
-                &       equ%a00,equ%a10,equ%a01,equ%a11,&
-                &       struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
+                &       equ%a00,equ%a10,equ%a01,equ%a11 )
 
             !..   10.2  Set up virtual limiters
 
@@ -171,12 +186,16 @@ contains
 !!$                & equ%npx,equ%ptx,equ%pty, & 
 !!$                & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
 
+            !..   10.2.1 Diagnostics: Write out resulting structures
 #ifdef USE_SILO
             call csioGetStructureSegments( struct%nstruc, struct%npstru, &
                  & struct%xstruc, struct%ystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
-#endif
 
-            !..   10.2.1 Diagnostics: Write out resulting structures
+            call csioOpenFile('carreVirtualStr')
+            call csioOpenFile()
+            call csioCloseFile()                         
+
+#endif
 
             open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
             do is = 1, struct%nstruc

@@ -13,10 +13,16 @@ module CarreSiloIO
 #include <CARREDIM.F>
   
   integer :: iReg = 0, iSurf = 0, iRelax = 0
+  integer :: iRegSave = 0, iSurfSave = 0, iRelaxSave = 0
   integer :: csioDbfile
   logical :: fileopen = .false.
 
-  character(5+4+3+3), save :: filename = 'carre000100100001'
+  character(5), parameter :: FILENAMEBASE_DEFAULT = 'carre'
+  character(5), save :: filenameBase = FILENAMEBASE_DEFAULT, filenameBaseSave
+
+  character(5+3+4+3), save :: filename = 'carre0010001001'
+  character(*), parameter :: FILENAME_EXTENSION = '.silo'
+  character(*), parameter :: FILENAME_FORMAT = '(a5,i3.3,i4.4,i3.3)' ! ireg, isurf, irelax
 
   integer :: csioStrucNSeg
   real(rKind), allocatable, dimension(:,:,:) :: csioStrucSegments
@@ -25,7 +31,8 @@ module CarreSiloIO
 
   private
   public csioOpenFile, csioCloseFile
-  public csioSetRegion, csioSetSurface, csioSetRelax, csioSetFilename, csioGetStructureSegments
+  public csioSetRegion, csioSetSurface, csioSetRelax, csioSetFilename, csioSetFilenameBase, csioGetStructureSegments
+  public csioSaveCounters, csioRestoreCounters
   public csioStrucNSeg, csioStrucSegments
   public csioVirtualStrucNSeg, csioVirtualStrucSegments
 
@@ -40,8 +47,8 @@ contains
 
     call csioSetFilename(name)
 #ifdef USE_SILO
-    call logmsg(LOGDEBUG, "CarreSiloIO.csioOpenFile: opening file "//filename)
-    call siloOpen( filename, csioDbfile )
+    call logmsg(LOGDEBUG, "CarreSiloIO.csioOpenFile: opening file "//filename//FILENAME_EXTENSION)
+    call siloOpen( filename//FILENAME_EXTENSION, csioDbfile )
 #endif
     fileopen = .true.
 
@@ -57,15 +64,25 @@ contains
   end subroutine csioOpenFile
 
   subroutine csioCloseFile()
-    if ( fileopen ) then 
-       
+    if ( fileopen ) then        
 #ifdef USE_SILO       
        call logmsg(LOGDEBUG, "CarreSiloIO.csioCloseFile: closing file "//filename)    
        call siloClose( csioDbfile )
 #endif
-            fileopen = .false.
+       fileopen = .false.
     end if
   end subroutine csioCloseFile
+
+  subroutine csioSetFilenameBase( base )
+    character(5), intent(in), optional :: base
+
+    if (present(base)) then
+       filenameBase = base
+    else
+       filenameBase = FILENAMEBASE_DEFAULT
+    end if
+
+  end subroutine csioSetFilenameBase
 
   subroutine csioSetRegion( diReg )
     integer, intent(in) :: diReg
@@ -75,19 +92,23 @@ contains
     call csioCloseFile()
   end subroutine csioSetRegion
  
-  subroutine csioSetSurface( diSurf )
-    integer, intent(in) :: diSurf
+  subroutine csioSetSurface( diSurf, delta )
+    integer, intent(in), optional :: diSurf, delta
 
-    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetSurface: surface "//int2str(diSurf))    
-    iSurf = diSurf
+    if (present(diSurf)) iSurf = diSurf       
+    if (present(delta)) iSurf = iSurf + delta
+
+    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetSurface: surface "//int2str(iSurf))    
     call csioCloseFile()
   end subroutine csioSetSurface
 
-  subroutine csioSetRelax( diRelax )
-    integer, intent(in) :: diRelax
+  subroutine csioSetRelax( diRelax, delta )
+    integer, intent(in), optional :: diRelax, delta
 
-    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetRelax: relaxation "//int2str(diRelax))    
-    iRelax = diRelax
+    if (present(diRelax)) iRelax = diRelax
+    if (present(delta)) iRelax = iRelax + delta
+
+    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetRelax: relaxation "//int2str(iRelax))    
     call csioCloseFile()
   end subroutine csioSetRelax
 
@@ -96,13 +117,28 @@ contains
     character(len(filename)), intent(in), optional :: name
 
     if (present(name)) then 
-            call csioCloseFile()
-            filename = name
+       call csioCloseFile()
+       filename = name
     else
-            write ( filename, '(a5,i4.4,i3.3,i3.3)' ) 'carre', ireg, isurf, irelax
+       write ( filename, FILENAME_FORMAT ) filenameBase, ireg, isurf, irelax
     end if
   end subroutine csioSetFilename
 
+  !> Save counter variables into save* variables for restoring them later.
+  subroutine csioSaveCounters()
+    filenameBaseSave = filenameBase
+    iRegSave = iReg
+    iSurfSave = iSurf
+    iRelaxSave = iRelax
+  end subroutine csioSaveCounters
+
+  !> Restore counter variables from save* variables
+  subroutine csioRestoreCounters()
+    filenameBase = filenameBaseSave
+    iReg = iRegSave
+    iSurf = iSurfSave
+    iRelax = iRelaxSave
+  end subroutine csioRestoreCounters
 
   !> Get a description of a line segment grid as expected by siloWriteLineSegmentGrid
   !> Segments: dim. 1: segment index, dim. 2: 1 = x coordinate, 2 = y coordinate, dim. 3: 1 = start point, 2 = end point,

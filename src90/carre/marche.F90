@@ -39,7 +39,7 @@
       PARAMETER (const1=1.E-08)
       REAL*8 pas,x1,y1,x2,y2,psi1,psi2,pastmp,ecart1,ecart2, & 
      &       niv1x(npnimx),niv1y(npnimx)
-      LOGICAL echec,coin,ouvert
+      LOGICAL echec,coin,ouvert, crbnivFailed
 
 !  procedures
       INTEGER ifind,indsgm
@@ -183,7 +183,10 @@
 
    10 CONTINUE
 
-      IF (pastmp .LT. 0.5*stpmin) RETURN
+      IF (pastmp .LT. 0.5*stpmin) then
+         write (*,*) 'marche: stopping level line search because minimum stepping delta reached'
+         RETURN
+      end IF
 
       x1 = x2
       y1 = y2
@@ -237,6 +240,12 @@
 !     print*,'ind1, ind2=',ind1,ind2
 !***
 
+      ! If we stepped onto the next structure segment, 
+      ! set the current stepping point to the node connecting
+      ! the two segments. 
+      ! FIXME: this is pretty broken, because if we are unlucky
+      ! pas is set to a very small value, which causes the 
+      ! iterative last-level-line-search to terminate
       IF (ind1 .NE. ind2) THEN
 
          COIN = .TRUE.
@@ -424,8 +433,16 @@
 
          CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
      &          niv1x,niv1y,nstruc,npstru,xstruc, & 
-     &          ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
-         if(indstr.ne.0 .and. indstr.ne.fraplq) indlim=indstr
+     &          ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2, &
+     &          allowFail = .true., failed = crbnivFailed)
+         
+         if (crbnivFailed) then 
+            ! finding the level line failed, try error handling
+            echec = .true.
+         else
+            ! ...everything ok, continue normally
+            if(indstr.ne.0 .and. indstr.ne.fraplq) indlim=indstr
+         end if
 !***
 !     print*,'apres crbniv3: k, indstr=',k,indstr
 !     do j=1,k
