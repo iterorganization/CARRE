@@ -22,7 +22,7 @@ module carre_postprocess
   public carre_postprocess_computation
 
   ! Number of faces of a cell. 
-  ! Bit positions in grid%faceflag marking that faces of a cell are intersected
+  ! Bit positions in grid%cellFaceFlag marking that faces of a cell are intersected
   integer, parameter :: INDEX_FACE_LEFT = 1
   integer, parameter :: INDEX_FACE_BOTTOM = 2
   integer, parameter :: INDEX_FACE_RIGHT = 3
@@ -45,7 +45,7 @@ contains
 
     ! internal
     integer :: iReg, iPol, iRad, iFace
-    double precision :: xx(2), yy(2)
+    logical :: doesIntersect
 
     ! Initialize grid%nr (TODO: move this into the actual gridding routines,
     ! maille.F90. Currently not possible because they are not fully converted
@@ -59,49 +59,17 @@ contains
        grid%lineFlagRad(1, iReg) = GRIDLINE_REQUIRED
        grid%lineFlagRad(grid%np1(iReg), iReg) = GRIDLINE_REQUIRED
     end do
+    ! TODO: the grid lines going into the x-point are also required...
 
-    ! TODO: the grid line going into the x-point is also required...
+    ! Compute face/structure intersections
+    call computeFaceStructureIntersections( struct, grid )
 
+    ! Mark points to be inside/outside of vessel
+    call labelPointsInsideOutside(equ, grid)
 
-    ! Identify cells that are intersected by vessel structure
-    grid%faceflag = 0
-    grid%cellflag = GRID_UNDEFINED
+    ! Compute the object categorization
+    call categorizeCellsAndFaces()
 
-    do iReg = 1, grid%nreg
-
-        do iPol = 1, grid%np1(iReg) - 1
-            do iRad = 1, grid%nr(iReg) - 1
-
-                do iFace = 1, 4
-
-                    ! fill xx, yy
-                    call getFace(iFace)
-
-                    call intersect_structure( xx, yy, &
-                        & struct, grid%faceISec(iFace, iPol, iRad, iReg), &
-                        & ipx = grid%faceISecPx(iFace, iPol, iRad, iReg), &
-                        & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )
-
-                    if (grid%faceISec(iFace, iPol, iRad, iReg)) then     
-                        grid%faceflag(iPol, iRad, iReg) = &
-                            & ibset(grid%faceflag(iPol, iRad, iReg), iFace)
-                    end if
-                end do
-
-            end do
-        end do
-    end do
-
-    ! Translate the grid%faceflag array into cell flags
-    ! First assume all boundary cells are problematic
-    where (grid%faceflag /= GRID_UNDEFINED) grid%cellflag = GRID_BOUNDARY_REFINE
-    ! Then figure out which ones are ok (the ones where opposite faces
-    ! are intersected)
-    where (btest(grid%faceflag, INDEX_FACE_LEFT) .and. btest(grid%faceflag, INDEX_FACE_RIGHT)) grid%cellflag = GRID_BOUNDARY
-    where (btest(grid%faceflag, INDEX_FACE_TOP) .and. btest(grid%faceflag, INDEX_FACE_BOTTOM)) grid%cellflag = GRID_BOUNDARY
-
-    ! Mark cells to be inside/outside of vessel
-    call labelCells(equ, grid)
 
 #ifdef USE_SILO
     ! write results of first postprocessing step
@@ -113,8 +81,8 @@ contains
             & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
 
         call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
-            & 'faceflag'//int2str(iReg), &
-            & real(grid%faceflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
+            & 'cellFaceFlag'//int2str(iReg), &
+            & real(grid%cellFaceFlag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
             & DB_ZONECENT )
         call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
             & 'cellflag'//int2str(iReg), &
@@ -130,6 +98,9 @@ contains
     end do
 #endif
 
+    stop
+
+
     ! Fix broken cells by modifying the grid accordingly
     call fixCells(equ, struct, grid)
 
@@ -144,6 +115,136 @@ contains
     end do
 #endif
 
+  contains
+
+    subroutine categorizeCellsAndFaces()
+
+      ! internal
+      integer :: cellIntNodeCount(npmamx-1,nrmamx-1,nregmx)
+      logical :: candidate(npmamx-1,nrmamx-1,nregmx)
+
+      ! Transfer face intersection information to cells (filling grid%cellFaceFlag)
+      grid%cellFaceFlag = 0
+
+      do iReg = 1, grid%nreg
+
+         do iPol = 1, grid%np1(iReg) - 1
+            do iRad = 1, grid%nr(iReg) - 1
+
+               do iFace = 1, 4 ! left, bottom, right, top
+
+                  select case (iFace)
+                  case(FACE_LEFT) ! left
+                     doesIntersect = grid%faceISec(FACE_RADIAL, iPol, iRad, iReg)
+                  case(FACE_BOTTOM) ! bottom
+                     doesIntersect = grid%faceISec(FACE_POLOIDAL, iPol, iRad, iReg)
+                  case(FACE_RIGHT) ! right
+                     doesIntersect = grid%faceISec(FACE_RADIAL, iPol + 1, iRad, iReg)
+                  case(FACE_TOP) ! top
+                     doesIntersect = grid%faceISec(FACE_POLOIDAL, iPol, iRad + 1, iReg)
+                  end select
+
+                  if (doesIntersect) then     
+                     grid%cellFaceFlag(iPol, iRad, iReg) = &
+                          & ibset(grid%cellFaceFlag(iPol, iRad, iReg), iFace)
+                  end if
+               end do
+
+            end do
+         end do
+      end do
+
+      ! First mark cells internal/external
+      ! Cell is internal if at least one point is internal
+      grid%cellFlag = GRID_EXTERNAL
+
+      cellIntNodeCount = 0
+      do iReg = 1, grid%nreg
+
+         do iPol = 1, grid%np1(iReg) - 1
+            do iRad = 1, grid%nr(iReg) - 1
+
+               if ( grid%pointFlag(iPol, iRad, iReg) == GRID_INTERNAL ) &
+                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
+               if ( grid%pointFlag(iPol+1, iRad, iReg) == GRID_INTERNAL ) &
+                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
+               if ( grid%pointFlag(iPol, iRad+1, iReg) == GRID_INTERNAL ) &
+                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
+               if ( grid%pointFlag(iPol+1, iRad+1, iReg) == GRID_INTERNAL ) &
+                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
+
+               if (cellIntNodeCount(iPol, iRad, iReg) > 0) &
+                    & grid%cellFlag(iPol, iRad, iReg) = GRID_INTERNAL
+
+            end do
+         end do
+      end do
+
+
+      ! Translate the grid%cellFaceFlag array into cell flags
+      ! First assume all boundary cells are unproblematic
+      where ( (grid%cellFaceFlag /= GRID_UNDEFINED) .and. (grid%cellFlag == GRID_INTERNAL) ) &
+           & grid%cellflag = GRID_BOUNDARY
+
+
+      ! Then figure out which ones must be refined: cells with more than five edges
+      ! Current recipe:
+      ! -cells with three internal points
+      ! -that have intersections in adjacent faces
+
+      candidate = .false.
+
+      ! adjacent faces intersected?
+      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
+      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
+      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
+      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
+
+      where (candidate .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
+
+    end subroutine categorizeCellsAndFaces
+
+  end subroutine carre_postprocess_computation
+
+
+  !> Compute face/structure intersections and fill the
+  !> grid%faceISec, grid%faceISecPx/y arrays
+  subroutine computeFaceStructureIntersections( struct, grid )
+    type(CarreStructures), intent(in) :: struct
+    type(CarreGrid), intent(inout) :: grid
+
+    ! internal
+    integer :: iReg, iPol, iRad, iFace
+    double precision :: xx(2), yy(2)
+
+    ! Mark faces intersected by structure elements
+    grid%faceISec = .false.
+
+    do iReg = 1, grid%nreg
+
+        do iPol = 1, grid%np1(iReg)
+            do iRad = 1, grid%nr(iReg)
+                do iFace = 1, 2 ! poloidal, radial
+
+                   ! Skip nonexisting faces
+                   select case (iFace)
+                   case(FACE_POLOIDAL) ! poloidal
+                      if (iPol == grid%np1(iReg)) cycle
+                   case(FACE_RADIAL) ! radial
+                      if (iRad == grid%nr(iReg)) cycle
+                   end select
+
+                    ! fill xx, yy with face start-, endpoint
+                    call getFace(iFace)
+
+                    call intersect_structure( xx, yy, &
+                        & struct, grid%faceISec(iFace, iPol, iRad, iReg), &
+                        & ipx = grid%faceISecPx(iFace, iPol, iRad, iReg), &
+                        & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )
+                end do
+            end do
+        end do
+    end do
 
   contains
 
@@ -151,31 +252,22 @@ contains
       integer, intent(in) :: iFace
 
       select case (iFace)
-      case(1) ! Left face of cell
-          xx(1) = grid%xmail(iPol, iRad, iReg)
-          yy(1) = grid%ymail(iPol, iRad, iReg)
-          xx(2) = grid%xmail(iPol, iRad + 1, iReg)
-          yy(2) = grid%ymail(iPol, iRad + 1, iReg)
-      case(2) ! Bottom face of cell
+      case(1) ! Poloidal face (iPol, iRad) -> (iPol+1, iRad)
           xx(1) = grid%xmail(iPol, iRad, iReg)
           yy(1) = grid%ymail(iPol, iRad, iReg)
           xx(2) = grid%xmail(iPol + 1, iRad, iReg)
           yy(2) = grid%ymail(iPol + 1, iRad, iReg)              
-      case(3) ! Right face of cell
-          xx(1) = grid%xmail(iPol + 1, iRad, iReg)
-          yy(1) = grid%ymail(iPol + 1, iRad, iReg)
-          xx(2) = grid%xmail(iPol + 1, iRad + 1, iReg)
-          yy(2) = grid%ymail(iPol + 1, iRad + 1, iReg)
-      case(4) ! Top face of cell
-          xx(1) = grid%xmail(iPol, iRad + 1, iReg)
-          yy(1) = grid%ymail(iPol, iRad + 1, iReg)
-          xx(2) = grid%xmail(iPol + 1, iRad + 1, iReg)
-          yy(2) = grid%ymail(iPol + 1, iRad + 1, iReg)
+      case(2) ! Radial face (iPol, iRad) -> (iPol, iRad + 1)
+          xx(1) = grid%xmail(iPol, iRad, iReg)
+          yy(1) = grid%ymail(iPol, iRad, iReg)
+          xx(2) = grid%xmail(iPol, iRad + 1, iReg)
+          yy(2) = grid%ymail(iPol, iRad + 1, iReg)
       end select
 
     end subroutine getFace
 
-  end subroutine carre_postprocess_computation
+  end subroutine computeFaceStructureIntersections
+
 
   !> Compute intersection of a line segment curve with the structure elements
   subroutine intersect_structure(xx, yy, struct, doesIntersect, iStruct, &
@@ -209,126 +301,234 @@ contains
   end subroutine intersect_structure
 
 
-  !> Label cells to be in/outside of the vessel
-  subroutine labelCells(equ, grid )      
+!!$  !> Label cells to be in/outside of the vessel
+!!$  subroutine labelCells(equ, grid )      
+!!$    type(CarreEquilibrium), intent(in) :: equ
+!!$    type(CarreGrid), intent(inout) :: grid
+!!$
+!!$    ! internal
+!!$    integer :: iReg, xip, xir
+!!$    integer :: cells(npmamx-1,nrmamx-1,nregmx)
+!!$
+!!$    cells = GRID_UNDEFINED
+!!$
+!!$    do iReg = 1, grid%nreg
+!!$        ! For region, find a cell next to x-point (which will be on the inside)
+!!$        call findXPointCell(xip, xir)
+!!$
+!!$        ! Walk away from there (recursively?) until all cells are marked
+!!$        ! For limiter, just take a cell on the core boundary.
+!!$        call markInternalCells(xip, xir, cells)
+!!$    end do
+!!$
+!!$    ! all cells that are still undefined are external
+!!$    where (cells == GRID_UNDEFINED) cells = GRID_EXTERNAL
+!!$
+!!$    grid%cellflag = cells
+!!$
+!!$  contains
+!!$
+!!$    !> Mark internal cells 
+!!$    recursive subroutine markInternalCells(ip, ir, cells)
+!!$      integer, intent(in) :: ip, ir
+!!$      integer :: cells(npmamx-1,nrmamx-1,nregmx)
+!!$
+!!$      ! internal
+!!$      integer :: iNb
+!!$      integer, parameter :: NNEIGHBOUR = 8
+!!$      integer, parameter :: &
+!!$          & dp(NNEIGHBOUR) = (/ -1, -1,  0, +1, +1, +1,  0, -1 /), &
+!!$          & dr(NNEIGHBOUR) = (/  0, -1, -1, -1,  0, +1, +1, +1 /)
+!!$
+!!$      ! Is this cell inside the region?
+!!$      if ( (ip <= 0) .or. (ir <= 0) &
+!!$          & .or. (ip >= grid%np1(iReg)) .or. (ir >= grid%nr(iReg)) ) then
+!!$          ! no -> skip
+!!$          return
+!!$      end if
+!!$
+!!$      ! Have we visited this cell before?
+!!$      if ( cells(ip, ir, iReg) /= GRID_UNDEFINED ) then
+!!$          ! Yes -> skip
+!!$          return 
+!!$      end if
+!!$
+!!$      ! We are coming from an internal cell. 
+!!$      ! Figure out situation of current cell from intersection test.
+!!$      select case (grid%cellflag(ip, ir, iReg))
+!!$      case(GRID_BOUNDARY, GRID_BOUNDARY_REFINE)
+!!$          ! hit a boundary cell - transfer flag, return
+!!$          cells(ip, ir, iReg) = grid%cellflag(ip, ir, iReg)
+!!$          return
+!!$      end select
+!!$
+!!$      ! This is an internal cell
+!!$      cells(ip, ir, iReg) = GRID_INTERNAL
+!!$
+!!$      ! proceed into all eight neighbour cells
+!!$      do iNb = 1, NNEIGHBOUR 
+!!$          call markInternalCells(ip + dp(iNb), ir + dr(iNb), cells)
+!!$      end do
+!!$    end subroutine markInternalCells
+!!$
+!!$    ! Find cell in current region which is next to an x-point
+!!$    subroutine findXPointCell(xipol,xirad)
+!!$      integer, intent(out) :: xipol, xirad
+!!$
+!!$      ! internal
+!!$      integer :: ipol, irad, ipx
+!!$      double precision :: dx
+!!$      double precision, parameter :: XPOINT_TOL = 1e-6
+!!$      real*8 :: dist
+!!$      external dist
+!!$
+!!$      ! search for x-point in this region
+!!$      do iPol = 1, grid%np1(iReg)
+!!$          do iRad = 1, grid%nr(iReg)
+!!$
+!!$              ! check distance for all x-points
+!!$              do ipx = 1, equ%npx
+!!$                  dx = dist( equ%ptx(ipx), equ%pty(ipx), &
+!!$                      & grid%xmail(iPol, iRad, iReg), &
+!!$                      & grid%ymail(iPol, iRad, iReg) )
+!!$
+!!$                  if (dx < XPOINT_TOL) then
+!!$                      ! found an x-point, return cell indices
+!!$                      xipol = ipol
+!!$                      xirad = irad
+!!$                      ! if we are at the upper boundary line,
+!!$                      ! move back into cell 
+!!$                      if (xipol == grid%np1(iReg)) &
+!!$                          & xipol = xipol - 1
+!!$                      if (xirad == grid%nr(iReg)) &
+!!$                          & xirad = xirad - 1
+!!$
+!!$                      write (*,*) "findXPointCell: region ", iReg, ", found x-point&
+!!$                          & at ", xipol, xirad, ", position ", equ%ptx(ipx), &
+!!$                          & equ%pty(ipx)
+!!$                      return
+!!$                  end if
+!!$
+!!$              end do
+!!$
+!!$          end do
+!!$      end do
+!!$
+!!$      ! if we arrive here, no cell next to an x-point was found
+!!$      xipol = GRID_UNDEFINED
+!!$      xirad = GRID_UNDEFINED
+!!$
+!!$    end subroutine findXPointCell
+!!$
+!!$  end subroutine labelCells
+
+
+  !> Label points to be in/outside of the vessel by stepping along faces
+  !> and exploiting the intersection information
+  subroutine labelPointsInsideOutside( equ, grid )      
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreGrid), intent(inout) :: grid
 
     ! internal
     integer :: iReg, xip, xir
-    integer :: cells(npmamx-1,nrmamx-1,nregmx)
+    integer :: points(npmamx,nrmamx,nregmx)
 
-    cells = GRID_UNDEFINED
+    points = GRID_UNDEFINED
 
     do iReg = 1, grid%nreg
-        ! For region, find a cell next to x-point (which will be on the inside)
-        call findXPointCell(xip, xir)
+        ! For region, find an x-point (which is declared to be on the inside)
+        ! TODO: for limiter, just take any point on the core boundary.
+        call findXPointInRegion(equ, grid, iReg, xip, xir)
 
-        ! Walk away from there (recursively?) until all cells are marked
-        ! For limiter, just take a cell on the core boundary.
-        call markInternalCells(xip, xir, cells)
+        ! Walk away from there (recursively) until all points are marked.
+        ! (this recursion will do transitions between the regions)
+        call markInternalPoints(xip, xir, iReg, points)
     end do
 
-    ! all cells that are still undefined are external
-    where (cells == GRID_UNDEFINED) cells = GRID_EXTERNAL
+    ! all points that are still undefined are external
+    where (points == GRID_UNDEFINED) points = GRID_EXTERNAL
 
-    grid%cellflag = cells
+    grid%pointFlag = points
 
   contains
 
-    !> Mark internal cells 
-    recursive subroutine markInternalCells(ip, ir, cells)
-      integer, intent(in) :: ip, ir
-      integer :: cells(npmamx-1,nrmamx-1,nregmx)
+    !> Mark face starting at (ip,ir) in direction iFaceDir 
+    !> as internal and mark connected faces recursively
+    recursive subroutine markInternalPoints(ip, ir, iReg, points)
+      integer, intent(in) :: ip, ir, iReg
+      integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
 
       ! internal
-      integer :: iNb
-      integer, parameter :: NNEIGHBOUR = 8
-      integer, parameter :: &
-          & dp(NNEIGHBOUR) = (/ -1, -1,  0, +1, +1, +1,  0, -1 /), &
-          & dr(NNEIGHBOUR) = (/  0, -1, -1, -1,  0, +1, +1, +1 /)
+      logical :: faceIntersect
+      integer :: ipOther, irOther, iRegOther
 
-      ! Is this cell inside the region?
-      if ( (ip <= 0) .or. (ir <= 0) &
-          & .or. (ip >= grid%np1(iReg)) .or. (ir >= grid%nr(iReg)) ) then
+      ! Is this point inside the region?
+      if ( (ip < 1) .or. (ir < 1) &
+          & .or. (ip > grid%np1(iReg)) .or. (ir > grid%nr(iReg)) ) then
           ! no -> skip
           return
       end if
 
-      ! Have we visited this cell before?
-      if ( cells(ip, ir, iReg) /= GRID_UNDEFINED ) then
+      ! Have we visited this point before?
+      if ( points(ip, ir, iReg) /= GRID_UNDEFINED ) then
           ! Yes -> skip
           return 
       end if
 
-      ! We are coming from an internal cell. 
-      ! Figure out situation of current cell from intersection test.
-      select case (grid%cellflag(ip, ir, iReg))
-      case(GRID_BOUNDARY, GRID_BOUNDARY_REFINE)
-          ! hit a boundary cell - transfer flag, return
-          cells(ip, ir, iReg) = grid%cellflag(ip, ir, iReg)
-          return
-      end select
+      ! So this point is internal
+      points(ip, ir, iReg) = GRID_INTERNAL
 
-      ! This is an internal cell
-      cells(ip, ir, iReg) = GRID_INTERNAL
+      ! Now go to all points connect to this one via a face that
+      ! is not intersect by a structure element
 
-      ! proceed into all eight neighbour cells
-      do iNb = 1, NNEIGHBOUR 
-          call markInternalCells(ip + dp(iNb), ir + dr(iNb), cells)
-      end do
-    end subroutine markInternalCells
+      ! radial direction
+      ! ...go along top face
+      if (ir < grid%nr(iReg)) then
+         faceIntersect = grid%faceISec(FACE_RADIAL, ip, ir, iReg)
+         if (.not. faceIntersect) then
+            call markInternalPoints(ip, ir+1, iReg, points)
+         end if
+      end if
+      ! ...go along bottom face
+      if (ir > 1) then
+         faceIntersect = grid%faceISec(FACE_RADIAL, ip, ir-1, iReg)
+         if (.not. faceIntersect) then
+            call markInternalPoints(ip, ir-1, iReg, points)
+         end if
+      end if
 
-    ! Find cell in current region which is next to an x-point
-    subroutine findXPointCell(xipol,xirad)
-      integer, intent(out) :: xipol, xirad
+      ! poloidal direction
+      ! ...go along right face
+      if (ip < grid%np1(iReg)) then
+         faceIntersect = grid%faceISec(FACE_POLOIDAL, ip, ir, iReg)
+         if (.not. faceIntersect) then
+            call markInternalPoints(ip+1, ir, iReg, points)
+         end if
+      end if
+      ! ...go along left face
+      if (ip > 1) then
+         faceIntersect = grid%faceISec(FACE_POLOIDAL, ip-1, ir, iReg)
+         if (.not. faceIntersect) then
+            call markInternalPoints(ip-1, ir, iReg, points)
+         end if
+      end if
 
-      ! internal
-      integer :: ipol, irad, ipx
-      double precision :: dx
-      double precision, parameter :: XPOINT_TOL = 1e-6
-      real*8 :: dist
-      external dist
+      ! Finally, also propagate the information that this point
+      ! is internal to the other grid regions
+      do iRegOther = 1, grid%nreg
+         if (iRegOther == iReg) cycle
+         call findPointInRegion(grid, iRegOther, grid%xmail(ip, ir, iReg), &
+              & grid%ymail(ip, ir, iReg), &
+              & ipOther, irOther)
 
-      ! search for x-point in this region
-      do iPol = 1, grid%np1(iReg)
-          do iRad = 1, grid%nr(iReg)
-
-              ! check distance for all x-points
-              do ipx = 1, equ%npx
-                  dx = dist( equ%ptx(ipx), equ%pty(ipx), &
-                      & grid%xmail(iPol, iRad, iReg), &
-                      & grid%ymail(iPol, iRad, iReg) )
-
-                  if (dx < XPOINT_TOL) then
-                      ! found an x-point, return cell indices
-                      xipol = ipol
-                      xirad = irad
-                      ! if we are at the upper boundary line,
-                      ! move back into cell 
-                      if (xipol == grid%np1(iReg)) &
-                          & xipol = xipol - 1
-                      if (xirad == grid%nr(iReg)) &
-                          & xirad = xirad - 1
-
-                      write (*,*) "findXPointCell: region ", iReg, ", found x-point&
-                          & at ", xipol, xirad, ", position ", equ%ptx(ipx), &
-                          & equ%pty(ipx)
-                      return
-                  end if
-
-              end do
-
-          end do
+         call markInternalPoints(ipOther, irOther, iRegOther, points)
       end do
 
-      ! if we arrive here, no cell next to an x-point was found
-      xipol = GRID_UNDEFINED
-      xirad = GRID_UNDEFINED
+    end subroutine markInternalPoints
 
-    end subroutine findXPointCell
+  end subroutine labelPointsInsideOutside
 
-  end subroutine labelCells
+
 
 
   !> Fix broken cells by modifying the grid 
@@ -371,8 +571,8 @@ contains
 
                 if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE) then
 
-                    isecTopFace = btest(grid%faceflag(ip, ir, iReg), INDEX_FACE_TOP)
-                    isecBotFace = btest(grid%faceflag(ip, ir, iReg), INDEX_FACE_BOTTOM)
+                    isecTopFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_TOP)
+                    isecBotFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_BOTTOM)
 
                     if (isecTopFace .and. isecBotFace) then
                         ! cell to refine, but more than one refinement point per cell - help!
@@ -380,57 +580,56 @@ contains
                             & " cell (ipol, irad) ", ip, ir
                     end if
 
-!!$                    if (.false.) then
-                    if (isecTopFace) then
-                       ! Debug plotting: abuse region number for current cell
-                       iBrokenCell = iBrokenCell + 1
-                       call csioSetRegion(100 + iBrokenCell)
-
-                       ! Add a radial line through the intersection point
-                       ! of this face with the structure. Note that the
-                       ! intersection point known at this point 
-                       ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
-                       !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
-                       ! is inaccurate and will be recomputed 
-                        call addRadialLine( equ, struct, grid, &
-                             & iReg, &
-                             & grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg), &
-                             & grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg), &
-                             & recomputeIntersection = .true., &
-                             & iFcR = irMap(ir, iReg) + 1 )
-
-                        ! update grid index map to account for radial line
-                        ! We added a radial grid line between poloidal points ip and ip + 1
-                        ! Shift all indices bigger than that up by one
-                        ! TODO: check we don't run out of space...
-                        ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
-                    end if
-
-                    ! same for the bottom face, if required
-                    if (isecBotFace) then
-                       ! Debug plotting: abuse region number for current cell
-                       iBrokenCell = iBrokenCell + 1
-                       call csioSetRegion(100 + iBrokenCell)
-
-                       ! Add a radial line through the intersection point
-                       ! of this face with the structure. Note that the
-                       ! intersection point known at this point 
-                       ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
-                       !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
-                       ! is inaccurate and will be recomputed 
-                        call addRadialLine( equ, struct, grid, &
-                             & iReg, &
-                             & grid%faceISecPx(INDEX_FACE_BOTTOM, ip, ir, iReg), &
-                             & grid%faceISecPy(INDEX_FACE_BOTTOM, ip, ir, iReg), &
-                             & recomputeIntersection = .true., &
-                             & iFcR = irMap(ir, iReg) )
-
-                        ! update grid index map to account for radial line
-                        ! We added a radial grid line between poloidal points ip and ip + 1
-                        ! Shift all indices bigger than that up by one
-                        ! TODO: check we don't run out of space...
-                        ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
-                    end if
+!!$                    if (isecTopFace) then
+!!$                       ! Debug plotting: abuse region number for current cell
+!!$                       iBrokenCell = iBrokenCell + 1
+!!$                       call csioSetRegion(100 + iBrokenCell)
+!!$
+!!$                       ! Add a radial line through the intersection point
+!!$                       ! of this face with the structure. Note that the
+!!$                       ! intersection point known at this point 
+!!$                       ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
+!!$                       !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
+!!$                       ! is inaccurate and will be recomputed 
+!!$                        call addRadialLine( equ, struct, grid, &
+!!$                             & iReg, &
+!!$                             & grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg), &
+!!$                             & grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg), &
+!!$                             & recomputeIntersection = .true., &
+!!$                             & iFcR = irMap(ir, iReg) + 1 )
+!!$
+!!$                        ! update grid index map to account for radial line
+!!$                        ! We added a radial grid line between poloidal points ip and ip + 1
+!!$                        ! Shift all indices bigger than that up by one
+!!$                        ! TODO: check we don't run out of space...
+!!$                        ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
+!!$                    end if
+!!$
+!!$                    ! same for the bottom face, if required
+!!$                    if (isecBotFace) then
+!!$                       ! Debug plotting: abuse region number for current cell
+!!$                       iBrokenCell = iBrokenCell + 1
+!!$                       call csioSetRegion(100 + iBrokenCell)
+!!$
+!!$                       ! Add a radial line through the intersection point
+!!$                       ! of this face with the structure. Note that the
+!!$                       ! intersection point known at this point 
+!!$                       ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
+!!$                       !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
+!!$                       ! is inaccurate and will be recomputed 
+!!$                        call addRadialLine( equ, struct, grid, &
+!!$                             & iReg, &
+!!$                             & grid%faceISecPx(INDEX_FACE_BOTTOM, ip, ir, iReg), &
+!!$                             & grid%faceISecPy(INDEX_FACE_BOTTOM, ip, ir, iReg), &
+!!$                             & recomputeIntersection = .true., &
+!!$                             & iFcR = irMap(ir, iReg) )
+!!$
+!!$                        ! update grid index map to account for radial line
+!!$                        ! We added a radial grid line between poloidal points ip and ip + 1
+!!$                        ! Shift all indices bigger than that up by one
+!!$                        ! TODO: check we don't run out of space...
+!!$                        ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
+!!$                    end if
                 end if
 
             end do
@@ -967,16 +1166,16 @@ contains
              
              ! test face identity, accounting for switched points
              match = &
-                  & ( identical(grid%xmail(ip, ir, iReg), &
+                  & ( pointsIdentical(grid%xmail(ip, ir, iReg), &
                   &             grid%ymail(ip, ir, iReg), xFrom, yFrom)&
                   & .and. &
-                  &   identical(grid%xmail(ipTo, irTo, iReg), &
+                  &   pointsIdentical(grid%xmail(ipTo, irTo, iReg), &
                   &             grid%ymail(ipTo, irTo, iReg), xTo, yTo) ) &
                   & .or. &
-                  &  ( identical(grid%xmail(ip, ir, iReg), &
+                  &  ( pointsIdentical(grid%xmail(ip, ir, iReg), &
                   &              grid%ymail(ip, ir, iReg), xTo, yTo)&
                   & .and. &
-                  &    identical(grid%xmail(ipTo, irTo, iReg), &
+                  &    pointsIdentical(grid%xmail(ipTo, irTo, iReg), &
                   &              grid%ymail(ipTo, irTo, iReg), xFrom, yFrom) )
              
              if (match) then
@@ -997,25 +1196,97 @@ contains
     if (present(iFcR)) iFcR = GRID_UNDEFINED
     if (present(regionHasFace)) regionHasFace = .false.
 
-  contains
-
-    logical function identical( x1, y1, x2, y2 )     
-      double precision, intent(in) :: x1, y1, x2, y2
-
-      ! internal
-      double precision :: dist
-      external :: dist
-
-      double precision, parameter :: ABSTOL = 1e-9
-
-      identical = ( dist(x1, y1, x2, y2) < ABSTOL )
-
-    end function identical
     
   end subroutine findFaceInRegion
 
+  !> Check if points (x1,y1) and (x2,y2) are identical
+  !> (i.e, very very close to each other)
+  logical function pointsIdentical( x1, y1, x2, y2 )     
+    double precision, intent(in) :: x1, y1, x2, y2
+    
+    ! internal
+    double precision :: dist
+    external :: dist
+    
+    double precision, parameter :: ABSTOL = 1e-9
+
+    pointsIdentical = ( dist(x1, y1, x2, y2) < ABSTOL )
+    
+  end function pointsIdentical
 
 
+  !> Find the indices (xipol, xirad) of a given point (x,y) in the region iReg of the grid.
+  !> If no point is found, GRID_UNDEFINED is returned for th indices
+  subroutine findPointInRegion(grid, iReg, x, y, xipol, xirad)
+    type(CarreGrid), intent(in) :: grid
+      integer, intent(in) :: iReg
+      double precision, intent(in) :: x, y
+      integer, intent(out) :: xipol, xirad
+
+      ! internal
+      integer :: ipol, irad, ipx
+      double precision :: dx
+      double precision, parameter :: POINT_TOL = 1e-6
+      real*8 :: dist
+      external dist
+
+      ! search point in this region
+      do iPol = 1, grid%np1(iReg)
+          do iRad = 1, grid%nr(iReg)
+
+             if ( pointsIdentical( x, y, &
+                  & grid%xmail(iPol, iRad, iReg), &
+                  & grid%ymail(iPol, iRad, iReg) ) ) then
+
+                ! found point, return indices
+                xipol = ipol
+                xirad = irad
+                return
+             end if
+             
+          end do
+       end do
+
+      ! if we arrive here, no cell next to an x-point was found
+      xipol = GRID_UNDEFINED
+      xirad = GRID_UNDEFINED
+
+    end subroutine findPointInRegion
+
+
+    ! Find index of x-point in this region
+    subroutine findXPointInRegion(equ, grid, iReg, xipol, xirad)
+      type(CarreEquilibrium), intent(in) :: equ
+      type(CarreGrid), intent(in) :: grid
+      integer, intent(in) :: iReg
+      integer, intent(out) :: xipol, xirad
+
+      ! internal
+      integer :: ipol, irad, ipx
+      double precision :: dx
+      double precision, parameter :: XPOINT_TOL = 1e-6
+      real*8 :: dist
+      external dist
+
+      ! check all x-points
+      do ipx = 1, equ%npx
+         call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), &
+              & xipol, xirad )
+
+         if ( ( xipol /= GRID_UNDEFINED ) .and. ( xirad /= GRID_UNDEFINED ) ) then         
+            write (*,*) "findXPointInRegion: region ", iReg, ", found x-point&
+                 & at ", xipol, xirad, ", position ", equ%ptx(ipx), &
+                 & equ%pty(ipx)
+            return
+         end if
+      end do
+
+      ! if we arrive here, no cell next to an x-point was found
+      xipol = GRID_UNDEFINED
+      xirad = GRID_UNDEFINED
+
+    end subroutine findXPointInRegion
+    
 
   
   !> Compute minimum distance of a point to a curve, by 

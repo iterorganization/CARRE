@@ -7,7 +7,7 @@ module carre_types
 
   integer, parameter, public :: GRID_UNDEFINED = 0
 
-  ! Grid cell labels
+  ! Grid object labels
   integer, parameter, public :: GRID_INTERNAL = 1
   integer, parameter, public :: GRID_EXTERNAL = 2
   integer, parameter, public :: GRID_BOUNDARY = 3
@@ -16,6 +16,16 @@ module carre_types
   ! Grid line flags
   integer, parameter, public :: GRIDLINE_BASELINE = 1
   integer, parameter, public :: GRIDLINE_REQUIRED = 2
+
+  ! Face number of a cell
+  integer, parameter, public :: FACE_LEFT = 1
+  integer, parameter, public :: FACE_BOTTOM = 2
+  integer, parameter, public :: FACE_RIGHT = 3
+  integer, parameter, public :: FACE_TOP = 4
+  
+  ! Numbering for face alignment
+  integer, parameter, public :: FACE_POLOIDAL = 1
+  integer, parameter, public :: FACE_RADIAL = 2
 
 
   type CarreParameters
@@ -113,16 +123,19 @@ module carre_types
                & psidym(npmamx,nrmamx,nregmx)
           
           ! Logical flag for face/structure intersection. True means
-          ! The specific face is intersected by a structure segment.
+          ! the specific face is intersected by a structure segment.
           ! Dimensions:
-          ! 1: face number, 2: poloidal cell index
+          ! 1: face alignment: 1 = poloidal, 2 = radial
+          ! 2: poloidal cell index
           ! 3: radial cell index, 4: region number
-          logical :: faceISec(4,npmamx,nrmamx,nregmx)
-          double precision :: faceISecPx(4,npmamx,nrmamx,nregmx)
-          double precision :: faceISecPy(4,npmamx,nrmamx,nregmx)
+          logical :: faceISec(2,npmamx,nrmamx,nregmx)
+          double precision :: faceISecPx(2,npmamx,nrmamx,nregmx)
+          double precision :: faceISecPy(2,npmamx,nrmamx,nregmx)
           
           integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
-          integer :: faceflag(npmamx-1,nrmamx-1,nregmx)
+          integer :: cellFaceFlag(npmamx-1,nrmamx-1,nregmx)
+
+          integer :: pointFlag(npmamx,nrmamx,nregmx)
 
           ! logical flags marking grid lines as required
           integer :: lineFlagRad(nrmamx, nregmx)
