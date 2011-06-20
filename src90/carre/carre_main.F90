@@ -182,9 +182,9 @@ contains
 
             !..   10.2  Set up virtual limiters
 
-            call VIRTUALLIMITERS(struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
-                & equ%npx,equ%ptx,equ%pty, & 
-                & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
+!!$            call VIRTUALLIMITERS(struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
+!!$                & equ%npx,equ%ptx,equ%pty, & 
+!!$                & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
 
             !..   10.2.1 Diagnostics: Write out resulting structures
 #ifdef USE_SILO

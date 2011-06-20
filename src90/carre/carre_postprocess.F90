@@ -119,6 +119,27 @@ contains
        call siloWritePointGrid( csioDbfile, 'internalPoints', &
             & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
 
+       ! boundary points
+       nIntPoints = 0
+
+       do iReg = 1, grid%nreg
+          do ip = 1, grid%np1(iReg)
+             do ir = 1, grid%nr(iReg)
+                if ( grid%pointFlag(ip, ir, iReg) /= GRID_BOUNDARY) cycle
+                
+                nIntPoints = nIntPoints + 1
+
+                tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+             end do
+          end do                    
+       end do
+
+       write (*,*) 'carre_postprocess: ', nIntPoints, ' boundary points'
+       if (nIntPoints > 0) then
+          call siloWritePointGrid( csioDbfile, 'boundaryPoints', &
+               & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+       end if
 
        ! radial intersected faces
        nIntPoints = 0
@@ -203,8 +224,9 @@ contains
     subroutine categorizeCellsAndFaces()
 
       ! internal
-      integer :: cellIntNodeCount(npmamx-1,nrmamx-1,nregmx)
+      integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
       logical :: candidate(npmamx-1,nrmamx-1,nregmx)
+      integer :: iReg, iPol, iRad, iFace, i, j
 
       ! Transfer face intersection information to cells (filling grid%cellFaceFlag)
       grid%cellFaceFlag = 0
@@ -238,27 +260,33 @@ contains
       end do
 
       ! First mark cells internal/external
-      ! Cell is internal if at least one point is internal
       grid%cellFlag = GRID_EXTERNAL
 
+      ! Count internal / external corners of cells
       cellIntNodeCount = 0
+      cellExtNodeCount = 0
+
       do iReg = 1, grid%nreg
 
          do iPol = 1, grid%np1(iReg) - 1
             do iRad = 1, grid%nr(iReg) - 1
 
-               if ( grid%pointFlag(iPol, iRad, iReg) == GRID_INTERNAL ) &
-                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
-               if ( grid%pointFlag(iPol+1, iRad, iReg) == GRID_INTERNAL ) &
-                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
-               if ( grid%pointFlag(iPol, iRad+1, iReg) == GRID_INTERNAL ) &
-                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
-               if ( grid%pointFlag(iPol+1, iRad+1, iReg) == GRID_INTERNAL ) &
-                    & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
+               ! loop over cell corners
+               do i = 0, 1 ! poloidal 
+                  do j = 0, 1 ! radial
+                     
+                     if ( isInternal(grid%pointFlag(iPol+i, iRad+j, iReg)) ) &
+                          & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
 
+                     if ( isExternal(grid%pointFlag(iPol+i, iRad+j, iReg)) ) &
+                          & cellExtNodeCount(iPol, iRad, iReg) = cellExtNodeCount(iPol, iRad, iReg) + 1
+
+                  end do
+               end do
+
+               ! Cell is internal if at least one point is internal
                if (cellIntNodeCount(iPol, iRad, iReg) > 0) &
                     & grid%cellFlag(iPol, iRad, iReg) = GRID_INTERNAL
-
             end do
          end do
       end do
@@ -272,21 +300,36 @@ contains
 
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
-      ! -cells with three internal points
+      ! -cells with three internal points and one external cell
       ! -that have intersections in adjacent faces
+!!$      candidate = .false.
+!!$
+!!$      ! adjacent faces intersected?
+!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
+!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
+!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
+!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
 
-      candidate = .false.
 
-      ! adjacent faces intersected?
-      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
-      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
-      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
-      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
-
-      where (candidate .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
+!!$      where (candidate .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
+      where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
 
     end subroutine categorizeCellsAndFaces
 
+    ! For use in categorizeCellsAndFaces
+    logical function isInternal(pointFlag)
+      integer, intent(in) :: pointFlag
+      
+      isInternal = (pointFlag == GRID_INTERNAL)
+    end function isInternal
+
+    ! For use in categorizeCellsAndFaces
+    logical function isExternal(pointFlag)
+      integer, intent(in) :: pointFlag
+      
+      isExternal = (pointFlag == GRID_EXTERNAL)
+    end function isExternal
+    
   end subroutine carre_postprocess_computation
 
 
@@ -373,7 +416,7 @@ contains
                & struct%rxstruc(1:abs(struct%rnpstru(is)), is), &
                & struct%rystruc(1:abs(struct%rnpstru(is)), is), &
                & doesIntersect, iSegment, ipx, ipy, &
-               & testEndPoints = .true.)
+               & testEndPoints = .false.)
           if (present(iStruct)) iStruct = is
           if (doesIntersect) return
        end do
@@ -406,7 +449,10 @@ contains
         ! Walk away from there (recursively) until all points are marked.
         ! (this recursion will do transitions between the regions)
         call markInternalPoints(xip, xir, iReg, points)
+
+        call markBoundaryPoints(iReg, points)
     end do
+
 
     ! all points that are still undefined are external
     where (points == GRID_UNDEFINED) points = GRID_EXTERNAL
@@ -449,7 +495,13 @@ contains
       if (ir < grid%nr(iReg)) then
          faceIntersect = grid%faceISec(FACE_RADIAL, ip, ir, iReg)
          if (.not. faceIntersect) then
+            ! Internal point! Recursive propagation.
             call markInternalPoints(ip, ir+1, iReg, points)
+         else
+            ! Boundary point? (non-recursive)
+            call checkBoundaryPoint(ip, ir+1, iReg, &
+                 & grid%faceISecPx(FACE_RADIAL, ip, ir, iReg), &
+                 & grid%faceISecPy(FACE_RADIAL, ip, ir, iReg), points )
          end if
       end if
       ! ...go along bottom face
@@ -457,6 +509,10 @@ contains
          faceIntersect = grid%faceISec(FACE_RADIAL, ip, ir-1, iReg)
          if (.not. faceIntersect) then
             call markInternalPoints(ip, ir-1, iReg, points)
+         else
+            call checkBoundaryPoint(ip, ir-1, iReg,&
+                 & grid%faceISecPx(FACE_RADIAL, ip, ir-1, iReg), &
+                 & grid%faceISecPy(FACE_RADIAL, ip, ir-1, iReg), points )
          end if
       end if
 
@@ -466,6 +522,10 @@ contains
          faceIntersect = grid%faceISec(FACE_POLOIDAL, ip, ir, iReg)
          if (.not. faceIntersect) then
             call markInternalPoints(ip+1, ir, iReg, points)
+         else
+            call checkBoundaryPoint(ip+1, ir, iReg, &
+                 & grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg), &
+                 & grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg), points )
          end if
       end if
       ! ...go along left face
@@ -473,6 +533,10 @@ contains
          faceIntersect = grid%faceISec(FACE_POLOIDAL, ip-1, ir, iReg)
          if (.not. faceIntersect) then
             call markInternalPoints(ip-1, ir, iReg, points)
+         else
+            call checkBoundaryPoint(ip-1, ir, iReg, &
+                 & grid%faceISecPx(FACE_POLOIDAL, ip-1, ir, iReg), &
+                 & grid%faceISecPy(FACE_POLOIDAL, ip-1, ir, iReg), points )
          end if
       end if
 
@@ -488,6 +552,65 @@ contains
       end do
 
     end subroutine markInternalPoints
+
+    !> Check whether the given point coincides with the given intersection
+    !> point. If yes, mark it as a boundary point.
+    subroutine checkBoundaryPoint( ip, ir, iReg, isecPx, isecPy, points )
+      integer, intent(in) :: ip, ir, iReg
+      double precision, intent(in) :: isecPx, isecPy
+      integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
+
+      return
+      if ( pointsIdentical( grid%xmail(ip, ir, iReg), grid%ymail(ip, ir, iReg), &
+           & isecPx, isecPy ) ) then
+         points(ip, ir, iReg) = GRID_BOUNDARY
+      end if
+
+    end subroutine checkBoundaryPoint
+
+    !> This a brute-force routine identifying all grid points in the region coinciding
+    !> with a face-structure intersection, and marking them to boundary points.
+    !> This is supposed to be done by checkBoundaryPoint during the recursion,
+    !> but somehow this is unreliable.
+    subroutine markBoundaryPoints(iReg, points)
+      integer, intent(in) :: iReg
+      integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
+
+      ! internal
+      integer :: ip, ir
+      double precision :: ipx, ipy
+
+      do ip = 1, grid%np1(iReg)
+         do ir = 1, grid%nr(iReg)
+
+            ! poloidal face
+            if ((ip < grid%np1(iReg)) &
+                 & .and. grid%faceISec(FACE_POLOIDAL,ip,ir,iReg)) then
+               ipx = grid%faceISecPx(FACE_POLOIDAL,ip,ir,iReg)
+               ipy = grid%faceISecPy(FACE_POLOIDAL,ip,ir,iReg)                              
+
+               if ( pointsIdentical(ipx, ipy, &
+                    & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) points(ip,ir,iReg) = GRID_BOUNDARY
+               if ( pointsIdentical(ipx, ipy, &
+                    & grid%xmail(ip+1,ir,iReg), grid%ymail(ip+1,ir,iReg)) ) points(ip+1,ir,iReg) = GRID_BOUNDARY
+            end if
+
+            ! radial face
+            if ((ir < grid%nr(iReg)) &
+                 & .and. grid%faceISec(FACE_RADIAL,ip,ir,iReg)) then
+               ipx = grid%faceISecPx(FACE_RADIAL,ip,ir,iReg)
+               ipy = grid%faceISecPy(FACE_RADIAL,ip,ir,iReg)                              
+
+               if ( pointsIdentical(ipx, ipy, &
+                    & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) points(ip,ir,iReg) = GRID_BOUNDARY
+               if ( pointsIdentical(ipx, ipy, &
+                    & grid%xmail(ip,ir+1,iReg), grid%ymail(ip,ir+1,iReg)) ) points(ip,ir+1,iReg) = GRID_BOUNDARY
+            end if
+
+         end do
+      end do
+
+    end subroutine markBoundaryPoints
 
   end subroutine labelPointsInsideOutside
 
