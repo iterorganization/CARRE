@@ -17,6 +17,8 @@
 
       IMPLICIT NONE
 
+      logical, parameter :: DEBUGFILES_MAILCN = .false.
+
 !..  Cette sous-routine fait le maillage curviligne orthogonal dans
 !  la region centrale.
 
@@ -392,6 +394,7 @@
                 ! write out current grid status
                 
                 ! entire grid created so far
+                if (DEBUGFILES_MAILCN) then
                 call csioOpenFile()
                 
                 call siloWriteQuadGrid( csioDbfile, "region", &
@@ -417,6 +420,7 @@
                      & siloExpandSegmentData( propo(1:nppol) ), DB_NODECENT )
                 call siloWriteUMData( csioDbfile,  "currentsurface", "varr", &
                      & siloExpandSegmentData( varr(1:nppol) ), DB_NODECENT )
+                end if
 #endif                
 
                 if(ortmax.le.rlcept) go to 19

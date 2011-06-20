@@ -16,6 +16,8 @@
 #endif
 
       IMPLICIT NONE
+      
+      logical, parameter :: DEBUGFILES_MAILRG = .false.
 
 !..  Cette sous-routine fait le maillage curviligne orthogonal dans
 !  une region.
@@ -508,6 +510,7 @@
                      enddo
 
 #ifdef USE_SILO
+                     if (DEBUGFILES_MAILRG) then
                      ! TODO: maybe move this into a subroutine in CarreSiloIO
                      ! write out current grid status
 
@@ -536,6 +539,7 @@
                           & siloExpandSegmentData( propo(1:nppol) ), DB_NODECENT )
                      call siloWriteUMData( csioDbfile,  "currentsurface", "varr", &
                           & siloExpandSegmentData( varr(1:nppol) ), DB_NODECENT )
+                     end if
 #endif
 
                      if(ortmax.le.rlcept) go to 19

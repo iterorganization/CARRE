@@ -35,7 +35,7 @@ contains
 
   !> Perform postprocessing on the grid as generated in carre_main.
   !> This is only relevant if the cut-cell type extended grid generation is requested.
-
+  
   subroutine carre_postprocess_computation(par, equ, grid, struct)
 
     type(CarreParameters), intent(in) :: par
@@ -44,8 +44,14 @@ contains
     type(CarreStructures), intent(in) :: struct
 
     ! internal
-    integer :: iReg, iPol, iRad, iFace
+    integer :: iReg, iPol, iRad, iFace, iPostProcess
     logical :: doesIntersect
+    integer :: tmpCellQt(npmamx-1,nrmamx-1,nregmx)
+
+    ! for writing out point grids
+    double precision, dimension(npmamx * nrmamx * nregmx * 2) :: tmpX, tmpY
+    integer :: nIntPoints, ip, ir
+
 
     ! Initialize grid%nr (TODO: move this into the actual gridding routines,
     ! maille.F90. Currently not possible because they are not fully converted
@@ -61,56 +67,136 @@ contains
     end do
     ! TODO: the grid lines going into the x-point are also required...
 
-    ! Compute face/structure intersections
-    call computeFaceStructureIntersections( struct, grid )
+    do iPostProcess = 1, 2
 
-    ! Mark points to be inside/outside of vessel
-    call labelPointsInsideOutside(equ, grid)
+       write(*,*) 'carre_postprocess_computation: pass '//int2str(iPostProcess)
 
-    ! Compute the object categorization
-    call categorizeCellsAndFaces()
+       ! Compute face/structure intersections
+       call computeFaceStructureIntersections( struct, grid )
 
+       ! Mark points to be inside/outside of vessel
+       call labelPointsInsideOutside(equ, grid)
 
-#ifdef USE_SILO
-    ! write results of first postprocessing step
-    call csioOpenFile('carrePostProcS1')
-    do iReg = 1, grid%nreg
-        call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
-            & grid%np1(iReg), grid%nr(iReg), &
-            & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
-            & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
+       ! Compute the object categorization
+       call categorizeCellsAndFaces()
 
-        call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
-            & 'cellFaceFlag'//int2str(iReg), &
-            & real(grid%cellFaceFlag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
-            & DB_ZONECENT )
-        call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
-            & 'cellflag'//int2str(iReg), &
-            & real(grid%cellflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
-            & DB_ZONECENT )
-
-    end do
-    ! limiting level lines
-    do iRad = 1, struct%nbniv
-       call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iRad), &
-            & struct%nivx(1:struct%nivtot(iRad), iRad), &
-            & struct%nivy(1:struct%nivtot(iRad), iRad) )
-    end do
-#endif
-
-    ! Fix broken cells by modifying the grid accordingly
-    call fixCells(equ, struct, grid)
 
 #ifdef USE_SILO
-    ! write results of second postprocessing step
-    call csioOpenFile('carrePostProcS2')
-    do iReg = 1, grid%nreg
-        call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
-            & grid%np1(iReg), grid%nr(iReg), &
-            & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
-            & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
-    end do
+       ! write results of first postprocessing step
+       call csioOpenFile('carrePostProcA'//int2str(iPostProcess))
+       do iReg = 1, grid%nreg
+          call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
+               & grid%np1(iReg), grid%nr(iReg), &
+               & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
+               & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
+
+          call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
+               & 'cellFaceFlag'//int2str(iReg), &
+               & real(grid%cellFaceFlag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
+               & DB_ZONECENT )
+          call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
+               & 'cellflag'//int2str(iReg), &
+               & real(grid%cellflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
+               & DB_ZONECENT )                  
+       end do
+
+       ! internal points
+       nIntPoints = 0
+
+       do iReg = 1, grid%nreg
+          do ip = 1, grid%np1(iReg)
+             do ir = 1, grid%nr(iReg)
+                if ( grid%pointFlag(ip, ir, iReg) /= GRID_INTERNAL) cycle
+                
+                nIntPoints = nIntPoints + 1
+
+                tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+             end do
+          end do                    
+       end do
+
+       call siloWritePointGrid( csioDbfile, 'internalPoints', &
+            & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+
+       ! radial intersected faces
+       nIntPoints = 0
+
+       do iReg = 1, grid%nreg
+          do ip = 1, grid%np1(iReg)
+             do ir = 1, grid%nr(iReg)
+
+                ! radial face
+                if ( ir < grid%nr(iReg) ) then
+                   if (grid%faceISec(FACE_RADIAL, ip, ir, iReg)) then
+                      nIntPoints = nIntPoints + 1
+                      tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                      tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+                      nIntPoints = nIntPoints + 1
+                      tmpX(nIntPoints) = grid%xmail(ip, ir+1, iReg)
+                      tmpY(nIntPoints) = grid%ymail(ip, ir+1, iReg)                
+                   end if
+                end if
+
+             end do
+          end do                    
+       end do
+
+       call siloWritePointGrid( csioDbfile, 'radialIntersectedFaces', &
+            & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+       ! radial intersected faces
+       nIntPoints = 0
+
+       do iReg = 1, grid%nreg
+          do ip = 1, grid%np1(iReg)
+             do ir = 1, grid%nr(iReg)
+
+                ! poloidal face
+                if ( ip < grid%np1(iReg) ) then
+                   if ( grid%faceISec(FACE_POLOIDAL, ip, ir, iReg)) then
+                      nIntPoints = nIntPoints + 1
+                      tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                      tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+                      nIntPoints = nIntPoints + 1
+                      tmpX(nIntPoints) = grid%xmail(ip+1, ir, iReg)
+                      tmpY(nIntPoints) = grid%ymail(ip+1, ir, iReg)                
+                   end if
+                end if
+
+             end do
+          end do                    
+       end do
+
+       call siloWritePointGrid( csioDbfile, 'poloidalIntersectedFaces', &
+            & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+
+
+       ! limiting level lines
+       do iRad = 1, struct%nbniv
+          call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iRad), &
+               & struct%nivx(1:struct%nivtot(iRad), iRad), &
+               & struct%nivy(1:struct%nivtot(iRad), iRad) )
+       end do
 #endif
+
+       ! Fix broken cells by modifying the grid accordingly
+       call fixCells(equ, struct, grid)
+
+#ifdef USE_SILO
+       ! write results of second postprocessing step
+       call csioOpenFile('carrePostProcB'//int2str(iPostProcess))
+       do iReg = 1, grid%nreg
+          call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
+               & grid%np1(iReg), grid%nr(iReg), &
+               & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
+               & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
+       end do
+#endif
+
+    end do
 
   contains
 
@@ -237,7 +323,8 @@ contains
                     call intersect_structure( xx, yy, &
                         & struct, grid%faceISec(iFace, iPol, iRad, iReg), &
                         & ipx = grid%faceISecPx(iFace, iPol, iRad, iReg), &
-                        & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )
+                        & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )                    
+
                 end do
             end do
         end do
@@ -285,7 +372,8 @@ contains
           call intersect(xx(iSeg:iSeg+1), yy(iSeg:iSeg+1), &
                & struct%rxstruc(1:abs(struct%rnpstru(is)), is), &
                & struct%rystruc(1:abs(struct%rnpstru(is)), is), &
-               & doesIntersect, iSegment, ipx, ipy)
+               & doesIntersect, iSegment, ipx, ipy, &
+               & testEndPoints = .true.)
           if (present(iStruct)) iStruct = is
           if (doesIntersect) return
        end do
@@ -416,6 +504,7 @@ contains
     logical :: isecTopFace, isecBotFace
 
     logical :: refineFace(2,npmamx,nrmamx,nregmx)
+    double precision :: px, py
 
     ! Map from original grid indices (1:grid%np(iReg), 1:grid%nr(iReg))
     ! to current grid situation (with added radial lines)
@@ -438,21 +527,46 @@ contains
           do ir = 1, npRadOriginal(iReg) - 1
              
              if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE) then
-                ! broken cell should have one intersected poloidal face
-               
+                ! broken cell should have one intersected poloidal face               
                 isecTopFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_TOP)
                 isecBotFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_BOTTOM)
+
+                ! If more than two intersections per cell,  grid/geometry has issues
                 call assert( .not. (isecTopFace .and. isecBotFace), &
                      & 'fixCells: broken cell has two intersected poloidal faces')
 
-!!$                if (isecTopFace .and. isecBotFace) then
-!!$                   ! cell to refine, but more than one refinement point per cell - help!
-!!$                   write (*,*) "fixCells: your grid/geometry has issues in region ", iReg,&
-!!$                        & " cell (ipol, irad) ", ip, ir
-!!$                end if
+                ! Here, we are only interested in "real" intersections, i.e.
+                ! intersections in the middle of the face, not directly in the face 
+                ! endpoints
 
-                if (iSecTopFace) refineFace(FACE_POLOIDAL, ip, ir+1, iReg) = .true.
-                if (iSecBotFace) refineFace(FACE_POLOIDAL, ip, ir, iReg) = .true.
+                if (iSecTopFace) then
+                   px = grid%faceISecPx(FACE_POLOIDAL, ip, ir+1, iReg)
+                   py = grid%faceISecPy(FACE_POLOIDAL, ip, ir+1, iReg)
+
+                   if (.not. ( &
+                        & pointsIdentical(px, py, grid%xmail(ip,ir+1,iReg), grid%ymail(ip,ir+1,iReg)) &
+                        & .or. &
+                        & pointsIdentical(px, py, grid%xmail(ip+1,ir+1,iReg), grid%ymail(ip+1,ir+1,iReg)) &
+                        & ) ) &
+                        & then
+                      refineFace(FACE_POLOIDAL, ip, ir+1, iReg) = .true.
+                   end if
+                end if
+
+                if (iSecBotFace) then
+                   px = grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg)
+                   py = grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg)
+
+                   if (.not. ( &
+                        & pointsIdentical(px, py, grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) &
+                        & .or. &
+                        & pointsIdentical(px, py, grid%xmail(ip+1,ir,iReg), grid%ymail(ip+1,ir,iReg)) &
+                        & ) ) &
+                        & then
+                      refineFace(FACE_POLOIDAL, ip, ir, iReg) = .true.
+                   end if
+
+                end if
              end if
              
           end do
@@ -818,8 +932,9 @@ contains
        ! The two zeros in the clort call are the guard lengths. We effectively 
        ! disable the "proportional distribution" criterion here.
        !lPasmin = pasmin * 1e-1
-       lPasmin = 1e-4
-       lTgarde = 0d2
+       !lPasmin = 1e-4
+       lPasmin = 5e-4
+       lTgarde = 1e-1
        call clort( refx, refy,&
             & newx, newy, &
             & critNew, size(refx), &
@@ -1077,7 +1192,7 @@ contains
     double precision :: dist
     external :: dist
     
-    double precision, parameter :: ABSTOL = 1e-9
+    double precision, parameter :: ABSTOL = 1e-6
 
     pointsIdentical = ( dist(x1, y1, x2, y2) < ABSTOL )
     
@@ -1187,7 +1302,8 @@ contains
   !> doesIntersect: flag indicating whether intersection found
   !> iSegment: index of segment intersected
   !> ipx, ipy: intersection point (if found)
-  subroutine intersect(xx,yy,xst,yst,doesIntersect,iSegment,ipx,ipy)
+  subroutine intersect(xx,yy,xst,yst,doesIntersect,iSegment,ipx,ipy,&
+       & testEndPoints)
 
     !  arguments
     REAL*8, intent(in) :: xx(2),yy(2),xst(:),yst(:)
@@ -1195,16 +1311,38 @@ contains
     logical, intent(out) :: doesIntersect
     integer, intent(out), optional :: iSegment
     REAL*8, intent(out), optional :: ipx, ipy
+    logical, intent(in), optional :: testEndPoints
+
     !  variables locales
-    INTEGER i
+    INTEGER i, j, k
     !.. determ: determinant de la matrice des deux equations.
     !.. mult1: facteur multiplicatif du segment de courbe.
     !.. mult2: facteur multiplicatif du segment de structure.
-    REAL*8 mult1,mult2,determ
+    REAL*8 mult1,mult2,determ, lipx, lipy
 
 
     !..Boucle sur la structure.
     DO i=1, size(xst)-1
+
+       if (present(testEndPoints)) then
+          if (testEndPoints) then
+             do j = 0, 1 ! start point, end point of structure segment
+                do k = 1, 2 ! start point, end point of line segment
+                   if (pointsIdentical(xx(k), yy(k), xst(i+j), yst(i+j))) then
+                      
+                      if (present(iSegment)) iSegment = i
+                      if (present(ipx) .and. present(ipy)) then
+                         ipx = xx(k)
+                         ipy = yy(k)
+                      end if                      
+                      return
+                      
+                   end if
+                end do              
+             end do
+          end if
+       end if
+
         !..Calcul du determinant de la matrice.
         determ = (-(xx(2) - xx(1))) * (yst(i+1) - yst(i)) + & 
             &                   (yy(2) - yy(1)) * (xst(i+1) - xst(i))
@@ -1228,8 +1366,10 @@ contains
                     doesIntersect = .true.
                     if (present(iSegment)) iSegment = i
                     if (present(ipx) .and. present(ipy)) then
-                        ipx = xx(1) + mult1 * (xx(2) - xx(1))
-                        ipy = yy(1) + mult1 * (yy(2) - yy(1))
+!!$                        ipx = xx(1) + mult1 * (xx(2) - xx(1))
+!!$                        ipy = yy(1) + mult1 * (yy(2) - yy(1))
+                        ipx = xst(i) + mult2 * (xst(i+1) - xst(i))
+                        ipy = yst(i) + mult2 * (yst(i+1) - yst(i))
                     end if
                     return
                 ENDIF
