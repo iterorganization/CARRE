@@ -28,7 +28,7 @@ module carre_postprocess
   integer, parameter :: INDEX_FACE_RIGHT = 3
   integer, parameter :: INDEX_FACE_TOP = 4
 
-  logical, parameter :: DEBUGFILES_ADDRADIALLINE = .true.
+  logical, parameter :: DEBUGFILES_ADDRADIALLINE = .false.
   logical, parameter :: DEBUGFILES_INSERTPOINTS = .false.
 
 contains
@@ -44,14 +44,9 @@ contains
     type(CarreStructures), intent(in) :: struct
 
     ! internal
-    integer :: iReg, iPol, iRad, iFace, iPostProcess
+    integer :: iReg, iPol, iRad, iFace, iPostProcess, nCellsToRefine
     logical :: doesIntersect
     integer :: tmpCellQt(npmamx-1,nrmamx-1,nregmx)
-
-    ! for writing out point grids
-    double precision, dimension(npmamx * nrmamx * nregmx * 2) :: tmpX, tmpY
-    integer :: nIntPoints, ip, ir
-
 
     ! Initialize grid%nr (TODO: move this into the actual gridding routines,
     ! maille.F90. Currently not possible because they are not fully converted
@@ -67,8 +62,7 @@ contains
     end do
     ! TODO: the grid lines going into the x-point are also required...
 
-    do iPostProcess = 1, 2
-
+    do iPostProcess = 1, 4
        write(*,*) 'carre_postprocess_computation: pass '//int2str(iPostProcess)
 
        ! Compute face/structure intersections
@@ -80,144 +74,29 @@ contains
        ! Compute the object categorization
        call categorizeCellsAndFaces()
 
+       call writeGridStateToSiloFile('carrePostProcA'//int2str(iPostProcess), struct, grid)
 
-#ifdef USE_SILO
-       ! write results of first postprocessing step
-       call csioOpenFile('carrePostProcA'//int2str(iPostProcess))
-       do iReg = 1, grid%nreg
-          call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
-               & grid%np1(iReg), grid%nr(iReg), &
-               & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
-               & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
-
-          call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
-               & 'cellFaceFlag'//int2str(iReg), &
-               & real(grid%cellFaceFlag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
-               & DB_ZONECENT )
-          call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
-               & 'cellflag'//int2str(iReg), &
-               & real(grid%cellflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
-               & DB_ZONECENT )                  
-       end do
-
-       ! internal points
-       nIntPoints = 0
-
-       do iReg = 1, grid%nreg
-          do ip = 1, grid%np1(iReg)
-             do ir = 1, grid%nr(iReg)
-                if ( grid%pointFlag(ip, ir, iReg) /= GRID_INTERNAL) cycle
-                
-                nIntPoints = nIntPoints + 1
-
-                tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
-                tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
-             end do
-          end do                    
-       end do
-
-       call siloWritePointGrid( csioDbfile, 'internalPoints', &
-            & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
-
-       ! boundary points
-       nIntPoints = 0
-
-       do iReg = 1, grid%nreg
-          do ip = 1, grid%np1(iReg)
-             do ir = 1, grid%nr(iReg)
-                if ( grid%pointFlag(ip, ir, iReg) /= GRID_BOUNDARY) cycle
-                
-                nIntPoints = nIntPoints + 1
-
-                tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
-                tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
-             end do
-          end do                    
-       end do
-
-       write (*,*) 'carre_postprocess: ', nIntPoints, ' boundary points'
-       if (nIntPoints > 0) then
-          call siloWritePointGrid( csioDbfile, 'boundaryPoints', &
-               & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
-       end if
-
-       ! radial intersected faces
-       nIntPoints = 0
-
-       do iReg = 1, grid%nreg
-          do ip = 1, grid%np1(iReg)
-             do ir = 1, grid%nr(iReg)
-
-                ! radial face
-                if ( ir < grid%nr(iReg) ) then
-                   if (grid%faceISec(FACE_RADIAL, ip, ir, iReg)) then
-                      nIntPoints = nIntPoints + 1
-                      tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
-                      tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
-                      nIntPoints = nIntPoints + 1
-                      tmpX(nIntPoints) = grid%xmail(ip, ir+1, iReg)
-                      tmpY(nIntPoints) = grid%ymail(ip, ir+1, iReg)                
-                   end if
-                end if
-
-             end do
-          end do                    
-       end do
-
-       call siloWritePointGrid( csioDbfile, 'radialIntersectedFaces', &
-            & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
-
-       ! radial intersected faces
-       nIntPoints = 0
-
-       do iReg = 1, grid%nreg
-          do ip = 1, grid%np1(iReg)
-             do ir = 1, grid%nr(iReg)
-
-                ! poloidal face
-                if ( ip < grid%np1(iReg) ) then
-                   if ( grid%faceISec(FACE_POLOIDAL, ip, ir, iReg)) then
-                      nIntPoints = nIntPoints + 1
-                      tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
-                      tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
-                      nIntPoints = nIntPoints + 1
-                      tmpX(nIntPoints) = grid%xmail(ip+1, ir, iReg)
-                      tmpY(nIntPoints) = grid%ymail(ip+1, ir, iReg)                
-                   end if
-                end if
-
-             end do
-          end do                    
-       end do
-
-       call siloWritePointGrid( csioDbfile, 'poloidalIntersectedFaces', &
-            & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
-
-
-
-       ! limiting level lines
-       do iRad = 1, struct%nbniv
-          call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iRad), &
-               & struct%nivx(1:struct%nivtot(iRad), iRad), &
-               & struct%nivy(1:struct%nivtot(iRad), iRad) )
-       end do
-#endif
+       ! cells need refinement?
+       nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE )
+       write(*,*) 'carre_postprocess, iteration ', iPostProcess, ': ', &
+            & nCellsToRefine, ' cells to refine'
+       if (nCellsToRefine == 0) exit
 
        ! Fix broken cells by modifying the grid accordingly
        call fixCells(equ, struct, grid)
-
-#ifdef USE_SILO
-       ! write results of second postprocessing step
-       call csioOpenFile('carrePostProcB'//int2str(iPostProcess))
-       do iReg = 1, grid%nreg
-          call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
-               & grid%np1(iReg), grid%nr(iReg), &
-               & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
-               & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
-       end do
-#endif
-
     end do
+
+    ! write results of postprocessing iteration
+    call writeGridStateToSiloFile('carrePostProcC0', struct, grid)
+    
+    ! Finalize grid cell fixes by moving external points
+    ! of faces onto boundary intersections
+    call finalizeCells(grid)
+
+    call categorizeCellsAndFaces()
+
+    ! write final postprocessing result
+    call writeGridStateToSiloFile('carrePostProcD0', struct, grid)
 
   contains
 
@@ -416,7 +295,7 @@ contains
                & struct%rxstruc(1:abs(struct%rnpstru(is)), is), &
                & struct%rystruc(1:abs(struct%rnpstru(is)), is), &
                & doesIntersect, iSegment, ipx, ipy, &
-               & testEndPoints = .false.)
+               & testEndPoints = .true.)
           if (present(iStruct)) iStruct = is
           if (doesIntersect) return
        end do
@@ -1143,6 +1022,114 @@ contains
     endif
   end subroutine insertPoints
 
+  subroutine finalizeCells(grid)
+    type(CarreGrid), intent(inout) :: grid
+
+    ! internal
+    integer :: iReg, ir, ip, iFace, ip2, ir2, ipExt, irExt, ipBnd, irBnd
+    integer :: nExt, nBnd
+
+    integer :: iPass, dx, dy, ipFace, irFace
+    logical :: pointMoved
+
+    ! For all intersected faces with an internal point on one and
+    ! an external point on the other side, move the external point
+    ! to the structure intersection
+
+    ! Consider every external point. Look at all faces this point is part of,
+    ! and consider the other end point.
+    ! First pass: if the other endpoint is an internal point, they are connect
+    ! by an intersected face. Move point onto the intersection.
+    ! Second pass: if the other endpoint is a boundary point, move the point onto it.
+    ! Only move every point once.
+    
+    do iReg = 1, grid%nReg
+       do ip = 1, grid%np1(iReg)
+          do ir = 1, grid%nr(iReg)
+             
+             if (grid%pointFlag(ip, ir, iReg) /= GRID_EXTERNAL) cycle
+
+             ! apply correction strategies one after another
+             pointMoved = .false.
+             do iPass = 1, 2
+
+                ! loop over all neighbour points = connected faces
+                do dx = -1, 1
+                   do dy = -1, 1
+                      ! make sure the offset we use makes sense
+                      if ( (abs(dx) + abs(dy)) /= 1) cycle
+
+                      ! Compute indices of neighbour point
+                      ip2 = ip + dx
+                      ir2 = ir + dy                    
+
+                      ! make sure neighbour point is in region
+                      if ( (ip2 < 1) .or. (ip2 > grid%np1(iReg)) ) cycle
+                      if ( (ir2 < 1) .or. (ir2 > grid%nr(iReg)) ) cycle
+
+                      ! figure out indices and type of face this point is on
+                      ipFace = ip + min(dx, 0)
+                      irFace = ir + min(dy, 0)
+                      if (dx /= 0) iFace = FACE_POLOIDAL
+                      if (dy /= 0) iFace = FACE_RADIAL
+
+                      ! First pass: move onto intersection
+                      if ( (iPass==1) .and. &
+                           & (grid%pointFlag(ip2, ir2, iReg) == GRID_INTERNAL) ) then
+
+                         ! external and internal point: 
+                         ! move external point onto intersection (in all regions!)                         
+                         call movePoint( grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
+                              & grid%faceISecPx(iFace,ipFace,irFace,iReg), grid%faceISecPy(iFace,ipFace,irFace,iReg) )
+                         pointMoved = .true.
+                         exit
+                      end if
+
+                      ! Second pass: move onto boundary point
+                      if ( (iPass==2) .and. &
+                           & (grid%pointFlag(ip2, ir2, iReg) == GRID_BOUNDARY) ) then
+
+                         ! external and boundary point: 
+                         ! move external point onto boundary point (-> triangle cell)
+                         call movePoint( grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
+                              & grid%xmail(ip2,ir2,iReg), grid%ymail(ip2,ir2,iReg) )
+                         pointMoved = .true.
+                         exit
+                      end if                      
+                   end do ! dy loop
+
+                   if (pointMoved) exit
+                end do ! dx loop
+
+                if (pointMoved) exit
+             end do ! strategy loop
+
+           end do
+        end do
+     end do
+
+   contains
+
+     subroutine movePoint( xFrom, yFrom, xTo, yTo )
+       double precision, intent(in) :: xFrom, yFrom, xTo, yTo
+       
+       ! internal
+       integer :: iReg, ip, ir
+
+       do iReg = 1, grid%nreg
+          ip = GRID_UNDEFINED
+          call findPointInRegion(grid, iReg, xFrom, yFrom, ip, ir)
+          ! if no point found, go to next region
+          if (ip == GRID_UNDEFINED) cycle
+          grid%xmail(ip, ir, iReg) = xTo
+          grid%ymail(ip, ir, iReg) = yTo
+       end do
+
+     end subroutine movePoint
+
+  end subroutine finalizeCells
+  
+
 
   !> Find the face in region iReg to which the given point (px, py) is closest.
   !> The starting point of the face (lowest in dex in poloidal and radial direction)
@@ -1301,23 +1288,25 @@ contains
     ! if we arrive here, nothing was found
     if (present(iFcP)) iFcP = GRID_UNDEFINED
     if (present(iFcR)) iFcR = GRID_UNDEFINED
-    if (present(regionHasFace)) regionHasFace = .false.
-
-    
+    if (present(regionHasFace)) regionHasFace = .false.    
   end subroutine findFaceInRegion
 
   !> Check if points (x1,y1) and (x2,y2) are identical
   !> (i.e, very very close to each other)
-  logical function pointsIdentical( x1, y1, x2, y2 )     
+  logical function pointsIdentical( x1, y1, x2, y2, absTol )     
     double precision, intent(in) :: x1, y1, x2, y2
+    double precision, intent(in), optional :: absTol
     
     ! internal
-    double precision :: dist
+    double precision :: dist, lAbsTol
     external :: dist
     
-    double precision, parameter :: ABSTOL = 1e-6
+    double precision, parameter :: DEFAULTABSTOL = 1e-6
 
-    pointsIdentical = ( dist(x1, y1, x2, y2) < ABSTOL )
+    lAbsTol = DEFAULTABSTOL
+    if (present(absTol)) lAbsTol = absTol
+
+    pointsIdentical = ( dist(x1, y1, x2, y2) < lAbsTol )
     
   end function pointsIdentical
 
@@ -1451,7 +1440,8 @@ contains
           if (testEndPoints) then
              do j = 0, 1 ! start point, end point of structure segment
                 do k = 1, 2 ! start point, end point of line segment
-                   if (pointsIdentical(xx(k), yy(k), xst(i+j), yst(i+j))) then
+                   if (pointsIdentical(xx(k), yy(k), xst(i+j), yst(i+j), &
+                        & absTol=1d-4 )) then
                       
                       if (present(iSegment)) iSegment = i
                       if (present(ipx) .and. present(ipy)) then
@@ -1503,6 +1493,211 @@ contains
     doesIntersect = .FALSE.
     if (present(iSegment)) iSegment = GRID_UNDEFINED
   END subroutine intersect
+
+
+  subroutine writeGridStateToSiloFile(filename, struct, grid)
+    character(*), intent(in) :: filename
+    type(CarreStructures), intent(in) :: struct
+    type(CarreGrid), intent(in) :: grid       
+
+    ! internal
+    integer :: iReg, iFace, iRad, iPol
+    logical :: doesIntersect
+    integer :: tmpCellQt(npmamx-1,nrmamx-1,nregmx)
+
+    ! for writing out point grids
+    double precision, dimension(npmamx * nrmamx * nregmx * 2) :: tmpX, tmpY
+    integer :: nIntPoints, ip, ir, ip2, ir2
+
+
+
+#ifdef USE_SILO
+    ! write results of first postprocessing step
+    call csioOpenFile(filename)
+    do iReg = 1, grid%nreg
+       call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
+            & grid%np1(iReg), grid%nr(iReg), &
+            & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
+            & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
+
+       call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
+            & 'cellFaceFlag'//int2str(iReg), &
+            & real(grid%cellFaceFlag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
+            & DB_ZONECENT )
+       call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
+            & 'cellflag'//int2str(iReg), &
+            & real(grid%cellflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
+            & DB_ZONECENT )                  
+    end do
+
+    ! internal points
+    nIntPoints = 0
+
+    do iReg = 1, grid%nreg
+       do ip = 1, grid%np1(iReg)
+          do ir = 1, grid%nr(iReg)
+             if ( grid%pointFlag(ip, ir, iReg) /= GRID_INTERNAL) cycle
+
+             nIntPoints = nIntPoints + 1
+
+             tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+             tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+          end do
+       end do
+    end do
+
+    call siloWritePointGrid( csioDbfile, 'internalPoints', &
+         & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+    ! external points
+    nIntPoints = 0
+
+    do iReg = 1, grid%nreg
+       do ip = 1, grid%np1(iReg)
+          do ir = 1, grid%nr(iReg)
+             if ( grid%pointFlag(ip, ir, iReg) /= GRID_EXTERNAL) cycle
+
+             nIntPoints = nIntPoints + 1
+
+             tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+             tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+          end do
+       end do
+    end do
+
+    call siloWritePointGrid( csioDbfile, 'externalPoints', &
+         & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+
+    ! boundary points
+    nIntPoints = 0
+
+    do iReg = 1, grid%nreg
+       do ip = 1, grid%np1(iReg)
+          do ir = 1, grid%nr(iReg)
+             if ( grid%pointFlag(ip, ir, iReg) /= GRID_BOUNDARY) cycle
+
+             nIntPoints = nIntPoints + 1
+
+             tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+             tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+          end do
+       end do
+    end do
+
+    write (*,*) 'carre_postprocess: ', nIntPoints, ' boundary points'
+    if (nIntPoints > 0) then
+       call siloWritePointGrid( csioDbfile, 'boundaryPoints', &
+            & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+    end if
+
+    ! radial intersected faces
+    nIntPoints = 0
+
+    do iReg = 1, grid%nreg
+       do ip = 1, grid%np1(iReg)
+          do ir = 1, grid%nr(iReg)
+
+             ! radial face
+             if ( ir < grid%nr(iReg) ) then
+                if (grid%faceISec(FACE_RADIAL, ip, ir, iReg)) then
+                   nIntPoints = nIntPoints + 1
+                   tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                   tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+                   nIntPoints = nIntPoints + 1
+                   tmpX(nIntPoints) = grid%xmail(ip, ir+1, iReg)
+                   tmpY(nIntPoints) = grid%ymail(ip, ir+1, iReg)                
+                end if
+             end if
+
+          end do
+       end do
+    end do
+
+    call siloWritePointGrid( csioDbfile, 'radialIntersectedFaces', &
+         & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+    ! radial intersected faces
+    nIntPoints = 0
+
+    do iReg = 1, grid%nreg
+       do ip = 1, grid%np1(iReg)
+          do ir = 1, grid%nr(iReg)
+
+             ! poloidal face
+             if ( ip < grid%np1(iReg) ) then
+                if ( grid%faceISec(FACE_POLOIDAL, ip, ir, iReg)) then
+                   nIntPoints = nIntPoints + 1
+                   tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                   tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+                   nIntPoints = nIntPoints + 1
+                   tmpX(nIntPoints) = grid%xmail(ip+1, ir, iReg)
+                   tmpY(nIntPoints) = grid%ymail(ip+1, ir, iReg)                
+                end if
+             end if
+
+          end do
+       end do
+    end do
+
+    call siloWritePointGrid( csioDbfile, 'poloidalIntersectedFaces', &
+         & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+
+    ! intersected faces with two external points
+    ! radial intersected faces
+    nIntPoints = 0
+
+    do iReg = 1, grid%nreg
+       do ip = 1, grid%np1(iReg)
+          do ir = 1, grid%nr(iReg)
+             do iFace = 1, 2 ! poloidal, radial
+
+                select case (iFace)
+                case(FACE_POLOIDAL)
+                   if (ip == grid%np1(iReg)) cycle
+                   ip2 = ip + 1
+                   ir2 = ir
+                case(FACE_RADIAL)
+                   if (ir == grid%nr(iReg)) cycle
+                   ip2 = ip
+                   ir2 = ir + 1
+                end select
+
+                if ( .not. grid%faceISec(iFace, ip, ir, iReg)) cycle
+
+                if ( (grid%cellFlag(ip,ir,iReg) == GRID_EXTERNAL) &
+                     & .and. (grid%cellFlag(ip2,ir2,iReg) == GRID_EXTERNAL) ) then
+                   nIntPoints = nIntPoints + 1
+                   tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                   tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+                   nIntPoints = nIntPoints + 1
+                   tmpX(nIntPoints) = grid%xmail(ip2, ir2, iReg)
+                   tmpY(nIntPoints) = grid%ymail(ip2, ir2, iReg)
+                end if
+
+             end do
+          end do
+       end do
+    end do
+
+    call siloWritePointGrid( csioDbfile, 'intersectedExternalFaces', &
+         & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+
+
+    ! limiting level lines
+    do iRad = 1, struct%nbniv
+       call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iRad), &
+            & struct%nivx(1:struct%nivtot(iRad), iRad), &
+            & struct%nivy(1:struct%nivtot(iRad), iRad) )
+    end do
+
+    call csioCloseFile()
+
+#endif
+
+
+  end subroutine writeGridStateToSiloFile
 
 
 end module carre_postprocess
