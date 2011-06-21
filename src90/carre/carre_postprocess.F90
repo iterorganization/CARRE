@@ -93,8 +93,6 @@ contains
     ! of faces onto boundary intersections
     call finalizeCells(grid)
 
-    call categorizeCellsAndFaces()
-
     ! write final postprocessing result
     call writeGridStateToSiloFile('carrePostProcD0', struct, grid)
 
@@ -1029,8 +1027,8 @@ contains
     integer :: iReg, ir, ip, iFace, ip2, ir2, ipExt, irExt, ipBnd, irBnd
     integer :: nExt, nBnd
 
-    integer :: iPass, dx, dy, ipFace, irFace
-    logical :: pointMoved
+    integer :: iPass, dx, dy, ipFace, irFace, nInt, ipl, irl, ipFix, irFix, ipNb, irNb
+    logical :: pointMoved, pointOk
 
     ! For all intersected faces with an internal point on one and
     ! an external point on the other side, move the external point
@@ -1108,6 +1106,74 @@ contains
         end do
      end do
 
+     ! Now catch special case of internal cells with three external cells and one internal cell
+     ! (no boundary cells). Make sure the external point not connected to the internal 
+     ! point via a face is placed on one of the other external point. If this is not 
+     ! the case, move it to the external neighbour along the radial face.
+
+     do iReg = 1, grid%nReg
+        do ip = 1, grid%np1(iReg) - 1
+           do ir = 1, grid%nr(iReg) - 1
+        
+              ! we are interested in internal cells
+              if (grid%cellflag(ip, ir, iReg) == GRID_EXTERNAL) cycle
+              
+              ! ...with 1 internal and 3 external points
+              nInt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_INTERNAL )
+              nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
+              if (.not. ((nInt == 1) .and. (nExt == 3)) ) cycle
+              
+              write (*,*) 'finalizeCells: candidate cell ', ip, ir, iReg
+
+              ! find the internal point
+              ipFix = GRID_UNDEFINED
+              irFix = GRID_UNDEFINED
+              do ipL = 0, 1
+                 do irL = 0, 1
+                    if ( grid%pointflag(ip + ipL, ir + irL, iReg) == GRID_INTERNAL ) then
+                       ipFix = ip + ipL
+                       irFix = ir + irL
+                    end if
+                 end do
+              end do
+              call assert( ipFix /= GRID_UNDEFINED )
+
+              ! the external point we are interested in is on the opposite corner
+              ipFix = ipFix + 1
+              irFix = irFix + 1
+              if (ipFix > ip+1) ipFix = ip
+              if (irFix > ir+1) irFix = ir
+      
+              ! Check whether the point is already positioned on another corner
+              pointOk = .false.
+
+              ! compare with neighbour in poloidal direction
+              ipNb = ipFix + 1
+              irNb = irFix
+              if (ipNb > ip+1) ipNb = ip
+              pointOk = pointOk .or. pointsIdentical( &
+                   & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
+                   & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) )
+
+              ! compare with neighbour in radial direction
+              ipNb = ipFix
+              irNb = irFix + 1
+              if (irNb > ir+1) irNb = ir
+              pointOk = pointOk .or. pointsIdentical( &
+                   & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
+                   & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) )
+
+              ! if not ok, set it to neighbour in radial direction
+              if (.not. pointOk) then
+                 write (*,*) 'finalizeCells: cell ', ip, ir, iReg,', fixing node ', ipFix, irFix, ' with node ', ipNb, irNb
+                 call movePoint( grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
+                   & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) )
+              end if
+
+           end do
+        end do
+     end do
+
    contains
 
      subroutine movePoint( xFrom, yFrom, xTo, yTo )
@@ -1126,6 +1192,7 @@ contains
        end do
 
      end subroutine movePoint
+
 
   end subroutine finalizeCells
   
@@ -1468,14 +1535,14 @@ contains
                 &              (yst(i)-yy(1)) * (xst(i+1)-xst(i)))/determ
 
             !..Pour avoir intersection, il faut que mult1 soit entre 0 et 1
-            IF ((mult1.GT.0.).AND.(mult1.LT.1.)) THEN
+            IF ((mult1 >= 0.0d0).AND.(mult1 <= 1.0d0)) THEN
 
                 !..Fact. mult. du segment de structure.
                 mult2= ((xx(2)-xx(1)) * (yst(i)-yy(1)) - & 
                     &                (yy(2)-yy(1)) * (xst(i)-xx(1)))/determ
 
                 !..Intersection si mult2 entre 0 et 1
-                IF ((mult2.GT.0.).AND.(mult2.LT.1.)) THEN
+                IF ((mult2 >= 0.0d0).AND.(mult2 <= 1.0d0)) THEN
                     doesIntersect = .true.
                     if (present(iSegment)) iSegment = i
                     if (present(ipx) .and. present(ipy)) then
