@@ -532,8 +532,11 @@ contains
                 isecBotFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_BOTTOM)
 
                 ! If more than two intersections per cell,  grid/geometry has issues
-                call assert( .not. (isecTopFace .and. isecBotFace), &
-                     & 'fixCells: broken cell has two intersected poloidal faces')
+                if ( isecTopFace .and. isecBotFace ) then
+                   write (*,*) 'fixCells: broken cell has two intersected poloidal faces:', &
+                        & ip, ir, iReg, ' corner at ', &
+                        & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)
+                end if
 
                 ! Here, we are only interested in "real" intersections, i.e.
                 ! intersections in the middle of the face, not directly in the face 
