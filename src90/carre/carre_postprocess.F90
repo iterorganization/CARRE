@@ -74,7 +74,7 @@ contains
        ! Compute the object categorization
        call categorizeCellsAndFaces()
 
-       call writeGridStateToSiloFile('carrePostProcA'//int2str(iPostProcess), struct, grid)
+       call writeGridStateToSiloFile('carrePostProcA'//int2str(iPostProcess), equ, struct, grid)
 
        ! cells need refinement?
        nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE )
@@ -87,14 +87,14 @@ contains
     end do
 
     ! write results of postprocessing iteration
-    call writeGridStateToSiloFile('carrePostProcC0', struct, grid)
+    call writeGridStateToSiloFile('carrePostProcC0', equ, struct, grid)
     
     ! Finalize grid cell fixes by moving external points
     ! of faces onto boundary intersections
     call finalizeCells(grid)
 
     ! write final postprocessing result
-    call writeGridStateToSiloFile('carrePostProcD0', struct, grid)
+    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
   contains
 
@@ -1565,8 +1565,9 @@ contains
   END subroutine intersect
 
 
-  subroutine writeGridStateToSiloFile(filename, struct, grid)
+  subroutine writeGridStateToSiloFile(filename, equ, struct, grid)
     character(*), intent(in) :: filename
+    type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(in) :: grid       
 
@@ -1579,11 +1580,18 @@ contains
     double precision, dimension(npmamx * nrmamx * nregmx * 2) :: tmpX, tmpY
     integer :: nIntPoints, ip, ir, ip2, ir2
 
-
-
 #ifdef USE_SILO
-    ! write results of first postprocessing step
     call csioOpenFile(filename)
+
+    ! write equilibrium data
+    call siloWriteStructured2dGrid( csioDbfile, 'equilibrium_grid', &
+         & equ%nx, equ%ny, &
+         & equ%x(1:equ%nx), equ%y(1:equ%ny) )
+
+    call siloWriteQuadData( csioDbfile, 'equilibrium_grid', 'psi', &
+         & equ%psi(1:equ%nx, 1:equ%ny), DB_NODECENT )
+
+    ! write region grids
     do iReg = 1, grid%nreg
        call siloWriteQuadGrid( csioDbfile, 'region'//int2str(iReg), &
             & grid%np1(iReg), grid%nr(iReg), &
