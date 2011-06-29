@@ -1597,7 +1597,6 @@ contains
             & grid%np1(iReg), grid%nr(iReg), &
             & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
             & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg) )
-
        call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
             & 'cellFaceFlag'//int2str(iReg), &
             & real(grid%cellFaceFlag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
@@ -1605,7 +1604,17 @@ contains
        call siloWriteQuadData( csioDbfile, 'region'//int2str(iReg), &
             & 'cellflag'//int2str(iReg), &
             & real(grid%cellflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
-            & DB_ZONECENT )                  
+            & DB_ZONECENT )
+
+       call siloWriteQuadGrid( csioDbfile, 'cregion'//int2str(iReg), &
+            & grid%np1(iReg), grid%nr(iReg), &
+            & grid%xmail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
+            & grid%ymail(1:grid%np1(iReg), 1:grid%nr(iReg), iReg), &
+            & logicalPlot = .true. )
+       call siloWriteQuadData( csioDbfile, 'cregion'//int2str(iReg), &
+            & 'ccellflag'//int2str(iReg), &
+            & real(grid%cellflag(1:grid%np1(iReg)-1, 1:grid%nr(iReg)-1, iReg),rKind), &
+            & DB_ZONECENT )
     end do
 
     ! internal points
