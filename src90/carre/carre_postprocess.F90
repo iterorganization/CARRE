@@ -19,7 +19,7 @@ module carre_postprocess
 
   private
 
-  public carre_postprocess_computation
+  public carre_postprocess_computation, writeGridStateToSiloFile
 
   ! Number of faces of a cell. 
   ! Bit positions in grid%cellFaceFlag marking that faces of a cell are intersected

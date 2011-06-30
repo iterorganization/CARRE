@@ -86,23 +86,25 @@
                   ENDIF
                ENDIF
 
-               IF (y2.GE.equ%y(j).AND.y2.LE.equ%y(j+1).AND.aa.NE.0.) THEN
-                  if(equ%a10(i,j,2)+equ%a11(i,j,2)*y2.ne.0.) then
-                    x2 = (-equ%a00(i,j,2)-(equ%a01(i,j,2)*y2))/(equ%a10(i,j,2) & 
-     &                   +(equ%a11(i,j,2)*y2))
-                  else
-                    x2 = 2.*equ%x(1)-equ%x(2)
-                  endif
-                  IF (x2.GE.equ%x(i).AND.x2.LE.equ%x(i+1)) THEN
+               if (aa.NE.0.) then
+                  IF (y2.GE.equ%y(j).AND.y2.LE.equ%y(j+1)) THEN
+                     if(equ%a10(i,j,2)+equ%a11(i,j,2)*y2.ne.0.) then
+                        x2 = (-equ%a00(i,j,2)-(equ%a01(i,j,2)*y2))/(equ%a10(i,j,2) & 
+                             &                   +(equ%a11(i,j,2)*y2))
+                     else
+                        x2 = 2.*equ%x(1)-equ%x(2)
+                     endif
+                     IF (x2.GE.equ%x(i).AND.x2.LE.equ%x(i+1)) THEN
 
-                     equ%npxtot = equ%npxtot + 1
-                     equ%pointx(equ%npxtot) = x2
-                     equ%pointy(equ%npxtot) = y2
-                     equ%ii(equ%npxtot) = i
-                     equ%jj(equ%npxtot) = j
+                        equ%npxtot = equ%npxtot + 1
+                        equ%pointx(equ%npxtot) = x2
+                        equ%pointy(equ%npxtot) = y2
+                        equ%ii(equ%npxtot) = i
+                        equ%jj(equ%npxtot) = j
 
+                     ENDIF
                   ENDIF
-               ENDIF
+               end if
             ENDIF
 
    20    CONTINUE

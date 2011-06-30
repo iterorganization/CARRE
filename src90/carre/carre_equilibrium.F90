@@ -27,6 +27,8 @@ contains
     ! internal
     double precision :: dx, dy
     integer :: i
+    double precision :: newPsi(NXMAX, NYMAX)
+
 
     call assert( equ%nx + addLeft + addRight <= nxmax )
     call assert( equ%ny + addTop + addBottom <= nxmax )
@@ -42,17 +44,22 @@ contains
     equ%x(addLeft + 1 : addLeft + equ%nx) = equ%x(1 : equ%nx)
     equ%y(addBottom + 1 : addBottom + equ%ny) = equ%y(1 : equ%ny)
     
-    equ%x(1 : addLeft) = (/ ( i*dx - addLeft*dx, i = 0, addLeft-1) /)
-    equ%x(addLeft + equ%nx + 1 : addLeft + equ%nx + addRight) = (/ ( i*dx + equ%x(equ%nx), i = 1, addRight) /)
+    equ%x(1 : addLeft) = (/ ( equ%x(addLeft + 1) - addLeft*dx + i*dx , i = 0, addLeft-1) /)
+    equ%x(addLeft + equ%nx + 1 : addLeft + equ%nx + addRight) = (/ ( i*dx + equ%x(equ%nx + addLeft), i = 1, addRight) /)
 
-    equ%y(1 : addBottom) = (/ ( i*dy - addBottom*dy, i = 0, addBottom-1) /)
-    equ%y(addBottom + equ%ny + 1 : addBottom + equ%ny + addTop) = (/ ( i*dy + equ%y(equ%ny), i = 1, addTop) /)
+    equ%y(1 : addBottom) = (/ ( equ%y(addBottom + 1)- addBottom*dy + i*dy , i = 0, addBottom-1) /)
+    equ%y(addBottom + equ%ny + 1 : addBottom + equ%ny + addTop) = (/ ( i*dy + equ%y(equ%ny + addBottom), i = 1, addTop) /)
+
+    ! move present psi data
+    newPsi = huge(newPsi)
+    newPsi( addLeft + 1 : addLeft + equ%nx, addBottom + 1 : addBottom + equ%ny ) = equ%psi(1 : equ%nx, 1 : equ%ny)
+    equ%psi = newPsi
 
     equ%nx = equ%nx + addLeft + addRight
     equ%ny = equ%ny + addTop + addBottom
 
     ! Run extension algorithm
-    call compute_distance_exact(equ, 1.0d0)
+    call compute_distance_exact(equ, -3.0d0)
 
   end subroutine extend_equilibrium
 
@@ -90,7 +97,7 @@ contains
       integer, intent(in) :: ixp, iyp
 
       ! internal
-      integer :: ix, iy
+      integer :: ix, iy, ixMin, iyMin
       double precision :: dist
 
       minDist = huge(minDist)
@@ -102,10 +109,16 @@ contains
             
             dist = sqrt( (equ%x(ixp) - equ%x(ix)) ** 2 &
                  & + (equ%y(iyp) - equ%y(iy)) ** 2 )
-
-            minDist = min( equ%psi(ix, iy) + dist * factor, minDist)
+            
+            if ( dist < minDist ) then
+               minDist = dist
+               ixMin = ix
+               iyMin = iy
+            end if
          end do
       end do
+
+      minDist = equ%psi(ixMin, iyMin) + minDist * factor
 
     end function minDist
 

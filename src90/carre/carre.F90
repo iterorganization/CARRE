@@ -85,7 +85,11 @@ PROGRAM CARRE
   ! Initialize & read carre input from file
   call carre_init(equ, struct, par)
 
+  call writeGridStateToSiloFile('carrePreProcA00', equ, struct, grid)
+
   call extend_equilibrium(equ, -0.14d0, huge(0.0d0), 40, 40, 0, 40)
+
+  call writeGridStateToSiloFile('carrePreProcB00', equ, struct, grid)
 
   ! Create the grid
   call carre_main_computation(equ, struct, par, grid, diag)
