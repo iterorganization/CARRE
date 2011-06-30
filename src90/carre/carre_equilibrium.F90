@@ -19,15 +19,20 @@ contains
 
   !> Extend a given equilibrium by throwing away data outside a given psi value and extending
   !> the remaining data.
-  subroutine extend_equilibrium(equ, psimin, psimax, addLeft, addRight, addBottom, addTop)
+  subroutine extend_equilibrium(equ, psimin, psimax, &
+       & rMin, rMax, zMin, zMax, &
+       & addLeft, addRight, addBottom, addTop)
     type(CarreEquilibrium), intent(inout) :: equ
-    double precision, intent(in) :: psimin, psimax
+    double precision, intent(in) :: psimin, psimax, rMin, rMax, zMin, zMax
     integer, intent(in) :: addLeft, addRight, addTop, addBottom
 
     ! internal
     double precision :: dx, dy
-    integer :: i
+    integer :: i, ixCutMin, ixCutMax, iyCutMin, iyCutMax
     double precision :: newPsi(NXMAX, NYMAX)
+
+    external :: ifind
+    integer :: ifind
 
 
     call assert( equ%nx + addLeft + addRight <= nxmax )
@@ -36,6 +41,26 @@ contains
     ! cut off psi values
     where (equ%psi < psimin) equ%psi = huge(equ%psi)
     where (equ%psi > psimax) equ%psi = huge(equ%psi)
+
+    if ( rMin > equ%x(1) ) then
+       ixCutMin = ifind( rMin, equ%x, equ%nx, 1)
+       equ%psi(1 : ixCutMin - 1, :) = huge(equ%psi)
+    end if
+
+    if ( rMax < equ%x(equ%nx) ) then
+       ixCutMax = ifind( rMax, equ%x, equ%nx, 1)
+       equ%psi(ixCutMax + 1 : equ%nx, :) = huge(equ%psi)
+    end if
+
+    if ( zMin > equ%y(1) ) then
+       iyCutMin = ifind( zMin, equ%y, equ%ny, 1)
+       equ%psi(:, 1 : iyCutMin - 1) = huge(equ%psi)
+    end if
+
+    if ( zMax < equ%y(equ%ny) ) then
+       iyCutMax = ifind( zMax, equ%y, equ%ny, 1)
+       equ%psi(:, iyCutMax + 1 : equ%ny) = huge(equ%psi)
+    end if
 
     ! extend grid towards left, right, bottom, top
     dx = equ%x(2) - equ%x(1)

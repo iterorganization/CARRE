@@ -1590,6 +1590,10 @@ contains
 
     call siloWriteQuadData( csioDbfile, 'equilibrium_grid', 'psi', &
          & equ%psi(1:equ%nx, 1:equ%ny), DB_NODECENT )
+    call siloWriteQuadData( csioDbfile, 'equilibrium_grid', 'psidx', &
+         & equ%psidx(1:equ%nx, 1:equ%ny), DB_NODECENT )
+    call siloWriteQuadData( csioDbfile, 'equilibrium_grid', 'psidy', &
+         & equ%psidy(1:equ%nx, 1:equ%ny), DB_NODECENT )
 
     ! write region grids
     do iReg = 1, grid%nreg

@@ -1,3 +1,4 @@
+
 PROGRAM CARRE
   !======================================================================
   !
@@ -87,7 +88,9 @@ PROGRAM CARRE
 
   call writeGridStateToSiloFile('carrePreProcA00', equ, struct, grid)
 
-  call extend_equilibrium(equ, -0.14d0, huge(0.0d0), 40, 40, 0, 40)
+  !call extend_equilibrium(equ, -0.14d0, huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), 1.2d0, 40, 40, 0, 40)
+  call extend_equilibrium(equ, -huge(0.0d0), huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), 1.2d0, 40, 40, 0, 40)
+  !call extend_equilibrium(equ, -0.14d0, huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), huge(0.0d0), 40, 40, 0, 40)
 
   call writeGridStateToSiloFile('carrePreProcB00', equ, struct, grid)
 

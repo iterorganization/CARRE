@@ -168,6 +168,10 @@
 !>>>
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
+
+        ! If in extended grid mode, set up ghost cells again
+        
+
 !<<<
 !        write(0,*) 'call ecrim4: nx,ny = ',nx,ny
 !>>>
