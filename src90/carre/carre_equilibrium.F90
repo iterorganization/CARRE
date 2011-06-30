@@ -56,23 +56,32 @@ contains
 
   end subroutine extend_equilibrium
 
+
+  !> Compute uninitialized values of psi by computing the distance to the closest
+  !> initialized value multiplied by some factor. This algorithm is fast, but imprecise.
+  !> It uses a distance transform with approximate distance constants.
+
   subroutine compute_distance_exact(equ, factor)
     type(CarreEquilibrium), intent(inout) :: equ
     double precision, intent(in) :: factor
 
     ! internal
     integer :: ix, iy
-    double precision :: newDist(nxmax, nymax)
+    double precision :: newPsi(NXMAX, NYMAX)
+
+    newPsi = equ%psi
 
     do ix = 1, equ%nx
        do iy = 1, equ%ny
           
           if ( equ%psi(ix, iy) == huge(equ%psi(ix, iy)) ) then
-             newDist(ix, iy) = minDist(ix, iy)
+             newPsi(ix, iy) = minDist(ix, iy)
           end if
 
        end do
     end do
+
+    equ%psi = newPsi
 
   contains
 
@@ -101,6 +110,33 @@ contains
     end function minDist
 
   end subroutine compute_distance_exact
+
+
+  !> Compute uninitialized values of psi by computing the distance to the closest
+  !> initialized value multiplied by some factor. This algorithm is very slow, but precise.
+  subroutine compute_distance_fast(equ, factor)
+    type(CarreEquilibrium), intent(inout) :: equ
+    double precision, intent(in) :: factor
+
+    ! internal
+    integer :: ix, iy
+    double precision :: newPsi(NXMAX, NYMAX)
+
+!!$    newPsi = equ%psi
+!!$
+!!$    do ix = 1, equ%nx
+!!$       do iy = 1, equ%ny
+!!$          
+!!$          if ( equ%psi(ix, iy) == huge(equ%psi(ix, iy)) ) then
+!!$             newPsi(ix, iy) = minDist(ix, iy)
+!!$          end if
+!!$
+!!$       end do
+!!$    end do
+!!$
+!!$    equ%psi = newPsi
+
+  end subroutine compute_distance_fast
 
 
 
