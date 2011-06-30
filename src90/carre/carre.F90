@@ -22,6 +22,7 @@ PROGRAM CARRE
   use carre_types
   use carre_main
   use carre_postprocess
+  use carre_equilibrium
 
   IMPLICIT NONE
 
@@ -84,8 +85,9 @@ PROGRAM CARRE
   ! Initialize & read carre input from file
   call carre_init(equ, struct, par)
 
-  ! Create the grid
+  call extend_equilibrium(equ, -0.14d0, huge(0.0d0), 40, 40, 0, 40)
 
+  ! Create the grid
   call carre_main_computation(equ, struct, par, grid, diag)
 
   ! Postprocess
