@@ -27,6 +27,15 @@ module carre_types
   integer, parameter, public :: FACE_POLOIDAL = 1
   integer, parameter, public :: FACE_RADIAL = 2
 
+  ! Grid extension modes
+  integer, parameter, public :: GRID_EXTENSION_OFF = 0
+  integer, parameter, public :: GRID_EXTENSION_MODE_TARGET = 1
+  integer, parameter, public :: GRID_EXTENSION_MODE_VESSEL = 2
+  
+  ! Equilibrium extension modes
+  integer, parameter, public :: EQU_EXTENSION_OFF = 0
+  integer, parameter, public :: EQU_EXTENSION_MODE_SIMPLE = 1
+  integer, parameter, public :: EQU_EXTENSION_MODE_VESSEL = 2
 
   type CarreParameters
 !.. nptseg: number of points along differents segments of separatrix
@@ -46,7 +55,21 @@ module carre_types
 !.. cstlin: a linear constant added along y to artificially disconnect
 !           the X-points. Set to 0 for connected double-nulls
       real*8 :: cstlin = 0.00
+
+      ! Control flag for equilibrium data extension
+      integer :: equExtensionMode = EQU_EXTENSION_OFF
+
+      ! psi cutoff parameters
+      double precision :: psimin = -huge(0.0d0), psimax = huge(0.0d0)
+      ! boundary cutoff parameters (given in physical space dimensions)
+      double precision :: rMin = -huge(0.0d0), rMax = huge(0.0d0)
+      double precision :: zMin = -huge(0.0d0), zMax = huge(0.0d0)
       
+      ! extension size for equilibrium grid at the boundaries
+      integer :: addLeft = 0, addRight = 0, addTop = 0, addBottom = 0      
+
+      ! Extended grid mode
+      integer :: gridExtensionMode = GRID_EXTENSION_MODE_TARGET
   end type CarreParameters
 
   
@@ -172,15 +195,10 @@ module carre_types
       REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
 
       character nomstr(strumx)*80
-
-
   end type CarreStructures
 
   public CarreParameters, CarreEquilibrium, CarreGrid, CarreStructures
 
-
 !!$contains
-
-
 
 end module carre_types

@@ -8,6 +8,7 @@ module itmcarre
   use carre_types
   use CarreDiagnostics
   use b2ITMMapping
+  use carre_parameter_io
 
   implicit none
 

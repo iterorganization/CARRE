@@ -1043,6 +1043,8 @@ contains
     ! by an intersected face. Move point onto the intersection.
     ! Second pass: if the other endpoint is a boundary point, move the point onto it.
     ! Only move every point once.
+
+    ! TODO: make sure we remove north/south boundary condition if possible
     
     do iReg = 1, grid%nReg
        do ip = 1, grid%np1(iReg)

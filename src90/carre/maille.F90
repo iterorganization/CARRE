@@ -18,6 +18,7 @@
       use CarreSiloIO
       use CarreDiagnostics
       use carre_types
+      use carre_parameter_io
   
       IMPLICIT NONE
   
@@ -1304,7 +1305,7 @@
 
                 !.. Check & modify code parameters
                 call check_and_modify_code_parameters(par, correct)
-            end do
+             end do
 
 
 
@@ -2266,9 +2267,10 @@
       RETURN
 !======================================================================
 
+contains
 
-CONTAINS
-
+  !> Read code parameters from carre.dat and allow user to change them.
+  !> TODO: move this to carre_parameter_io module 
   subroutine read_code_parameters(par, distxo)
     implicit none
     type(CarreParameters), intent(inout) :: par
@@ -2318,6 +2320,8 @@ CONTAINS
   end subroutine read_code_parameters
 
 
+  !> Perform sanity checks on parameters and let the user modify parameters interactively.
+  !> TODO: this routine should be moved into the carre_parameter_io module.
   subroutine check_and_modify_code_parameters(par, correct)
     implicit none
     type(CarreParameters), intent(inout) :: par
@@ -2347,7 +2351,7 @@ CONTAINS
             nn1=nn1+1
             xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
             yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
-         end do	
+         end do
 
 ! on colle la dernière ligne de niveau sur trace2 pour avoir
 ! la pénétration.

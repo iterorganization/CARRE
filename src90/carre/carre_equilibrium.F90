@@ -19,12 +19,9 @@ contains
 
   !> Extend a given equilibrium by throwing away data outside a given psi value and extending
   !> the remaining data.
-  subroutine extend_equilibrium(equ, psimin, psimax, &
-       & rMin, rMax, zMin, zMax, &
-       & addLeft, addRight, addBottom, addTop)
+  subroutine extend_equilibrium(equ, par)
     type(CarreEquilibrium), intent(inout) :: equ
-    double precision, intent(in) :: psimin, psimax, rMin, rMax, zMin, zMax
-    integer, intent(in) :: addLeft, addRight, addTop, addBottom
+    type(CarreParameters), intent(in) :: par
 
     ! internal
     double precision :: dx, dy
@@ -34,54 +31,67 @@ contains
     external :: ifind
     integer :: ifind
 
+    if (par%equilibriumExtensionMode == EQU_EXTENSION_OFF) return
 
-    call assert( equ%nx + addLeft + addRight <= nxmax )
-    call assert( equ%ny + addTop + addBottom <= nxmax )
+    call assert( equ%nx + par%addLeft + par%addRight <= nxmax )
+    call assert( equ%ny + par%addTop + par%addBottom <= nxmax )
 
-    ! cut off psi values
-    where (equ%psi < psimin) equ%psi = huge(equ%psi)
-    where (equ%psi > psimax) equ%psi = huge(equ%psi)
+    if (par%equilibriumExtensionMode == EQU_EXTENSION_MODE_SIMPLE) then
 
-    if ( rMin > equ%x(1) ) then
-       ixCutMin = ifind( rMin, equ%x, equ%nx, 1)
-       equ%psi(1 : ixCutMin - 1, :) = huge(equ%psi)
+       ! cut off psi values
+       where (equ%psi < par%psimin) equ%psi = huge(equ%psi)
+       where (equ%psi > par%psimax) equ%psi = huge(equ%psi)
+
+       if ( par%rMin > equ%x(1) ) then
+          ixCutMin = ifind( par%rMin, equ%x, equ%nx, 1)
+          equ%psi(1 : ixCutMin - 1, :) = huge(equ%psi)
+       end if
+
+       if ( par%rMax < equ%x(equ%nx) ) then
+          ixCutMax = ifind( par%rMax, equ%x, equ%nx, 1)
+          equ%psi(ixCutMax + 1 : equ%nx, :) = huge(equ%psi)
+       end if
+
+       if ( par%zMin > equ%y(1) ) then
+          iyCutMin = ifind( par%zMin, equ%y, equ%ny, 1)
+          equ%psi(:, 1 : iyCutMin - 1) = huge(equ%psi)
+       end if
+
+       if ( par%zMax < equ%y(equ%ny) ) then
+          iyCutMax = ifind( par%zMax, equ%y, equ%ny, 1)
+          equ%psi(:, iyCutMax + 1 : equ%ny) = huge(equ%psi)
+       end if
+
     end if
 
-    if ( rMax < equ%x(equ%nx) ) then
-       ixCutMax = ifind( rMax, equ%x, equ%nx, 1)
-       equ%psi(ixCutMax + 1 : equ%nx, :) = huge(equ%psi)
-    end if
-
-    if ( zMin > equ%y(1) ) then
-       iyCutMin = ifind( zMin, equ%y, equ%ny, 1)
-       equ%psi(:, 1 : iyCutMin - 1) = huge(equ%psi)
-    end if
-
-    if ( zMax < equ%y(equ%ny) ) then
-       iyCutMax = ifind( zMax, equ%y, equ%ny, 1)
-       equ%psi(:, iyCutMax + 1 : equ%ny) = huge(equ%psi)
+    if (par%equilibriumExtensionMode == EQU_EXTENSION_MODE_VESSEL) then
+       ! smart equilibrium cutoff: cut off points outside of vessel
+       call equilibrium_vessel_cutoff(equ, struct)
     end if
 
     ! extend grid towards left, right, bottom, top
     dx = equ%x(2) - equ%x(1)
     dy = equ%y(2) - equ%y(1)
 
-    equ%x(addLeft + 1 : addLeft + equ%nx) = equ%x(1 : equ%nx)
-    equ%y(addBottom + 1 : addBottom + equ%ny) = equ%y(1 : equ%ny)
+    equ%x(par%addLeft + 1 : par%addLeft + equ%nx) = equ%x(1 : equ%nx)
+    equ%y(par%addBottom + 1 : par%addBottom + equ%ny) = equ%y(1 : equ%ny)
     
-    equ%x(1 : addLeft) = (/ ( equ%x(addLeft + 1) - addLeft*dx + i*dx , i = 0, addLeft-1) /)
-    equ%x(addLeft + equ%nx + 1 : addLeft + equ%nx + addRight) = (/ ( i*dx + equ%x(equ%nx + addLeft), i = 1, addRight) /)
+    equ%x(1 : par%addLeft) = (/ ( equ%x(par%addLeft + 1) - par%addLeft*dx + i*dx , i = 0, par%addLeft-1) /)
+    equ%x(par%addLeft + equ%nx + 1 : par%addLeft + equ%nx + par%addRight) &
+         & = (/ ( i*dx + equ%x(equ%nx + par%addLeft), i = 1, par%addRight) /)
 
-    equ%y(1 : addBottom) = (/ ( equ%y(addBottom + 1)- addBottom*dy + i*dy , i = 0, addBottom-1) /)
-    equ%y(addBottom + equ%ny + 1 : addBottom + equ%ny + addTop) = (/ ( i*dy + equ%y(equ%ny + addBottom), i = 1, addTop) /)
+    equ%y(1 : par%addBottom) = (/ ( equ%y(par%addBottom + 1)- par%addBottom*dy + i*dy , i = 0, par%addBottom-1) /)
+    equ%y(par%addBottom + equ%ny + 1 : par%addBottom + equ%ny + par%addTop) &
+         & = (/ ( i*dy + equ%y(equ%ny + par%addBottom), i = 1, par%addTop) /)
 
     ! move present psi data
     newPsi = huge(newPsi)
-    newPsi( addLeft + 1 : addLeft + equ%nx, addBottom + 1 : addBottom + equ%ny ) = equ%psi(1 : equ%nx, 1 : equ%ny)
+    newPsi( par%addLeft + 1 : par%addLeft + equ%nx, par%addBottom + 1 : par%addBottom + equ%ny ) &
+         & = equ%psi(1 : equ%nx, 1 : equ%ny)
     equ%psi = newPsi
 
-    equ%nx = equ%nx + addLeft + addRight
-    equ%ny = equ%ny + addTop + addBottom
+    equ%nx = equ%nx + par%addLeft + par%addRight
+    equ%ny = equ%ny + par%addTop + par%addBottom
 
     ! Run extension algorithm
     call compute_distance_exact(equ, -3.0d0)
@@ -175,7 +185,5 @@ contains
 !!$    equ%psi = newPsi
 
   end subroutine compute_distance_fast
-
-
 
 end module carre_equilibrium

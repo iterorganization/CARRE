@@ -1,9 +1,12 @@
 module carre_virtualstructures
 
   use carre_types
+#ifdef USE_SILO
+  use SiloIO
+  use CarreSiloIO
+#endif
 
   implicit none
-
 
 #include <CARREDIM.F>
 
@@ -12,14 +15,56 @@ module carre_virtualstructures
 
 contains
 
+  subroutine setupVirtualStructures(par, equ, struct)
+    type(CarreParameters), intent(in) :: par
+    type(CarreEquilibrium), intent(in) :: equ
+    type(CarreStructures), intent(inout) :: struct
+
+    if (par%gridExtensionMode == GRID_EXTENSION_MODE_OFF) return
+
+    struct%nstruc = 0
+
+    CALL virtualTargets(par, equ, struct, &
+         & equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
+         & equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
+         & equ%a00,equ%a10,equ%a01,equ%a11 )
+
+    !..   10.2  Set up virtual limiters if in target mode
+    if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
+       call VIRTUALLIMITERS(struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
+            & equ%npx,equ%ptx,equ%pty, & 
+            & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
+    end if
+
+    !..   10.2.1 Diagnostics: Write out resulting structures
+#ifdef USE_SILO
+    call csioGetStructureSegments( struct%nstruc, struct%npstru, &
+         & struct%xstruc, struct%ystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
+
+    call csioOpenFile('carreVirtualStr')
+    call csioOpenFile()
+    call csioCloseFile()                         
+#endif
+
+!!$          open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
+!!$          do is = 1, struct%nstruc
+!!$             do ip = 1, abs(struct%npstru( is ))
+!!$                write (100,*) struct%xstruc(ip,is)*1000, & 
+!!$                     &             struct%ystruc(ip,is)*1000
+!!$             enddo
+!!$             write (100,*) ''
+!!$          enddo
+!!$          close(UNIT=100)
+  end subroutine setupVirtualStructures
+
 
   !> This routine creates virtual target plates
-  subroutine virtualtargets(equ, struct, nx,ny,x,y,psi,npx,ptx,pty, & 
-       &           fctpx,separx,separy,nptot, & 
-       &           a00,a10,a01,a11)
-
+  subroutine virtualTargets(par, equ, struct, nx,ny,x,y,psi,npx,ptx,pty, & 
+       & fctpx,separx,separy,nptot, & 
+       & a00,a10,a01,a11)
 
     !  arguments
+    type(CarreParameters), intent(in) :: par
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(inout) :: struct
 
@@ -67,14 +112,9 @@ contains
     real*8 :: vtmp1, vtmp2
     double precision :: limPsiMax, limPsiMin, limPsi, pointPsi
     integer :: nvtarget, idir, vtargetipx(struct%nbdef), vtistruc(struct%nbdef)
-    integer :: nptmp(2), npvtarget(struct%nbdef), npvtmp
+    integer :: nptmp(2), npvtmp
     parameter(pi=3.141592654)
     logical :: istarget
-    
-
-    integer, parameter :: MODE_TARGET = 1
-    integer, parameter :: MODE_VESSEL = 2
-    integer :: mode = MODE_TARGET
 
     !  procedures
     real*8 feval2d, angle, dist, norm
@@ -90,7 +130,7 @@ contains
        limPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
             & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
             & struct%nivx(1,i), struct%nivy(1,i) )
-       
+
        limPsiMin = min(limPsiMin, limPsi)
        limPsiMax = max(limPsiMax, limPsi)
     end do
@@ -108,7 +148,7 @@ contains
     do istru = 1, struct%rnstruc
 
        ! if in target mode, only consider points of target structures
-       if ( mode == MODE_TARGET ) then
+       if ( par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET ) then
           istarget = .false.
           do i = 1, struct%nbdef
              if ( struct%inddef(i) == istru ) then
@@ -232,7 +272,7 @@ contains
           do istru = 1, struct%rnstruc
 
              ! only look at targets
-             if ( ( mode == MODE_TARGET ) & 
+             if ( ( par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET ) & 
                   &              .and. .not. ( istru == itarget ) ) cycle
 
              ! Figure out the psi range for this target.
@@ -240,8 +280,8 @@ contains
              ! has to end on both targets. The easiest is to just select the
              ! biggest range over all targets
              ! TODO: this can be improved
-             select case ( mode )
-             case ( MODE_TARGET )
+             select case ( par%gridExtensionMode )
+             case ( GRID_EXTENSION_MODE_TARGET )
                 vtminpsi = huge(vtminpsi)
                 vtmaxpsi = -huge(vtminpsi)
                 do itarget = 1, nvtarget
@@ -254,8 +294,8 @@ contains
 !!$                ! limiting curves 
 !!$                vtminpsi = max( vtminpsi, limPsiMin )
 !!$                vtmaxpsi = min( vtmaxpsi, limPsiMax )
-                
-             case ( MODE_VESSEL )
+
+             case ( GRID_EXTENSION_MODE_VESSEL )
                 vtminpsi = minpsitot
                 vtmaxpsi = maxpsitot
              end select
@@ -490,5 +530,81 @@ contains
 
   end subroutine virtualtargets
 
+
+  !=======================================================================
+  !*** This routine creates virtual limiters.
+
+  !*** One virtual limiter is created for every limiting curve.
+  !*** The virtual limiters are triangles, the tip of which is placed
+  !*** in the middle of the limiting curve (measured
+  !*** in physical length along the curve) and the triangle is oriented
+  !*** away from the O-point
+  !=======================================================================
+
+  subroutine virtualLimiters(nivx,nivy,nivtot,nbniv,npx,ptx,pty, & 
+       & nstruc,npstru,xstruc,ystruc)
+
+
+    implicit none
+#include <CARREDIM.F>
+
+    !  arguments
+    real*8 :: nivx(npnimx,nivmx),nivy(npnimx,nivmx)
+    real*8 :: ptx(npxmx),pty(npxmx)
+    real*8 :: xstruc(npstmx,strumx),ystruc(npstmx,strumx)
+    integer :: nbniv, nivtot(nbniv), npx, nstruc, npstru(strumx)
+
+    !  variables locales
+    real*8 :: l, x, y, ox, oy, length, pi
+    integer :: iniv
+    parameter(pi=3.141592654)
+
+    double precision, parameter :: TRIANGLE_SIZE = 0.1
+    double precision, parameter :: TRIANGLE_ANGLE = pi / 2.5
+    !  procedures
+    real*8 :: long
+    external long
+
+    !.. nbniv : number of the limiting level lines
+    !.. nivx,nivy: coordinates of the points of the parametrised
+    !              limiting level lines (point index, curve index)
+    !.. nivtot: number of points for each parametrised limiting level line
+
+    !=======================================================================
+
+    do iniv = 1, nbniv
+
+       l = long( nivx(:,iniv), nivy(:,iniv), nivtot(iniv) )
+       call coord( nivx(:,iniv), nivy(:,iniv), nivtot(iniv), & 
+            &        l/2.0, x, y )
+
+!!$         ox = ( x - ptx(npx) ) * 0.1
+!!$         oy = ( y - pty(npx) ) * 0.1
+
+       ox = ( x - ptx(npx) ) 
+       oy = ( y - pty(npx) ) 
+       length = sqrt( ox ** 2 + oy ** 2 )
+       ox = ox / length
+       oy = oy / length
+
+       nstruc = nstruc + 1
+       npstru(nstruc) = 4
+       xstruc(1,nstruc) = x
+       ystruc(1,nstruc) = y
+
+       call rotate( ox, oy, TRIANGLE_ANGLE / 2.0 )
+       xstruc(2,nstruc) = x + ox * TRIANGLE_SIZE
+       ystruc(2,nstruc) = y + oy * TRIANGLE_SIZE
+
+       call rotate( ox, oy, - TRIANGLE_ANGLE )
+       xstruc(3,nstruc) = x + ox * TRIANGLE_SIZE
+       ystruc(3,nstruc) = y + oy * TRIANGLE_SIZE
+
+       xstruc(4,nstruc) = x
+       ystruc(4,nstruc) = y
+
+    enddo
+
+  end subroutine virtualLimiters
 
 end module carre_virtualStructures

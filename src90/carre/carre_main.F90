@@ -17,8 +17,15 @@ module carre_main
 
   public carre_main_computation
 
-contains
+  ! Virtual structure setup loop steps
+  integer, parameter :: ORIGINAL_STRUCT_STEP = 1
+  integer, parameter :: VIRTUAL_STRUCT_STEP = 2
 
+  ! Equilibrium extension loop steps
+  integer, parameter :: GIVEN_EQU_STEP = 1
+  integer, parameter :: EXTEND_EQU_STEP = 2
+
+contains
 
   subroutine carre_main_computation(equ, struct, par, grid, diag)
 
@@ -28,28 +35,24 @@ contains
     type(CarreGrid), intent(out) :: grid
     type(CarreDiag), intent(out) :: diag
 
-
     ! internal
-    integer :: isetup, i, j, itmp, is, ip, iLine
+    integer :: i, j, itmp, iLine
+    integer :: iSetupStruct, nEquSteps, iEquStep
 
 
     REAL*8, PARAMETER :: stp0=0.01, stpmin=0.001
-
-    logical dovirtualtargets
-    parameter (dovirtualtargets=.true.)
-
-
     !
     !..4.0  Calculate the first partial derivatives in x and y and store
     !       them in arrays psidx and psidy
 
     CALL DERIVE(equ)
 
-    !
-    !..5.0  Plot the level lines for psidx=0 and psidy=0
-    !
-    CALL cntour(equ%psidx,equ%psidy,equ%nx,equ%ny,&
-        & equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny))
+!!$    !
+!!$    !..5.0  Plot the level lines for psidx=0 and psidy=0
+!!$    !
+!!$    CALL cntour(equ%psidx,equ%psidy,equ%nx,equ%ny,&
+!!$        & equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny))
+
     !
     !  interpolation coefficients for psi and its derivatives
 
@@ -58,165 +61,156 @@ contains
     !
     !..6.0  Determine the points where the derivatives in x and y vanish
     !
-
     CALL GRAD0(equ, nxmax,nymax,gradmx)
 
     !
-    !..7.0  Select the X-points of interest
+    !..7.0  Select the X-points of interest from the original equilibrium data
     !
-
-    !ank-970702: moved dimensions to the included file
     CALL SELPTX(equ%npxtot,equ%npx,equ%pointx,equ%pointy,equ%ii,equ%jj,equ%ptx, & 
-        &            equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg)
+         &            equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg)
 
-    !     when using virtual targets, needs two passes through the setup
-    !     steps 8 to 10.
+    ! When using virtual targets, needs two passes through the analysis steps that 
+    ! find and arrange the separatrix pieces and targets
+    do iSetupStruct = ORIGINAL_STRUCT_STEP, VIRTUAL_STRUCT_STEP
 
-    do isetup = 1, 2
-        !
-        !..8.0  Parametrise the separatrices
-        !
-        IF (equ%npx.GT.0 .and. equ%limcfg.eq.0) THEN
-            !
-            CALL SPTRIS(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
-                &      equ%iptx,equ%jptx,equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
-                &      struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
-                &      struct%indplq,struct%inddef,struct%nbdef, & 
-                &      equ%a00,equ%a10,equ%a01,equ%a11)
+       ! When using equilibrium extension, on the first pass through the structure loop
+       ! we do the geometry analysis twice: first for the original equilibrium, then 
+       ! the psi data is modified, then a second pass is done to update the data.
+       ! This allows modifications to the equilibrium data that change psi inside the vessel
+       ! (in case you want to do that, at your own risk).
 
-            !
-            !..9.0  Arrange the separatrices
-            !
-            CALL ARGSEP(equ%npx,equ%ptx,equ%pty,equ%fctpx,equ%separx,equ%separy,&
-                & struct%indplq,equ%nptot,npnimx, & 
-                & equ%ptsep,equ%racord,equ%ptxint,equ%ypto,struct%nbdef,struct%inddef,&
-                & equ%eps_Xpt)
+       if (.not. par%extendEquilibrium) then 
+          ! Use default equlibrium data
+          nEquSteps = GIVEN_EQU_STEP
+       else
+          ! Extend equilibrium data: two passes
+          nEquSteps = EXTEND_EQU_STEP
+       end if
+       ! Only do two passes when working with original structures
+       if (iSetupStruct /= ORIGINAL_STRUCT_STEP) nEquSteps = GIVEN_EQU_STEP
 
-        ELSEIF(equ%LIMCFG.NE.0) THEN
-            !
-            !  13.   Identify the limiter
-            !
-            call limfnd(equ%xpto,equ%ypto,struct%nivx,struct%nivy,stp0,stpmin,&
-                & struct%distnv,struct%nivtot, & 
-                & struct%nbniv,equ%nx,equ%ny,equ%x,equ%y,equ%psi,&
-                & equ%npx,equ%ptx,equ%pty,equ%fctpx, & 
-                & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
-                & struct%indplq,struct%inddef,struct%nbdef, & 
-                & equ%a00,equ%a10,equ%a01,equ%a11)
+       do iEquStep = GIVEN_EQU_STEP, nEquSteps
 
-            do itmp=1,4
+          !..8.0  Parametrise the separatrices
+          IF (equ%npx.GT.0 .and. equ%limcfg.eq.0) THEN
+
+             ! Configuration with x-points
+
+             CALL SPTRIS(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
+                  &      equ%iptx,equ%jptx,equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
+                  &      struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
+                  &      struct%indplq,struct%inddef,struct%nbdef, & 
+                  &      equ%a00,equ%a10,equ%a01,equ%a11)
+
+             !
+             !..9.0  Arrange the separatrices
+             !
+             CALL ARGSEP(equ%npx,equ%ptx,equ%pty,equ%fctpx,equ%separx,equ%separy,&
+                  & struct%indplq,equ%nptot,npnimx, & 
+                  & equ%ptsep,equ%racord,equ%ptxint,equ%ypto,struct%nbdef,struct%inddef,&
+                  & equ%eps_Xpt)
+
+          ELSEIF(equ%LIMCFG.NE.0) THEN
+
+             ! Limiter configuration
+             !
+             !  13.   Identify the limiter
+             !
+             call limfnd(equ%xpto,equ%ypto,struct%nivx,struct%nivy,stp0,stpmin,&
+                  & struct%distnv,struct%nivtot, & 
+                  & struct%nbniv,equ%nx,equ%ny,equ%x,equ%y,equ%psi,&
+                  & equ%npx,equ%ptx,equ%pty,equ%fctpx, & 
+                  & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
+                  & struct%indplq,struct%inddef,struct%nbdef, & 
+                  & equ%a00,equ%a10,equ%a01,equ%a11)
+
+             do itmp=1,4
                 equ%ptsep(itmp,1) = 0
-            enddo
+             enddo
+          ENDIF
 
-        ENDIF
-
-        if(equ%npx.gt.0) then
-            !
-            !..10.0  Find the level lines in more detail
-            !
-            !<<<
-            write(0,*) '=== carre *..10.0 - before frtier'
-            write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') equ%ptx(1:equ%npx)
-            write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') equ%pty(1:equ%npx)
-            if(equ%limcfg.eq.0) then
+          if(equ%npx.gt.0) then
+             !
+             !..10.0  Find the level lines in more detail
+             !
+             !<<<
+             write(0,*) '=== carre *..10.0 - before frtier'
+             write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') equ%ptx(1:equ%npx)
+             write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') equ%pty(1:equ%npx)
+             if(equ%limcfg.eq.0) then
                 write(0,*) 'nptot(4,nxpoints)'
                 write(0,'(1x,16i5)') ((equ%nptot(i,j),i=1,4),j=1,equ%npx)
                 write(0,*) 'Strike points (presumably)'
                 write(0,'(3h x:,1p,8e12.4/(3x,8e12.4))') & 
-                    &     ((equ%separx(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
+                     &     ((equ%separx(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
                 write(0,'(3h y:,1p,8e12.4/(3x,8e12.4))') & 
-                    &     ((equ%separy(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
+                     &     ((equ%separy(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
                 !>>>
                 call trc_stk_in('carre','*..10.0')
                 CALL FRTIER(equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc, & 
-                    &      struct%npstru,struct%xstruc,struct%ystruc,struct%inddef,&
-                    &      struct%nbdef,equ%npx,equ%separx, & 
-                    &      equ%separy,equ%nptot,equ%ptsep,equ%racord,struct%nivx,&
-                    &      struct%nivy,struct%nivtot, & 
-                    &      struct%nbniv,stp0,stpmin, & 
-                    &      struct%distnv,equ%ptxint,equ%a00,equ%a10,equ%a01,equ%a11)
+                     &      struct%npstru,struct%xstruc,struct%ystruc,struct%inddef,&
+                     &      struct%nbdef,equ%npx,equ%separx, & 
+                     &      equ%separy,equ%nptot,equ%ptsep,equ%racord,struct%nivx,&
+                     &      struct%nivy,struct%nivtot, & 
+                     &      struct%nbniv,stp0,stpmin, & 
+                     &      struct%distnv,equ%ptxint,equ%a00,equ%a10,equ%a01,equ%a11)
                 call trc_stk_out
-            endif
+             endif
 
-            call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, & 
-                &        equ%ptsep,equ%npx,equ%nptot, & 
-                &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-                &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
+             call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, & 
+                  &        equ%ptsep,equ%npx,equ%nptot, & 
+                  &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+                  &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
 
 #ifdef USE_SILO
-            ! write results of first postprocessing step
-            call csioOpenFile('carreLevelLines')
-
-            ! limiting level lines
-            do iLine = 1, struct%nbniv
-               call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iLine), &
-                    & struct%nivx(1:struct%nivtot(iLine), iLine), &
-                    & struct%nivy(1:struct%nivtot(iLine), iLine) )
-            end do
+             call csioOpenFile('carreLevelLines')
+             ! limiting level lines
+             do iLine = 1, struct%nbniv
+                call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iLine), &
+                     & struct%nivx(1:struct%nivtot(iLine), iLine), &
+                     & struct%nivy(1:struct%nivtot(iLine), iLine) )
+             end do
 #endif
 
+          end if
 
+       end do ! equilibrium loop
 
-            ! If no virtual targets are to be created, exit loop and go directly to grid generation           
-            if ( .not. dovirtualtargets ) exit
-            ! If we arrive here the second time, the virtual targets have been created and the
-            ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
-            if ( isetup == 2 ) exit
+       ! At this point the equilibrium and topology data is in the final form. 
 
-            !..   10.1  Set up virtual targets
+       ! If no virtual targets are to be created, exit loop and go directly to grid generation           
+       if (par%gridExtensionMode == EXTENSION_MODE_OFF) then
+          exit
+       else
+          ! If we have a case with x-points, set up virtual geometry
+          if (equ%npx.gt.0)then
 
-            !..      Save current structures
-            struct%rnstruc = struct%nstruc
-            struct%rnpstru = struct%npstru
-            struct%rxstruc = struct%xstruc
-            struct%rystruc = struct%ystruc
+             ! If we arrive here the second time, the virtual targets have been created and the
+             ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
+             if ( iSetupStruct == VIRTUAL_STRUCT_STEP ) exit
 
-            struct%nstruc = 0
+             !..   10.1  Set up virtual targets
 
-            !..   10.1  Set up virtual targets
+             !..      Save current structures
+             struct%rnstruc = struct%nstruc
+             struct%rnpstru = struct%npstru
+             struct%rxstruc = struct%xstruc
+             struct%rystruc = struct%ystruc
 
-            CALL VIRTUALTARGETS(equ, struct, &
-                 & equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
-                &       equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
-                &       equ%a00,equ%a10,equ%a01,equ%a11 )
+             !..   10.1  Set up virtual structures
 
-            !..   10.2  Set up virtual limiters
+             call setupVirtualStructures(par, equ, struct)
+          end if                     ! npx.gt.0
+       end if
 
-!!$            call VIRTUALLIMITERS(struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
-!!$                & equ%npx,equ%ptx,equ%pty, & 
-!!$                & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
-
-            !..   10.2.1 Diagnostics: Write out resulting structures
-#ifdef USE_SILO
-            call csioGetStructureSegments( struct%nstruc, struct%npstru, &
-                 & struct%xstruc, struct%ystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
-
-            call csioOpenFile('carreVirtualStr')
-            call csioOpenFile()
-            call csioCloseFile()                         
-
-#endif
-
-            open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
-            do is = 1, struct%nstruc
-                do ip = 1, abs(struct%npstru( is ))
-                    write (100,*) struct%xstruc(ip,is)*1000, & 
-                        &             struct%ystruc(ip,is)*1000
-                enddo
-                write (100,*) ''
-            enddo
-            close(UNIT=100)
-
-        endif                     ! npx.gt.0
-
-    enddo                     ! end setup loop
+    end do                     ! end setup loop
 
     !
     !..12.0  Grid the regions
     !
     if(equ%npx.gt.0) then
 
-        CALL MAILLE(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%xpto,equ%ypto,&
+       CALL MAILLE(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%xpto,equ%ypto,&
             & equ%racord, & 
             &    equ%separx,equ%separy,equ%ptsep,equ%nptot,&
             & struct%distnv,equ%ptxint,struct%nstruc,struct%npstru, & 
