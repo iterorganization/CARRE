@@ -11,7 +11,7 @@ module carre_virtualstructures
 #include <CARREDIM.F>
 
   private
-  public :: virtualtargets
+  public :: setupVirtualStructures
 
 contains
 
@@ -20,7 +20,14 @@ contains
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(inout) :: struct
 
-    if (par%gridExtensionMode == GRID_EXTENSION_MODE_OFF) return
+    if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
+
+    select case(par%gridExtensionMode)
+    case(GRID_EXTENSION_MODE_TARGET)
+       call logmsg( LOGINFO, "setupVirtualStructures: creating virtual structures (target mode)" )
+    case(GRID_EXTENSION_MODE_VESSEL)
+       call logmsg( LOGINFO, "setupVirtualStructures: creating virtual structures (vessel mode)" )
+    end select
 
     struct%nstruc = 0
 
@@ -149,6 +156,7 @@ contains
 
        ! if in target mode, only consider points of target structures
        if ( par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET ) then
+
           istarget = .false.
           do i = 1, struct%nbdef
              if ( struct%inddef(i) == istru ) then

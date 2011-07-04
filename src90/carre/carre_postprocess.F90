@@ -2,10 +2,10 @@ module carre_postprocess
 
   use carre_types
   use CarreDiagnostics
-  use itm_string
   use carre_niveau
   use carre_criteria
   use itm_assert
+  use Logging
 
 #ifdef USE_SILO
   use SiloIO
@@ -48,10 +48,11 @@ contains
     logical :: doesIntersect
     integer :: tmpCellQt(npmamx-1,nrmamx-1,nregmx)
 
-    ! Initialize grid%nr (TODO: move this into the actual gridding routines,
-    ! maille.F90. Currently not possible because they are not fully converted
-    ! to the new derived types yet)
-    grid % nr = par % npr
+    
+    ! Only do postprocessing when doing grid extension
+    if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
+
+    call logmsg( LOGINFO, "carre_postprocess_computation: doing cut-cell type grid (grid extension)" )
 
     ! Initialize grid line flags
     grid%lineFlagRad = GRIDLINE_BASELINE
@@ -63,7 +64,7 @@ contains
     ! TODO: the grid lines going into the x-point are also required...
 
     do iPostProcess = 1, 4
-       write(*,*) 'carre_postprocess_computation: pass '//int2str(iPostProcess)
+       call logmsg(LOGDEBUG,  'carre_postprocess_computation: pass '//int2str(iPostProcess))
 
        ! Compute face/structure intersections
        call computeFaceStructureIntersections( struct, grid )
@@ -78,8 +79,8 @@ contains
 
        ! cells need refinement?
        nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE )
-       write(*,*) 'carre_postprocess, iteration ', iPostProcess, ': ', &
-            & nCellsToRefine, ' cells to refine'
+       call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
+            &int2str(nCellsToRefine)//' cells to refine')
        if (nCellsToRefine == 0) exit
 
        ! Fix broken cells by modifying the grid accordingly
@@ -533,9 +534,9 @@ contains
 
                 ! If more than two intersections per cell,  grid/geometry has issues
                 if ( isecTopFace .and. isecBotFace ) then
-                   write (*,*) 'fixCells: broken cell has two intersected poloidal faces:', &
-                        & ip, ir, iReg, ' corner at ', &
-                        & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)
+                   call logmsg(LOGDEBUG,  'fixCells: broken cell has two intersected poloidal faces:'//&
+                        & int2str(ip)//', '//int2str(ir)//', '//int2str(iReg)//' corner at '//&
+                        & real2str(grid%xmail(ip,ir,iReg))//' '//real2str(grid%ymail(ip,ir,iReg)))
                 end if
 
                 ! Here, we are only interested in "real" intersections, i.e.
@@ -682,10 +683,12 @@ contains
        if (.not. doesIntersect) then
           ! This can happen if multiple radial lines are added in one cell of the original grid,
           ! and the geometry changed such that the intersection vanishes.
-          write (*,*) 'addRadialLine: did not find intersection of face with a structure! Skipping this radial line.'
+          call logmsg(LOGDEBUG,  'addRadialLine: did not find intersection of face with a structure!&
+               & Skipping this radial line.')
           return
        end if
-       write (*,*) 'addRadialLine: old intersection ', px, py, ', new intersection ', newPx, newPy
+       call logmsg(LOGDEBUG,  'addRadialLine: old intersection '//real2str(px)//', '//real2str(py)//&
+            &', new intersection '//real2str(newPx)//', '//real2str(newPy))
     else
        newPx = px
        newPy = py
@@ -784,7 +787,8 @@ contains
             & iFcP=iOtherFcP, iFcR=iOtherFcR, regionHasFace = regionHasFace )
 
        if (regionHasFace) then
-          write (*,*) 'addRadialLine: region ', iReg, ' extending into region ', iRegOther
+          call logmsg(LOGDEBUG,  'addRadialLine: region '//int2str(iReg)&
+               &//' extending into region '//int2str(iRegOther) )
           call addRadialLine( equ, struct, grid, &
                & iRegOther, &
                & grid%xmail(liFcP+1, 1, iReg), &
@@ -802,7 +806,8 @@ contains
             & iFcP=iOtherFcP, iFcR=iOtherFcR, regionHasFace = regionHasFace )
 
        if (regionHasFace) then
-          write (*,*) 'addRadialLine: region ', iReg, ' extending into region ', iRegOther
+          call logmsg(LOGDEBUG,  'addRadialLine: region '//int2str(iReg)&
+               &//' extending into region '//int2str(iRegOther) )
           call addRadialLine( equ, struct, grid, &
                & iRegOther, &
                & grid%xmail(liFcP+1, grid%nr(iReg), iReg), &
@@ -1128,7 +1133,8 @@ contains
               nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
               if (.not. ((nInt == 1) .and. (nExt == 3)) ) cycle
               
-              write (*,*) 'finalizeCells: candidate cell ', ip, ir, iReg
+              call logmsg(LOGDEBUG,  'finalizeCells: candidate cell '//int2str(ip)&
+                   &//', '//int2str(ir)//', '//int2str(iReg) )
 
               ! find the internal point
               ipFix = GRID_UNDEFINED
@@ -1170,7 +1176,9 @@ contains
 
               ! if not ok, set it to neighbour in radial direction
               if (.not. pointOk) then
-                 write (*,*) 'finalizeCells: cell ', ip, ir, iReg,', fixing node ', ipFix, irFix, ' with node ', ipNb, irNb
+                 call logmsg(LOGDEBUG,  'finalizeCells: cell '//int2str(ip)//' '//int2str(ir)&
+                      &//' '//int2str(iReg)//', fixing node '//int2str(ipFix)//' '&
+                      &//int2str(irFix)//' with node '//int2str(ipNb)//' '//int2str(irNb) )
                  call movePoint( grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
                    & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) )
               end if
@@ -1442,9 +1450,9 @@ contains
               & xipol, xirad )
 
          if ( ( xipol /= GRID_UNDEFINED ) .and. ( xirad /= GRID_UNDEFINED ) ) then         
-            write (*,*) "findXPointInRegion: region ", iReg, ", found x-point&
-                 & at ", xipol, xirad, ", position ", equ%ptx(ipx), &
-                 & equ%pty(ipx)
+            call logmsg(LOGDEBUG,  "findXPointInRegion: region "//int2str(iReg)//", found x-point&
+                 & at "//int2str(xipol)//' '//int2str(xirad)//", position "//real2str(equ%ptx(ipx))//&
+                 & ' '//real2str(equ%pty(ipx)) )
             return
          end if
       end do
@@ -1567,6 +1575,9 @@ contains
   END subroutine intersect
 
 
+
+  !> Write grid state from data structures to silo file
+
   subroutine writeGridStateToSiloFile(filename, equ, struct, grid)
     character(*), intent(in) :: filename
     type(CarreEquilibrium), intent(in) :: equ
@@ -1678,7 +1689,7 @@ contains
        end do
     end do
 
-    write (*,*) 'carre_postprocess: ', nIntPoints, ' boundary points'
+    call logmsg(LOGDEBUG,  'carre_postprocess: '//int2str(nIntPoints)//' boundary points')
     if (nIntPoints > 0) then
        call siloWritePointGrid( csioDbfile, 'boundaryPoints', &
             & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )

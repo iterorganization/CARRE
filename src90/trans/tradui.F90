@@ -16,7 +16,7 @@
 #endif
       use carre_types
       use carre_parameter_io
-
+      
       implicit none
 
 !ank-970707: dimensions from the file
@@ -63,7 +63,7 @@
 
 
 !  procedures
-      external limail, change, ecrim1, b2agfz, b2agbb, ecrim2, ecrim3, & 
+      external limail, ecrim1, b2agfz, b2agbb, ecrim2, ecrim3, & 
      &        ecrim4
 !======================================================================
 !*** nregmx: maximum number of regions

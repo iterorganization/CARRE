@@ -1,4 +1,7 @@
 module carre_types
+
+  use Logging
+
   implicit none
 
   private 
@@ -70,6 +73,9 @@ module carre_types
 
       ! Extended grid mode
       integer :: gridExtensionMode = GRID_EXTENSION_MODE_TARGET
+
+      ! Log level (see Logging.f90)
+      integer :: logLevel = LOGWARNING
   end type CarreParameters
 
   

@@ -19,9 +19,10 @@ contains
 
   !> Extend a given equilibrium by throwing away data outside a given psi value and extending
   !> the remaining data.
-  subroutine extend_equilibrium(equ, par)
+  subroutine extend_equilibrium(equ, par, struct)
     type(CarreEquilibrium), intent(inout) :: equ
     type(CarreParameters), intent(in) :: par
+    type(CarreStructures), intent(in) :: struct
 
     ! internal
     double precision :: dx, dy
@@ -31,12 +32,14 @@ contains
     external :: ifind
     integer :: ifind
 
-    if (par%equilibriumExtensionMode == EQU_EXTENSION_OFF) return
+    if (par%equExtensionMode == EQU_EXTENSION_OFF) return
 
     call assert( equ%nx + par%addLeft + par%addRight <= nxmax )
     call assert( equ%ny + par%addTop + par%addBottom <= nxmax )
 
-    if (par%equilibriumExtensionMode == EQU_EXTENSION_MODE_SIMPLE) then
+    if (par%equExtensionMode == EQU_EXTENSION_MODE_SIMPLE) then
+
+       call logmsg(LOGINFO, "carre_equilibrium: simple equilibrium extension enabled")
 
        ! cut off psi values
        where (equ%psi < par%psimin) equ%psi = huge(equ%psi)
@@ -64,8 +67,10 @@ contains
 
     end if
 
-    if (par%equilibriumExtensionMode == EQU_EXTENSION_MODE_VESSEL) then
+    if (par%equExtensionMode == EQU_EXTENSION_MODE_VESSEL) then
        ! smart equilibrium cutoff: cut off points outside of vessel
+       call logmsg(LOGINFO, "carre_equilibrium: vessel/smart equilibrium extension enabled")
+
        call equilibrium_vessel_cutoff(equ, struct)
     end if
 
@@ -185,5 +190,16 @@ contains
 !!$    equ%psi = newPsi
 
   end subroutine compute_distance_fast
+
+
+  subroutine equilibrium_vessel_cutoff(equ, struct)
+    type(CarreEquilibrium), intent(inout) :: equ
+    type(CarreStructures), intent(in) :: struct
+
+
+
+  end subroutine equilibrium_vessel_cutoff
+
+
 
 end module carre_equilibrium

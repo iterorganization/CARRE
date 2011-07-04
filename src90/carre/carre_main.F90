@@ -2,7 +2,7 @@ module carre_main
 
   use carre_types
   use CarreDiagnostics
-  use itm_string
+  use Helper
   use carre_virtualstructures
 #ifdef USE_SILO
   use SiloIO
@@ -79,7 +79,7 @@ contains
        ! This allows modifications to the equilibrium data that change psi inside the vessel
        ! (in case you want to do that, at your own risk).
 
-       if (.not. par%extendEquilibrium) then 
+       if (.not. par%equExtensionMode == EQU_EXTENSION_OFF) then 
           ! Use default equlibrium data
           nEquSteps = GIVEN_EQU_STEP
        else
@@ -179,7 +179,7 @@ contains
        ! At this point the equilibrium and topology data is in the final form. 
 
        ! If no virtual targets are to be created, exit loop and go directly to grid generation           
-       if (par%gridExtensionMode == EXTENSION_MODE_OFF) then
+       if (par%gridExtensionMode == GRID_EXTENSION_OFF) then
           exit
        else
           ! If we have a case with x-points, set up virtual geometry
@@ -221,6 +221,12 @@ contains
             & grid%psim, grid%psidxm, grid%psidym)
 
     end if
+
+    ! After finalization of gridding, set grid%nr
+    ! (TODO: move this deeper into the actual gridding routines,
+    ! maille.F90. Currently not possible because they are not fully converted
+    ! to the new derived types yet)
+    grid % nr = par % npr
 
   end subroutine carre_main_computation
 

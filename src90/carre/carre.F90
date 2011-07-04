@@ -25,6 +25,7 @@ PROGRAM CARRE
   use carre_postprocess
   use carre_equilibrium
   use carre_parameter_io
+  use Logging
 
   IMPLICIT NONE
 
@@ -89,7 +90,7 @@ PROGRAM CARRE
 
   call writeGridStateToSiloFile('carrePreProcA00', equ, struct, grid)
 
-  call extend_equilibrium(equ, par)
+  call extend_equilibrium(equ, par, struct)
 
 !!$  !call extend_equilibrium(equ, -0.14d0, huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), 1.2d0, 40, 40, 0, 40)
 !!$  call extend_equilibrium(equ, -huge(0.0d0), huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), 1.2d0, 40, 40, 0, 40)
@@ -102,6 +103,9 @@ PROGRAM CARRE
 
   ! Postprocess
   call carre_postprocess_computation(par, equ, grid, struct)
+
+  ! Output final grid
+  call writeGridStateToSiloFile('carreFinal00000', equ, struct, grid)
 
   ! Finalize Carre 
   call carre_finalize(equ, struct, grid)
@@ -123,6 +127,8 @@ contains
     INTEGER i, j, ierror, iflag           
     character lign80*80
 
+    ! Set default loglevel (will be set again after reading carre.dat)
+    call setLogLevel(par%logLevel)
 
     !..1.0  Initialisation des variables par defaut et de la bibliotheque
     !       graphique
@@ -217,6 +223,9 @@ contains
     call read_code_parameters_noninteractive(par)
     ! The carre.dat input file is going to be read again, so we have to rewind it
     rewind(9)
+
+    ! Set loglevel as given in parameters
+    call setLogLevel(par%logLevel)
 
   end subroutine carre_init
 
