@@ -578,9 +578,9 @@ contains
           
           ! Heuristic: if the found level line is too large by an order of magnitude, reject it
           if ( (length/lengthFace) > 10d0 ) then
-             write (*,*) 'findLevelLineForPoints: found level line &
-                  & (length: ', length, ', points: ', npNivTmp, ')',&
-                  & '- REJECTED because too long compared to face (length: ', lengthFace, ')'
+             call logmsg( LOGKNOWNWARNING, 'findLevelLineForPoints: found level line &
+                  & (length: '//real2str(length)//', points: '//int2str(npNivTmp)//')'//&
+                  & '- REJECTED because too long compared to face (length: '//real2str(lengthFace)//')' )
              cycle
           end if
 
@@ -600,22 +600,19 @@ contains
        ! This happens if the equilibrium data has issues. 
        ! Usually happens for faces going ino the x-point. Fortunately there the 
        ! level lines are pretty straight anyway, so it's not a problem.
-       write (*,*) 'findLevelLineForPoints: WARNING: unable to find connecting level line.&
-            & Substituting direct connection line'
+       call logmsg( LOGKNOWNWARNING, 'findLevelLineForPoints: WARNING: unable to find connecting level line.&
+            & Substituting direct connection line' )
        npniv = 2
        nivx(1) = xFrom
        nivy(1) = yFrom
        nivx(2) = xTo
        nivy(2) = yTo
    else       
-      write (*,*) 'findLevelLineForPoints: distance of points is: ',&
-           & lengthFace, &
-           & ', found level line: length=', maxLength, &
-           & ' with ', npNiv, ' points'
+      call logmsg( LOGDEBUG, 'findLevelLineForPoints: distance of points is: '//real2str(lengthFace)//&
+           & ', found level line: length='//real2str(maxLength)//&
+           & ' with '//int2str(npNiv)//' points' )
    end if
 
   end subroutine findLevelLineForPoints
-
-
 
 end module carre_niveau

@@ -205,6 +205,6 @@ module carre_types
 
   public CarreParameters, CarreEquilibrium, CarreGrid, CarreStructures
 
-!!$contains
+!contains
 
 end module carre_types

@@ -4,6 +4,8 @@ module carre_main
   use CarreDiagnostics
   use Helper
   use carre_virtualstructures
+  use carre_equilibrium
+  use carre_postprocess ! for writeSilo...
 #ifdef USE_SILO
   use SiloIO
   use CarreSiloIO
@@ -79,17 +81,27 @@ contains
        ! This allows modifications to the equilibrium data that change psi inside the vessel
        ! (in case you want to do that, at your own risk).
 
-       if (.not. par%equExtensionMode == EQU_EXTENSION_OFF) then 
+       if (par%equExtensionMode == EQU_EXTENSION_OFF) then 
           ! Use default equlibrium data
           nEquSteps = GIVEN_EQU_STEP
        else
           ! Extend equilibrium data: two passes
           nEquSteps = EXTEND_EQU_STEP
        end if
-       ! Only do two passes when working with original structures
+       ! Only do two passes when currently working with original structures
        if (iSetupStruct /= ORIGINAL_STRUCT_STEP) nEquSteps = GIVEN_EQU_STEP
 
        do iEquStep = GIVEN_EQU_STEP, nEquSteps
+
+          ! We do the equilibrium extension on the beginning of the second
+          ! pass through the equilibrium setup loop
+          if (iEquStep == EXTEND_EQU_STEP) then
+             call extend_equilibrium(equ, par, struct)
+
+             ! Before running the geometry & topology analysis again,
+             ! we have to reset the related state variabels
+             call resetGeometryAndTopologyData()
+          end if
 
           !..8.0  Parametrise the separatrices
           IF (equ%npx.GT.0 .and. equ%limcfg.eq.0) THEN
@@ -162,15 +174,15 @@ contains
                   &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
                   &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
 
-#ifdef USE_SILO
-             call csioOpenFile('carreLevelLines')
-             ! limiting level lines
-             do iLine = 1, struct%nbniv
-                call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iLine), &
-                     & struct%nivx(1:struct%nivtot(iLine), iLine), &
-                     & struct%nivy(1:struct%nivtot(iLine), iLine) )
-             end do
-#endif
+!!$#ifdef USE_SILO
+!!$             call csioOpenFile('carreLevelLines')
+!!$             ! limiting level lines
+!!$             do iLine = 1, struct%nbniv
+!!$                call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iLine), &
+!!$                     & struct%nivx(1:struct%nivtot(iLine), iLine), &
+!!$                     & struct%nivy(1:struct%nivtot(iLine), iLine) )
+!!$             end do
+!!$#endif
 
           end if
 
@@ -227,6 +239,21 @@ contains
     ! maille.F90. Currently not possible because they are not fully converted
     ! to the new derived types yet)
     grid % nr = par % npr
+
+  contains
+
+    subroutine resetGeometryAndTopologyData()
+      struct%nbdef = 0
+      struct%nbniv = 0
+      equ%fctpx = 0.0d0
+      struct%inddef = 0
+      struct%nivtot = 0
+
+      equ%nptot = 0
+      struct%indplq = 0
+      equ%ptsep = 0
+      equ%ptxint = 0
+    end subroutine resetGeometryAndTopologyData
 
   end subroutine carre_main_computation
 

@@ -81,6 +81,13 @@
 !
 !  close input unit
       close(unit=iunit)
+
+!  Copy structures to separate arrays for real structures      
+      struct%rnstruc = struct%nstruc
+      struct%rnpstru = struct%npstru
+      struct%rxstruc = struct%xstruc
+      struct%rystruc = struct%ystruc
+      
       return
 !
  98   continue
