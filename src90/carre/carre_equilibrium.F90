@@ -29,9 +29,11 @@ contains
     double precision :: dx, dy
     integer :: i, ixCutMin, ixCutMax, iyCutMin, iyCutMax
     double precision :: newPsi(NXMAX, NYMAX)    
+    double precision :: psiPtO, psiPtX, distFactor
 
-    external :: ifind
+    external :: ifind, dist, feval2d
     integer :: ifind
+    double precision :: dist, feval2d
 
     if (par%equExtensionMode == EQU_EXTENSION_OFF) return
 
@@ -108,9 +110,22 @@ contains
 
     call writeGridStateToSiloFile('carreEquCutoff0', equ, struct )
 
+    ! Figure out distance factor for equilibrium extension
+    ! We compute the distance between o- and x-point both in space and psi, and derive 
+    ! the factor from that    
+    ! TODO: limiter case has to be treated differently.
+    psiPtO = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+         & equ%xpto, equ%ypto  )
+    
+    psiPtX = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+         & equ%ptx(1), equ%pty(1) )
+
+    distFactor = (psiPtX - psiPtO) / dist(equ%xpto, equ%ypto, equ%ptx(1), equ%pty(1))
+
     ! Run extension algorithm
-    !call compute_distance_exact(equ, -3.0d0)
-    call compute_distance_fast(equ, -3.0d0)
+    call compute_distance_fast(equ, distFactor)
 
     ! Re-compute some data...
     ! Calculate the first partial derivatives in x and y and store
@@ -209,17 +224,11 @@ contains
     NB_DX(1, :) = (/  -1, -1,  0,  1 /)
     NB_DY(1, :) = (/   0, -1, -1, -1 /)
     NB_D(1, :) = (/ D_DX, D_DIAG, D_DY, D_DIAG /)
-!!$    NB_DX(1, :) = (/ -1,  0,  1, -1, 1, -1, 0, 1 /)
-!!$    NB_DY(1, :) = (/ -1, -1, -1,  0, 0,  1, 1, 1 /)
-!!$    NB_D(1, :) = (/ D_DIAG, D_DY, D_DIAG, D_DX, D_DX, D_DIAG, D_DY, D_DIAG /)
 
     ! Pass tow: top-right -> bottom-left
     NB_DX(2, :) = (/  1, -1,  0,  1 /)
     NB_DY(2, :) = (/  0, +1, +1, +1 /)
     NB_D(2, :) = (/ D_DX, D_DIAG, D_DY, D_DIAG /)
-!!$    NB_DX(2, :) = (/ -1,  0,  1, -1, 1, -1, 0, 1 /)
-!!$    NB_DY(2, :) = (/ -1, -1, -1,  0, 0,  1, 1, 1 /)
-!!$    NB_D(2, :) = (/ D_DIAG, D_DY, D_DIAG, D_DX, D_DX, D_DIAG, D_DY, D_DIAG /)
 
     do iPass = 1, N_PASS
        
@@ -346,11 +355,6 @@ contains
 
                call intersect_structure( xx, yy, &
                     & struct, faceISec(ir, iz, iFc) )
-               
-!!$               if ( faceISec(ir, iz, iFc) ) then
-!!$                  call logmsg( LOGDEBUGBULK, 'compute_intersections: intersection for face '&
-!!$                       &//int2str(ir)//', '//int2str(iz)//', '//int2str(iFc) )
-!!$               end if
 
             end do
          end do
@@ -416,10 +420,6 @@ contains
          do iy = 1, equ%ny
             
             if (flag(ix,iy) == POINT_INTERNAL) then
-               
-!!$               tmpFlag( max(1, ix-1):min(ix+1, equ%nx), &
-!!$                    & max(1, iy-1):min(iy+1, equ%ny) ) = POINT_INTERNAL
-
                do ix2 = max(1, ix-1), min(ix+1, equ%nx)
                   do iy2 = max(1, iy-1), min(iy+1, equ%ny)
                      tmpFlag(ix2, iy2) = POINT_INTERNAL
@@ -436,7 +436,6 @@ contains
     end subroutine growInternalRegion
 
   end subroutine equilibrium_vessel_cutoff
-
 
 
 end module carre_equilibrium

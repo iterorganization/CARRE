@@ -178,18 +178,8 @@ contains
 
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
-      ! -cells with three internal points and one external cell
-      ! -that have intersections in adjacent faces
-!!$      candidate = .false.
-!!$
-!!$      ! adjacent faces intersected?
-!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
-!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_LEFT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
-!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_TOP)) candidate = .true.
-!!$      where (btest(grid%cellFaceFlag, INDEX_FACE_RIGHT) .and. btest(grid%cellFaceFlag, INDEX_FACE_BOTTOM)) candidate = .true.
+      ! -cells with three internal points and one external point
 
-
-!!$      where (candidate .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
       where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
 
     end subroutine categorizeCellsAndFaces
