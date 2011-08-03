@@ -135,7 +135,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
               do i=1,nptx
                   read(lun,*,err=14) xptxm(i),yptxm(i)
               end do
-              read(lun,*,err=14) xptom,ypto
+              read(lun,*,err=14) xptom,yptom
               havePredefinedXPoints = .true.
               !*** lconn>0 means "connect x-points")
               read(lun,*,end=11, err=111) lconn
