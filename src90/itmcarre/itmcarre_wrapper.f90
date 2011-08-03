@@ -18,11 +18,11 @@ program itmcarre_wrapper
   ! read input cpos from UAL
   call logmsg( LOGDEBUG, "itmcarre_wrapper: reading cpos" )
   ! equilibrium
-  call open_ual(idx, nmlFile="equilibrium.ual.namelist")
+  call open_ual(idx, nmlFile="ual.namelist.equilibrium")
   call euitm_get(idx,"equilibrium",equcpo)
   call close_ual(idx)
   ! limiter
-  call open_ual(idx, nmlFile="limiter.ual.namelist")
+  call open_ual(idx, nmlFile="ual.namelist.limiter")
   call euitm_get(idx,"limiter",limcpo)
   call close_ual(idx)  
 
@@ -32,7 +32,7 @@ program itmcarre_wrapper
 
   ! write output cpos to UAL
   call logmsg( LOGDEBUG, "itmcarre_wrapper: writing cpos" )
-  call open_ual(idx, nmlFile="edge.ual.namelist", doCreate=.true.)
+  call open_ual(idx, nmlFile="ual.namelist.edge", doCreate=.true.)
   call euitm_put(idx,"edge",edgecpo)
   call close_ual(idx)
 

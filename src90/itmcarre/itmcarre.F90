@@ -16,7 +16,7 @@ module itmcarre
   
 contains
 
-  subroutine itmcarre_main(equcpo, limcpo, edgecpo )
+  subroutine itmcarre_main(equcpo, limcpo, edgecpo)
         
     type(type_equilibrium), intent(in), pointer :: equcpo(:)
     type(type_limiter), intent(in) :: limcpo
@@ -116,15 +116,18 @@ contains
 
         struct%xstruc(1:struct%npstru(is), is) = limcpo % limiter_unit(is) % position % r
         struct%ystruc(1:struct%npstru(is), is) = limcpo % limiter_unit(is) % position % z
-
-        ! Repeat first point if closed structure
+        
         if ( limcpo % limiter_unit( is ) % closed(1) == 'y' ) then
+            ! Close structure: repeat first point, keep positive npstru
             struct%npstru(is) = struct%npstru(is) + 1
             call assert( struct%npstru(is) <= npstmx, &
                 & "read_structures: too many points (2) in structure "//int2str(is) )
 
             struct%xstruc(struct%npstru(is), is) = struct%xstruc(1, is)
             struct%ystruc(struct%npstru(is), is) = struct%ystruc(1, is)
+        else
+            ! Open structure: invert npstru to negative
+            struct%npstru(is) = - struct%npstru(is)
         end if
 
     end do

@@ -90,13 +90,16 @@
       call fillEquilibriumCpo( cpoequil(1) )
 
       ! This overwrites other contents of the shot
-      call open_ual(idx, doCreate = .true., nmlFile='limiter.ual.namelist')
-      !call euitm_put(idx,"equilibrium",cpoequil)
+      call open_ual(idx, doCreate = .true., nmlFile='ual.namelist.limiter')
       call euitm_put(idx,"limiter",cpolimiter)
+      call close_ual(idx)
+
+      call open_ual(idx, doCreate = .true., nmlFile='ual.namelist.equilibrium')
+      call euitm_put(idx,"equilibrium",cpoequil)
+      call close_ual(idx)
 
       call euitm_deallocate(cpoequil)
       call euitm_deallocate(cpolimiter)
-      call close_ual(idx)
 
 contains
 
@@ -168,6 +171,16 @@ contains
     cpo % profiles_2d % grid % dim1 = rgr(1:nr)
     cpo % profiles_2d % grid % dim2 = zgr(1:nz)
     cpo % profiles_2d % psi = pfm
+
+    ! x-points
+    allocate(cpo % eqgeometry % xpts % r(nxpt))
+    allocate(cpo % eqgeometry % xpts % z(nxpt))
+    cpo % eqgeometry % xpts % r = xptcntr(1,1:nxpt)
+    cpo % eqgeometry % xpts % z = xptcntr(2,1:nxpt)
+
+    ! o-point
+    cpo % global_param % mag_axis % position % r = xlpcntr(1)
+    cpo % global_param % mag_axis % position % z = xlpcntr(2)
 
   end subroutine fillEquilibriumCpo
 

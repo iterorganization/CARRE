@@ -78,7 +78,7 @@ module carre_types
       integer :: addLeft = 0, addRight = 0, addTop = 0, addBottom = 0      
 
       ! Extended grid mode
-      integer :: gridExtensionMode = GRID_EXTENSION_MODE_TARGET
+      integer :: gridExtensionMode = GRID_EXTENSION_OFF
 
       ! Log level (see Logging.f90)
       integer :: logLevel = LOGWARNING
