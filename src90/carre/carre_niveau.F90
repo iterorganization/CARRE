@@ -1,6 +1,8 @@
 module carre_niveau
 
   use carre_types
+  use Helper
+  use Logging
 #ifdef USE_SILO
   use SiloIO
   use CarreSiloIO
@@ -130,6 +132,7 @@ contains
     !=========================
 
     ! Debug output: set up local filenamespace for crbniv
+#ifdef USE_SILO
     if (DEBUGFILES_CRBNIV) then
        call csioSaveCounters()
        CRBNIV_CALL = CRBNIV_CALL + 1
@@ -138,6 +141,7 @@ contains
        call csioSetSurface(CRBNIV_CALL)
        call csioSetRegion(0)
     end if
+#endif
 
     !..Copie des arguments en variables locales
 
@@ -191,6 +195,7 @@ contains
              crbx(k) = xEnd
              crby(k) = yEnd
              foundEndPoint = .true.
+#ifdef USE_SILO
              if (DEBUGFILES_CRBNIV) then
                 !call csioOpenFile('carreCrbnivEndP')
                 call csioOpenFile()
@@ -199,6 +204,7 @@ contains
                 call csioCloseFile()
                 call csioRestoreCounters()
              end if             
+#endif
              return
           end if
        end if
@@ -343,6 +349,7 @@ contains
           print *
 
           ! debug output
+#ifdef USE_SILO
           if (DEBUGFILES_CRBNIV) then
              call csioOpenFile('carreCrbnivStop')
              call csioOpenFile()
@@ -351,6 +358,7 @@ contains
              call csioCloseFile()
              call csioRestoreCounters()
           end if
+#endif
 
           stop 'in crbniv: nothing found'
        end if
@@ -382,6 +390,7 @@ contains
           ii = i
           jj = j
 
+#ifdef USE_SILO
           if (DEBUGFILES_CRBNIV) then
              !call csioOpenFile('carreCrbnivOneP')
              call csioOpenFile()
@@ -390,6 +399,7 @@ contains
              call csioCloseFile()
              call csioRestoreCounters()
           end if
+#endif
           
           RETURN
 
@@ -465,6 +475,7 @@ contains
 
           !..Return if the level line was intercepted by a structure.
           IF (indstr .NE. 0) THEN
+#ifdef USE_SILO
              if (DEBUGFILES_CRBNIV) then
                 !call csioOpenFile('carreCrbnivStru')
                 call csioOpenFile()
@@ -473,7 +484,7 @@ contains
                 call csioCloseFile()
                 call csioRestoreCounters()
              end if
-
+#endif
              RETURN
           ENDIF
 
@@ -486,6 +497,7 @@ contains
        !
 
        if(i.eq.0 .or. i.eq.nx .or. j.eq.0 .or. j.eq.ny) then
+#ifdef USE_SILO
           if (DEBUGFILES_CRBNIV) then
              !call csioOpenFile('carreCrbnivOuts')
              call csioOpenFile()
@@ -494,7 +506,7 @@ contains
              call csioCloseFile()
              call csioRestoreCounters()
           end if
-          
+#endif          
           return
        end if
 
@@ -578,9 +590,9 @@ contains
           
           ! Heuristic: if the found level line is too large by an order of magnitude, reject it
           if ( (length/lengthFace) > 10d0 ) then
-             call logmsg( LOGKNOWNWARNING, 'findLevelLineForPoints: found level line &
-                  & (length: '//real2str(length)//', points: '//int2str(npNivTmp)//')'//&
-                  & '- REJECTED because too long compared to face (length: '//real2str(lengthFace)//')' )
+             call logmsg( LOGKNOWNWARNING, 'findLevelLineForPoints: found level line (length: '&
+                 &//real2str(length)//', points: '//int2str(npNivTmp)//')'//&
+                 & '- REJECTED because too long compared to face (length: '//real2str(lengthFace)//')' )
              cycle
           end if
 

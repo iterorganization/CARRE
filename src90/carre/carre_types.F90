@@ -59,6 +59,12 @@ module carre_types
 !           the X-points. Set to 0 for connected double-nulls
       real*8 :: cstlin = 0.00
 
+      ! Predefined x- and o-point locations
+      ! If xPointNum > 0, the values in xPointX/Y and oPointX/Y are assumed to be valid
+      integer :: xPointNum = 0 ! Number of predefined x-points
+      double precision :: xPointX(gradmx), xPointY(gradmx) ! x-point positions
+      double precision :: oPointX, oPointY ! o-point positions
+
       ! Control flag for equilibrium data extension
       integer :: equExtensionMode = EQU_EXTENSION_OFF
 

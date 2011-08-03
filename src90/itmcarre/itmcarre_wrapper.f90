@@ -15,12 +15,16 @@ program itmcarre_wrapper
 
   integer :: idx
 
-  ! open ual
-  call open_ual(idx)
-
   ! read input cpos from UAL
   call logmsg( LOGDEBUG, "itmcarre_wrapper: reading cpos" )
-  call read_ual(idx, equcpo, limcpo)
+  ! equilibrium
+  call open_ual(idx, nmlFile="equilibrium.ual.namelist")
+  call euitm_get(idx,"equilibrium",equcpo)
+  call close_ual(idx)
+  ! limiter
+  call open_ual(idx, nmlFile="limiter.ual.namelist")
+  call euitm_get(idx,"limiter",limcpo)
+  call close_ual(idx)  
 
   ! call itmcarre
   call logmsg( LOGDEBUG, "itmcarre_wrapper: main computation" )
@@ -28,28 +32,8 @@ program itmcarre_wrapper
 
   ! write output cpos to UAL
   call logmsg( LOGDEBUG, "itmcarre_wrapper: writing cpos" )
-  call write_ual(idx, edgecpo)
-
-  ! close ual
+  call open_ual(idx, nmlFile="edge.ual.namelist", doCreate=.true.)
+  call euitm_put(idx,"edge",edgecpo)
   call close_ual(idx)
-
-contains
-
-  subroutine read_ual(idx, equcpo, limcpo)
-    integer, intent(in) :: idx
-    type(type_equilibrium), intent(out), pointer :: equcpo(:)
-    type(type_limiter), intent(out) :: limcpo
-    
-    call euitm_get(idx,"equilibrium",equcpo)
-    call euitm_get(idx,"limiter",limcpo)
-    call logmsg( LOGDEBUG, "itmcarre_wrapper: equilibrium cpo #"//int2str(size(equcpo)) )
-  end subroutine read_ual
-
-  subroutine write_ual(idx, edgecpo)
-    integer, intent(in) :: idx
-    type(type_edge), intent(in), pointer :: edgecpo(:)
-
-    call euitm_put(idx,"edge",edgecpo)
-  end subroutine write_ual
 
 end program itmcarre_wrapper

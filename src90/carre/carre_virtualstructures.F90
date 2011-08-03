@@ -1,10 +1,11 @@
 module carre_virtualstructures
 
   use carre_types
+  use Logging
 #ifdef USE_SILO
   use SiloIO
-  use CarreSiloIO
 #endif
+  use CarreSiloIO
 
   implicit none
 

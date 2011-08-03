@@ -69,7 +69,8 @@ contains
     !..7.0  Select the X-points of interest from the original equilibrium data
     !
     CALL SELPTX(equ%npxtot,equ%npx,equ%pointx,equ%pointy,equ%ii,equ%jj,equ%ptx, & 
-         &            equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg)
+         & equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg,&
+         & par)
 
     ! When using virtual targets, needs two passes through the analysis steps that 
     ! find and arrange the separatrix pieces and targets
@@ -99,7 +100,7 @@ contains
              call extend_equilibrium(equ, par, struct)
 
              ! Before running the geometry & topology analysis again,
-             ! we have to reset the related state variabels
+             ! we have to reset the related state variables
              call resetGeometryAndTopologyData()
           end if
 

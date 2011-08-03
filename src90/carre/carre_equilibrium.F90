@@ -3,11 +3,12 @@ module carre_equilibrium
   use carre_types
   use itm_assert
   use carre_postprocess
+  use Logging
 
 #ifdef USE_SILO
   use SiloIO
-  use CarreSiloIO
 #endif
+  use CarreSiloIO
 
   implicit none
 

@@ -16,7 +16,6 @@ module itmcarre
   
 contains
 
-
   subroutine itmcarre_main(equcpo, limcpo, edgecpo )
         
     type(type_equilibrium), intent(in), pointer :: equcpo(:)
@@ -33,6 +32,9 @@ contains
     type(CarreDiag) :: diag
 
 
+    ! 0. Initialize some defaults
+    call defaut
+
     ! 1. Read code parameters (will come from type_param in the future)
     call logmsg( LOGDEBUG, "itmcarre: reading carre.dat" )
 
@@ -42,9 +44,9 @@ contains
         stop 'itmcarre: error reading carre.dat'
     end if
 
-    ! 2. Read equilibrium  
+    ! 2. Read equilibrium
     call logmsg( LOGDEBUG, "itmcarre: reading equilibrium CPO" )
-    call read_equilibrium( equcpo(1), equ )
+    call read_equilibrium( equcpo(1), equ, par )
 
     ! 3. Read limiter
     call logmsg( LOGDEBUG, "itmcarre: reading limiter CPO" )
@@ -63,9 +65,10 @@ contains
   
 
   !> Transfer equilbrium grid and data from CPO into Carre data structure.
-  subroutine read_equilibrium( equcpo, equ )
+  subroutine read_equilibrium( equcpo, equ, par )
     type(type_equilibrium), intent(in) :: equcpo
     type(CarreEquilibrium), intent(out) :: equ
+    type(CarreParameters), intent(inout) :: par
 
     call assert( equcpo % profiles_2d % grid_type(1) == '1', &
         & "read_equilibrium: Equ. CPO not in right format: no rect. grid" )
@@ -78,6 +81,15 @@ contains
     equ%x(1:equ%nx) = equcpo % profiles_2d % grid % dim1
     equ%y(1:equ%ny) = equcpo % profiles_2d % grid % dim2
     equ%psi(1:equ%nx, 1:equ%ny) = equcpo % profiles_2d % psi
+
+    ! X-points
+    par%xPointNum = size(equcpo % eqgeometry % xpts % r)
+    par%xPointX(1:par%xPointNum) = equcpo % eqgeometry % xpts % r(1:par%xPointNum)
+    par%xPointY(1:par%xPointNum) = equcpo % eqgeometry % xpts % z(1:par%xPointNum)
+
+    ! O-Point
+    par%oPointX = equcpo % global_param % mag_axis % position % r
+    par%oPointY = equcpo % global_param % mag_axis % position % z
 
   end subroutine read_equilibrium
 

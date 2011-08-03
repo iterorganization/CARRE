@@ -9,8 +9,8 @@ module carre_postprocess
 
 #ifdef USE_SILO
   use SiloIO
-  use CarreSiloIO
 #endif
+  use CarreSiloIO
 
   implicit none
 
@@ -700,6 +700,8 @@ contains
     grid%xmail(liFcP + 1, liFcR, iReg) = newPx
     grid%ymail(liFcP + 1, liFcR, iReg) = newPy
     
+
+#ifdef USE_SILO
     ! Debug output
     if (DEBUGFILES_ADDRADIALLINE .and. recomputeIntersection) then
        call csioSetSurface(0)
@@ -716,6 +718,7 @@ contains
             & 3, 3, siloFakeGridForPointX(newPx), siloFakeGridForPointY(newPy) )
        call csioCloseFile()
     end if
+#endif
 
     ! For this region iReg: compute new radial points by moving
     ! away from the given point in both directions
@@ -746,6 +749,7 @@ contains
             & grid%ymail(liFcP:liFcP+2, ir, iReg) )
     end do
 
+#ifdef USE_SILO
     ! Debug output: entire grid
     if (DEBUGFILES_ADDRADIALLINE) then
        call csioSetSurface(delta = 1)
@@ -759,6 +763,7 @@ contains
        end do
        call csioCloseFile()    
     end if   
+#endif
 
     ! For points on boundary of region, insert
     ! radial lines starting at this point in all other regions
@@ -805,6 +810,7 @@ contains
        end if
     end do
     
+#ifdef USE_SILO
     ! Debug output: entire region grid
     if (DEBUGFILES_ADDRADIALLINE) then
        call csioSetSurface(delta = 1)
@@ -818,6 +824,7 @@ contains
        end do
        call csioCloseFile()    
     end if
+#endif
 
   end subroutine addRadialLine
 
@@ -899,6 +906,7 @@ contains
     lNew(size(newx)) = lengthNew
     ! (first and last point in nivNewX must already be set correctly...)
 
+#ifdef USE_SILO
     ! Write out intermediate grid stage
     if (DEBUGFILES_INSERTPOINTS) then
        call csioSetRelax( 0 )
@@ -915,6 +923,7 @@ contains
             & tmpMailx, tmpMaily )            
        call csioCloseFile()
     end if
+#endif
 
     ! Optimize distribution of grid points according to the criteria,
     ! using the signed relaxation method 
@@ -991,6 +1000,7 @@ contains
              endif
           enddo
             
+#ifdef USE_SILO
           if (DEBUGFILES_INSERTPOINTS) then
              call csioSetRelax( i )
              call csioOpenFile()
@@ -1005,6 +1015,7 @@ contains
                   & tmpMailx, tmpMaily )            
              call csioCloseFile()
           end if
+#endif
 
           if(maxval(abs(critNew)) <= rlcept) exit
        enddo

@@ -90,8 +90,8 @@
       call fillEquilibriumCpo( cpoequil(1) )
 
       ! This overwrites other contents of the shot
-      call open_ual(idx, doCreate = .true.)
-      call euitm_put(idx,"equilibrium",cpoequil)
+      call open_ual(idx, doCreate = .true., nmlFile='limiter.ual.namelist')
+      !call euitm_put(idx,"equilibrium",cpoequil)
       call euitm_put(idx,"limiter",cpolimiter)
 
       call euitm_deallocate(cpoequil)
@@ -99,38 +99,6 @@
       call close_ual(idx)
 
 contains
-
-
-!!$  subroutine open_ual(idx)
-!!$    integer, intent(out) :: idx
-!!$
-!!$    ! internal
-!!$    integer :: shot, run, refshot, refrun
-!!$    character(len=5)::treename
-!!$
-!!$    namelist /b2_ual_write_namelist/ treename, shot, run, refshot, refrun
-!!$
-!!$    ! default values
-!!$    shot = 2
-!!$    run = 1
-!!$    refshot = 1
-!!$    refrun = 0
-!!$    treename = 'euitm'
-!!$    
-!!$    ! read namelist from configuration file
-!!$    read (ninp(0),b2_ual_write_namelist)
-!!$    write (nout(0),b2_ual_write_namelist)
-!!$
-!!$    ! establish UAL access
-!!$    call euitm_create(treename, shot, run, refshot, refrun, idx)
-!!$  end subroutine open_ual
-!!$
-!!$
-!!$  subroutine close_ual(idx)
-!!$    integer, intent(in) :: idx
-!!$
-!!$    call euitm_close(idx)
-!!$  end subroutine close_ual
 
   subroutine fillLimiterCpo( cpo )
     type(type_limiter), intent(inout) :: cpo
