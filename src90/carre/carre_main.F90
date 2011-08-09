@@ -17,7 +17,7 @@ module carre_main
 
   private
 
-  public carre_main_computation
+  public carre_main_computation, carre_open_output_file
 
   ! Virtual structure setup loop steps
   integer, parameter :: ORIGINAL_STRUCT_STEP = 1
@@ -28,6 +28,13 @@ module carre_main
   integer, parameter :: EXTEND_EQU_STEP = 2
 
 contains
+
+  subroutine carre_open_output_file()
+    OPEN(UNIT=10,FILE='carre.out',STATUS='unknown')
+    rewind(10)
+    !  2.1  specify output format
+    write(10,*)'output format: carre70'
+  end subroutine carre_open_output_file
 
   subroutine carre_main_computation(equ, struct, par, grid, diag)
 

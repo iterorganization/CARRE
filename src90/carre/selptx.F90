@@ -257,7 +257,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
           write(*,*) 'No X-point - limiter configuration'
       end if
 
-#ifndef EUITM
+#ifndef CARRE_NONINTERACTIVE
       write(*,*)
       write(*,*) 'Do you accept the selection (y/n)?'
       read(*,'(a)') rep

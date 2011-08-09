@@ -28,13 +28,12 @@ CONTAINS
     ! internal
     integer :: ient,isor,ifail
 
-#ifdef EUITM 
-    ! For ITMCARRE, the code parameters are initialized 
+#ifdef CARRE_NONINTERACTIVE
+    ! In noninteractive mode, the code parameters are initialized 
     ! at the entry into the ITMCARRE main subroutine.
     ! Don't read from file or user.
     return
 #else
-
     !..1.1  Read all the necessary data from the file    
     ient = 9
     isor = 0

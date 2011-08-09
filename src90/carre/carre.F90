@@ -146,11 +146,11 @@ contains
     OPEN(UNIT=7, FILE='rzpsi.dat', STATUS='old')
     OPEN(UNIT=8, FILE='structure.dat', STATUS='old')
     OPEN(UNIT=9, FILE='carre.dat', STATUS='unknown')
-    OPEN(UNIT=10,FILE='carre.out',STATUS='unknown')
     open(unit=11,status='scratch')
-    !
-    !  2.1  specify output format
-    write(10,*)'output format: carre70'
+
+    ! Open the output file
+    call carre_open_output_file()
+
     !
     !..3.0  Read the data
     !
@@ -162,7 +162,6 @@ contains
     rewind(7)
     rewind(8)
     rewind(9)
-    rewind(10)
     call entete(7,'$r',iflag)
     read(7,100)lign80
     i=index(lign80,'=')

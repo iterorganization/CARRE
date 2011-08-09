@@ -38,3 +38,10 @@ setenv USE_UAL -DUSE_UAL
 #unsetenv USE_UAL
 
 #setenv NOUSE_MSCL True
+
+
+# Interactive Carre
+
+setenv CARRE_NONINTERACTIVE "-DCARRE_NONINTERACTIVE"
+unsetenv CARRE_NONINTERACTIVE
+

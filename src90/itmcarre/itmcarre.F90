@@ -35,7 +35,7 @@ contains
     ! 0. Initialize some defaults
     call defaut
 
-    ! 1. Read code parameters (will come from type_param in the future)
+    ! 1.1 Read code parameters (will come from type_param in the future)
     call logmsg( LOGDEBUG, "itmcarre: reading carre.dat" )
 
     OPEN(UNIT=9, FILE='carre.dat', STATUS='unknown')
@@ -43,6 +43,10 @@ contains
     if ( ifail /= 0 ) then
         stop 'itmcarre: error reading carre.dat'
     end if
+    rewind(UNIT=9)
+
+    ! 1.2 Open output file carre.out
+    call carre_open_output_file()
 
     ! 2. Read equilibrium
     call logmsg( LOGDEBUG, "itmcarre: reading equilibrium CPO" )

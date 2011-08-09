@@ -12,7 +12,7 @@ INCLUDE = -I ${SRCDIR}/include
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 EXCLUDELIST = carre.o fcrr.o tradui.o euitm_routines.o itmcarre_wrapper.o
 
-DEFINES = ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL}
+DEFINES = ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL} ${CARRE_NONINTERACTIVE}
 
 # Include object lists
 include LISTOBJ

@@ -2279,8 +2279,8 @@ contains
     ! internal
     integer :: ient,isor,ifail
 
-#ifdef EUITM 
-    ! For ITMCARRE, the code parameters are initialized 
+#ifdef CARRE_NONINTERACTIVE 
+    ! For non-interactive use the code parameters are initialized 
     ! at the entry into the ITMCARRE main subroutine.
     ! Don't read from file or user.
     return
@@ -2327,7 +2327,7 @@ contains
     type(CarreParameters), intent(inout) :: par
     logical, intent(out) :: correct
 
-#ifdef EUITM 
+#ifdef CARRE_NONINTERACTIVE
     ! For ITMCARRE, the code parameters cannot be modified by the user
     correct = .true.
     
