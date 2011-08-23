@@ -15,6 +15,8 @@ module carre_types
   integer, parameter, public :: GRID_EXTERNAL = 2
   integer, parameter, public :: GRID_BOUNDARY = 3
   integer, parameter, public :: GRID_BOUNDARY_REFINE = 4
+  integer, parameter, public :: GRID_INTERNAL_COARSEN = 5
+  integer, parameter, public :: GRID_BOUNDARY_COARSEN = 6
 
   ! Grid line flags
   integer, parameter, public :: GRIDLINE_BASELINE = 1
@@ -157,6 +159,8 @@ module carre_types
                & psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
                & psidym(npmamx,nrmamx,nregmx)
           
+          REAL*8, dimension(npmamx-1,nrmamx-1,nregmx) :: hx, hy
+
           ! Logical flag for face/structure intersection. True means
           ! the specific face is intersected by a structure segment.
           ! Dimensions:

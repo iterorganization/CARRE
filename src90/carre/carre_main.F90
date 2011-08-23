@@ -45,7 +45,7 @@ contains
     type(CarreDiag), intent(out) :: diag
 
     ! internal
-    integer :: i, j, itmp, iLine
+    integer :: i, j, itmp
     integer :: iSetupStruct, nEquSteps, iEquStep
 
 
@@ -99,6 +99,7 @@ contains
        ! Only do two passes when currently working with original structures
        if (iSetupStruct /= ORIGINAL_STRUCT_STEP) nEquSteps = GIVEN_EQU_STEP
 
+       ! Equilibrium setup loop
        do iEquStep = GIVEN_EQU_STEP, nEquSteps
 
           ! We do the equilibrium extension on the beginning of the second
@@ -194,15 +195,15 @@ contains
 
           end if
 
-       end do ! equilibrium loop
+       end do ! end equilibrium loop
 
        ! At this point the equilibrium and topology data is in the final form. 
 
        ! If no virtual targets are to be created, exit loop and go directly to grid generation           
        if (par%gridExtensionMode == GRID_EXTENSION_OFF) then
           exit
-       else
-          ! If we have a case with x-points, set up virtual geometry
+       else           
+          ! Otherwise, if we have a case with x-points, set up virtual geometry
           if (equ%npx.gt.0)then
 
              ! If we arrive here the second time, the virtual targets have been created and the

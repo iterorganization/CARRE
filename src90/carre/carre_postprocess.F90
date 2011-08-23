@@ -44,9 +44,8 @@ contains
     type(CarreStructures), intent(in) :: struct
 
     ! internal
-    integer :: iReg, iPol, iRad, iFace, iPostProcess, nCellsToRefine
+    integer :: iReg, iPostProcess, nCellsToRefine, nCellsToCoarsen
     logical :: doesIntersect
-    integer :: tmpCellQt(npmamx-1,nrmamx-1,nregmx)
 
     
     ! Only do postprocessing when doing grid extension
@@ -77,14 +76,46 @@ contains
 
        call writeGridStateToSiloFile('carrePostProcA'//int2str(iPostProcess), equ, struct, grid)
 
-       ! cells need refinement?
-       nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE )
-       call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
-            &int2str(nCellsToRefine)//' cells to refine')
-       if (nCellsToRefine == 0) exit
+       if ( mod( iPostProcess, 2 ) == 1 ) then
+           ! On odd iterations, do refinement.
+           ! Cells need refinement because of broken geometry?
+           nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE )
+           if ( nCellsToRefine > 0 ) then
+               call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
+                   &int2str(nCellsToRefine)//' cells to refine because of broken geometry')
+               
+               ! Fix cells by modifying the grid accordingly
+               call fixCells(equ, struct, grid)
 
-       ! Fix broken cells by modifying the grid accordingly
-       call fixCells(equ, struct, grid)
+               ! If we had broken cells, skip normal refinement 
+               continue
+           end if
+
+!!$       ! cells need refinement due to low resolution?
+!!$       nCellsToRefine = count( grid%cellflag == GRID_REFINE )
+!!$       if ( nCellsToRefine > 0 ) then
+!!$           call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
+!!$               &int2str(nCellsToRefine)//' cells to refine')
+!!$
+!!$           ! Fix cells by modifying the grid accordingly
+!!$           !call coarsenCells(equ, struct, grid)
+!!$           continue
+!!$       end if
+
+       else
+           ! On even iterations, do coarsening.
+           ! cells need coarsening?
+           nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
+               & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
+           if ( nCellsToRefine > 0 ) then
+               call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
+                   &int2str(nCellsToCoarsen)//' cells to coarsen')
+               
+               ! Fix cells by modifying the grid accordingly
+               call coarsenCells(grid)
+           end if
+       end if
+
     end do
 
     ! write results of postprocessing iteration
@@ -103,7 +134,6 @@ contains
 
       ! internal
       integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
-      logical :: candidate(npmamx-1,nrmamx-1,nregmx)
       integer :: iReg, iPol, iRad, iFace, i, j
 
       ! Transfer face intersection information to cells (filling grid%cellFaceFlag)
@@ -168,19 +198,29 @@ contains
             end do
          end do
       end do
-
-
+      
       ! Translate the grid%cellFaceFlag array into cell flags
       ! First assume all boundary cells are unproblematic
       where ( (grid%cellFaceFlag /= GRID_UNDEFINED) .and. (grid%cellFlag == GRID_INTERNAL) ) &
            & grid%cellflag = GRID_BOUNDARY
 
-
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
       ! -cells with three internal points and one external point
-
       where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
+
+      ! Figure out which must be coarsened due to too high resolution
+      where ( (grid%cellflag == GRID_BOUNDARY) &
+          & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_BOUNDARY_COARSEN
+      where ( (grid%cellflag == GRID_INTERNAL) &
+          & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
+
+      ! Figure out which must be refined due to too low resolution 
+      ! Currently we are only interested in increasing resolution at the targets
+!!$      where ( (grid%cellFaceFlag == GRID_BOUNDARY) &
+!!$          & .and. (grid%hx < grid%pasmin) ) grid%cellflag = GRID_BOUNDARY_COARSEN
+!!$      where ( (grid%cellFaceFlag == GRID_INTERNAL) &
+!!$          & .and. (grid%hx < grid%pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
 
     end subroutine categorizeCellsAndFaces
 
@@ -199,6 +239,52 @@ contains
     end function isExternal
     
   end subroutine carre_postprocess_computation
+
+
+  ! Compute characteristic cell size in x and y direction
+  subroutine computeHxHy( grid )
+    type(CarreGrid), intent(inout) :: grid
+
+    ! internal
+    integer :: iReg, iPol, iRad
+    double precision :: mx1, my1, mx2, my2, dist
+    external :: dist
+
+
+
+    do iReg = 1, grid%nreg
+
+        do iPol = 1, grid%np1(iReg) - 1
+            do iRad = 1, grid%nr(iReg) - 1
+                ! hx
+                mx1 = ( grid % xmail( iPol, iRad, iReg ) &
+                    & + grid % xmail( iPol, iRad + 1, iReg ) ) / 2
+                my1 = ( grid % ymail( iPol, iRad, iReg ) &
+                    & + grid % ymail( iPol, iRad + 1, iReg ) ) / 2
+                mx2 = ( grid % xmail( iPol + 1, iRad, iReg ) &
+                    & + grid % xmail( iPol + 1, iRad + 1, iReg ) ) / 2
+                my2 = ( grid % ymail( iPol + 1, iRad, iReg ) &
+                    & + grid % ymail( iPol + 1, iRad + 1, iReg ) ) / 2
+
+                grid % hx( iPol, iRad, iReg ) = dist( mx1, my1, mx2, my2 )
+
+                ! hy
+                mx1 = ( grid % xmail( iPol, iRad, iReg ) &
+                    & + grid % xmail( iPol + 1, iRad, iReg ) ) / 2
+                my1 = ( grid % ymail( iPol, iRad, iReg ) &
+                    & + grid % ymail( iPol + 1, iRad, iReg ) ) / 2
+                mx2 = ( grid % xmail( iPol, iRad + 1, iReg ) &
+                    & + grid % xmail( iPol + 1, iRad + 1, iReg ) ) / 2
+                my2 = ( grid % ymail( iPol, iRad + 1, iReg ) &
+                    & + grid % ymail( iPol + 1, iRad + 1, iReg ) ) / 2
+
+                grid % hy( iPol, iRad, iReg ) = dist( mx1, my1, mx2, my2 )
+            end do
+        end do
+
+    end do
+
+  end subroutine computeHxHy
 
 
   !> Compute face/structure intersections and fill the
@@ -614,7 +700,6 @@ contains
 
   end subroutine fixCells
 
-
   !> Add a radial grid line to a grid region, starting at the face
   !> given by the points (fcFromX,fcFromY) and (fcToX,fcToY).
   !> The new radial grid line should go through the the point (px, py).
@@ -1028,12 +1113,105 @@ contains
     endif
   end subroutine insertPoints
 
+
+  !> Coarsen grid by removing excessively fine rows of grid cells
+  subroutine coarsenCells(grid)
+    type(CarreGrid), intent(inout) :: grid  
+
+    ! internal
+    integer :: iReg, ip, ir
+!!$
+!!$    logical :: refineFace(2,npmamx,nrmamx,nregmx)
+!!$    double precision :: px, py
+!!$
+    ! Map from original grid indices (1:grid%np(iReg), 1:grid%nr(iReg))
+    ! to current grid situation (with removed radial lines)
+    integer :: irMap(nrmamx, nregmx), ipMap(npmamx, nregmx)
+    integer :: npRadOriginal(nregmx), npPolOriginal(nregmx)
+
+    logical :: removeRadialLine(npmamx,nregmx)
+
+    ! Set up identity maps for radial and poloidal point indices
+    npRadOriginal = grid%nr
+    npPolOriginal = grid%np1
+    do iReg = 1, grid%nreg
+        ipMap(:, iReg) = (/ (ip, ip = 1, grid%np1(iReg)) /)
+        irMap(:, iReg) = (/ (ir, ir = 1, grid%nr(iReg)) /)
+    end do
+
+    ! Figure out what radial grid lines have to be removed
+    ! to remove excessively fine cells
+    removeRadialLine = .false.
+    do iReg = 1, grid%nreg
+        do ip = 1, npPolOriginal(iReg) - 1
+            do ir = 1, npRadOriginal(iReg) - 1
+
+                if ( ( grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_COARSEN ) .or. &
+                    & ( grid%cellflag(ip, ir, iReg) == GRID_INTERNAL_COARSEN ) ) then
+
+                    if (.not. radialLineRequired(ip, iReg)) then
+                        removeRadialLine(ip, iReg) = .true.
+                    else if (.not. radialLineRequired(ip + 1, iReg)) then
+                        removeRadialLine(ip+1, iReg) = .true.
+                    else
+                        ! Found no radial line that can be removed
+                        call logmsg(LOGWARNING, "coarsenCells: cannot&
+                            & coarsen cell")
+                    end if
+                end if
+
+            end do
+        end do
+    end do
+
+  contains
+
+    ! Check whether the radial line going through ir, ireg
+    ! is required. This test includes the extension of the
+    ! radial line into the other regions, too.
+    logical function radialLineRequired(ip, ireg) result( required )
+      integer, intent(in) :: ip, ireg
+      
+      ! internal
+      integer :: iContinue, iRegOther, ipOther, irOther
+      double precision :: xBnd, yBnd
+
+      required = .true.
+      if ( grid%lineFlagRad(ip, ireg) == GRIDLINE_REQUIRED ) return
+
+      ! continuation in other regions
+      do iContinue = 1, 2
+          select case (iContinue)
+          case(1)
+              xBnd = grid%xmail(ip, 1, ireg)
+              yBnd = grid%ymail(ip, 1, ireg)
+          case(2)
+              xBnd = grid%xmail(ip, npRadOriginal(iReg), ireg)
+              yBnd = grid%ymail(ip, npRadOriginal(iReg), ireg)
+          end select
+
+          do iRegOther = 1, grid%nreg
+              if (iRegOther == ireg) continue
+              call findPointInRegion(grid, iRegOther, xBnd, yBnd, ipOther, irOther)
+              if (ipOther /= GRID_UNDEFINED) then
+                  if ( grid%lineFlagRad(ipOther, ireg) == GRIDLINE_REQUIRED ) return
+              end if
+          end do
+      end do
+      
+      required = .false.
+    end function radialLineRequired
+
+  end subroutine coarsenCells
+
+
+
   subroutine finalizeCells(grid)
     type(CarreGrid), intent(inout) :: grid
 
     ! internal
-    integer :: iReg, ir, ip, iFace, ip2, ir2, ipExt, irExt, ipBnd, irBnd
-    integer :: nExt, nBnd
+    integer :: iReg, ir, ip, iFace, ip2, ir2
+    integer :: nExt
 
     integer :: iPass, dx, dy, ipFace, irFace, nInt, ipl, irl, ipFix, irFix, ipNb, irNb
     logical :: pointMoved, pointOk
@@ -1116,9 +1294,9 @@ contains
         end do
      end do
 
-     ! Now catch special case of internal cells with three external cells and one internal cell
-     ! (no boundary cells). Make sure the external point not connected to the internal 
-     ! point via a face is placed on one of the other external point. If this is not 
+     ! Now catch special case of internal cells with three external points and one internal point
+     ! (no boundary point). Make sure the external point not connected to the internal 
+     ! point via a face is placed on one of the other external points. If this is not 
      ! the case, move it to the external neighbour along the radial face.
 
      do iReg = 1, grid%nReg
@@ -1400,8 +1578,7 @@ contains
       integer, intent(out) :: xipol, xirad
 
       ! internal
-      integer :: ipol, irad, ipx
-      double precision :: dx
+      integer :: ipol, irad
       double precision, parameter :: POINT_TOL = 1e-6
       real*8 :: dist
       external dist
@@ -1423,7 +1600,7 @@ contains
           end do
        end do
 
-      ! if we arrive here, no cell next to an x-point was found
+      ! Nothing found
       xipol = GRID_UNDEFINED
       xirad = GRID_UNDEFINED
 
@@ -1438,8 +1615,7 @@ contains
       integer, intent(out) :: xipol, xirad
 
       ! internal
-      integer :: ipol, irad, ipx
-      double precision :: dx
+      integer :: ipx
       double precision, parameter :: XPOINT_TOL = 1e-6
       real*8 :: dist
       external dist
@@ -1510,7 +1686,7 @@ contains
     !.. determ: determinant de la matrice des deux equations.
     !.. mult1: facteur multiplicatif du segment de courbe.
     !.. mult2: facteur multiplicatif du segment de structure.
-    REAL*8 mult1,mult2,determ, lipx, lipy
+    REAL*8 mult1,mult2,determ
 
 
     !..Boucle sur la structure.
@@ -1586,9 +1762,7 @@ contains
     type(CarreGrid), intent(in), optional :: grid       
 
     ! internal
-    integer :: iReg, iFace, iRad, iPol
-    logical :: doesIntersect
-    integer :: tmpCellQt(npmamx-1,nrmamx-1,nregmx)
+    integer :: iReg, iFace, iRad
 
     ! for writing out point grids
     double precision, dimension(npmamx * nrmamx * nregmx * 2) :: tmpX, tmpY

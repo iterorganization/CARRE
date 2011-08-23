@@ -675,6 +675,5 @@
               diag%gdsomvarrp(ireg)=diag%gdsomvarrp(ireg)+(diag%somvarrp(ir,ireg)/(nprad-1))
       enddo
 
-  888 CONTINUE
       RETURN
       END
