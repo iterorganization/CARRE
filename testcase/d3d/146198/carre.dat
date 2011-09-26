@@ -1,0 +1,28 @@
+$parameters
+repart   =     2
+nrelax   =  5000
+relax    =   9.9999998E-03
+pasmin   =   9.9999998E-03
+rlcept   =   1.0000000E-06
+pntrat   =   5.9855628E-01
+nptseg(1) =    21
+deltp1(1) =   5.3685163E-03
+deltpn(1) =   1.9854491E-03
+nptseg(2) =    21
+deltp1(2) =   1.8336920E-02
+deltpn(2) =   5.5042622E-03
+nptseg(3) =    61
+deltp1(3) =   4.5922410E-02
+deltpn(3) =   4.4363372E-02
+npr(1) =    31
+deltr1(1) =   1.7448658E-03
+deltrn(1) =   2.2134179E-02
+npr(2) =    11
+deltr1(2) =  -2.0390954E-03
+deltrn(2) =  -1.1208819E-02
+npr(3) =    11
+deltr1(3) =  -7.0678298E-03
+deltrn(3) =  -1.7668174E-01
+tgarde(1) =   2.0000000E-01
+tgarde(2) =   2.0000000E-01
+$end
