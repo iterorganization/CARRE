@@ -119,6 +119,7 @@ contains
     real*8 :: rx(2), ry(2)
     real*8 :: vtmp1, vtmp2
     double precision :: limPsiMax, limPsiMin, limPsi, pointPsi
+    double precision :: gnorm
     integer :: nvtarget, idir, vtargetipx(struct%nbdef), vtistruc(struct%nbdef)
     integer :: nptmp(2), npvtmp
     parameter(pi=3.141592654)
@@ -153,6 +154,9 @@ contains
     minpsitot = huge(minpsitot)
     maxpsitot = -minpsitot
 
+    seppx = huge(seppx)
+    seppy = huge(seppy)
+
     do istru = 1, struct%rnstruc
 
        ! if in target mode, only consider points of target structures
@@ -171,7 +175,7 @@ contains
        minpsi(istru) = huge(minpsi)
        maxpsi(istru) = -huge(minpsi)
 
-       write (0,*) 'Structure ', istru, & 
+       write (0,*) 'virtualtargets: Structure ', istru, & 
             &        ': ', struct%rnpstru(istru), ' points'
        ! loop over all points in structure
        do ip = 1, abs(struct%rnpstru(istru))
@@ -235,13 +239,13 @@ contains
              ! decrease step size and try again
              istep = istep + 1
              if ( istep > 1000 ) then
-                write(0,*) 'Did not find separatrix'
+                write(0,*) 'virtualtargets: did not find separatrix'
                 exit
              endif
           enddo ! separatrix projection loop
        enddo ! structure point loop
 
-       write(0,*) 'Structure:', istru, ', psi range:', & 
+       write(0,*) 'virtualtargets Structure:', istru, ', psi range:', & 
             &        minpsi(istru),  maxpsi(istru)
 
     enddo ! structure loop
@@ -342,6 +346,8 @@ contains
                 tx = seppx(ip,istru)
                 ty = seppy(ip,istru)
 
+                if (tx == huge(seppx)) cycle
+
                 alpha = angle( ptx(ipx), pty(ipx), & 
                      &                 separx( nptot( isep, ipx ), isep, ipx ), & 
                      &                 separy( nptot( isep, ipx ), isep, ipx ), & 
@@ -435,8 +441,9 @@ contains
              gy = feval2d( nx, ny, x, y, & 
                   &              a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3), & 
                   &              tx, ty )
+             gnorm = norm(gx, gy)             
 
-             dx = 1e-2;
+             dx = 1/gnorm * (x(2) - x(1)) * 4;
              tx = tx + dir * dx * gx
              ty = ty + dir * dx * gy
 
@@ -457,8 +464,8 @@ contains
              if ( tpsi < vtminpsi ) exit
 
              istep = istep + 1
-             if ( istep > npstmx ) then
-                write(0,*) 'Unable to finish virtual target'
+             if ( istep > npstmx - 10 ) then
+                write(0,*) 'virtualtargets: Unable to finish virtual target'
                 exit
              endif
 

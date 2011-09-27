@@ -186,6 +186,23 @@ contains
 
     ! Build the level line segment by segment
     do 
+       ! Check that we don't run out of storage for the level line
+       if ( k == npnimx ) then
+          ! Cannot store more points. Warn and return.
+          call logmsg(LOGWARNING, "crbniv: too many points in level line, returning incomplete line.")
+#ifdef USE_SILO
+             if (DEBUGFILES_CRBNIV) then
+                !call csioOpenFile('carreCrbnivEndP')
+                call csioOpenFile()
+                call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
+                     & crbx(1:k), crby(1:k) )    
+                call csioCloseFile()
+                call csioRestoreCounters()
+             end if             
+#endif
+          return
+       end if
+
        
        ! If an end point is given, check whether it is in the current cell.
        ! If yes, close the level line.

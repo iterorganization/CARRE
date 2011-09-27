@@ -127,6 +127,7 @@ contains
 
     ! Run extension algorithm
     call compute_distance_fast(equ, distFactor)
+    !call compute_distance_exact(equ, distFactor)
 
     ! Re-compute some data...
     ! Calculate the first partial derivatives in x and y and store

@@ -47,7 +47,7 @@ contains
     integer :: iReg, iPostProcess, nCellsToRefine, nCellsToCoarsen
     logical :: doesIntersect
 
-    
+   
     ! Only do postprocessing when doing grid extension
     if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
 
@@ -62,7 +62,7 @@ contains
     end do
     ! TODO: the grid lines going into the x-point are also required...
 
-    do iPostProcess = 1, 4
+    do iPostProcess = 1, 21
        call logmsg(LOGDEBUG,  'carre_postprocess_computation: pass '//int2str(iPostProcess))
 
        ! Compute face/structure intersections
@@ -78,6 +78,7 @@ contains
 
        if ( mod( iPostProcess, 2 ) == 1 ) then
            ! On odd iterations, do refinement.
+
            ! Cells need refinement because of broken geometry?
            nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE )
            if ( nCellsToRefine > 0 ) then
@@ -88,7 +89,7 @@ contains
                call fixCells(equ, struct, grid)
 
                ! If we had broken cells, skip normal refinement 
-               continue
+               cycle
            end if
 
 !!$       ! cells need refinement due to low resolution?
@@ -99,15 +100,16 @@ contains
 !!$
 !!$           ! Fix cells by modifying the grid accordingly
 !!$           !call coarsenCells(equ, struct, grid)
-!!$           continue
+!!$           cycle
 !!$       end if
 
        else
            ! On even iterations, do coarsening.
+
            ! cells need coarsening?
            nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
                & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
-           if ( nCellsToRefine > 0 ) then
+           if ( nCellsToCoarsen > 0 ) then
                call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
                    &int2str(nCellsToCoarsen)//' cells to coarsen')
                
@@ -210,6 +212,7 @@ contains
       where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
 
       ! Figure out which must be coarsened due to too high resolution
+      call computeHxHy(grid)
       where ( (grid%cellflag == GRID_BOUNDARY) &
           & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_BOUNDARY_COARSEN
       where ( (grid%cellflag == GRID_INTERNAL) &
@@ -249,7 +252,6 @@ contains
     integer :: iReg, iPol, iRad
     double precision :: mx1, my1, mx2, my2, dist
     external :: dist
-
 
 
     do iReg = 1, grid%nreg
@@ -691,7 +693,8 @@ contains
                 ! We added a radial grid line between poloidal points ip and ip + 1
                 ! Shift all indices bigger than that up by one
                 ! TODO: check we don't run out of space...
-                ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
+                ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1                
+
              end if
 
           end do
@@ -808,9 +811,6 @@ contains
     ! For this region iReg: compute new radial points by moving
     ! away from the given point in both directions
 
-    ! DEBUG: no relaxation inside insertPoints for now...
-    !nrelax = 0    
-
     ! Positive direction
     iSurface = 0
     do ir = lIFcR + 1, grid%nr(iReg)       
@@ -848,7 +848,7 @@ contains
        end do
        call csioCloseFile()    
     end if   
-#endif
+#endif   
 
     ! For points on boundary of region, insert
     ! radial lines starting at this point in all other regions
@@ -910,6 +910,9 @@ contains
        call csioCloseFile()    
     end if
 #endif
+
+    ! Mark the new radial line segment as required
+    grid%lineFlagRad(liFcP + 1, iReg) = GRIDLINE_REQUIRED
 
   end subroutine addRadialLine
 
@@ -1113,71 +1116,70 @@ contains
     endif
   end subroutine insertPoints
 
-
   !> Coarsen grid by removing excessively fine rows of grid cells
   subroutine coarsenCells(grid)
     type(CarreGrid), intent(inout) :: grid  
 
     ! internal
-    integer :: iReg, ip, ir
-!!$
-!!$    logical :: refineFace(2,npmamx,nrmamx,nregmx)
-!!$    double precision :: px, py
-!!$
-    ! Map from original grid indices (1:grid%np(iReg), 1:grid%nr(iReg))
-    ! to current grid situation (with removed radial lines)
-    integer :: irMap(nrmamx, nregmx), ipMap(npmamx, nregmx)
-    integer :: npRadOriginal(nregmx), npPolOriginal(nregmx)
-
-    logical :: removeRadialLine(npmamx,nregmx)
-
-    ! Set up identity maps for radial and poloidal point indices
-    npRadOriginal = grid%nr
-    npPolOriginal = grid%np1
-    do iReg = 1, grid%nreg
-        ipMap(:, iReg) = (/ (ip, ip = 1, grid%np1(iReg)) /)
-        irMap(:, iReg) = (/ (ir, ir = 1, grid%nr(iReg)) /)
-    end do
+    integer :: iReg, ip, ir, np
+    logical :: removeRadialLine(npmamx,nregmx), removeable
 
     ! Figure out what radial grid lines have to be removed
     ! to remove excessively fine cells
     removeRadialLine = .false.
     do iReg = 1, grid%nreg
-        do ip = 1, npPolOriginal(iReg) - 1
-            do ir = 1, npRadOriginal(iReg) - 1
+        do ip = 1, grid%np1(iReg) - 1
+            do ir = 1, grid%nr(iReg) - 1
 
                 if ( ( grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_COARSEN ) .or. &
                     & ( grid%cellflag(ip, ir, iReg) == GRID_INTERNAL_COARSEN ) ) then
 
-                    if (.not. radialLineRequired(ip, iReg)) then
-                        removeRadialLine(ip, iReg) = .true.
-                    else if (.not. radialLineRequired(ip + 1, iReg)) then
-                        removeRadialLine(ip+1, iReg) = .true.
-                    else
+                    call markRadialLine(ip, iReg, removeable)
+                    if (.not. removeable) call markRadialLine(ip + 1, iReg, removeable)
+                    if (.not. removeable) then
                         ! Found no radial line that can be removed
-                        call logmsg(LOGWARNING, "coarsenCells: cannot&
-                            & coarsen cell")
+                        !call logmsg(LOGWARNING, "coarsenCells: cannot coarsen cell")
                     end if
                 end if
 
             end do
         end do
+        call logmsg(LOGDEBUG, "coarsenCells: region "//int2str(iReg)//": can remove " &
+             & //int2str(count(removeRadialLine(:, iReg) == .true.))//" lines.")
+    end do
+
+    ! Remove lines region by region
+    do iReg = 1, grid%nreg
+        np = 0
+        do ip = 1, grid%np1(iReg)
+            if (.not. removeRadialLine(ip, iReg)) then
+                np = np + 1
+                grid%xmail(np, :, iReg) = grid%xmail(ip, :, iReg)
+                grid%ymail(np, :, iReg) = grid%ymail(ip, :, iReg)
+            end if            
+        end do
+        grid%np1(iReg) = np
     end do
 
   contains
 
-    ! Check whether the radial line going through ir, ireg
-    ! is required. This test includes the extension of the
-    ! radial line into the other regions, too.
-    logical function radialLineRequired(ip, ireg) result( required )
+    ! Check whether the radial line going through ir, ireg can be removed, and 
+    ! if yes, mark it to be removed in array removeRadialLine for all regions.
+    subroutine markRadialLine(ip, iReg, removeable) 
       integer, intent(in) :: ip, ireg
+      logical, intent(out) :: removeable
       
       ! internal
-      integer :: iContinue, iRegOther, ipOther, irOther
+      integer :: iContinue, iRegOther, ipOther, irOther, i
+      integer :: ipRegions(grid%nreg)
       double precision :: xBnd, yBnd
 
-      required = .true.
+      removeable = .false.
+      ipRegions = GRID_UNDEFINED
+
+      ! origin region
       if ( grid%lineFlagRad(ip, ireg) == GRIDLINE_REQUIRED ) return
+      ipRegions(iReg) = ip
 
       ! continuation in other regions
       do iContinue = 1, 2
@@ -1186,21 +1188,28 @@ contains
               xBnd = grid%xmail(ip, 1, ireg)
               yBnd = grid%ymail(ip, 1, ireg)
           case(2)
-              xBnd = grid%xmail(ip, npRadOriginal(iReg), ireg)
-              yBnd = grid%ymail(ip, npRadOriginal(iReg), ireg)
+              xBnd = grid%xmail(ip, grid%nr(iReg), ireg)
+              yBnd = grid%ymail(ip, grid%nr(iReg), ireg)
           end select
 
           do iRegOther = 1, grid%nreg
-              if (iRegOther == ireg) continue
+              if (iRegOther == ireg) cycle
               call findPointInRegion(grid, iRegOther, xBnd, yBnd, ipOther, irOther)
               if (ipOther /= GRID_UNDEFINED) then
                   if ( grid%lineFlagRad(ipOther, ireg) == GRIDLINE_REQUIRED ) return
+                  ipRegions(iRegOther) = ipOther
               end if
           end do
       end do
-      
-      required = .false.
-    end function radialLineRequired
+
+      ! radial line is removeable in all regions. Mark to be removed in all regions
+      removeable = .true.
+      do i = 1, grid%nreg
+          if (ipRegions(i) /= GRID_UNDEFINED) &
+               & removeRadialLine(ipRegions(i), i) = .true.
+      end do
+
+    end subroutine markRadialLine
 
   end subroutine coarsenCells
 
@@ -1459,7 +1468,8 @@ contains
        end do       
     end do
 
-    call assert( (liFcP /= GRID_UNDEFINED) .and. (liFcR /= GRID_UNDEFINED) )
+    call assert( (liFcP /= GRID_UNDEFINED) .and. (liFcR /= GRID_UNDEFINED), &
+         & "findFaceForPoint: did not find a face close to the given point - something is broken." )
 
   contains
     
@@ -1688,9 +1698,15 @@ contains
     !.. mult2: facteur multiplicatif du segment de structure.
     REAL*8 mult1,mult2,determ
 
+    logical :: doesIntersectCheck
+
+    if (present(iSegment)) iSegment = GRID_UNDEFINED    
 
     !..Boucle sur la structure.
     DO i=1, size(xst)-1
+
+       doesIntersectCheck = segments_intersect( xx(1), yy(1), xx(2), yy(2), &
+            & xst(i), yst(i), xst(i+1), yst(i+1) )
 
        if (present(testEndPoints)) then
           if (testEndPoints) then
@@ -1704,7 +1720,9 @@ contains
                       if (present(ipx) .and. present(ipy)) then
                          ipx = xx(k)
                          ipy = yy(k)
-                      end if                      
+                      end if
+                      call assert( doesIntersect .eqv. doesIntersectCheck, &
+                           & "intersect and segments_intersect disagree" )
                       return
                       
                    end if
@@ -1734,6 +1752,13 @@ contains
                 !..Intersection si mult2 entre 0 et 1
                 IF ((mult2 >= 0.0d0).AND.(mult2 <= 1.0d0)) THEN
                     doesIntersect = .true.
+                    if (.not. doesIntersectCheck) then 
+                       call logmsg(LOGDEBUG, &
+                            & "intersect: intersect(true) and segments_intersect(false) disagree, returning false")
+                       doesIntersect = .false.
+                       return
+                    end if
+
                     if (present(iSegment)) iSegment = i
                     if (present(ipx) .and. present(ipy)) then
 !!$                        ipx = xx(1) + mult1 * (xx(2) - xx(1))
@@ -1748,8 +1773,53 @@ contains
     END DO
 
     doesIntersect = .FALSE.
-    if (present(iSegment)) iSegment = GRID_UNDEFINED
+    call assert( doesIntersect .eqv. doesIntersectCheck, &
+         & "intersect(false) and segments_intersect(true) disagree" )
   END subroutine intersect
+
+
+  logical function segments_intersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y)
+    double precision, intent(in) :: p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y
+
+    ! internal
+    double precision :: d1, d2, d3, d4
+    
+    d1 = direction(p3x, p3y, p4x, p4y, p1x, p1y)
+    d2 = direction(p3x, p3y, p4x, p4y, p2x, p2y)
+    d3 = direction(p1x, p1y, p2x, p2y, p3x, p3y)
+    d4 = direction(p1x, p1y, p2x, p2y, p4x, p4y)
+
+    segments_intersect = .true.
+    
+    if (   ((d1 > 0.0d0 .and. d2 < 0.0d0) .or. (d1 < 0.0d0 .and. d2 > 0.0d0)) .and. &
+         & ((d3 > 0.0d0 .and. d4 < 0.0d0) .or. (d3 < 0.0d0 .and. d4 > 0.0d0))  ) return
+
+    if ( d1 == 0.0d0 .and. on_segment(p3x, p3y, p4x, p4y, p1x, p1y ) ) return
+    if ( d2 == 0.0d0 .and. on_segment(p3x, p3y, p4x, p4y, p2x, p2y ) ) return
+    if ( d3 == 0.0d0 .and. on_segment(p1x, p1y, p2x, p2y, p3x, p3y ) ) return
+    if ( d4 == 0.0d0 .and. on_segment(p1x, p1y, p2x, p2y, p4x, p4y ) ) return
+   
+    segments_intersect = .false.
+
+  contains
+
+    double precision function direction( pix, piy, pjx, pjy, pkx, pky )
+      double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
+      
+      direction = (pkx - pix) * (pjy - piy) - (pjx - pix) * (pky - piy) 
+
+    end function direction
+
+    logical function on_segment( pix, piy, pjx, pjy, pkx, pky )
+      double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
+
+      on_segment = (min(pix, pjx) <= pkx) .and. (pkx <= max(pix, pjx)) &
+           & .and. (min(piy, pjy) <= pky) .and. (pky <= max(piy, pjy))
+
+    end function on_segment
+
+  END function segments_intersect
+
 
 
 
