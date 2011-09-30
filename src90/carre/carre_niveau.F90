@@ -607,7 +607,7 @@ contains
           
           ! Heuristic: if the found level line is too large by an order of magnitude, reject it
           if ( (length/lengthFace) > 10d0 ) then
-             call logmsg( LOGKNOWNWARNING, 'findLevelLineForPoints: found level line (length: '&
+             call logmsg( LOGDEBUGBULK, 'findLevelLineForPoints: found level line (length: '&
                  &//real2str(length)//', points: '//int2str(npNivTmp)//')'//&
                  & '- REJECTED because too long compared to face (length: '//real2str(lengthFace)//')' )
              cycle
@@ -637,7 +637,7 @@ contains
        nivx(2) = xTo
        nivy(2) = yTo
    else       
-      call logmsg( LOGDEBUG, 'findLevelLineForPoints: distance of points is: '//real2str(lengthFace)//&
+      call logmsg( LOGDEBUGBULK, 'findLevelLineForPoints: distance of points is: '//real2str(lengthFace)//&
            & ', found level line: length='//real2str(maxLength)//&
            & ' with '//int2str(npNiv)//' points' )
    end if

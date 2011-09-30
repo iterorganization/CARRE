@@ -19,6 +19,7 @@
       use CarreDiagnostics
       use carre_types
       use carre_parameter_io
+      use logging
   
       IMPLICIT NONE
   
@@ -116,6 +117,7 @@
 !c>>>
 
       nuldec = .FALSE.
+      lg = 0.0d0
 
 !..On procede au cas par cas selon la configuration des separatrices.
 
@@ -2278,6 +2280,8 @@ contains
 
     ! internal
     integer :: ient,isor,ifail
+    integer :: iseg
+
 
 #ifdef CARRE_NONINTERACTIVE 
     ! For non-interactive use the code parameters are initialized 
@@ -2317,6 +2321,19 @@ contains
          ENDIF
 #endif
 
+    ! If we do an extended grid, modify the code parameters before starting the gridding
+    if (par%gridExtensionMode /= GRID_EXTENSION_OFF) then
+       
+        call logmsg(LOGINFO, "read_code_parameters: adjusting deltp1, deltpn for &
+             &use with extended grid algorithm")
+
+        do iseg = 1, size(lg)
+            if ( lg(iseg) == 0.0d0 ) exit
+            par%deltp1(iseg) = lg(iseg) / (par%nptseg(iseg) - 1)
+            par%deltpn(iseg) = lg(iseg) / (par%nptseg(iseg) - 1)
+        end do
+    end if
+
   end subroutine read_code_parameters
 
 
@@ -2330,89 +2347,103 @@ contains
 #ifdef CARRE_NONINTERACTIVE
     ! For ITMCARRE, the code parameters cannot be modified by the user
     correct = .true.
-    
+
     ! But we still want to write out the carre.out file
     CALL SORTIE(nsep,nreg,np1, & 
-        &  distxo,xmail,ymail,nx,ny, & 
-        &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par)
+         &  distxo,xmail,ymail,nx,ny, & 
+         &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par)
 
     return
-#else
+#else  
 
-         CALL RAPPEL(par,&
-             & lg,difpsi,distnv,nreg,nsep,npx,&
-             & dpmin,dpmax,drmin,drmax,distxo,6,correct)
+    CALL RAPPEL(par,&
+         & lg,difpsi,distnv,nreg,nsep,npx,&
+         & dpmin,dpmax,drmin,drmax,distxo,6,correct)
 
-!..Initialise the primary level line
+    !..Initialise the primary level line
 
-         nn1=0
+    nn1=0
 
-         DO ipas=1,nptot(ptsep(3,ipx),ipx)
-            nn1=nn1+1
-            xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
-         end do
+    DO ipas=1,nptot(ptsep(3,ipx),ipx)
+        nn1=nn1+1
+        xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
+        yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+    end do
 
-! on colle la dernière ligne de niveau sur trace2 pour avoir
-! la pénétration.
+    ! on colle la dernière ligne de niveau sur trace2 pour avoir
+    ! la pénétration.
 
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
-     &        ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc, & 
-     &        nivx,nivy,nivtot,nbniv, & 
-     &         par%pntrat,distxo,xn,yn,nn1, & 
-     &         par%repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
-     &         a00,a01,a10,a11,psi,nx,ny,x,y)
+    call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
+         &        ptsep,npx,nptot, & 
+         &        nstruc,npstru,xstruc,ystruc, & 
+         &        nivx,nivy,nivtot,nbniv, & 
+         &         par%pntrat,distxo,xn,yn,nn1, & 
+         &         par%repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
+         &         a00,a01,a10,a11,psi,nx,ny,x,y)
 
-         if (correct) then
-           if(sellan(1:8).eq.'francais') then
-             WRITE(6,301)
-           elseif(sellan(1:7).eq.'english') then
-             WRITE(6,300)
-           endif
-           READ(5,302)rep
-         endif
+    if (correct) then
+        if(sellan(1:8).eq.'francais') then
+            WRITE(6,301)
+        elseif(sellan(1:7).eq.'english') then
+            WRITE(6,300)
+        endif
+        READ(5,302)rep
+    endif
 
-         if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
+    if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
 
-            ient = 5
-            isor = 6
-            pntrat_old = par%pntrat
-            CALL CHANGE(par,ient,isor,ifail)
-            if (par%pntrat.ne.pntrat_old) then
+        ient = 5
+        isor = 6
+        pntrat_old = par%pntrat
+        CALL CHANGE(par,ient,isor,ifail)
+        if (par%pntrat.ne.pntrat_old) then
 
             call endpag
 
             call trace2(x(1),x(nx),y(1),y(ny), & 
-     &     separx,separy,ptsep,npx,nptot, & 
-     &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-     &         nivtot,nbniv)
+                 &     separx,separy,ptsep,npx,nptot, & 
+                 &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+                 &         nivtot,nbniv)
 
-            endif
-            ! parameters have been changed and state has to be recomputed
-            !GO TO 3 
-         else
-            CALL RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, & 
-     &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
+        endif
+        ! parameters have been changed and state has to be recomputed
+        !GO TO 3 
+    else
+        CALL RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, & 
+             &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
 
 
-            CALL SORTIE(nsep,nreg,np1, & 
-                 &  distxo,xmail,ymail,nx,ny, & 
-                 &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par,&
-                 &  psim,psidxm,psidym)
+        CALL SORTIE(nsep,nreg,np1, & 
+             &  distxo,xmail,ymail,nx,ny, & 
+             &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par,&
+             &  psim,psidxm,psidym)
 
-         ENDIF
+    ENDIF
 
-!..Save the chosen parameters
+    !..Save the chosen parameters
 
-  301        FORMAT(//T2,'Est-ce que ces valeurs sont correctes? (o/n)')
-  300        format(//T2,'Do you wish to accept these values (y/n)?')
-  302      FORMAT(A)
+301 FORMAT(//T2,'Est-ce que ces valeurs sont correctes? (o/n)')
+300 format(//T2,'Do you wish to accept these values (y/n)?')
+302 FORMAT(A)
 
 #endif
 
   end subroutine check_and_modify_code_parameters
 
+!!$  ! Modify code parameters in order to match 
+!!$  subroutine setupCodeParametersForExtendedGrid(par, equ)
+!!$    type(CarreParameters), intent(inout) :: par
+!!$    type(CarreEquilibrium), intent(inout) :: equ
+!!$
+!!$    integer :: isep
+!!$    double precision :: 
+!!$
+!!$    do isep = 1, 4
+!!$        lg(isep) = long(separx(1,ptsep(isep,ipx),ipx), &
+!!$             & separy(1,ptsep(isep,ipx),ipx), &
+!!$             & nptot(ptsep(isep,ipx),ipx))
+!!$    end do
+!!$
+!!$  end subroutine setupCodeParametersForExtendedGrid
 
-
-      END
+END subroutine

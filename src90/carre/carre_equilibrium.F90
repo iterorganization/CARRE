@@ -3,6 +3,7 @@ module carre_equilibrium
   use carre_types
   use itm_assert
   use carre_postprocess
+  use carre_intersect
   use Logging
 
 #ifdef USE_SILO
@@ -355,7 +356,7 @@ contains
                   yy(2) = equ%y(iz + 1)
                end select
 
-               call intersect_structure( xx, yy, &
+               call intersect_all_structures( xx, yy, &
                     & struct, faceISec(ir, iz, iFc) )
 
             end do

@@ -41,7 +41,7 @@ module CarreSiloIO
 contains
  
   subroutine csioOpenFile(name)
-    character(len(filename)), intent(in), optional :: name
+    character(*), intent(in), optional :: name
 
     call csioCloseFile()
 
@@ -87,7 +87,7 @@ contains
   subroutine csioSetRegion( diReg )
     integer, intent(in) :: diReg
    
-    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetRegion: region "//int2str(diReg))    
+    call logmsg(LOGDEBUGBULK, "CarreSiloIO.csioSetRegion: region "//int2str(diReg))    
     iReg = diReg
     call csioCloseFile()
   end subroutine csioSetRegion
@@ -98,7 +98,7 @@ contains
     if (present(diSurf)) iSurf = diSurf       
     if (present(delta)) iSurf = iSurf + delta
 
-    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetSurface: surface "//int2str(iSurf))    
+    call logmsg(LOGDEBUGBULK, "CarreSiloIO.csioSetSurface: surface "//int2str(iSurf))    
     call csioCloseFile()
   end subroutine csioSetSurface
 
@@ -108,7 +108,7 @@ contains
     if (present(diRelax)) iRelax = diRelax
     if (present(delta)) iRelax = iRelax + delta
 
-    call logmsg(LOGDEBUG, "CarreSiloIO.csioSetRelax: relaxation "//int2str(iRelax))    
+    call logmsg(LOGDEBUGBULK, "CarreSiloIO.csioSetRelax: relaxation "//int2str(iRelax))    
     call csioCloseFile()
   end subroutine csioSetRelax
 

@@ -170,7 +170,7 @@ module carre_types
           logical :: faceISec(2,npmamx,nrmamx,nregmx)
           double precision :: faceISecPx(2,npmamx,nrmamx,nregmx)
           double precision :: faceISecPy(2,npmamx,nrmamx,nregmx)
-          
+
           integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
           integer :: cellFaceFlag(npmamx-1,nrmamx-1,nregmx)
 
@@ -178,6 +178,13 @@ module carre_types
 
           ! logical flags marking grid lines as required
           integer :: lineFlagRad(nrmamx, nregmx)
+
+          ! neighbour information for following cells in the radial direction
+          ! from region to region
+          ! Dimensions: 1=region, 2=poloidal index of radial cell strip,
+          !             3=radial direction (1=positive, 2=negative)
+          integer :: nbFaceReg(nregmx, npmamx-1, 2), &
+               & nbFaceIPol(nregmx, npmamx-1, 2), nbFaceIRad(nregmx, npmamx-1, 2)
 
   end type CarreGrid
   
