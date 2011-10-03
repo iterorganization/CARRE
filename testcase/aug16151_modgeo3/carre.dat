@@ -1,8 +1,8 @@
 $parameters
 repart   =     2
-nrelax   =  40
+nrelax   =  500
 relax    =   0.5
-pasmin   =   4.0E-02
+pasmin   =   5.0E-03
 rlcept   =   1.0E-06
 pntrat   =   2.0E-01
 nptseg(1) =    12
@@ -41,6 +41,6 @@ addRight  = 00
 addBottom = 0
 addTop    = 00
 gridExtensionMode = 2
-loglevel = 8
 loglevel = 3
+loglevel = 6
 $end
