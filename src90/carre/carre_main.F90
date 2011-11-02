@@ -168,6 +168,9 @@ contains
                      &     ((equ%separy(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
                 !>>>
                 call trc_stk_in('carre','*..10.0')
+
+                call writeGridStateToSiloFile('carreFrtierA000', equ, struct)
+
                 CALL FRTIER(equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc, & 
                      &      struct%npstru,struct%xstruc,struct%ystruc,struct%inddef,&
                      &      struct%nbdef,equ%npx,equ%separx, & 
@@ -226,11 +229,12 @@ contains
 
     end do                     ! end setup loop
 
-
     !
     !..12.0  Grid the regions
     !
     if(equ%npx.gt.0) then
+
+       call writeGridStateToSiloFile('carreMaille0000', equ, struct)
 
        CALL MAILLE(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%xpto,equ%ypto,&
             & equ%racord, & 

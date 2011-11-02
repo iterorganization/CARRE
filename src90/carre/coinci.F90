@@ -50,20 +50,20 @@
           imn=i
         endif
       end do
-      if(irp.ge.2) then
-        print *,'More than two occasions of the X-point mismatch in ', & 
-     &    'coinci'
-        print *,'==> May be an internal error in Carre'
-        call pltend
-        stop
-      end if
-      irp=irp+1
-      rmn=sqrt(rmn)
-      if(irp.eq.1) then
-        print *
-        print *,'== The following message may appear twice:'
-        print *
-      end if
+!       if(irp.ge.2) then
+!         print *,'More than two occasions of the X-point mismatch in ', & 
+!      &    'coinci'
+!         print *,'==> May be an internal error in Carre'
+!         call pltend
+!         stop
+!       end if
+!       irp=irp+1
+!       rmn=sqrt(rmn)
+!       if(irp.eq.1) then
+!         print *
+!         print *,'== The following message may appear twice:'
+!         print *
+!       end if
       print '(1x,1p,2a,2(e10.3,a))', & 
      &  'A separatrix misses the X-point by more than ', & 
      &  'the hard-wired tolerance (',rmn,' vs.',const,' )'

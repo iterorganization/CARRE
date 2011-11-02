@@ -40,7 +40,7 @@ contains
     !..   10.2  Set up virtual limiters if in target mode
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
        call VIRTUALLIMITERS(struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
-            & equ%npx,equ%ptx,equ%pty, & 
+            & equ%npx,equ%xpto,equ%ypto, & 
             & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
     end if
 
@@ -106,7 +106,7 @@ contains
 
     !  variables locales
     integer :: ipx, isep, istru, i
-    integer :: ip, itarget, istep
+    integer :: ip, itarget, istep, istepTot
     real*8 :: minpsitot, maxpsitot, & 
          &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, & 
          &     dir, tol
@@ -421,6 +421,7 @@ contains
 
        ! build virtual structure starting from the given points on the sep.
        ! step in both directions away from the separatrix
+       istepTot = 0
        do idir = 1, 2
           istep = 1
           if ( idir == 1 ) then
@@ -443,7 +444,7 @@ contains
                   &              tx, ty )
              gnorm = norm(gx, gy)             
 
-             dx = 1/gnorm * (x(2) - x(1)) * 4;
+             dx = 1/gnorm * (x(2) - x(1)) * 0.5 ;
              tx = tx + dir * dx * gx
              ty = ty + dir * dx * gy
 
@@ -464,7 +465,8 @@ contains
              if ( tpsi < vtminpsi ) exit
 
              istep = istep + 1
-             if ( istep > npstmx - 10 ) then
+             istepTot = istepTot + 1
+             if ( istepTot > npstmx - 10 ) then
                 write(0,*) 'virtualtargets: Unable to finish virtual target'
                 exit
              endif
@@ -557,7 +559,7 @@ contains
   !*** away from the O-point
   !=======================================================================
 
-  subroutine virtualLimiters(nivx,nivy,nivtot,nbniv,npx,ptx,pty, & 
+  subroutine virtualLimiters(nivx,nivy,nivtot,nbniv,npx,xpto,ypto, & 
        & nstruc,npstru,xstruc,ystruc)
 
 
@@ -566,7 +568,7 @@ contains
 
     !  arguments
     real*8 :: nivx(npnimx,nivmx),nivy(npnimx,nivmx)
-    real*8 :: ptx(npxmx),pty(npxmx)
+    real*8 :: xpto, ypto
     real*8 :: xstruc(npstmx,strumx),ystruc(npstmx,strumx)
     integer :: nbniv, nivtot(nbniv), npx, nstruc, npstru(strumx)
 
@@ -597,8 +599,8 @@ contains
 !!$         ox = ( x - ptx(npx) ) * 0.1
 !!$         oy = ( y - pty(npx) ) * 0.1
 
-       ox = ( x - ptx(npx) ) 
-       oy = ( y - pty(npx) ) 
+       ox = ( x - xpto ) 
+       oy = ( y - ypto ) 
        length = sqrt( ox ** 2 + oy ** 2 )
        ox = ox / length
        oy = oy / length

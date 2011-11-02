@@ -237,9 +237,9 @@ contains
     !.. mult2: facteur multiplicatif du segment de structure.
     REAL*8 mult1,mult2,determ
 
-    logical :: doesIntersectCheck
+    logical :: doesIntersectCramer, doesIntersectRobust
 
-    doesIntersectCheck = segments_intersect( xx(1), yy(1), xx(2), yy(2), &
+    doesIntersectRobust = segments_intersect( xx(1), yy(1), xx(2), yy(2), &
          & xst(1), yst(1), xst(2), yst(2) )
 
     if (present(testEndPoints)) then
@@ -254,7 +254,7 @@ contains
                             ipx = xx(k)
                             ipy = yy(k)
                         end if
-                        call assert( doesIntersect .eqv. doesIntersectCheck, &
+                        call assert( doesIntersect .eqv. doesIntersectRobust, &
                              & "intersect and segments_intersect disagree" )
                         return
 
@@ -268,44 +268,44 @@ contains
     determ = (-(xx(2) - xx(1))) * (yst(2) - yst(1)) + & 
          &                   (yy(2) - yy(1)) * (xst(2) - xst(1))
 
-    !..Si determinant non nul, alors il y a solution.            
+    !..Si determinant non nul, alors il y a solution.
     IF (determ .NE. 0.) THEN
 
-        !..Facteur multiplicatif du segment de courbe avec la methode de Cramer.                    
+        !..Facteur multiplicatif du segment de courbe avec la methode de Cramer.
         mult1 = ((-(xst(1)-xx(1))) * (yst(2)-yst(1)) + & 
              &              (yst(1)-yy(1)) * (xst(2)-xst(1)))/determ
+        !..Fact. mult. du segment de structure.
+        mult2= ((xx(2)-xx(1)) * (yst(1)-yy(1)) - & 
+             &                (yy(2)-yy(1)) * (xst(1)-xx(1)))/determ
+        
 
         !..Pour avoir intersection, il faut que mult1 soit entre 0 et 1
         IF ((mult1 >= 0.0d0).AND.(mult1 <= 1.0d0)) THEN
-
-            !..Fact. mult. du segment de structure.
-            mult2= ((xx(2)-xx(1)) * (yst(1)-yy(1)) - & 
-                 &                (yy(2)-yy(1)) * (xst(1)-xx(1)))/determ
-
             !..Intersection si mult2 entre 0 et 1
             IF ((mult2 >= 0.0d0).AND.(mult2 <= 1.0d0)) THEN
-                doesIntersect = .true.
-                if (.not. doesIntersectCheck) then 
-                    call logmsg(LOGDEBUG, &
-                         & "intersect: intersect(true) and segments_intersect(false) disagree, returning false")
-                    doesIntersect = .false.
-                    return
-                end if
-
-                if (present(ipx) .and. present(ipy)) then
-!!$                        ipx = xx(1) + mult1 * (xx(2) - xx(1))
-!!$                        ipy = yy(1) + mult1 * (yy(2) - yy(1))
-                    ipx = xst(1) + mult2 * (xst(2) - xst(1))
-                    ipy = yst(1) + mult2 * (yst(2) - yst(1))
-                end if
-                return
+                doesIntersectCramer = .true.
             ENDIF
         ENDIF
+
+        ! We have more trust in the result from the robust intersection test
+        doesIntersect = doesIntersectRobust
+
+        ! However, we have to use the coefficients from the non-robust
+        ! intersection computation to get an intersection point
+        if (doesIntersect .and. present(ipx) .and. present(ipy)) then
+                ipx = xst(1) + mult2 * (xst(2) - xst(1))
+                ipy = yst(1) + mult2 * (yst(2) - yst(1))
+        end if
+                
+        return        
+    ELSE
+        ! Zero determinant means colinear. The line segments can still 
+        ! coincide/overlap. In this case we declare the lines to not intersect.
+        doesIntersect = .FALSE.
+        ! We also do NOT check against the robust intersection test result
+        ! (which will indicate overlapping line segments to intersect).
     ENDIF
 
-    doesIntersect = .FALSE.
-    call assert( doesIntersect .eqv. doesIntersectCheck, &
-         & "intersect(false) and segments_intersect(true) disagree" )
   end subroutine intersection
 
 
