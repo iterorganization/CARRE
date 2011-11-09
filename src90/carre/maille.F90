@@ -2353,9 +2353,6 @@ contains
     correct = .true.
 
     ! But we still want to write out the carre.out file
-!!$    CALL SORTIE(equ%nsep,grid%nreg,grid%np1, & 
-!!$         &  equ%distxo,grid%xmail,grid%ymail,nx,equ%ny, & 
-!!$         &  equ%x,equ%y,equ%a00,equ%a10,equ%a01,equ%a11,equ%ptx,pty,equ%npx,equ%racord,1,equ%fctpx,diag,par)
     CALL SORTIE(equ, grid, diag, par, 1)
 
     return
@@ -2411,11 +2408,12 @@ contains
                  &         struct%nivtot,struct%nbniv)
 
         endif
+
         ! parameters have been changed and state has to be recomputed
-        !GO TO 3 
+        correct = .false.
     else
-        CALL RAPPEL(par,lg,difpsi,struct%distnv,grid%nreg,equ%nsep,equ%npx, & 
-             &             dpmin,dpmax,drmin,drmax,equ%distxo,10,correct)
+!!$        CALL RAPPEL(par,lg,difpsi,struct%distnv,grid%nreg,equ%nsep,equ%npx, & 
+!!$             &             dpmin,dpmax,drmin,drmax,equ%distxo,10,correct)
 
 
 !!$        CALL SORTIE(equ%nsep,grid%nreg,grid%np1, & 
@@ -2423,7 +2421,6 @@ contains
 !!$             &  equ%x,equ%y,equ%a00,equ%a10,equ%a01,equ%a11,equ%ptx,equ%pty,equ%npx,equ%racord,1,equ%fctpx,diag,par,&
 !!$             &  grid%psim,grid%psidxm,grid%psidym)
         CALL SORTIE(equ, grid, diag, par, 1)
-
     ENDIF
 
     !..Save the chosen parameters
