@@ -105,7 +105,16 @@ PROGRAM CARRE
   ! Postprocess
   call carre_postprocess_computation(par, equ, grid, struct)
 
-  ! Output final grid
+  ! Output grid data piece into carre.out
+!!$  CALL SORTIE(equ%nsep,grid%nreg,grid%np1, & 
+!!$       & equ%distxo,grid%xmail,grid%ymail,equ%nx,equ%ny, & 
+!!$       & equ%x, equ%y, equ%a00, equ%a10, equ%a01, equ%a11,&
+!!$       & equ%ptx, equ%pty, equ%npx, equ%racord,&
+!!$       & 2,& ! 2 means print grid data
+!!$       & equ%fctpx,diag,par,grid%psim,grid%psidxm,grid%psidym)
+  call SORTIE(equ, grid, diag, par, 2)
+
+  ! Output final grid to Silo
   call writeGridStateToSiloFile('carreFinal00000', equ, struct, grid)
 
   ! Finalize Carre 

@@ -15,8 +15,9 @@ module carre_types
   integer, parameter, public :: GRID_EXTERNAL = 2
   integer, parameter, public :: GRID_BOUNDARY = 3
   integer, parameter, public :: GRID_BOUNDARY_REFINE = 4
-  integer, parameter, public :: GRID_INTERNAL_COARSEN = 5
-  integer, parameter, public :: GRID_BOUNDARY_COARSEN = 6
+  integer, parameter, public :: GRID_BOUNDARY_REFINE_FIX = 5
+  integer, parameter, public :: GRID_INTERNAL_COARSEN = 6
+  integer, parameter, public :: GRID_BOUNDARY_COARSEN = 7
 
   ! Grid line flags
   integer, parameter, public :: GRIDLINE_BASELINE = 1
@@ -119,9 +120,10 @@ module carre_types
 !           innermost point of the limiter.
 !.. eps_Xpt Threshold to decide when we are close to an x-point (is set
 !           depending on equilibrium resolution)
-
+!   distxo  The distance between the active X-point and the O-point
+!.. nsep  : number of the separatrices per the configuration
       integer :: nx, ny, iptx(npxmx), jptx(npxmx), npx, npxtot,ptsep(4,npxmx), & 
-          &   nptot(4,npxmx), ii(gradmx), jj(gradmx),ptxint, limcfg
+          &   nptot(4,npxmx), ii(gradmx), jj(gradmx),ptxint, limcfg, nsep
 
       REAL*8 :: &
           &  x(nxmax), y(nymax), psi(nxmax,nymax), &
@@ -131,7 +133,7 @@ module carre_types
           & ptx(npxmx), pty(npxmx), xpto, ypto, fctpx(npxmx), & 
           & separx(npnimx,4,npxmx), separy(npnimx,4,npxmx), &
           & pointx(gradmx), pointy(gradmx), &
-          & eps_Xpt
+          & eps_Xpt, distxo
 
       LOGICAL racord
 

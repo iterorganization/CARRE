@@ -235,16 +235,7 @@ contains
     if(equ%npx.gt.0) then
 
        call writeGridStateToSiloFile('carreMaille0000', equ, struct)
-
-       CALL MAILLE(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%xpto,equ%ypto,&
-            & equ%racord, & 
-            &    equ%separx,equ%separy,equ%ptsep,equ%nptot,&
-            & struct%distnv,equ%ptxint,struct%nstruc,struct%npstru, & 
-            &    struct%xstruc,struct%ystruc,struct%inddef,&
-            & grid%nreg,grid%xn,grid%yn,grid%xmail,grid%ymail, & 
-            &    grid%np1,equ%ptx,equ%pty,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, & 
-            &    equ%a00,equ%a10,equ%a01,equ%a11,equ%fctpx,equ%limcfg,diag,par,&
-            & grid%psim, grid%psidxm, grid%psidym)
+       call maille(equ,struct,grid,diag,par)
 
     end if
 

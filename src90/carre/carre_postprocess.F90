@@ -112,7 +112,7 @@ contains
             ! On odd iterations, do refinement.
             npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
             ! Cells need refinement because of broken geometry?
-            nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE )
+            nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE_FIX )
             if ( nCellsToRefine > 0 ) then
                 call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
                      &int2str(nCellsToRefine)//' cells to refine because of broken geometry')
@@ -122,6 +122,7 @@ contains
 
                 ! If we had broken cells, skip normal refinement 
             end if
+
 !!$       ! cells need refinement due to low resolution?
 !!$       nCellsToRefine = count( grid%cellflag == GRID_REFINE )
 !!$       if ( nCellsToRefine > 0 ) then
@@ -266,7 +267,7 @@ contains
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
       ! -cells with three internal points and one external point
-      where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE
+      where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE_FIX
 
       ! Figure out which must be coarsened due to too high resolution
       call computeHxHy(grid)
@@ -276,11 +277,10 @@ contains
            & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
 
       ! Figure out which must be refined due to too low resolution 
-      ! Currently we are only interested in increasing resolution at the targets
-!!$      where ( (grid%cellFaceFlag == GRID_BOUNDARY) &
-!!$          & .and. (grid%hx < grid%pasmin) ) grid%cellflag = GRID_BOUNDARY_COARSEN
-!!$      where ( (grid%cellFaceFlag == GRID_INTERNAL) &
-!!$          & .and. (grid%hx < grid%pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
+      ! Increase resolution at the targets
+      where ( (grid%cellflag == GRID_BOUNDARY) &
+           & .and. (grid%hx > pasmin) ) grid%cellflag = GRID_BOUNDARY_REFINE
+
 
     end subroutine categorizeCellsAndFaces
 
@@ -627,7 +627,7 @@ contains
         do ip = 1, npPolOriginal(iReg) - 1
             do ir = 1, npRadOriginal(iReg) - 1
 
-                if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE) then
+                if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE_FIX) then
                     ! broken cell should have one intersected poloidal face               
                     isecTopFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_TOP)
                     isecBotFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_BOTTOM)

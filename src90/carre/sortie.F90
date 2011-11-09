@@ -1,16 +1,21 @@
-      SUBROUTINE SORTIE(nsep,nreg,np1, & 
-     &    distxo,xmail,ymail, & 
-     &    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero, & 
-     &    fctpx,diag,par,psim,psidxm,psidym)
+SUBROUTINE SORTIE(equ, grid, diag, par, numero)
+  use CarreDiagnostics
+  use carre_types
+  
+  IMPLICIT NONE
+  
+  type(CarreEquilibrium), intent(in) :: equ
+  type(CarreGrid), intent(in) :: grid
+  type(CarreDiag), intent(in) :: diag
+  type(CarreParameters), intent(in) :: par
+  integer, intent(in) :: numero
 
-!
-!  version : 07.07.97 19:08
-!
+!!$nsep,nreg,np1, & 
+!!$     &    equ%distxo,xmail,ymail, & 
+!!$     &    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero, & 
+!!$     &    fctpx,diag,par,psim,grid%psidxm,psidym)
+
 !======================================================================
-      use CarreDiagnostics
-      use carre_types
-
-      IMPLICIT NONE
 
 !..  Cette sous-routine imprime les resultats dans un fichier de sortie:
 !  maille.sor
@@ -19,22 +24,21 @@
 !  dimensions
 #include <CARREDIM.F>
 
-!  arguments
-      INTEGER nsep,nreg,np1(nreg), & 
-     &        nx,ny,npx,numero
-      REAL*8 & 
-     &     xmail(npmamx,nrmamx,nreg),ymail(npmamx,nrmamx,nreg), & 
-     &     distxo,x(nxmax),y(nymax), & 
-     &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-     &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
-     &     ptx(npx+1),pty(npx+1),fctpx(npx+1), &
-     &  psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
-     &  psidym(npmamx,nrmamx,nregmx)
+!!$      INTEGER nsep,nreg,np1(nreg), & 
+!!$     &        nx,ny,npx,numero
+!!$      REAL*8 & 
+!!$     &     xmail(npmamx,nrmamx,nreg),ymail(npmamx,nrmamx,nreg), & 
+!!$     &     equ%distxo,x(nxmax),y(nymax), & 
+!!$     &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
+!!$     &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
+!!$     &     ptx(npx+1),pty(npx+1),fctpx(npx+1), &
+!!$     &  psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
+!!$     &  psidym(npmamx,nrmamx,nregmx)
 
-      logical racord
-      type(CarreDiag), intent(in) :: diag
-      type(CarreParameters), intent(in) :: par
+      
+!!$      logical racord
 
+     
 !  variables en common
 #include <COMRLX.F>
 #include <COMLAN.F>
@@ -63,20 +67,20 @@
 !..Impression des points X et O.
 
         if(sellan(1:8).eq.'francais') then
-          write(10,111)npx,(ptx(i),pty(i),fctpx(i),i=1,npx)
+          write(10,111)equ%npx,(equ%ptx(i),equ%pty(i),equ%fctpx(i),i=1,equ%npx)
 111       format(//' Nombre de points X:',i3/ & 
      &      t5,'x',t25,'y',t45,'psi'/(t4,1pe15.8,t24,1pe15.8, & 
      &      t44,1pe15.8))
          elseif(sellan(1:7).eq.'english') then
-          write(10,211)npx,(ptx(i),pty(i),fctpx(i),i=1,npx)
+          write(10,211)equ%npx,(equ%ptx(i),equ%pty(i),equ%fctpx(i),i=1,equ%npx)
 211       format(//' Number of X-points:',i3/ & 
      &      t5,'x',t25,'y',t45,'psi'/(t4,1pe15.8,t24,1pe15.8, & 
      &      t44,1pe15.8))
          endif
-         write(10,112)ptx(npx+1),pty(npx+1),fctpx(npx+1)
+         write(10,112)equ%ptx(equ%npx+1),equ%pty(equ%npx+1),equ%fctpx(equ%npx+1)
 112      format(/' Point O:'/(t4,1pe15.8,t24,1pe15.8,t44,1pe15.8))
-         if(npx.gt.1) then
-            if(racord) then
+         if(equ%npx.gt.1) then
+            if(equ%racord) then
               if(sellan(1:8).eq.'francais') then
                 write(10,113)' Les points X sont raccordes.'
 113             format(a//)
@@ -101,20 +105,20 @@
          WRITE(10,100)par%repart
   100    FORMAT('repart =',I2)
 
-         WRITE(10,1015)distxo
+         WRITE(10,1015)equ%distxo
  1015    FORMAT('distxo =',F11.8)
 
          WRITE(10,101)par%pntrat
   101    FORMAT('pntrat =',F11.8)
 
-         DO 10 isep=1, nsep
+         DO 10 isep=1, equ%nsep
             WRITE(10,102)isep,par%nptseg(isep),isep,par%deltp1(isep),isep, & 
      &                par%deltpn(isep)
   102       FORMAT('nptseg(',I1,') =',I3/'deltp1(',I1,') =',F10.7/ & 
      &          'deltpn(',I1,') =',F10.7)
    10    CONTINUE
 
-         DO 20 ireg=1, nreg
+         DO 20 ireg=1, grid%nreg
             WRITE(10,103)ireg,par%npr(ireg),ireg,par%deltr1(ireg),ireg, & 
      &                par%deltrn(ireg)
   103       FORMAT('npr(',I1,') =',I3/'deltr1(',I1,') =',F10.7/ & 
@@ -126,7 +130,7 @@
   104       FORMAT('tgarde(',I1,') =',F8.5)
    25    CONTINUE
 
-         IF (nsep .GT. 3) THEN
+         IF (equ%nsep .GT. 3) THEN
             DO 26 i=3, 4
                WRITE(10,104)i,par%tgarde(i)
    26       CONTINUE
@@ -150,37 +154,35 @@
 114      format(t2,'x(m)',t18,'y(m)',t34,'psi(SI)',t50,'dpsi/dx',t66, & 
      &     'dpsi/dy')
          write(10,*)'$maille'
-         WRITE(10,106)nreg
+         WRITE(10,106)grid%nreg
   106    FORMAT('''nreg=''',I5)
 
-         DO 30 ireg=1, nreg
-            WRITE(10,107)ireg
-  107       FORMAT('''region:''',I5)
-            WRITE(10,108)np1(ireg),par%npr(ireg)
-  108       FORMAT('''nppol=''',I5,'  ''nprad=''',I5)
+         DO ireg=1, grid%nreg
+             ! write one region
+             WRITE(10,107)ireg
+107          FORMAT('''region:''',I5)
+             WRITE(10,108)grid%np1(ireg),par%npr(ireg)
+108          FORMAT('''nppol=''',I5,'  ''nprad=''',I5)
 
-            DO 32 j=1, par%npr(ireg)
-            do 31 i=1,np1(ireg)
-                ! psi interpolation moved up into maille
-!!$               xx = xmail(i,j,ireg)
-!!$               yy = ymail(i,j,ireg)
-!!$               ii = ifind(xx,x,nx,1)
-!!$               jj = ifind(yy,y,ny,1)
-!!$               psimai = a00(ii,jj,1)+a10(ii,jj,1)*xx+a01(ii,jj,1)*yy & 
-!!$     &                + a11(ii,jj,1)*xx*yy
-!!$               psidx = a00(ii,jj,2)+a10(ii,jj,2)*xx+a01(ii,jj,2)*yy & 
-!!$     &                + a11(ii,jj,2)*xx*yy
-!!$               psidy = a00(ii,jj,3)+a10(ii,jj,3)*xx+a01(ii,jj,3)*yy & 
-!!$     &                + a11(ii,jj,3)*xx*yy
+             ! write grid point data
+             DO j=1, par%npr(ireg)
+                 do i=1,grid%np1(ireg)
+                     WRITE(10,109)grid%xmail(i,j,ireg),grid%ymail(i,j,ireg),&
+                          & grid%psim(i,j,ireg), & 
+                          & grid%psidxm(i,j,ireg),grid%psidym(i,j,ireg)
+109                  FORMAT(1p5E16.8)
+                 end do
+             end do
+             ! write grid cell data
+             DO j=1, par%npr(ireg)
+                 do i=1,grid%np1(ireg)
+                     WRITE(10,109)grid%xmail(i,j,ireg),grid%ymail(i,j,ireg),&
+                          & grid%psim(i,j,ireg), & 
+                          & grid%psidxm(i,j,ireg),grid%psidym(i,j,ireg)
+                 end do
+             end do
 
-               WRITE(10,109)xmail(i,j,ireg),ymail(i,j,ireg),psim(i,j,ireg), & 
-     &           psidxm(i,j,ireg),psidym(i,j,ireg)
-! 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
-  109          FORMAT(1p5E16.8)
-
-   31       continue
-   32       CONTINUE
-   30    CONTINUE
+         end DO
 
          if(sellan(1:8).eq.'francais') then
            WRITE(10,110)
@@ -201,7 +203,7 @@
            write(10,*) '$Flux surface labels'
          endif
 
-         DO ireg=1, nreg
+         DO ireg=1, grid%nreg
             WRITE(10,107) ireg
             DO i=1, par%npr(ireg)
                     WRITE(10,129) i,diag%gdpsi(i,ireg),diag%racpsi(i,ireg), & 
@@ -227,7 +229,7 @@
            write(10,*) '$Flux surface quality indices'
          endif
 
-         DO ireg=1, nreg
+         DO ireg=1, grid%nreg
             WRITE(10,107) ireg
             DO i=1, par%npr(ireg)
                     WRITE(10,139) i,diag%somort(i,ireg),diag%somortp(i,ireg), & 
@@ -240,7 +242,7 @@
          write(10,134)
   134    format(t2,'ir',t8,'sompropo',t24,'sompropop',t40,'somvarr', & 
      &          t56,'somvarrp')
-         DO ireg=1, nreg
+         DO ireg=1, grid%nreg
             WRITE(10,107) ireg
             DO i=1, par%npr(ireg)
                     WRITE(10,139) i,diag%sompropo(i,ireg),diag%sompropop(i,ireg), & 
@@ -251,7 +253,7 @@
          write(10,*)
          write(10,144)
   144    format(t2,'ir',t40,'segt')
-         DO ireg=1, nreg
+         DO ireg=1, grid%nreg
             WRITE(10,107) ireg
             DO i=1, par%npr(ireg)
                     WRITE(10,149) i, & 
@@ -276,7 +278,7 @@
            write(10,*) '$Totals per region'
          endif
 
-         DO ireg=1, nreg
+         DO ireg=1, grid%nreg
                  WRITE(10,169) ireg,diag%gdsomortp(ireg),diag%gdsomortpurp(ireg), & 
                       & diag%gdsompropop(ireg),diag%gdsomvarrp(ireg)
          enddo

@@ -1,12 +1,15 @@
-      SUBROUTINE MAILLE(nx,ny,x,y,psi,npx,xpto,ypto,racord, & 
-     &     separx,separy,ptsep,nptot,distnv,ptxint,nstruc,npstru, & 
-     &     xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail, & 
-     &     np1,ptx,pty,nivx,nivy,nivtot,nbniv, & 
-     &     a00,a10,a01,a11,fctpx,limcfg,diag,par,&
-     &     psim, psidxm, psidym)
-  !
-!  version : 23.06.98 19:53
-!
+      Subroutine MAILLE(equ,struct,grid,diag,par)
+
+
+        ! TODO: grid%xn may be local
+
+!!$nx,ny,equ%x,equ%y,equ%psi,npx,equ%xpto,equ%ypto,equ%racord, & 
+!!$     &     equ%separx,equ%separy,equ%ptsep,equ%nptot,distnv,equ%ptxint,struct%nstruc,struct%npstru, & 
+!!$     &     struct%nstruc,struct%ystruc,struct%inddef,grid%nreg,grid%xn,grid%yn,xmail,grid%ymail, & 
+!!$     &     grid%np1,equ%ptx,pty,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, & 
+!!$     &     equ%a00,a10,a01,a11,equ%fctpx,limcfg,equ,grid,diag,par,&
+!!$     &     equ%psim, equ%psidxm, equ%psidym, distxo, nsep)
+
 !======================================================================
 !ank -- The comments are translated from French, sorry for errors!
 
@@ -28,23 +31,26 @@
 #include <CARREDIM.F>
 
       !  arguments
-      INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint, & 
-     &        nstruc,npstru(nstruc),nreg,inddef(4), & 
-     &        np1(nregmx),nivtot(nivmx),nbniv,limcfg
-      LOGICAL racord
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax), & 
-     &  xpto,ypto,separx(npnimx,4,npx), & 
-     &  separy(npnimx,4,npx),xstruc(npstmx,nstruc),pty(npx+1), & 
-     &  ystruc(npstmx,nstruc),xn(npnimx),yn(npnimx),ptx(npx+1), & 
-     &  xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*),distnv(5,5), & 
-     &  nivx(npnimx,nivmx),nivy(npnimx,nivmx),fctpx(npx+1), & 
-     &  a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3),&
-     &  psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
-     &  psidym(npmamx,nrmamx,nregmx)
+!!$      INTEGER nx,ny,npx,equ%ptsep(4,npx),equ%nptot(4,npx),equ%ptxint, & 
+!!$     &        struct%nstruc,struct%npstru(struct%nstruc),grid%nreg,struct%inddef(4), & 
+!!$     &        grid%np1(grid%nregmx),struct%nivtot(nivmx),struct%nbniv,limcfg,nsep
+!!$      LOGICAL equ%racord
+!!$      REAL*8 x(nxmax),y(nymax),equ%psi(nxmax,nymax), & 
+!!$     &  equ%xpto,equ%ypto,equ%separx(npnimx,4,npx), & 
+!!$     &  equ%separy(npnimx,4,npx),struct%nstruc(npstmx,struct%nstruc),pty(npx+1), & 
+!!$     &  struct%ystruc(npstmx,struct%nstruc),grid%xn(npnimx),grid%yn(npnimx),equ%ptx(npx+1), & 
+!!$     &  xmail(npmamx,nrmamx,*),grid%ymail(npmamx,nrmamx,*),struct%distnv(5,5), & 
+!!$     &  struct%nivx(npnimx,nivmx),struct%nivy(npnimx,nivmx),equ%fctpx(npx+1), & 
+!!$     &  equ%a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
+!!$     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3),&
+!!$     &  equ%psim(npmamx,nrmamx,grid%nregmx),equ%psidxm(npmamx,nrmamx,grid%nregmx), & 
+!!$     &  equ%psidym(npmamx,nrmamx,grid%nregmx),distxo
 
       type(CarreDiag), intent(inout) :: diag
       type(CarreParameters), intent(inout) :: par
+      type(CarreEquilibrium), intent(inout) :: equ
+      type(CarreGrid), intent(inout) :: grid
+      type(CarreStructures), intent(inout) :: struct
 
       !  variables en common
 #include <COMLAN.F>
@@ -52,12 +58,12 @@
 
       !  variables locales
       INTEGER isep,ipas,ireg,ipx,sens,nn,idef, & 
-     &  nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
+     &  ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
      &  ,ptxext,i,j,nbcl(2),nnlast,npr1,nmail,imail
       REAL*8 dist,x2,y2,lg(10), & 
      &  xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
      &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, & 
-     &  gardd2,xptxo,yptxo,distxo,xint,yint,xext,yext,psiint, & 
+     &  gardd2,xptxo,yptxo,xint,yint,xext,yext,psiint, & 
      &  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
       REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10), & 
      &  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx) & 
@@ -78,19 +84,19 @@
 
 !=========================
 !.. npnimx: <=> npnimx
-!.. nreg  : number of regions
-!.. xmail,ymail: coordinates of the grid points
+!.. grid%nreg  : number of regions
+!.. xmail,grid%ymail: coordinates of the grid points
 !                (poloidal index, radial index, region index)
-!.. xn,yn : working arrays for coordinates along a parametrised curve
+!.. grid%xn,grid%yn : working arrays for coordinates along a parametrised curve
 !.. nn    : number of points on the same curve
-!.. np1   : number of points in poloidal direction
+!.. grid%np1   : number of points in poloidal direction
 !.. ireg  : region index
 !.. ipx   : X-point index
 !.. ptxext: index of the outer X-point
 !.. sens  : direction of movement along a target:
 !           1=the same as the target points, 2=the opposite
 !.. idef  : index of the target from where the routine starts
-!.. a00,a10,a01,a11: coefficients.
+!.. equ%a00,a10,a01,a11: coefficients.
 !.. nsep  : number of the separatrices per the configuration
 !.. nbcrb : number of boundary lines
 !.. ii,jj : cell identification indices
@@ -113,7 +119,7 @@
 !
 !..calculs
 !c<<<
-!      write(0,*) '===> Entering maille.  npx, limcfg = ',npx,limcfg
+!      write(0,*) '===> Entering maille.  npx, limcfg = ',npx,equ%limcfg
 !c>>>
 
       nuldec = .FALSE.
@@ -123,67 +129,67 @@
 
 !----------------------------------------------------------------------
 
-      IF (npx.EQ.1 .and. limcfg.eq.0) THEN
+      IF (equ%npx.EQ.1 .and. equ%limcfg.eq.0) THEN
 
 !----------------------------------------------------------------------
 !..1.   Single null
 
          nbcrb = 1
-         nreg = 3
-         nsep = 3
+         grid%nreg = 3
+         equ%nsep = 3
          ipx = 1
 
 !..The distance between the X-point and the O-point
 
-         xx = separx(1,ptsep(3,ipx),ipx)
-         yy = separy(1,ptsep(3,ipx),ipx)
+         xx = equ%separx(1,equ%ptsep(3,ipx),ipx)
+         yy = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
-         xptxo = xpto - xx
-         yptxo = ypto - yy
+         xptxo = equ%xpto - xx
+         yptxo = equ%ypto - yy
 
-         distxo = SQRT((xptxo)**2 + (yptxo)**2)
+         equ%distxo = SQRT((xptxo)**2 + (yptxo)**2)
 
 !..Normalise the vector from the X-point to the O-point
 
-         xptxo = xptxo/distxo
-         yptxo = yptxo/distxo
+         xptxo = xptxo/equ%distxo
+         yptxo = yptxo/equ%distxo
 
-!..Psi value at the X-point
+!..Equ%psi value at the X-point
 
-         ii = ifind(xx,x,nx,1)
-         jj = ifind(yy,y,ny,1)
+         ii = ifind(xx,equ%x,equ%nx,1)
+         jj = ifind(yy,equ%y,equ%ny,1)
 
-         fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
-     &            a11(ii,jj,1)*xx*yy
+         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx &
+              & + equ%a01(ii,jj,1)*yy + equ%a11(ii,jj,1)*xx*yy
 
 !..Calculate the length of each separatrix
 
          DO 1 isep = 1, 3
 
-            lg(isep) = long(separx(1,ptsep(isep,ipx),ipx), & 
-     &                 separy(1,ptsep(isep,ipx),ipx), & 
-     &                 nptot(ptsep(isep,ipx),ipx))
+            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
 
     1    CONTINUE
 
 !.. Read initial set of code parameters
-         call read_code_parameters(par, distxo)
+         call read_code_parameters(par, equ%distxo)
 
          correct = .false.
          do while (.not. correct)
 
-             !..Calculate the psi difference between the penetration values
+             !..Calculate the equ%psi difference between the penetration values
 
              IF (par%repart .EQ. 2) THEN
 
                  xfin = xx + xptxo*par%pntrat
                  yfin = yy + yptxo*par%pntrat
 
-                 ii = ifind(xfin,x,nx,1)
-                 jj = ifind(yfin,y,ny,1)
+                 ii = ifind(xfin,equ%x,equ%nx,1)
+                 jj = ifind(yfin,equ%y,equ%ny,1)
 
-                 fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-                     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                      & equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                  difpsi = fctfin - fctini
 
@@ -204,10 +210,10 @@
 
              !..Radial direction
 
-             CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
                  &               spacer(1,1),drmin(1),drmax(1))
 
-             CALL NUNIFO(par%npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+             CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
                  &               spacer(1,2),drmin(2),drmax(2))
 
              IF (par%repart .EQ. 1) THEN
@@ -230,21 +236,22 @@
 
          DO 6 isep=1, 3
 
-           sepmax(1,isep) = separx(1,ptsep(isep,ipx),ipx)
-           sepmay(1,isep) = separy(1,ptsep(isep,ipx),ipx)
+           sepmax(1,isep) = equ%separx(1,equ%ptsep(isep,ipx),ipx)
+           sepmay(1,isep) = equ%separy(1,equ%ptsep(isep,ipx),ipx)
            dist=0.
 
            DO 5 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
-     &          separy(1,ptsep(isep,ipx),ipx),nptot(ptsep(isep,ipx),ipx) & 
-     &          ,dist,sepmax(ipas,isep),sepmay(ipas,isep))
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &          equ%separy(1,equ%ptsep(isep,ipx),ipx),&
+     &          equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &          dist,sepmax(ipas,isep),sepmay(ipas,isep))
     5      CONTINUE
 
-           sepmax(par%nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
-     &       ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
-     &       ptsep(isep,ipx),ipx)
+           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &       equ%ptsep(isep,ipx),ipx)
+           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &       equ%ptsep(isep,ipx),ipx)
     6    CONTINUE
 
 !..1.3  Grid region by region
@@ -256,24 +263,24 @@
          call csioSetRegion( 1 )
 
          ireg=1
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 10 ipas=par%nptseg(1), 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
    10    CONTINUE
 
          DO 11 ipas=2, par%nptseg(3)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
    11    CONTINUE
 
          DO 12 ipas=2, par%nptseg(2)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
    12    CONTINUE
 
 
@@ -281,29 +288,29 @@
 
          idef = 1
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
 
-         DO 13 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 13 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
    13    CONTINUE
 
-         DO 14 ipas=2,nptot(ptsep(3,ipx),ipx)
+         DO 14 ipas=2,equ%nptot(equ%ptsep(3,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
    14    CONTINUE
 
-         DO 15 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 15 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
    15    CONTINUE
 
 !..Initialise the guard indices
@@ -314,8 +321,8 @@
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*17')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'droite')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
          DO 17 ipas=1, par%npr(ireg)-1
@@ -329,10 +336,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &              np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-     &              a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+     &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+     &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+     &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
      &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
      &              ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -344,41 +351,41 @@
          call csioSetRegion( 2 )
 
          ireg=2
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 20 ipas=par%nptseg(1), 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
    20    CONTINUE
 
          DO 21 ipas=2, par%nptseg(2)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
    21    CONTINUE
 
 !..Go along the target 1
 
          idef = 1
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
 
-         DO 22 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 22 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
    22    CONTINUE
 
-         DO 23 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 23 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
    23    CONTINUE
 
 !..Initialise the guard indices
@@ -389,8 +396,8 @@
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*25 ')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'gauche')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
          DO 25 ipas=1, par%npr(ireg)-1
@@ -404,10 +411,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &              np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &              a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &              ynlast,nnlast,nuldec,.false.,diag,ireg)
 !
@@ -418,25 +425,25 @@
          call csioSetRegion( 3 )
 
          ireg=3
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 30 ipas=1, par%nptseg(3)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
    30    CONTINUE
 
-         x2 = separx(1,ptsep(3,ipx),ipx)
-         y2 = separy(1,ptsep(3,ipx),ipx)
+         x2 = equ%separx(1,equ%ptsep(3,ipx),ipx)
+         y2 = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
 
-         DO 31 ipas=1,nptot(ptsep(3,ipx),ipx)
+         DO 31 ipas=1,equ%nptot(equ%ptsep(3,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
    31    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
@@ -452,82 +459,82 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &       pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &       a00,a10,a01,a11,par%repart, & 
-     &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
+     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+     &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+     &       xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 !----------------------------------------------------------------------
 
-      ELSE IF ((npx.EQ.2) .AND. (racord)) THEN
+      ELSE IF ((equ%npx.EQ.2) .AND. (equ%racord)) THEN
 
 !..2.   Connected double null
 
 !----------------------------------------------------------------------
          nbcrb = 1
-         nreg = 5
-         nsep = 6
+         grid%nreg = 5
+         equ%nsep = 6
 
 !..The distance between the top X-point and the O-point
 
          ipx = 1
 
-         xx = separx(1,ptsep(3,ipx),ipx)
-         yy = separy(1,ptsep(3,ipx),ipx)
+         xx = equ%separx(1,equ%ptsep(3,ipx),ipx)
+         yy = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
-         xptxo = xpto - xx
-         yptxo = ypto - yy
+         xptxo = equ%xpto - xx
+         yptxo = equ%ypto - yy
 
-         distxo = SQRT((xptxo)**2 + (yptxo)**2)
+         equ%distxo = SQRT((xptxo)**2 + (yptxo)**2)
 
 !..Normalise the vector from the X-point to the O-point
 
-         xptxo = xptxo/distxo
-         yptxo = yptxo/distxo
+         xptxo = xptxo/equ%distxo
+         yptxo = yptxo/equ%distxo
 
-!..Calculate the psi value at the X-point
+!..Calculate the equ%psi value at the X-point
 
-         ii = ifind(xx,x,nx,1)
-         jj = ifind(yy,y,ny,1)
+         ii = ifind(xx,equ%x,equ%nx,1)
+         jj = ifind(yy,equ%y,equ%ny,1)
 
-         fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
-     &            a11(ii,jj,1)*xx*yy
+         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + & 
+     &            equ%a11(ii,jj,1)*xx*yy
 
 !..Calculate the length of each separatrix
 
          ipx = 1
          DO 38 isep = 1, 4
-            lg(isep) = long(separx(1,ptsep(isep,ipx),ipx), & 
-     &                 separy(1,ptsep(isep,ipx),ipx), & 
-     &                 nptot(ptsep(isep,ipx),ipx))
+            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
    38    CONTINUE
 
          ipx = 2
          DO 39 isep = 1, 2
-            lg(isep+4) = long(separx(1,ptsep(isep,ipx),ipx), & 
-     &                   separy(1,ptsep(isep,ipx),ipx), & 
-     &                   nptot(ptsep(isep,ipx),ipx))
+            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx))
    39    CONTINUE
 
 !..2.1  Read all the necessary data from the file
 
-         call read_code_parameters(par, distxo)
+         call read_code_parameters(par, equ%distxo)
 
          correct = .false.
          do while (.not. correct)
 
-             !..Calculate the psi difference between the penetration values
+             !..Calculate the equ%psi difference between the penetration values
 
              IF (par%repart .EQ. 2) THEN
 
                  xfin = xx + xptxo*par%pntrat
                  yfin = yy + yptxo*par%pntrat
 
-                 ii = ifind(xfin,x,nx,1)
-                 jj = ifind(yfin,y,ny,1)
+                 ii = ifind(xfin,equ%x,equ%nx,1)
+                 jj = ifind(yfin,equ%y,equ%ny,1)
 
-                 fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-                     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                     &               equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                  difpsi = fctfin - fctini
 
@@ -557,16 +564,16 @@
 
              !..Radial direction
 
-             CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
                  &               spacer(1,1),drmin(1),drmax(1))
 
-             CALL NUNIFO(par%npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+             CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
                  &               spacer(1,2),drmin(2),drmax(2))
 
-             CALL NUNIFO(par%npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+             CALL NUNIFO(par%npr(3),struct%distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
                  &               spacer(1,3),drmin(3),drmax(3))
 
-             CALL NUNIFO(par%npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+             CALL NUNIFO(par%npr(4),struct%distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
                  &               spacer(1,4),drmin(4),drmax(4))
 
              IF (par%repart .EQ. 1) THEN
@@ -590,42 +597,42 @@
          ipx = 1
          DO 44 isep=1, 4
 
-           sepmax(1,isep) = separx(1,ptsep(isep,ipx),ipx)
-           sepmay(1,isep) = separy(1,ptsep(isep,ipx),ipx)
+           sepmax(1,isep) = equ%separx(1,equ%ptsep(isep,ipx),ipx)
+           sepmay(1,isep) = equ%separy(1,equ%ptsep(isep,ipx),ipx)
            dist=0.
 
            DO 45 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
-     &                   separy(1,ptsep(isep,ipx),ipx), & 
-     &                   nptot(ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
      &                   sepmax(ipas,isep),sepmay(ipas,isep))
    45      CONTINUE
-           sepmax(par%nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
-     &       ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
-     &       ptsep(isep,ipx),ipx)
+           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &       equ%ptsep(isep,ipx),ipx)
+           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &       equ%ptsep(isep,ipx),ipx)
    44    CONTINUE
 
          ipx = 2
          DO 46 isep=1, 2
 
-           sepmax(1,isep+4) = separx(1,ptsep(isep,ipx),ipx)
-           sepmay(1,isep+4) = separy(1,ptsep(isep,ipx),ipx)
+           sepmax(1,isep+4) = equ%separx(1,equ%ptsep(isep,ipx),ipx)
+           sepmay(1,isep+4) = equ%separy(1,equ%ptsep(isep,ipx),ipx)
            dist=0.
 
            DO 47 ipas=2, par%nptseg(isep+4)-1
               dist=dist + spacep(ipas-1,isep+4)
-              CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
-     &                   separy(1,ptsep(isep,ipx),ipx), & 
-     &                   nptot(ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
      &                   sepmax(ipas,isep+4),sepmay(ipas,isep+4))
 
    47      CONTINUE
-           sepmax(par%nptseg(isep+4),isep+4)=separx(nptot(ptsep(isep,ipx), & 
-     &       ipx),ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep+4),isep+4)=separy(nptot(ptsep(isep,ipx), & 
-     &       ipx),ptsep(isep,ipx),ipx)
+           sepmax(par%nptseg(isep+4),isep+4)=equ%separx(equ%nptot(equ%ptsep(isep,ipx), & 
+     &       ipx),equ%ptsep(isep,ipx),ipx)
+           sepmay(par%nptseg(isep+4),isep+4)=equ%separy(equ%nptot(equ%ptsep(isep,ipx), & 
+     &       ipx),equ%ptsep(isep,ipx),ipx)
    46    CONTINUE
 
 !..2.3. Grid region by region
@@ -635,24 +642,24 @@
 !..Define the primary curve and the grid points
 
          ireg=1
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 50 ipas=par%nptseg(1), 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
    50    CONTINUE
 
          DO 51 ipas=2, par%nptseg(3)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
    51    CONTINUE
 
          DO 52 ipas=2, par%nptseg(5)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,5)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,5)
    52    CONTINUE
 
 
@@ -661,32 +668,32 @@
          idef = 1
          ipx = 1
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
          ipx = 1
 
-         DO 53 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 53 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
    53    CONTINUE
 
-         DO 54 ipas=2,nptot(ptsep(3,ipx),ipx)
+         DO 54 ipas=2,equ%nptot(equ%ptsep(3,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
    54    CONTINUE
 
          ipx = 2
 
-         DO 55 ipas=2,nptot(ptsep(1,ipx),ipx)
+         DO 55 ipas=2,equ%nptot(equ%ptsep(1,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
    55    CONTINUE
 
 !..Initialise the guard indices
@@ -697,8 +704,8 @@
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*57')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'droite')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
          DO 57 ipas=1, par%npr(ireg)-1
@@ -712,10 +719,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-     &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-     &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+     &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+     &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+     &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
      &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
      &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -725,18 +732,18 @@
 !..Define the primary curve and the grid points
 
          ireg=2
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 60 ipas=par%nptseg(1), 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
    60    CONTINUE
 
          DO 61 ipas=2, par%nptseg(2)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
    61    CONTINUE
 
 !..Go along the target 1
@@ -744,24 +751,24 @@
          idef = 1
          ipx = 1
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
          ipx = 1
 
-         DO 63 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 63 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
    63    CONTINUE
 
-         DO 64 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 64 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
    64    CONTINUE
 
 !..Initialise the guard indices
@@ -772,8 +779,8 @@
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*67')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'gauche')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
          DO 67 ipas=1, par%npr(ireg)-1
@@ -787,10 +794,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -800,24 +807,24 @@
 !..Define the primary curve and the grid points
 
          ireg=3
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 70 ipas=par%nptseg(2), 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
    70    CONTINUE
 
          DO 71 ipas=2, par%nptseg(4)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,4)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,4)
    71    CONTINUE
 
          DO 72 ipas=2, par%nptseg(6)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
    72    CONTINUE
 
 !..Go along the target 2
@@ -825,32 +832,32 @@
          idef = 2
          ipx = 1
 
-         x2 = separx(nptot(ptsep(2,ipx),ipx),ptsep(2,ipx),ipx)
-         y2 = separy(nptot(ptsep(2,ipx),ipx),ptsep(2,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(2,ipx),ipx),equ%ptsep(2,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(2,ipx),ipx),equ%ptsep(2,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
          ipx = 1
 
-         DO 73 ipas=nptot(ptsep(2,ipx),ipx),1,-1
+         DO 73 ipas=equ%nptot(equ%ptsep(2,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
    73    CONTINUE
 
-         DO 74 ipas=2,nptot(ptsep(4,ipx),ipx)
+         DO 74 ipas=2,equ%nptot(equ%ptsep(4,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(4,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(4,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(4,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(4,ipx),ipx)
    74    CONTINUE
 
          ipx = 2
 
-         DO 75 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 75 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
    75    CONTINUE
 
 !..Initialise the guard indices
@@ -861,8 +868,8 @@
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*77')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'gauche')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
          DO 77 ipas=1, par%npr(ireg)-1
@@ -876,10 +883,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -889,18 +896,18 @@
 !..Define the primary curve and the grid points
 
          ireg=4
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 80 ipas=par%nptseg(5), 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,5)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,5)
    80    CONTINUE
 
          DO 81 ipas=2, par%nptseg(6)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
    81    CONTINUE
 
 !..Go along the target 3
@@ -908,24 +915,24 @@
          idef = 3
          ipx = 2
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
          ipx = 2
 
-         DO 83 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 83 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
    83    CONTINUE
 
-         DO 84 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 84 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
    84    CONTINUE
 
 !..Initialise the guard indices
@@ -936,8 +943,8 @@
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*87')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'gauche')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
          DO 87 ipas=1, par%npr(ireg)-1
@@ -952,10 +959,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -965,38 +972,38 @@
 !..Define the primary curve and the grid points
 
          ireg=5
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
          ipx = 1
 
          DO 90 ipas=1, par%nptseg(3)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
    90    CONTINUE
 
          DO 91 ipas=par%nptseg(4)-1,1,-1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,4)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,4)
    91    CONTINUE
 
-         x2 = separx(1,ptsep(3,ipx),ipx)
-         y2 = separy(1,ptsep(3,ipx),ipx)
+         x2 = equ%separx(1,equ%ptsep(3,ipx),ipx)
+         y2 = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
 
-         DO 92 ipas=1,nptot(ptsep(3,ipx),ipx)
+         DO 92 ipas=1,equ%nptot(equ%ptsep(3,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
    92    CONTINUE
 
-         DO 93 ipas=nptot(ptsep(4,ipx),ipx)-1,1,-1
+         DO 93 ipas=equ%nptot(equ%ptsep(4,ipx),ipx)-1,1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(4,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(4,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(4,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(4,ipx),ipx)
    93    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
@@ -1012,26 +1019,26 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &       pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &       a00,a10,a01,a11,par%repart, & 
-     &       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
+     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+     &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+     &       xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 !----------------------------------------------------------------------
 
-      ELSE IF ((npx.EQ.2) .AND. (.NOT.(racord))) THEN
+      ELSE IF ((equ%npx.EQ.2) .AND. (.NOT.(equ%racord))) THEN
 
 !----------------------------------------------------------------------
 !.3.  Disconnected double null
 
-         nreg = 6
-         nsep = 6
-         ptxext = MOD(ptxint,2) + 1
+         grid%nreg = 6
+         equ%nsep = 6
+         ptxext = MOD(equ%ptxint,2) + 1
          npr1 = 0
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
             idef = 1
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
             idef = 3
          ENDIF
 
@@ -1040,8 +1047,8 @@
 
          DO 100 i=4, 1, -1
 
-            distnv(1,i+1) = distnv(1,i)
-            distnv(2,i+1) = distnv(2,i)
+            struct%distnv(1,i+1) = struct%distnv(1,i)
+            struct%distnv(2,i+1) = struct%distnv(2,i)
 
   100    CONTINUE
 
@@ -1051,94 +1058,94 @@
 !..Calculate the distance between the inner and outer separatrices, if
 !  they are both present, along the target
 
-         xint = separx(nptot(ptsep(1,ptxint),ptxint),ptsep(1,ptxint), & 
-     &                 ptxint)
-         yint = separy(nptot(ptsep(1,ptxint),ptxint),ptsep(1,ptxint), & 
-     &                 ptxint)
-         xext = separx(nptot(ptsep(3,ptxext),ptxext),ptsep(3,ptxext), & 
+         xint = equ%separx(equ%nptot(equ%ptsep(1,equ%ptxint),equ%ptxint),equ%ptsep(1,equ%ptxint), & 
+     &                 equ%ptxint)
+         yint = equ%separy(equ%nptot(equ%ptsep(1,equ%ptxint),equ%ptxint),equ%ptsep(1,equ%ptxint), & 
+     &                 equ%ptxint)
+         xext = equ%separx(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), & 
      &                 ptxext)
-         yext = separy(nptot(ptsep(3,ptxext),ptxext),ptsep(3,ptxext), & 
+         yext = equ%separy(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), & 
      &                 ptxext)
 
-         distnv(1,1) = plqdst(xint,yint,xext,yext,xstruc(1,inddef(idef)) & 
-     &            ,ystruc(1,inddef(idef)),npstru(inddef(idef)),'droite')
+         struct%distnv(1,1) = plqdst(xint,yint,xext,yext,struct%xstruc(1,struct%inddef(idef)) & 
+     &            ,struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),'droite')
 
 
-         ii = ifind(xint,x,nx,1)
-         jj = ifind(yint,y,ny,1)
+         ii = ifind(xint,equ%x,equ%nx,1)
+         jj = ifind(yint,equ%y,equ%ny,1)
 
-         psiint = a00(ii,jj,1) + a10(ii,jj,1)*xint + a01(ii,jj,1)*yint & 
-     &          + a11(ii,jj,1)*xint*yint
+         psiint = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xint + equ%a01(ii,jj,1)*yint & 
+     &          + equ%a11(ii,jj,1)*xint*yint
 
-         ii = ifind(xext,x,nx,1)
-         jj = ifind(yext,y,ny,1)
+         ii = ifind(xext,equ%x,equ%nx,1)
+         jj = ifind(yext,equ%y,equ%ny,1)
 
-         psiext = a00(ii,jj,1) + a10(ii,jj,1)*xext + a01(ii,jj,1)*yext & 
-     &          + a11(ii,jj,1)*xext*yext
+         psiext = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xext + equ%a01(ii,jj,1)*yext & 
+     &          + equ%a11(ii,jj,1)*xext*yext
 
-         distnv(2,1) = psiext - psiint
+         struct%distnv(2,1) = psiext - psiint
 
 !..The distance between the inner X-point and the O-point
 
-         ipx = ptxint
+         ipx = equ%ptxint
 
-         xx = separx(1,ptsep(3,ipx),ipx)
-         yy = separy(1,ptsep(3,ipx),ipx)
+         xx = equ%separx(1,equ%ptsep(3,ipx),ipx)
+         yy = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
-         xptxo = xpto - xx
-         yptxo = ypto - yy
+         xptxo = equ%xpto - xx
+         yptxo = equ%ypto - yy
 
-         distxo = SQRT((xptxo)**2 + (yptxo)**2)
+         equ%distxo = SQRT((xptxo)**2 + (yptxo)**2)
 
 !..Normalise the vector from the X-point to the O-point
 
-         xptxo = xptxo/distxo
-         yptxo = yptxo/distxo
+         xptxo = xptxo/equ%distxo
+         yptxo = yptxo/equ%distxo
 
-!..Calculate the psi value at the inner X-point
+!..Calculate the equ%psi value at the inner X-point
 
-         ii = ifind(xx,x,nx,1)
-         jj = ifind(yy,y,ny,1)
+         ii = ifind(xx,equ%x,equ%nx,1)
+         jj = ifind(yy,equ%y,equ%ny,1)
 
-         fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
-     &            a11(ii,jj,1)*xx*yy
+         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + & 
+     &            equ%a11(ii,jj,1)*xx*yy
 
 !..Calculate the length of each separatrix
 
          ipx = 1
          DO 102 isep = 1, 2
-            lg(isep) = long(separx(1,ptsep(isep,ipx),ipx), & 
-     &                 separy(1,ptsep(isep,ipx),ipx), & 
-     &                 nptot(ptsep(isep,ipx),ipx))
+            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
   102    CONTINUE
 
          ipx = 2
          DO 103 isep = 1, 2
-            lg(isep+4) = long(separx(1,ptsep(isep,ipx),ipx), & 
-     &                   separy(1,ptsep(isep,ipx),ipx), & 
-     &                   nptot(ptsep(isep,ipx),ipx))
+            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx))
   103    CONTINUE
 
             !..3.1  Read all the necessary data from the file
             
             !.. Read initial set of code parameters
-            call read_code_parameters(par, distxo)
+            call read_code_parameters(par, equ%distxo)
 
             correct = .false.
             do while (.not. correct)
 
-                !..Calculate the psi difference between the penetration values
+                !..Calculate the equ%psi difference between the penetration values
 
                 IF (par%repart .EQ. 2) THEN
 
                     xfin = xx + xptxo*par%pntrat
                     yfin = yy + yptxo*par%pntrat
 
-                    ii = ifind(xfin,x,nx,1)
-                    jj = ifind(yfin,y,ny,1)
+                    ii = ifind(xfin,equ%x,equ%nx,1)
+                    jj = ifind(yfin,equ%y,equ%ny,1)
 
-                    fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-                        &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+                    fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                        &               equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                     difpsi = fctfin - fctini
 
@@ -1161,19 +1168,19 @@
 
                 !..Calculate the intervals, dmin and dmax, in the radial direction
 
-                CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+                CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
                     &               spacer(1,1),drmin(1),drmax(1))
 
-                CALL NUNIFO(par%npr(2),distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+                CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
                     &               spacer(1,2),drmin(2),drmax(2))
 
-                CALL NUNIFO(par%npr(3),distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+                CALL NUNIFO(par%npr(3),struct%distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
                     &               spacer(1,3),drmin(3),drmax(3))
 
-                CALL NUNIFO(par%npr(4),distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+                CALL NUNIFO(par%npr(4),struct%distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
                     &               spacer(1,4),drmin(4),drmax(4))
 
-                CALL NUNIFO(par%npr(5),distnv(par%repart,5),par%deltr1(5),par%deltrn(5), & 
+                CALL NUNIFO(par%npr(5),struct%distnv(par%repart,5),par%deltr1(5),par%deltrn(5), & 
                     &               spacer(1,5),drmin(5),drmax(5))
 
                 IF (par%repart .EQ. 1) THEN
@@ -1203,22 +1210,22 @@
                     nn=0
                     ipx = ptxext
 
-                    DO ipas=nptot(ptsep(3,ipx),ipx),1,-1
+                    DO ipas=equ%nptot(equ%ptsep(3,ipx),ipx),1,-1
                         nn=nn+1
-                        xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-                        yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+                        grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+                        grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
                     end DO
 
-                    DO ipas=2,nptot(ptsep(4,ipx),ipx)
+                    DO ipas=2,equ%nptot(equ%ptsep(4,ipx),ipx)
                         nn=nn+1
-                        xn(nn)=separx(ipas,ptsep(4,ipx),ipx)
-                        yn(nn)=separy(ipas,ptsep(4,ipx),ipx)
+                        grid%xn(nn)=equ%separx(ipas,equ%ptsep(4,ipx),ipx)
+                        grid%yn(nn)=equ%separy(ipas,equ%ptsep(4,ipx),ipx)
                     end DO
 
                     !..Co-ordinates of the outer X-point
 
-                    xptxex = separx(1,ptsep(3,ipx),ipx)
-                    yptxex = separy(1,ptsep(3,ipx),ipx)
+                    xptxex = equ%separx(1,equ%ptsep(3,ipx),ipx)
+                    yptxex = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
                     !..Points of the grid to be used for the first call to doubld
 
@@ -1226,81 +1233,81 @@
                         ireg=1
                         nmail=min(41,nn/5)
                         nmail=nmail+mod(nmail+1,2)
-                        ll=long(separx(1,ptsep(3,ipx),ipx), & 
-                            &                separy(1,ptsep(3,ipx),ipx), & 
-                            &                nptot(ptsep(3,ipx),ipx))
-                        xmail(1,1,ireg)=separx(nptot(ptsep(3,ipx),ipx), & 
-                            &          ptsep(3,ipx),ipx)
-                        ymail(1,1,ireg)=separy(nptot(ptsep(3,ipx),ipx), & 
-                            &          ptsep(3,ipx),ipx)
+                        ll=long(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
+                            &                equ%separy(1,equ%ptsep(3,ipx),ipx), & 
+                            &                equ%nptot(equ%ptsep(3,ipx),ipx))
+                        grid%xmail(1,1,ireg)=equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx), & 
+                            &          equ%ptsep(3,ipx),ipx)
+                        grid%ymail(1,1,ireg)=equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx), & 
+                            &          equ%ptsep(3,ipx),ipx)
                         do imail=nmail/2,2,-1
                             dist=ll*(nmail/2-imail+1.)/(nmail/2)
-                            CALL COORD(separx(1,ptsep(3,ipx),ipx), & 
-                                &            separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx), & 
-                                &            dist,xmail(imail,1,ireg),ymail(imail,1,ireg))
+                            CALL COORD(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
+                                &            equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx), & 
+                                &            dist,grid%xmail(imail,1,ireg),grid%ymail(imail,1,ireg))
                         enddo
-                        xmail(nmail/2+1,1,ireg)=xptxex
-                        ymail(nmail/2+1,1,ireg)=yptxex
+                        grid%xmail(nmail/2+1,1,ireg)=xptxex
+                        grid%ymail(nmail/2+1,1,ireg)=yptxex
 
-                        ll=long(separx(1,ptsep(4,ipx),ipx), & 
-                            &                separy(1,ptsep(4,ipx),ipx), & 
-                            &                nptot(ptsep(4,ipx),ipx))
-                        xmail(nmail,1,ireg)=separx(nptot(ptsep(4,ipx),ipx), & 
-                            &          ptsep(4,ipx),ipx)
-                        ymail(nmail,1,ireg)=separy(nptot(ptsep(4,ipx),ipx), & 
-                            &          ptsep(4,ipx),ipx)
+                        ll=long(equ%separx(1,equ%ptsep(4,ipx),ipx), & 
+                            &                equ%separy(1,equ%ptsep(4,ipx),ipx), & 
+                            &                equ%nptot(equ%ptsep(4,ipx),ipx))
+                        grid%xmail(nmail,1,ireg)=equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx), & 
+                            &          equ%ptsep(4,ipx),ipx)
+                        grid%ymail(nmail,1,ireg)=equ%separy(equ%nptot(equ%ptsep(4,ipx),ipx), & 
+                            &          equ%ptsep(4,ipx),ipx)
                         do imail=2,nmail/2
                             dist=ll*(imail-1.)/(nmail/2)
-                            CALL COORD(separx(1,ptsep(3,ipx),ipx), & 
-                                &            separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx), & 
-                                &            dist,xmail(nmail/2+imail,1,ireg), & 
-                                &            ymail(nmail/2+imail,1,ireg))
+                            CALL COORD(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
+                                &            equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx), & 
+                                &            dist,grid%xmail(nmail/2+imail,1,ireg), & 
+                                &            grid%ymail(nmail/2+imail,1,ireg))
                         enddo
                     endif
 
                     !..Second boundary curve
 
                     npcrb2=0
-                    ipx = ptxint
+                    ipx = equ%ptxint
 
-                    DO ipas=nptot(ptsep(1,ipx),ipx),1,-1
+                    DO ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
                         npcrb2=npcrb2+1
-                        xcrb2(npcrb2)=separx(ipas,ptsep(1,ipx),ipx)
-                        ycrb2(npcrb2)=separy(ipas,ptsep(1,ipx),ipx)
+                        xcrb2(npcrb2)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+                        ycrb2(npcrb2)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
                     end DO
 
-                    DO ipas=2,nptot(ptsep(3,ipx),ipx)
+                    DO ipas=2,equ%nptot(equ%ptsep(3,ipx),ipx)
                         npcrb2=npcrb2+1
-                        xcrb2(npcrb2)=separx(ipas,ptsep(3,ipx),ipx)
-                        ycrb2(npcrb2)=separy(ipas,ptsep(3,ipx),ipx)
+                        xcrb2(npcrb2)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+                        ycrb2(npcrb2)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
                     end DO
 
-                    DO ipas=2,nptot(ptsep(2,ipx),ipx)
+                    DO ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
                         npcrb2=npcrb2+1
-                        xcrb2(npcrb2)=separx(ipas,ptsep(2,ipx),ipx)
-                        ycrb2(npcrb2)=separy(ipas,ptsep(2,ipx),ipx)
+                        xcrb2(npcrb2)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+                        ycrb2(npcrb2)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
                     end DO
 
                     call trc_stk_in('maille','*114')
-                    CALL DOUBLD(bouclx,boucly,xn,yn,nn,spacer(1,1), & 
-                        &        par%npr(1),inddef(idef),xext,yext,xptxex,yptxex,xpto, & 
-                        &        ypto,nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
-                        &        ystruc,a00,a10,a01,a11,par%repart, & 
+                    CALL DOUBLD(bouclx,boucly,grid%xn,grid%yn,nn,spacer(1,1), & 
+                        &        par%npr(1),struct%inddef(idef),xext,yext,xptxex,yptxex,equ%xpto, & 
+                        &        equ%ypto,equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc, & 
+                        &        struct%ystruc,equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
                         &        xcrb2,ycrb2,npcrb2)
                     call trc_stk_out
                 endif
 
-                ipx = ptxint
+                ipx = equ%ptxint
                 dist=0.0
 
-                lg(3) = ruban(separx(1,ptsep(3,ipx),ipx), & 
-                    &                separy(1,ptsep(3,ipx),ipx),nptot(ptsep(3,ipx),ipx) & 
+                lg(3) = ruban(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
+                    &                equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx) & 
                     &                ,bouclx,boucly,dist)
                 CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), & 
                     &               dpmin(3),dpmax(3))
 
-                lg(4) = long(separx(1,ptsep(3,ipx),ipx),separy(1,ptsep(3,ipx) & 
-                    &              ,ipx),nptot(ptsep(3,ipx),ipx)) - lg(3)
+                lg(4) = long(equ%separx(1,equ%ptsep(3,ipx),ipx),equ%separy(1,equ%ptsep(3,ipx) & 
+                    &              ,ipx),equ%nptot(equ%ptsep(3,ipx),ipx)) - lg(3)
                 CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), & 
                     &               dpmin(4),dpmax(4))
 
@@ -1318,17 +1325,17 @@
 
 !..Right part
 
-         ipx = ptxint
+         ipx = equ%ptxint
 
          nbcl(1) = 1
-         xbcl(1,1) = separx(1,ptsep(3,ipx),ipx)
-         ybcl(1,1) = separy(1,ptsep(3,ipx),ipx)
+         xbcl(1,1) = equ%separx(1,equ%ptsep(3,ipx),ipx)
+         ybcl(1,1) = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
   120    CONTINUE
 
          nbcl(1) = nbcl(1) + 1
-         xbcl(nbcl(1),1) = separx(nbcl(1),ptsep(3,ipx),ipx)
-         ybcl(nbcl(1),1) = separy(nbcl(1),ptsep(3,ipx),ipx)
+         xbcl(nbcl(1),1) = equ%separx(nbcl(1),equ%ptsep(3,ipx),ipx)
+         ybcl(nbcl(1),1) = equ%separy(nbcl(1),equ%ptsep(3,ipx),ipx)
 
          lbcl = long(xbcl(1,1),ybcl(1,1),nbcl(1))
 
@@ -1341,19 +1348,19 @@
 
 !..Left part
 
-         ipx = ptxint
+         ipx = equ%ptxint
 
          nbcl(2) = 1
-         xbcl(1,2) = separx(nptot(ptsep(3,ipx),ipx),ptsep(3,ipx),ipx)
-         ybcl(1,2) = separy(nptot(ptsep(3,ipx),ipx),ptsep(3,ipx),ipx)
+         xbcl(1,2) = equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx),equ%ptsep(3,ipx),ipx)
+         ybcl(1,2) = equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx),equ%ptsep(3,ipx),ipx)
 
   121    CONTINUE
 
          nbcl(2) = nbcl(2) + 1
-         xbcl(nbcl(2),2) = separx(nptot(ptsep(3,ipx),ipx) - nbcl(2) + 1, & 
-     &                     ptsep(3,ipx),ipx)
-         ybcl(nbcl(2),2) = separy(nptot(ptsep(3,ipx),ipx) - nbcl(2) + 1, & 
-     &                     ptsep(3,ipx),ipx)
+         xbcl(nbcl(2),2) = equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx) - nbcl(2) + 1, & 
+     &                     equ%ptsep(3,ipx),ipx)
+         ybcl(nbcl(2),2) = equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx) - nbcl(2) + 1, & 
+     &                     equ%ptsep(3,ipx),ipx)
 
          lbcl = long(xbcl(1,2),ybcl(1,2),nbcl(2))
 
@@ -1370,21 +1377,21 @@
          ipx = 1
          DO 122 isep=1, 2
 
-           sepmax(1,isep) = separx(1,ptsep(isep,ipx),ipx)
-           sepmay(1,isep) = separy(1,ptsep(isep,ipx),ipx)
+           sepmax(1,isep) = equ%separx(1,equ%ptsep(isep,ipx),ipx)
+           sepmay(1,isep) = equ%separy(1,equ%ptsep(isep,ipx),ipx)
            dist=0.
 
            DO 123 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
-     &                   separy(1,ptsep(isep,ipx),ipx), & 
-     &                   nptot(ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
      &                   sepmax(ipas,isep),sepmay(ipas,isep))
   123      CONTINUE
-           sepmax(par%nptseg(isep),isep)=separx(nptot(ptsep(isep,ipx),ipx), & 
-     &       ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep),isep)=separy(nptot(ptsep(isep,ipx),ipx), & 
-     &       ptsep(isep,ipx),ipx)
+           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &       equ%ptsep(isep,ipx),ipx)
+           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &       equ%ptsep(isep,ipx),ipx)
   122    CONTINUE
 
          DO 124 isep=1, 2
@@ -1405,21 +1412,21 @@
          ipx = 2
          DO 126 isep=1, 2
 
-           sepmax(1,isep+4) = separx(1,ptsep(isep,ipx),ipx)
-           sepmay(1,isep+4) = separy(1,ptsep(isep,ipx),ipx)
+           sepmax(1,isep+4) = equ%separx(1,equ%ptsep(isep,ipx),ipx)
+           sepmay(1,isep+4) = equ%separy(1,equ%ptsep(isep,ipx),ipx)
            dist=0.
 
            DO 127 ipas=2, par%nptseg(isep+4)-1
               dist=dist + spacep(ipas-1,isep+4)
-              CALL COORD(separx(1,ptsep(isep,ipx),ipx), & 
-     &                   separy(1,ptsep(isep,ipx),ipx), & 
-     &                   nptot(ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
      &                   sepmax(ipas,isep+4),sepmay(ipas,isep+4))
   127      CONTINUE
-           sepmax(par%nptseg(isep+4),isep+4)=separx(nptot(ptsep(isep,ipx), & 
-     &       ipx),ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep+4),isep+4)=separy(nptot(ptsep(isep,ipx), & 
-     &       ipx),ptsep(isep,ipx),ipx)
+           sepmax(par%nptseg(isep+4),isep+4)=equ%separx(equ%nptot(equ%ptsep(isep,ipx), & 
+     &       ipx),equ%ptsep(isep,ipx),ipx)
+           sepmay(par%nptseg(isep+4),isep+4)=equ%separy(equ%nptot(equ%ptsep(isep,ipx), & 
+     &       ipx),equ%ptsep(isep,ipx),ipx)
   126    CONTINUE
 
 !..3.3. Grid region by region
@@ -1435,115 +1442,115 @@
          npcrb2=0
          ipx = ptxext
 
-         DO 130 ipas=nptot(ptsep(3,ipx),ipx),1,-1
+         DO 130 ipas=equ%nptot(equ%ptsep(3,ipx),ipx),1,-1
             npcrb2=npcrb2+1
-            xcrb2(npcrb2)=separx(ipas,ptsep(3,ipx),ipx)
-            ycrb2(npcrb2)=separy(ipas,ptsep(3,ipx),ipx)
+            xcrb2(npcrb2)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            ycrb2(npcrb2)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
   130    CONTINUE
 
-         DO 131 ipas=2,nptot(ptsep(4,ipx),ipx)
+         DO 131 ipas=2,equ%nptot(equ%ptsep(4,ipx),ipx)
             npcrb2=npcrb2+1
-            xcrb2(npcrb2)=separx(ipas,ptsep(4,ipx),ipx)
-            ycrb2(npcrb2)=separy(ipas,ptsep(4,ipx),ipx)
+            xcrb2(npcrb2)=equ%separx(ipas,equ%ptsep(4,ipx),ipx)
+            ycrb2(npcrb2)=equ%separy(ipas,equ%ptsep(4,ipx),ipx)
   131    CONTINUE
 
 !..Define the primary curve and the grid points
 
          ireg=1
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
 
             DO 132 ipas=par%nptseg(1), 1, -1
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
   132       CONTINUE
 
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
 
             DO 133 ipas=par%nptseg(5), 1, -1
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,5)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,5)
   133       CONTINUE
 
          ENDIF
 
          DO 134 ipas=2, par%nptseg(3)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
   134    CONTINUE
 
          DO 135 ipas=par%nptseg(4)-1, 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,4)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,4)
   135    CONTINUE
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
 
             DO 136 ipas=2, par%nptseg(2)
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
   136       CONTINUE
 
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
 
             DO 137 ipas=2, par%nptseg(6)
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
   137       CONTINUE
 
          ENDIF
 
 !..Initialise the guard indices and starting target
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
             idef = 1
             gardd2 = par%tgarde(2)
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
             idef = 3
             gardd2 = par%tgarde(4)
          ENDIF
          gardd1 = par%tgarde(idef)
 
-         ipx = ptxint
+         ipx = equ%ptxint
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
-         ipx = ptxint
+         ipx = equ%ptxint
 
-         DO 140 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 140 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
   140    CONTINUE
 
-         DO 141 ipas=2,nptot(ptsep(3,ipx),ipx)
+         DO 141 ipas=2,equ%nptot(equ%ptsep(3,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
   141    CONTINUE
 
-         DO 142 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 142 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
   142    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*145')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'droite')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
          DO 145 ipas=1, par%npr(ireg)-1
@@ -1557,16 +1564,16 @@
          nnlast=0
          ipx = ptxext
 
-         DO 146 ipas=nptot(ptsep(3,ipx),ipx),1,-1
+         DO 146 ipas=equ%nptot(equ%ptsep(3,ipx),ipx),1,-1
             nnlast=nnlast+1
-            xnlast(nnlast)=separx(ipas,ptsep(3,ipx),ipx)
-            ynlast(nnlast)=separy(ipas,ptsep(3,ipx),ipx)
+            xnlast(nnlast)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            ynlast(nnlast)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
   146    CONTINUE
 
-         DO 147 ipas=2,nptot(ptsep(4,ipx),ipx)
+         DO 147 ipas=2,equ%nptot(equ%ptsep(4,ipx),ipx)
             nnlast=nnlast+1
-            xnlast(nnlast)=separx(ipas,ptsep(4,ipx),ipx)
-            ynlast(nnlast)=separy(ipas,ptsep(4,ipx),ipx)
+            xnlast(nnlast)=equ%separx(ipas,equ%ptsep(4,ipx),ipx)
+            ynlast(nnlast)=equ%separy(ipas,equ%ptsep(4,ipx),ipx)
   147    CONTINUE
 
          nuldec = .TRUE.
@@ -1576,24 +1583,24 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
 !..Arangement of the mesh point which must coinside with outer X-point
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
 
-            xmail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = xptxex
-            ymail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = yptxex
+            grid%xmail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = xptxex
+            grid%ymail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = yptxex
 
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
 
-            xmail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = xptxex
-            ymail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = yptxex
+            grid%xmail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = xptxex
+            grid%ymail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = yptxex
 
          ENDIF
 
@@ -1606,44 +1613,44 @@
 !..Define the primary curve and the grid points
 
          ireg=2
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
 
             DO 150 ipas=1,par%nptseg(1)+par%nptseg(3)-2
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = grid%xmail(ipas,par%npr(1),1)
+               grid%ymail(grid%np1(ireg),1,ireg) = grid%ymail(ipas,par%npr(1),1)
   150       CONTINUE
 
             DO 151 ipas=1, par%nptseg(5)
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,5)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,5)
   151       CONTINUE
 
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
 
             DO 152 ipas=1,par%nptseg(5)+par%nptseg(3)-2
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = grid%xmail(ipas,par%npr(1),1)
+               grid%ymail(grid%np1(ireg),1,ireg) = grid%ymail(ipas,par%npr(1),1)
   152       CONTINUE
 
             DO 153 ipas=1, par%nptseg(1)
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
   153       CONTINUE
 
          ENDIF
 
 !..Initialise the guard indices and starting target
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
             idef = 1
             gardd2 = par%tgarde(3)
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
             idef = 3
             gardd2 = par%tgarde(1)
          ENDIF
@@ -1651,31 +1658,31 @@
 
          ipx = ptxext
 
-         x2 = separx(nptot(ptsep(3,ipx),ipx),ptsep(3,ipx),ipx)
-         y2 = separy(nptot(ptsep(3,ipx),ipx),ptsep(3,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx),equ%ptsep(3,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx),equ%ptsep(3,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
          ipx = ptxext
 
-         DO 154 ipas=nptot(ptsep(3,ipx),ipx),1,-1
+         DO 154 ipas=equ%nptot(equ%ptsep(3,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
   154    CONTINUE
 
-         DO 155 ipas=2,nptot(ptsep(1,ipx),ipx)
+         DO 155 ipas=2,equ%nptot(equ%ptsep(1,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
   155    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*157')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'droite')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
          call trc_stk_out
 
          DO 157 ipas=1, par%npr(ireg)-1
@@ -1689,10 +1696,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -1703,18 +1710,18 @@
 !..Define the primary curve and the grid points
 
          ireg=3
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 160 ipas=par%nptseg(1),1,-1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
   160    CONTINUE
 
          DO 161 ipas=2, par%nptseg(2)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
   161    CONTINUE
 
 !..Initialise the guard indices and starting target
@@ -1725,8 +1732,8 @@
 
          ipx = 1
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 
 !..Initialise the primary level line
@@ -1734,23 +1741,23 @@
          nn=0
          ipx = 1
 
-         DO 164 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 164 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
   164    CONTINUE
 
-         DO 165 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 165 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
   165    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*167')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'gauche')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
          DO 167 ipas=1, par%npr(ireg)-1
@@ -1764,10 +1771,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -1779,46 +1786,46 @@
 !..Define the primary curve and the grid points
 
          ireg=4
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
 
             DO 170 ipas=par%nptseg(1)+par%nptseg(2)+par%nptseg(3)+par%nptseg(4)-3, & 
      &                             par%nptseg(1)+par%nptseg(3), -1
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = grid%xmail(ipas,par%npr(1),1)
+               grid%ymail(grid%np1(ireg),1,ireg) = grid%ymail(ipas,par%npr(1),1)
   170       CONTINUE
 
             DO 171 ipas=1, par%nptseg(6)
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
   171       CONTINUE
 
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
 
             DO 172 ipas=par%nptseg(5)+par%nptseg(6)+par%nptseg(3)+par%nptseg(4)-3, & 
      &                             par%nptseg(5)+par%nptseg(3), -1
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = xmail(ipas,par%npr(1),1)
-               ymail(np1(ireg),1,ireg) = ymail(ipas,par%npr(1),1)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = grid%xmail(ipas,par%npr(1),1)
+               grid%ymail(grid%np1(ireg),1,ireg) = grid%ymail(ipas,par%npr(1),1)
   172       CONTINUE
 
             DO 173 ipas=1, par%nptseg(2)
-               np1(ireg) = np1(ireg)+1
-               xmail(np1(ireg),1,ireg) = sepmax(ipas,2)
-               ymail(np1(ireg),1,ireg) = sepmay(ipas,2)
+               grid%np1(ireg) = grid%np1(ireg)+1
+               grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
   173       CONTINUE
 
          ENDIF
 
 !..Initialise the guard indices and starting target
 
-         IF (ptxint .EQ. 1) THEN
+         IF (equ%ptxint .EQ. 1) THEN
             idef = 2
             gardd2 = par%tgarde(4)
-         ELSE IF (ptxint .EQ. 2) THEN
+         ELSE IF (equ%ptxint .EQ. 2) THEN
             idef = 4
             gardd2 = par%tgarde(2)
          ENDIF
@@ -1826,31 +1833,31 @@
 
          ipx = ptxext
 
-         x2 = separx(nptot(ptsep(4,ipx),ipx),ptsep(4,ipx),ipx)
-         y2 = separy(nptot(ptsep(4,ipx),ipx),ptsep(4,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx),equ%ptsep(4,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(4,ipx),ipx),equ%ptsep(4,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
          ipx = ptxext
 
-         DO 174 ipas=nptot(ptsep(4,ipx),ipx),1,-1
+         DO 174 ipas=equ%nptot(equ%ptsep(4,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(4,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(4,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(4,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(4,ipx),ipx)
   174    CONTINUE
 
-         DO 175 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 175 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
   175    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*177')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'gauche')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
          DO 177 ipas=1, par%npr(ireg)-1
@@ -1864,10 +1871,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.true.,diag,ireg)
 
@@ -1878,18 +1885,18 @@
 !..Define the primary curve and the grid points
 
          ireg=5
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO 180 ipas=par%nptseg(5), 1, -1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,5)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,5)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,5)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,5)
   180    CONTINUE
 
          DO 181 ipas=2, par%nptseg(6)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,6)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,6)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
   181    CONTINUE
 
 !..Initialise the guard indices and starting target
@@ -1900,31 +1907,31 @@
 
          ipx = 2
 
-         x2 = separx(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
-         y2 = separy(nptot(ptsep(1,ipx),ipx),ptsep(1,ipx),ipx)
+         x2 = equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
+         y2 = equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx),equ%ptsep(1,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
          ipx = 2
 
-         DO 184 ipas=nptot(ptsep(1,ipx),ipx),1,-1
+         DO 184 ipas=equ%nptot(equ%ptsep(1,ipx),ipx),1,-1
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(1,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(1,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(1,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(1,ipx),ipx)
   184    CONTINUE
 
-         DO 185 ipas=2,nptot(ptsep(2,ipx),ipx)
+         DO 185 ipas=2,equ%nptot(equ%ptsep(2,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(2,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(2,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(2,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
   185    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*187')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x2,y2,'gauche')
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
          call trc_stk_out
 
          DO 187 ipas=1, par%npr(ireg)-1
@@ -1938,10 +1945,10 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &               np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &               x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &               a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -1950,32 +1957,32 @@
 !..Define the primary curve and the grid points
 
          ireg=6
-         np1(ireg) = 0
-         ipx = ptxint
+         grid%np1(ireg) = 0
+         ipx = equ%ptxint
 
          DO 190 ipas=1, par%nptseg(3)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,3)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,3)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
   190    CONTINUE
 
          DO 191 ipas=par%nptseg(4)-1,1,-1
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,4)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,4)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,4)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,4)
   191    CONTINUE
 
-         x2 = separx(1,ptsep(3,ipx),ipx)
-         y2 = separy(1,ptsep(3,ipx),ipx)
+         x2 = equ%separx(1,equ%ptsep(3,ipx),ipx)
+         y2 = equ%separy(1,equ%ptsep(3,ipx),ipx)
 
 !..Initialise the primary level line
 
          nn=0
 
-         DO 192 ipas=1,nptot(ptsep(3,ipx),ipx)
+         DO 192 ipas=1,equ%nptot(equ%ptsep(3,ipx),ipx)
             nn=nn+1
-            xn(nn)=separx(ipas,ptsep(3,ipx),ipx)
-            yn(nn)=separy(ipas,ptsep(3,ipx),ipx)
+            grid%xn(nn)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+            grid%yn(nn)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
   192    CONTINUE
 
 !..Relate the desirable sweeping direction to the structure orientation
@@ -1992,72 +1999,72 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &      pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &      a00,a10,a01,a11,par%repart, & 
-     &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
+     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+     &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+     &      xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 !----------------------------------------------------------------------
 
-      ELSE IF (limcfg.eq.1) THEN
+      ELSE IF (equ%limcfg.eq.1) THEN
 
 !----------------------------------------------------------------------
 !..4.   Limiter configuration
 
          nbcrb = 1
-         nreg = 2
-         nsep = 1
+         grid%nreg = 2
+         equ%nsep = 1
          ipx = 1
-         isep=nsep
+         isep=equ%nsep
 
 !..The distance between the X-point and the O-point
 
-         xx = nivx(1,1)
-         yy = nivy(1,1)
+         xx = struct%nivx(1,1)
+         yy = struct%nivy(1,1)
 
-         xptxo = xpto - xx
-         yptxo = ypto - yy
+         xptxo = equ%xpto - xx
+         yptxo = equ%ypto - yy
 
-         distxo = SQRT((xptxo)**2 + (yptxo)**2)
+         equ%distxo = SQRT((xptxo)**2 + (yptxo)**2)
 
 !..Normalise the vector from the X-point to the O-point
 
-         xptxo = xptxo/distxo
-         yptxo = yptxo/distxo
+         xptxo = xptxo/equ%distxo
+         yptxo = yptxo/equ%distxo
 
-!..Calculate the psi value at the X-point
+!..Calculate the equ%psi value at the X-point
 
-         ii = ifind(xx,x,nx,1)
-         jj = ifind(yy,y,ny,1)
+         ii = ifind(xx,equ%x,equ%nx,1)
+         jj = ifind(yy,equ%y,equ%ny,1)
 
-         fctini = a00(ii,jj,1) + a10(ii,jj,1)*xx + a01(ii,jj,1)*yy + & 
-     &            a11(ii,jj,1)*xx*yy
+         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + & 
+     &            equ%a11(ii,jj,1)*xx*yy
 
 
 !..Calculate the length of each separatrix
 
-         lg(isep) = long(nivx(1,1),nivy(1,1),nivtot(1))
+         lg(isep) = long(struct%nivx(1,1),struct%nivy(1,1),struct%nivtot(1))
          
          !..4.1  Read all the necessary data from the file
          
          !.. Read initial set of code parameters
-         call read_code_parameters(par, distxo)
+         call read_code_parameters(par, equ%distxo)
 
          correct = .false.
          do while (.not. correct)
 
-             !..Calculate the psi difference between the penetration values
+             !..Calculate the equ%psi difference between the penetration values
 
              IF (par%repart .EQ. 2) THEN
 
                  xfin = xx + xptxo*par%pntrat
                  yfin = yy + yptxo*par%pntrat
 
-                 ii = ifind(xfin,x,nx,1)
-                 jj = ifind(yfin,y,ny,1)
+                 ii = ifind(xfin,equ%x,equ%nx,1)
+                 jj = ifind(yfin,equ%y,equ%ny,1)
 
-                 fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
-                     &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
+                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                     &               equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                  difpsi = fctfin - fctini
 
@@ -2073,7 +2080,7 @@
 
              !..Radial direction
 
-             CALL NUNIFO(par%npr(1),distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
                  &               spacer(1,1),drmin(1),drmax(1))
 
              IF (par%repart .EQ. 1) THEN
@@ -2095,20 +2102,20 @@
 
 !..4.2  Distribute the points along separatrices
 
-         DO isep=1, nsep
+         DO isep=1, equ%nsep
 
-           sepmax(1,isep) = nivx(1,1)
-           sepmay(1,isep) = nivy(1,1)
+           sepmax(1,isep) = struct%nivx(1,1)
+           sepmay(1,isep) = struct%nivy(1,1)
            dist=0.
 
            DO ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(nivx(1,1),nivy(1,1),nivtot(1), & 
+              CALL COORD(struct%nivx(1,1),struct%nivy(1,1),struct%nivtot(1), & 
      &          dist,sepmax(ipas,isep),sepmay(ipas,isep))
            ENDDO
 
-           sepmax(par%nptseg(isep),isep)=nivx(nivtot(1),1)
-           sepmay(par%nptseg(isep),isep)=nivy(nivtot(1),1)
+           sepmax(par%nptseg(isep),isep)=struct%nivx(struct%nivtot(1),1)
+           sepmay(par%nptseg(isep),isep)=struct%nivy(struct%nivtot(1),1)
          ENDDO
 
 !..4.3. Grid region by region
@@ -2118,20 +2125,20 @@
 !..Define the primary curve and the grid points
 
          ireg=1
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO ipas=1, par%nptseg(1)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
          ENDDO
 
 !..Go along the target 1
 
          idef = 1
 
-         x2 = nivx(1,1)
-         y2 = nivy(1,1)
+         x2 = struct%nivx(1,1)
+         y2 = struct%nivy(1,1)
 !***
 !        print*,'x2, y2=',x2,y2
 !***
@@ -2140,10 +2147,10 @@
 
          nn=0
 
-         DO ipas=1,nivtot(1)
+         DO ipas=1,struct%nivtot(1)
             nn=nn+1
-            xn(nn)=nivx(ipas,1)
-            yn(nn)=nivy(ipas,1)
+            grid%xn(nn)=struct%nivx(ipas,1)
+            grid%yn(nn)=struct%nivy(ipas,1)
          ENDDO
 
 !..Initialise the guard indices
@@ -2154,11 +2161,11 @@
 !..Determine the structure orientation
 
 !!!!
-!        sens =-drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)),
-!    .                 npstru(inddef(idef)),x2,y2,'droite')
+!        sens =-drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)),
+!    .                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
          sens=1
-         sens=horair(xpto,ypto,x2,y2,xstruc(1,inddef(idef)), & 
-     &     ystruc(1,inddef(idef)),npstru(inddef(idef)),sens)
+         sens=horair(equ%xpto,equ%ypto,x2,y2,struct%xstruc(1,struct%inddef(idef)), & 
+     &     struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),sens)
 !***
 !        print*,'dans maille: sens=',sens
 !***
@@ -2173,16 +2180,16 @@
 
 !***
 !        print*,'call mailrg'
-!        print*,'ireg, idef, inddef=',ireg,idef,inddef(idef)
-!        print*,'np1, npr=',np1(ireg),npr(ireg)
+!        print*,'ireg, idef, struct%inddef=',ireg,idef,struct%inddef(idef)
+!        print*,'grid%np1, npr=',grid%np1(ireg),npr(ireg)
 !***
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas, & 
-              &              np1(ireg),par%npr(ireg),inddef(idef),x2,y2,nx,ny, & 
-              &              x,y,psi,xpto,ypto,nstruc,npstru,xstruc,ystruc, & 
-              &              a00,a10,a01,a11,par%repart, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
+              &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
+              &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+              &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &              ynlast,nnlast,nuldec,.false.,diag,ireg)
 
@@ -2191,25 +2198,25 @@
 !..Define the primary curve and the grid points
 
          ireg=2
-         np1(ireg) = 0
+         grid%np1(ireg) = 0
 
          DO ipas=1, par%nptseg(1)
-            np1(ireg) = np1(ireg)+1
-            xmail(np1(ireg),1,ireg) = sepmax(ipas,1)
-            ymail(np1(ireg),1,ireg) = sepmay(ipas,1)
+            grid%np1(ireg) = grid%np1(ireg)+1
+            grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
+            grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
          ENDDO
 
-         x2 = nivx(1,1)
-         y2 = nivy(1,1)
+         x2 = struct%nivx(1,1)
+         y2 = struct%nivy(1,1)
 
 !..Initialise the primary level line
 
          nn=0
 
-         DO ipas=1,nivtot(1)
+         DO ipas=1,struct%nivtot(1)
             nn=nn+1
-            xn(nn)=nivx(nn,1)
-            yn(nn)=nivy(nn,1)
+            grid%xn(nn)=struct%nivx(nn,1)
+            grid%yn(nn)=struct%nivy(nn,1)
          ENDDO
 
 !..Definition des pas pour le balayage vers le centre
@@ -2228,40 +2235,34 @@
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,par%pntrat, & 
-     &      pas,np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc, & 
-     &      a00,a10,a01,a11,par%repart, & 
-     &      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
+     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
+     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+     &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+     &      xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 
 !       ...
       ENDIF
 !======================================================================
 
-!  6. Compute psi and grad psi at the grid points
+!  6. Compute equ%psi and grad equ%psi at the grid points
 
-      do ireg=1, nreg
+      do ireg=1, grid%nreg
           do j=1, par%npr(ireg)
-              do i= 1,np1(ireg)
-                  xx = xmail(i,j,ireg)
-                  yy = ymail(i,j,ireg)
-                  ii = ifind(xx,x,nx,1)
-                  jj = ifind(yy,y,ny,1)
-                  psim(i,j,ireg) = a00(ii,jj,1)+a10(ii,jj,1)*xx+a01(ii,jj,1)*yy & 
-                      & + a11(ii,jj,1)*xx*yy
-                  psidxm(i,j,ireg) = a00(ii,jj,2)+a10(ii,jj,2)*xx+a01(ii,jj,2)*yy & 
-                      & + a11(ii,jj,2)*xx*yy
-                  psidym(i,j,ireg) = a00(ii,jj,3)+a10(ii,jj,3)*xx+a01(ii,jj,3)*yy & 
-                      & + a11(ii,jj,3)*xx*yy
+              do i= 1,grid%np1(ireg)
+                  xx = grid%xmail(i,j,ireg)
+                  yy = grid%ymail(i,j,ireg)
+                  ii = ifind(xx,equ%x,equ%nx,1)
+                  jj = ifind(yy,equ%y,equ%ny,1)
+                  grid%psim(i,j,ireg) = equ%a00(ii,jj,1)+equ%a10(ii,jj,1)*xx+equ%a01(ii,jj,1)*yy & 
+                      & + equ%a11(ii,jj,1)*xx*yy
+                  grid%psidxm(i,j,ireg) = equ%a00(ii,jj,2)+equ%a10(ii,jj,2)*xx+equ%a01(ii,jj,2)*yy & 
+                      & + equ%a11(ii,jj,2)*xx*yy
+                  grid%psidym(i,j,ireg) = equ%a00(ii,jj,3)+equ%a10(ii,jj,3)*xx+equ%a01(ii,jj,3)*yy & 
+                      & + equ%a11(ii,jj,3)*xx*yy
               end do
           end do
       end do
-
-!..5.  Write the grid data into a file
-
-      CALL SORTIE(nsep,nreg,np1, & 
-     &  distxo,xmail,ymail,nx,ny, & 
-     &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,2,fctpx,diag,par,psim,psidxm,psidym)
 
 !c<<<
 !      write(0,*) '<=== Leaving maille'
@@ -2304,18 +2305,18 @@ contains
 
            if(sellan(1:8).eq.'francais') then
              CALL LECCLF(par%nptseg,par%npr,lg,&
-                 & par%deltp1,par%deltpn,par%deltr1,limcfg, & 
+                 & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, & 
                  & par%deltrn,par%repart,par%pntrat,par%tgarde,&
-                 & distnv,xptxo,yptxo, & 
-                 & distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-                 & npx,racord,x,y,nx,ny)
+                 & struct%distnv,xptxo,yptxo, & 
+                 & distxo,xx,yy,fctini,difpsi,equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
+                 & equ%npx,equ%racord,equ%x,equ%y,equ%nx,equ%ny)
            elseif(sellan(1:7).eq.'english') then
              CALL LECCLE(par%nptseg,par%npr,lg,&
-                 & par%deltp1,par%deltpn,par%deltr1,limcfg, & 
+                 & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, & 
                  & par%deltrn,par%repart,par%pntrat,par%tgarde,&
-                 & distnv,xptxo,yptxo, & 
-                 & distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nxmax,nymax, & 
-                 & npx,racord,x,y,nx,ny)
+                 & struct%distnv,xptxo,yptxo, & 
+                 & distxo,xx,yy,fctini,difpsi,equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
+                 & equ%npx,equ%racord,equ%x,equ%y,equ%nx,equ%ny)
            endif
 
          ENDIF
@@ -2349,37 +2350,38 @@ contains
     correct = .true.
 
     ! But we still want to write out the carre.out file
-    CALL SORTIE(nsep,nreg,np1, & 
-         &  distxo,xmail,ymail,nx,ny, & 
-         &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par)
+!!$    CALL SORTIE(equ%nsep,grid%nreg,grid%np1, & 
+!!$         &  equ%distxo,grid%xmail,grid%ymail,nx,equ%ny, & 
+!!$         &  equ%x,equ%y,equ%a00,equ%a10,equ%a01,equ%a11,equ%ptx,pty,equ%npx,equ%racord,1,equ%fctpx,diag,par)
+    CALL SORTIE(equ, grid, diag, par, 1)
 
     return
 #else  
 
     CALL RAPPEL(par,&
-         & lg,difpsi,distnv,nreg,nsep,npx,&
-         & dpmin,dpmax,drmin,drmax,distxo,6,correct)
+         & lg,difpsi,struct%distnv,grid%nreg,equ%nsep,equ%npx,&
+         & dpmin,dpmax,drmin,drmax,equ%distxo,6,correct)
 
     !..Initialise the primary level line
 
     nn1=0
 
-    DO ipas=1,nptot(ptsep(3,ipx),ipx)
+    DO ipas=1,equ%nptot(equ%ptsep(3,ipx),ipx)
         nn1=nn1+1
-        xn(nn1)=separx(ipas,ptsep(3,ipx),ipx)
-        yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
+        grid%xn(nn1)=equ%separx(ipas,equ%ptsep(3,ipx),ipx)
+        grid%yn(nn1)=equ%separy(ipas,equ%ptsep(3,ipx),ipx)
     end do
 
     ! on colle la dernière ligne de niveau sur trace2 pour avoir
     ! la pénétration.
 
-    call trace3(x(1),x(nx),y(1),y(ny),separx,separy, & 
-         &        ptsep,npx,nptot, & 
-         &        nstruc,npstru,xstruc,ystruc, & 
-         &        nivx,nivy,nivtot,nbniv, & 
-         &         par%pntrat,distxo,xn,yn,nn1, & 
+    call trace3(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, & 
+         &        equ%ptsep,equ%npx,equ%nptot, & 
+         &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+         &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, & 
+         &         par%pntrat,equ%distxo,grid%xn,grid%yn,nn1, & 
          &         par%repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
-         &         a00,a01,a10,a11,psi,nx,ny,x,y)
+         &         equ%a00,equ%a01,equ%a10,equ%a11,equ%psi,equ%nx,equ%ny,equ%x,equ%y)
 
     if (correct) then
         if(sellan(1:8).eq.'francais') then
@@ -2400,23 +2402,24 @@ contains
 
             call endpag
 
-            call trace2(x(1),x(nx),y(1),y(ny), & 
-                 &     separx,separy,ptsep,npx,nptot, & 
-                 &         nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
-                 &         nivtot,nbniv)
+            call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), & 
+                 &     equ%separx,equ%separy,equ%ptsep,equ%npx,equ%nptot, & 
+                 &         struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,struct%nivx,struct%nivy, & 
+                 &         struct%nivtot,struct%nbniv)
 
         endif
         ! parameters have been changed and state has to be recomputed
         !GO TO 3 
     else
-        CALL RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, & 
-             &             dpmin,dpmax,drmin,drmax,distxo,10,correct)
+        CALL RAPPEL(par,lg,difpsi,struct%distnv,grid%nreg,equ%nsep,equ%npx, & 
+             &             dpmin,dpmax,drmin,drmax,equ%distxo,10,correct)
 
 
-        CALL SORTIE(nsep,nreg,np1, & 
-             &  distxo,xmail,ymail,nx,ny, & 
-             &  x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,diag,par,&
-             &  psim,psidxm,psidym)
+!!$        CALL SORTIE(equ%nsep,grid%nreg,grid%np1, & 
+!!$             &  equ%distxo,grid%xmail,grid%ymail,equ%nx,equ%ny, & 
+!!$             &  equ%x,equ%y,equ%a00,equ%a10,equ%a01,equ%a11,equ%ptx,equ%pty,equ%npx,equ%racord,1,equ%fctpx,diag,par,&
+!!$             &  grid%psim,grid%psidxm,grid%psidym)
+        CALL SORTIE(equ, grid, diag, par, 1)
 
     ENDIF
 
@@ -2439,9 +2442,9 @@ contains
 !!$    double precision :: 
 !!$
 !!$    do isep = 1, 4
-!!$        lg(isep) = long(separx(1,ptsep(isep,ipx),ipx), &
-!!$             & separy(1,ptsep(isep,ipx),ipx), &
-!!$             & nptot(ptsep(isep,ipx),ipx))
+!!$        lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+!!$             & equ%separy(1,equ%ptsep(isep,ipx),ipx), &
+!!$             & equ%nptot(equ%ptsep(isep,ipx),ipx))
 !!$    end do
 !!$
 !!$  end subroutine setupCodeParametersForExtendedGrid
