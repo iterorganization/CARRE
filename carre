@@ -147,6 +147,7 @@ do {
                 }
                 mv -f traduit.out $griddir/$grid_stem.v$n.geo && \
                   /bin/echo -e "The grid is stored as $griddir/$grid_stem.v$n.geo"
+                ictrans -e 'spooler postfilea4' -e '3Print' gmeta && mv ictrans.tmp.ps $griddir/$grid_stem.v$n.ps
                 touch CARRE.HISTORY
 		echo $user `date +%Y-%m-%d_%H:%M:%S` >> CARRE.HISTORY
 		ls -ls dg.??? | cut -d ' ' -f 9- >> CARRE.HISTORY
