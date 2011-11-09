@@ -1,4 +1,4 @@
-      subroutine ecrim2(nfin,nx,ny,crx,cry,bb,nxmax,nymax)
+      subroutine ecrim2(nfin,nx,ny,crx,cry,bb,b2cflag,nxmax,nymax)
 !
 !  version : 02.12.98 20:49
 !
@@ -12,7 +12,8 @@
       integer nfin,nx,ny,nxmax,nymax
       real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
      &  bb(-1:nxmax,-1:nymax,0:3)
-!
+      integer b2cflag(-1:nxmax,-1:nymax,2)
+
 !  local variables
       integer ix,iy
       real*8 x0,y0
@@ -40,15 +41,16 @@
 
 !* print B2.5
           write (nfin,117) ix+1,iy+1,x0,y0,crx(ix,iy,0),cry(ix,iy,0), & 
-     &      crx(ix,iy,1),cry(ix,iy,1),crx(ix,iy,2),cry(ix,iy,2), & 
-     &         crx(ix,iy,3),cry(ix,iy,3),bb(ix,iy,0),bb(ix,iy,2)
+               & crx(ix,iy,1),cry(ix,iy,1),crx(ix,iy,2),cry(ix,iy,2), & 
+               & crx(ix,iy,3),cry(ix,iy,3),bb(ix,iy,0),bb(ix,iy,2), &
+               & b2cflag(ix,iy,:)
 
 
 
         enddo
       enddo
 
- 117  FORMAT(I4,1X,I4,1X,12(F12.8,1X))
+ 117  FORMAT(I4,1X,I4,1X,12(F12.8,1X),I4,2I4)
       return
 !======================================================================
       end

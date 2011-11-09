@@ -1,6 +1,7 @@
-      subroutine b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmax,nymax, & 
+      subroutine b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmax,nymax, & 
      &                  r,z,nreg,nppol,nprad,npolmx,nradmx, & 
-     &                  nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
+     &                  nptseg,psidx,psidy,psi,psidxm,psidym,&
+     &                  cflag,b0r0, & 
      &                  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
 !
 !  version : 12.01.99 13:10
@@ -27,7 +28,9 @@
 
       integer npolmx,nradmx,nxmax,nymax,ncutmx,nisomx
       integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10), & 
-     &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx)
+     &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx),&
+     &  cflag(npolmx,nradmx,nreg,2)
+      integer b2cflag(-1:nxmax,-1:nymax,2)
       real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
      &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), & 
      &  r(npolmx,nradmx,nreg),z(npolmx,nradmx,nreg), & 
@@ -931,6 +934,7 @@
                   ffbz(ix,iy,1)=twopi*b0r0
                   ffbz(ix,iy,2)=twopi*b0r0
                   ffbz(ix,iy,3)=twopi*b0r0
+                  b2cflag(ix,iy,:)=cflag(j,i,irg,:)
                   iy=iy+1     ! }
                 end do
                 ix=ix+1     ! }

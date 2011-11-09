@@ -71,7 +71,7 @@ CONTAINS
       type(CarreParameters), intent(inout) :: par
 
 !  variables locales
-      INTEGER ieg,ierror
+      INTEGER ieg,ierror,ipos
       CHARACTER*80 vari, novlan
 
 !  procedures
@@ -107,11 +107,15 @@ CONTAINS
         endif
       endif
 !
-!  on trouve la position au debut des parametres quand on lit
+!  on trouve la position du debut des parametres quand on lit
 !  d'un fichier
       if(ient.ne.5) then
    5    continue
         read(ient,2,end=99)vari
+        if(index(vari,'output format').gt.0) then
+            ipos=index(vari,':')
+            read(vari(ipos+1:min(ipos+8,len(vari))),'(a8)') par%carre_format
+        end if
         if(index(vari,'$paramet').eq.0) go to 5
       endif
 

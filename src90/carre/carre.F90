@@ -112,6 +112,7 @@ PROGRAM CARRE
 !!$       & equ%ptx, equ%pty, equ%npx, equ%racord,&
 !!$       & 2,& ! 2 means print grid data
 !!$       & equ%fctpx,diag,par,grid%psim,grid%psidxm,grid%psidym)
+  call SORTIE(equ, grid, diag, par, 1)
   call SORTIE(equ, grid, diag, par, 2)
 
   ! Output final grid to Silo

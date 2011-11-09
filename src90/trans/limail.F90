@@ -1,6 +1,6 @@
 !=======================================================================
       subroutine limail(nrid,nreg,nppol,nprad,r,z,psi,psidxm,psidym, & 
-     &  npomax,nramax)
+     &  cflag,npomax,nramax,nregmx,carre_format)
       implicit none
 !
 !  lecture de la maille produite par le programme carre pour traitement
@@ -17,9 +17,12 @@
 !  nramax: dimention declaree dans la direction radiale
 !
 !  arguments
-      integer nrid,nreg,nppol(*),nprad(*),npomax,nramax
+      integer nrid,nreg,nppol(*),nprad(*),npomax,nramax,nregmx,&
+           & cflag(npomax,nramax,nregmx,2)
       real*8 r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*), & 
      &     psidxm(npomax,nramax,*),psidym(npomax,nramax,*)
+      character*8 carre_format
+
 !
 !  variables locales
       integer ipol,irad,ireg,iflag
@@ -30,11 +33,17 @@
       call entete(nrid,'$maille',iflag)
       read(nrid,*,end=99)ligne,nreg
       do ireg=1,nreg
-      read(nrid,*,end=99)ligne
-      read(nrid,*,end=99)ligne,nppol(ireg),ligne,nprad(ireg)
-      read(nrid,*,end=99)((r(ipol,irad,ireg),z(ipol,irad,ireg), & 
-     &  psi(ipol,irad,ireg),psidxm(ipol,irad,ireg), & 
-     &  psidym(ipol,irad,ireg),ipol=1,nppol(ireg)),irad=1,nprad(ireg))
+          read(nrid,*,end=99)ligne
+          read(nrid,*,end=99)ligne,nppol(ireg),ligne,nprad(ireg)
+          read(nrid,*,end=99)((r(ipol,irad,ireg),z(ipol,irad,ireg),&
+               & psi(ipol,irad,ireg),psidxm(ipol,irad,ireg), &
+               & psidym(ipol,irad,ireg),ipol=1,nppol(ireg)),irad=1,nprad(ireg))
+          if(trim(carre_format).eq.'carre71') then
+              read(nrid,*,end=99)ligne
+              read(nrid,*,end=99) &
+                   & ((cflag(ipol,irad,ireg,1),cflag(ipol,irad,ireg,2), &
+                   & ipol=1,nppol(ireg)-1),irad=1,nprad(ireg)-1)
+          endif
       enddo
 !
 !  close input unit

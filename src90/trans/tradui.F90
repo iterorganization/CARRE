@@ -27,8 +27,10 @@
       integer nxmx,nymx,ncutmx,nisomx
       parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1)
       integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), & 
-     &        ifail,nx,ny, & 
-     &        ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1)
+           & ifail,nx,ny, & 
+           & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
+           & cflag(npmamx,nrmamx,nregmx,2)
+      integer b2cflag(-1:nxmx,-1:nymx,2)
       real*8 r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx), & 
      &  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
      &  psidym(npmamx,nrmamx,nregmx),distxo
@@ -107,7 +109,7 @@
 !* 3.   Read the grid
 
       call limail(nin,nreg,nppol,nprad,r,z,psi,psidxm,psidym, & 
-     &  npmamx,nrmamx)
+           &  cflag,npmamx,nrmamx,nregmx,par%carre_format)
 
 !* 4.   Select the output format
 
@@ -132,26 +134,28 @@
         call ecrim1(nout,nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, & 
      &  nrmamx)
 !
-! B2.5 Format
+! B2.5 Format (Carre script default)
 !
       elseif(isel.eq.2) then
 !
-        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
-     &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
-     &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+             & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+             & par%nptseg,psidx,psidy,&
+             & psi,psidxm,psidym,cflag,b0r0, & 
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
-        call ecrim2(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
+        call ecrim2(nfin,nx,ny,crx,cry,bb,b2cflag,nxmx,nymx)
 !
 ! Original SONNET/DIVIMP format
 !
       elseif(isel.eq.3) then
 !
-        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
-     &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
-     &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+             & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+             & par%nptseg,psidx,psidy,&
+             & psi,psidxm,psidym,cflag,b0r0, & 
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
         call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
@@ -160,10 +164,11 @@
 !
       elseif(isel.eq.4) then
 !
-        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
-     &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
-     &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+             & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+             & par%nptseg,psidx,psidy,&
+             & psi,psidxm,psidym,cflag,b0r0, & 
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
 !<<<
 !        write(0,*) 'call b2agbb'
 !>>>
@@ -186,10 +191,11 @@
 !
       elseif(isel.eq.5) then
 !
-        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
-     &   r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-     &   par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
-     &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+             & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+             & par%nptseg,psidx,psidy,&
+             & psi,psidxm,psidym,cflag,b0r0, & 
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &   crx,cry,psidx,psidy,nxmx,nymx)
 ! jdemod - added fpsi to call to ecrim5
@@ -202,10 +208,11 @@
       elseif(isel.eq.6) then
 
               ! assemble the crx, cry arrays
-              call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
-                   &    r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
-                   &    par%nptseg,psidx,psidy,psi,psidxm,psidym,b0r0, & 
-                   &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+        call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+             & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+             & par%nptseg,psidx,psidy,&
+             & psi,psidxm,psidym,cflag,b0r0, & 
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
               
               ! allocate connectivity arrays 
               allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &

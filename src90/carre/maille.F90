@@ -1,14 +1,6 @@
-      Subroutine MAILLE(equ,struct,grid,diag,par)
+Subroutine MAILLE(equ,struct,grid,diag,par)
 
-
-        ! TODO: grid%xn may be local
-
-!!$nx,ny,equ%x,equ%y,equ%psi,npx,equ%xpto,equ%ypto,equ%racord, & 
-!!$     &     equ%separx,equ%separy,equ%ptsep,equ%nptot,distnv,equ%ptxint,struct%nstruc,struct%npstru, & 
-!!$     &     struct%nstruc,struct%ystruc,struct%inddef,grid%nreg,grid%xn,grid%yn,xmail,grid%ymail, & 
-!!$     &     grid%np1,equ%ptx,pty,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, & 
-!!$     &     equ%a00,a10,a01,a11,equ%fctpx,limcfg,equ,grid,diag,par,&
-!!$     &     equ%psim, equ%psidxm, equ%psidym, distxo, nsep)
+  ! TODO: grid%xn,... may be local
 
 !======================================================================
 !ank -- The comments are translated from French, sorry for errors!
@@ -25,27 +17,11 @@
       use logging
   
       IMPLICIT NONE
-  
-      !ank-970707: dimensions from the file
+      
       !  dimensions
 #include <CARREDIM.F>
 
       !  arguments
-!!$      INTEGER nx,ny,npx,equ%ptsep(4,npx),equ%nptot(4,npx),equ%ptxint, & 
-!!$     &        struct%nstruc,struct%npstru(struct%nstruc),grid%nreg,struct%inddef(4), & 
-!!$     &        grid%np1(grid%nregmx),struct%nivtot(nivmx),struct%nbniv,limcfg,nsep
-!!$      LOGICAL equ%racord
-!!$      REAL*8 x(nxmax),y(nymax),equ%psi(nxmax,nymax), & 
-!!$     &  equ%xpto,equ%ypto,equ%separx(npnimx,4,npx), & 
-!!$     &  equ%separy(npnimx,4,npx),struct%nstruc(npstmx,struct%nstruc),pty(npx+1), & 
-!!$     &  struct%ystruc(npstmx,struct%nstruc),grid%xn(npnimx),grid%yn(npnimx),equ%ptx(npx+1), & 
-!!$     &  xmail(npmamx,nrmamx,*),grid%ymail(npmamx,nrmamx,*),struct%distnv(5,5), & 
-!!$     &  struct%nivx(npnimx,nivmx),struct%nivy(npnimx,nivmx),equ%fctpx(npx+1), & 
-!!$     &  equ%a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-!!$     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3),&
-!!$     &  equ%psim(npmamx,nrmamx,grid%nregmx),equ%psidxm(npmamx,nrmamx,grid%nregmx), & 
-!!$     &  equ%psidym(npmamx,nrmamx,grid%nregmx),distxo
-
       type(CarreDiag), intent(inout) :: diag
       type(CarreParameters), intent(inout) :: par
       type(CarreEquilibrium), intent(inout) :: equ
@@ -2352,8 +2328,8 @@ contains
     ! For ITMCARRE, the code parameters cannot be modified by the user
     correct = .true.
 
-    ! But we still want to write out the carre.out file
-    CALL SORTIE(equ, grid, diag, par, 1)
+!!$    ! But we still want to write out the carre.out file
+!!$    CALL SORTIE(equ, grid, diag, par, 1)
 
     return
 #else  
@@ -2412,18 +2388,10 @@ contains
         ! parameters have been changed and state has to be recomputed
         correct = .false.
     else
-!!$        CALL RAPPEL(par,lg,difpsi,struct%distnv,grid%nreg,equ%nsep,equ%npx, & 
-!!$             &             dpmin,dpmax,drmin,drmax,equ%distxo,10,correct)
-
-
-!!$        CALL SORTIE(equ%nsep,grid%nreg,grid%np1, & 
-!!$             &  equ%distxo,grid%xmail,grid%ymail,equ%nx,equ%ny, & 
-!!$             &  equ%x,equ%y,equ%a00,equ%a10,equ%a01,equ%a11,equ%ptx,equ%pty,equ%npx,equ%racord,1,equ%fctpx,diag,par,&
-!!$             &  grid%psim,grid%psidxm,grid%psidym)
-        CALL SORTIE(equ, grid, diag, par, 1)
+        ! Parameters ok, write them to output file
+        !..Save the chosen parameters
+!!$        CALL SORTIE(equ, grid, diag, par, 1)
     ENDIF
-
-    !..Save the chosen parameters
 
 301 FORMAT(//T2,'Est-ce que ces valeurs sont correctes? (o/n)')
 300 format(//T2,'Do you wish to accept these values (y/n)?')

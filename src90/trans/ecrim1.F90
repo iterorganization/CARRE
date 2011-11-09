@@ -367,7 +367,7 @@
         t=2*(nppol(1)-1)*(nprad(1)-1)+2*(nppol(2)-1)*(nprad(2)-1)
         r=e(3,t)
         if(r.ne.t-1) then
-          write(6,*)'mauvaise identification du 2-e coin droit'
+          write(6,*)'mauvaise identification du 2-nd coin droit'
           stop
         endif
 !       call swapdi(t,r,v,e,cotali)

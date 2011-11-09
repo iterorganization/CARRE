@@ -33,7 +33,7 @@ contains
     OPEN(UNIT=10,FILE='carre.out',STATUS='unknown')
     rewind(10)
     !  2.1  specify output format
-    write(10,*)'output format: carre70'
+    write(10,*)'output format:'//CARRE_VERSION
   end subroutine carre_open_output_file
 
   subroutine carre_main_computation(equ, struct, par, grid, diag)

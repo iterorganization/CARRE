@@ -8,6 +8,9 @@ module carre_types
 
 #include <CARREDIM.F>
 
+  ! Carre version string
+  character(len=8), parameter, public :: CARRE_VERSION = "carre71"
+
   integer, parameter, public :: GRID_UNDEFINED = 0
 
   ! Grid object labels
@@ -85,6 +88,9 @@ module carre_types
 
       ! Log level (see Logging.f90)
       integer :: logLevel = LOGWARNING
+
+      ! Output format
+      character(len=8) :: carre_format = CARRE_VERSION
   end type CarreParameters
 
   
