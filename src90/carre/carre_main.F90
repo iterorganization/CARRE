@@ -239,11 +239,6 @@ contains
 
     end if
 
-    ! After finalization of gridding, set grid%nr
-    ! (TODO: move this deeper into the actual gridding routines,
-    ! maille.F90. Currently not possible because they are not fully converted
-    ! to the new derived types yet)
-    grid % nr = par % npr
 
   contains
 

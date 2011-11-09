@@ -119,7 +119,7 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
    10    CONTINUE
 
          DO 20 ireg=1, grid%nreg
-            WRITE(10,103)ireg,par%npr(ireg),ireg,par%deltr1(ireg),ireg, & 
+            WRITE(10,103)ireg,grid%nr(ireg),ireg,par%deltr1(ireg),ireg, & 
      &                par%deltrn(ireg)
   103       FORMAT('npr(',I1,') =',I3/'deltr1(',I1,') =',F10.7/ & 
      &          'deltrn(',I1,') =',F10.7)
@@ -161,11 +161,11 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
              ! write one region
              WRITE(10,107)ireg
 107          FORMAT('''region:''',I5)
-             WRITE(10,108)grid%np1(ireg),par%npr(ireg)
+             WRITE(10,108)grid%np1(ireg),grid%nr(ireg)
 108          FORMAT('''nppol=''',I5,'  ''nprad=''',I5)
 
              ! write grid point data
-             DO j=1, par%npr(ireg)
+             DO j=1, grid%nr(ireg)
                  do i=1,grid%np1(ireg)
                      WRITE(10,109)grid%xmail(i,j,ireg),grid%ymail(i,j,ireg),&
                           & grid%psim(i,j,ireg), & 
@@ -173,12 +173,12 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
 109                  FORMAT(1p5E16.8)
                  end do
              end do
+
              ! write grid cell data
-             DO j=1, par%npr(ireg)
-                 do i=1,grid%np1(ireg)
-                     WRITE(10,109)grid%xmail(i,j,ireg),grid%ymail(i,j,ireg),&
-                          & grid%psim(i,j,ireg), & 
-                          & grid%psidxm(i,j,ireg),grid%psidym(i,j,ireg)
+             WRITE(10,"(a)") "'cellflags'"
+             DO j=1, grid%nr(ireg) - 1
+                 do i=1,grid%np1(ireg) - 1
+                     WRITE(10,"(2i4)") grid%cellflag(i,j,ireg), grid%cellFaceFlag(i,j,ireg)
                  end do
              end do
 
@@ -205,7 +205,7 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
 
          DO ireg=1, grid%nreg
             WRITE(10,107) ireg
-            DO i=1, par%npr(ireg)
+            DO i=1, grid%nr(ireg)
                     WRITE(10,129) i,diag%gdpsi(i,ireg),diag%racpsi(i,ireg), & 
                          & diag%gdr(i,ireg),diag%r(i,ireg),&
                          & diag%rho(i,ireg),diag%ra(i,ireg)
@@ -231,7 +231,7 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
 
          DO ireg=1, grid%nreg
             WRITE(10,107) ireg
-            DO i=1, par%npr(ireg)
+            DO i=1, grid%nr(ireg)
                     WRITE(10,139) i,diag%somort(i,ireg),diag%somortp(i,ireg), & 
                          & diag%somortpur(i,ireg),diag%somortpurp(i,ireg)
             enddo
@@ -244,7 +244,7 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
      &          t56,'somvarrp')
          DO ireg=1, grid%nreg
             WRITE(10,107) ireg
-            DO i=1, par%npr(ireg)
+            DO i=1, grid%nr(ireg)
                     WRITE(10,139) i,diag%sompropo(i,ireg),diag%sompropop(i,ireg), & 
                          & diag%somvarr(i,ireg),diag%somvarrp(i,ireg)
             enddo
@@ -255,7 +255,7 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
   144    format(t2,'ir',t40,'segt')
          DO ireg=1, grid%nreg
             WRITE(10,107) ireg
-            DO i=1, par%npr(ireg)
+            DO i=1, grid%nr(ireg)
                     WRITE(10,149) i, & 
                          & diag%segt(i,ireg)
             enddo

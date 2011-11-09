@@ -2264,6 +2264,9 @@
           end do
       end do
 
+      ! After finalization of gridding, set grid%nr appropriately
+      grid % nr = par % npr
+
 !c<<<
 !      write(0,*) '<=== Leaving maille'
 !c>>>
