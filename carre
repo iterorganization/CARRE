@@ -37,7 +37,8 @@ the files carre.log and traduit.log, respectively.
 [ -z "$1" ] && { /bin/echo -e "$Usage"; exit 4; }
 
 # griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${Model_Class-iter}}
-griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${DEVICE-iter}}
+# griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${DEVICE-iter}}
+griddir=${CARRE_GRIDDIR-$SOLPSTOP/data/meshes}
 class=$DEVICE
 indir=${CARRE_INPUTDIR-.}
 stordir=
@@ -51,6 +52,7 @@ grid_stem=$class.carre
     /bin/echo -e "No linking - the input files are assumed to exist in \"$indir\""
     q=p
     qqs=c
+    grid_stem=`ls -ls dg.str | awk '{print $NF}' | xargs basename | sed 's:\.str$::'`
 } || { \
     u="$indir/$1"
     [ -r $u.vrq ] && [ -r $u.str ] && [ -r $u.fld ] & { \
@@ -102,7 +104,7 @@ do {
                 class=${class%/*}
                 class=${class##*/}
             }
-            griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/$class}
+            griddir=${CARRE_GRIDDIR-$SOLPSTOP/data/meshes}
             [ -n "$CARRE_STOREDIR" ] && stordir="$CARRE_STOREDIR/$class"
 
             /bin/echo -e "class = $class\ngriddir = $griddir\nindir = $indir\ngrid_stem = $grid_stem"
@@ -131,23 +133,24 @@ do {
                 }
                 /bin/echo -e dir OK
                 n=1
-                set -- $griddir/$grid_stem.[0-9][0-9][0-9]
+                set -- $griddir/$grid_stem.v[0-9][0-9][0-9].geo
                 [ -f $1 ] && {
-#                    n=`ls $griddir/$grid_stem.[0-9][0-9][0-9] | tail -1`
-		    n=`echo $griddir/$grid_stem.[0-9][0-9][0-9] | awk '{print $NF}'`
-                    n=${n#*/$grid_stem.}
+                    n=`ls $griddir/$grid_stem.v[0-9][0-9][0-9].geo | tail -1`
+#		    n=`echo $griddir/$grid_stem.v[0-9][0-9][0-9].geo | awk '{print $NF}'`
+                    n=${n#*/$grid_stem.v}
+                    n=${n%.geo}
+                    /bin/echo -e "Last grid number found is : $n"
                     let "n = n + 1"
                 }
                 [ ${#n} -lt 2 ] && n=00$n || {
                     [ ${#n} -lt 3 ] && n=0$n
                 }
-                /bin/echo -e "$n"
-                mv -f traduit.out $griddir/$grid_stem.$n && \
-                  /bin/echo -e "The grid is stored as $griddir/$grid_stem.$n"
+                mv -f traduit.out $griddir/$grid_stem.v$n.geo && \
+                  /bin/echo -e "The grid is stored as $griddir/$grid_stem.v$n.geo"
                 touch CARRE.HISTORY
 		echo $user `date +%Y-%m-%d_%H:%M:%S` >> CARRE.HISTORY
 		ls -ls dg.??? | cut -d ' ' -f 9- >> CARRE.HISTORY
-		/bin/echo -e echo "The grid is stored as $griddir/$grid_stem.$n" >> CARRE.HISTORY
+		/bin/echo -e echo "The grid is stored as $griddir/$grid_stem.v$n".geo >> CARRE.HISTORY
                 [ -n "$stordir" ] && {
                   [ -d "$stordir" ] || {
                     [ -a "$stordir" ] && {
@@ -163,7 +166,7 @@ do {
                     }
                   }
                   [ -d "$stordir" ] && {
-                    s="$stordir/$n"
+                    s="$stordir/$grid_stem.v$n"
                     u=y
                     [ -d "$s" ] && {
                       /bin/echo -e "The directory \"$s\" already exists. Use it (y/n)? \c"
@@ -220,15 +223,16 @@ do {
             [ -n "$u" ] && {
                 uu=
                 for n in $u; do
-                  uu="$uu $griddir/$grid_stem.$n"
+                  uu="$uu $griddir/$grid_stem.v$n.geo"
                 done
                 ls -l $uu
                 /bin/echo -e "Do you wish to remove this grid(s)? (y/n): \c"; read u
                 case "$u" in
                   ( y|Y ) rm -f $uu
                           for f in $uu; do {
-                            n=${f#$griddir/$grid_stem.}
-                            [ -d "$stordir/$n" ] && rm -r "$stordir/$n"
+                            n=${f#$griddir/$grid_stem.v}
+                            n=${n%.geo}
+                            [ -d "$stordir/$grid_stem.v$n" ] && rm -r "$stordir/$grid_stem.v$n"
                           }; done ;;
                   (  *  ) ;;
                 esac
