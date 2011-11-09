@@ -240,7 +240,7 @@ c      sur toutes les lignes de niveau de la région de somortpur, sompropo, som
       open(unit=11,status='scratch')
 c
 c  2.1  specify output format
-      write(10,*)'output format: carre70'
+      write(10,*)'output format: carre71'
 
 *
 *..3.0  Read the data

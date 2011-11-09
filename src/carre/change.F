@@ -1,6 +1,7 @@
 ************************************************************************
       SUBROUTINE CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,ient,isor,ifail)
+     .                  pntrat,tgarde,distxo,ient,isor,ifaili,
+     .                  carre_format)
 c
 c  version : 07.07.97 18:38
 c
@@ -20,6 +21,7 @@ cank-970707: dimensions from the file
       INTEGER nptseg(10),repart,npr(nregmx),ient,isor,ifail
       REAL*8 deltp1(10),deltpn(10),deltr1(10),deltrn(10),pntrat
      .       ,tgarde(4),distxo
+      CHARACTER*8 carre_format
 
 *  variables locales
       INTEGER ieg,ierror
@@ -64,11 +66,15 @@ c-langue
         endif
       endif
 c
-c  on trouve la position au debut des parametres quand on lit
+c  on trouve la position du debut des parametres quand on lit
 c  d'un fichier
       if(ient.ne.5) then
    5    continue
         read(ient,2,end=99)vari
+        if(index(vari,'output format').gt.0) then
+          ipos=index(vari,':')
+	  read(vari(ipos+1:ipos+8),'(a8)') carre_format
+        end if
         if(index(vari,'$paramet').eq.0) go to 5
       endif
 

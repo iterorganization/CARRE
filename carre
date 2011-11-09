@@ -117,7 +117,7 @@ do {
     ( s|S )                                               # save the control data:
             cp carre.out carre.dat; q=c; break;;
     ( c|C )                                               # convert:
-            /bin/echo -e "carre.out\n4" | $OBJECTCODE/traduit 2>traduit.log; q=t; break;;
+            /bin/echo -e "carre.out\n2" | $OBJECTCODE/traduit 2>traduit.log; q=t; break;;
     ( t|T )                                               # store the grid:
             [ -r traduit.out ] && {
                 [ -d "$griddir" ] || {

@@ -19,7 +19,8 @@ c  variables locales
       parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1)
       integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx),
      ,        nptseg(10),repart,npr(10),ifail,nx,ny,
-     ,        ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1)
+     ,        ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1),
+     ,        iflag1(npmamx,nrmamx,nregmx),iflag2(npmamx,nrmamx,nregmx)
       real*8 r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx),
      .  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx),
      .  psidym(npmamx,nrmamx,nregmx),deltp1(10),deltpn(10),deltr1(10),
@@ -29,6 +30,7 @@ c  variables locales
      .  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3),
      .  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3)
       character nom*80
+      character carre_format*8
 
 c  procedures
       external limail, change, ecrim1, b2agfz, b2agbb, ecrim2, ecrim3,
@@ -71,12 +73,13 @@ c* 2.   Read the parameters used to create the grid
 
       distxo=1.0e30
       call change(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,nin,nout,ifail)
+     .            pntrat,tgarde,distxo,nin,nout,ifail,
+     .            carre_format)
 
 c* 3.   Read the grid
 
       call limail(nin,nreg,nppol,nprad,r,z,psi,psidxm,psidym,
-     .  npmamx,nrmamx)
+     .  iflag1,iflag2,npmamx,nrmamx,carre_format)
 
 c* 4.   Select the output format
 
