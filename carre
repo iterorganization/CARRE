@@ -140,7 +140,6 @@ do {
                     n=${n#*/$grid_stem.v}
                     n=${n%.geo}
                     /bin/echo -e "Last grid number found is : $n"
-                    /bin/echo -e "Last grid number found is : $n"
                     let "n = n + 1"
                 }
                 [ ${#n} -lt 2 ] && n=00$n || {
