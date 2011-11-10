@@ -229,9 +229,10 @@ listobj:
 LISTOBJ: listobj
 
 ${OBJECTCODE}/dependencies.${OBJECTCODE}.include:
-	-mkdir ${OBJECTCODE}
+	-mkdir -p ${OBJECTCODE}
 	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
 	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}.use
+	${MAKE} listobj
 	${MAKE} depend
 ${OBJECTCODE}/dependencies.${OBJECTCODE}.use: ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
 

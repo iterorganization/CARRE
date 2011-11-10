@@ -1063,6 +1063,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
+            b2cflag(ix,iy,:)=cflag(ipol+1,irad,ireg,:)
           end do      ! }
         end do
 !  private region: left side
@@ -1095,6 +1096,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
           end do      ! }
         end do
 !  central region
@@ -1127,6 +1129,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
           end do      ! }
         end do
 !  private region: right side
@@ -1159,6 +1162,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
           end do      ! }
         end do
 !  periphery
@@ -1241,6 +1245,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
+            b2cflag(ix,iy,:)=cflag(ipol+1,irad,ireg,:)
           end do      ! }
         end do
 !  central region
@@ -1273,6 +1278,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
           end do      ! }
         end do
 !  periphery

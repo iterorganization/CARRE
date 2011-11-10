@@ -145,7 +145,7 @@
              & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
-        call ecrim2(nfin,nx,ny,crx,cry,bb,b2cflag,nxmx,nymx)
+        call ecrim2(nfin,nx,ny,crx,cry,fpsi,bb,b2cflag,nxmx,nymx)
 !
 ! Original SONNET/DIVIMP format
 !
