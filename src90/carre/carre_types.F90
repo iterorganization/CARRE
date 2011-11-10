@@ -47,7 +47,8 @@ module carre_types
   integer, parameter, public :: EQU_EXTENSION_MODE_VESSEL = 2
 
   type CarreParameters
-!.. nptseg: number of points along differents segments of separatrix
+!.. nptseg: number of points along differents segments of separatrix (as given
+!..         in input file carre.dat. See also CarreGrid%nptseg)
 !.. repart: selector for the radial point distribution
 !           1=absolute distance, 2=difference in psi
 !.. tgarde: guard length for each divertor target
@@ -57,8 +58,8 @@ module carre_types
 !.. deltp1,deltpn: values of the first and last intervals for each sep.
 !.. deltr1,deltrn: values of the first and last intervals for each reg.
 
-      INTEGER nptseg(10),repart,npr(nregmx)
-      REAL*8 deltp1(10),deltpn(10),deltr1(10),deltrn(10),pntrat, & 
+      INTEGER :: nptseg(nsepsegmx),repart,npr(nregmx)
+      REAL*8 deltp1(nsepsegmx),deltpn(nsepsegmx),deltr1(nsepsegmx),deltrn(nsepsegmx),pntrat, & 
      &       tgarde(4)
 
 !.. cstlin: a linear constant added along y to artificially disconnect
@@ -159,8 +160,12 @@ module carre_types
 !.. xn,yn : working array for coordinates along a parametrised curve
 !.. psim : value of psi interpolated to grid points
 !.. psidxm, psidym: grad psi interpolated to grid points
-          integer :: nreg, np1(nregmx), nr(nregmx)
+!.. nptseg: number of points along differents segments of separatrix (as resulting
+!           from the grid generation/postprocessing algorithm). Might differ
+!           from the input values in carre.dat/CarreParameters%nptseg.
 
+          integer :: nreg, np1(nregmx), nr(nregmx)
+          INTEGER :: nptseg(nsepsegmx)
           REAL*8  & 
                & xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
                & ymail(npmamx,nrmamx,nregmx), &
@@ -168,6 +173,10 @@ module carre_types
                & psidym(npmamx,nrmamx,nregmx)
           
           REAL*8, dimension(npmamx-1,nrmamx-1,nregmx) :: hx, hy
+
+          ! For every radial line in every region, store from which
+          ! separatrix segment this radial line emanates
+          integer :: radLineSepSeg(npmamx,nregmx)
 
           ! Logical flag for face/structure intersection. True means
           ! the specific face is intersected by a structure segment.

@@ -3,7 +3,9 @@
       integer, parameter :: nxmax=1025,  nymax=1025, npstmx=1200, &
      &          npnimx=5000, &
      &          npxmx=4   , strumx=60  ,  nivmx=8  , nbdmx=8 , &
-     &          gradmx=100  , npmamx=500 , nrmamx=200, nregmx=6
+     &          gradmx=100  , npmamx=500 , nrmamx=200, nregmx=6, &
+     &          nsepsegmx = 10
+
 
 !     AUTOCONTINUE=.true. will skip questions when failing to converge
 #ifdef EUITM
@@ -29,6 +31,7 @@
 !***  npnimx      : max. number of points in the tracing curve (?)
 !***                (for curves tracing contour lines)
 !***  nbdmx       : max. number of divertor plates (?)
+!***  nsepsegmx   : max. number of separatrix segments
 !***
 !.. npnimx: nombre maximum de points dans une courbe quelconque a
 !           tracer.

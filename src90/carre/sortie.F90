@@ -112,7 +112,7 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
   101    FORMAT('pntrat =',F11.8)
 
          DO 10 isep=1, equ%nsep
-            WRITE(10,102)isep,par%nptseg(isep),isep,par%deltp1(isep),isep, & 
+            WRITE(10,102)isep,grid%nptseg(isep),isep,par%deltp1(isep),isep, & 
      &                par%deltpn(isep)
   102       FORMAT('nptseg(',I1,') =',I3/'deltp1(',I1,') =',F10.7/ & 
      &          'deltpn(',I1,') =',F10.7)

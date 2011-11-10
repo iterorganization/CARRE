@@ -603,6 +603,9 @@ contains
 
     logical :: refineFace(2,npmamx,nrmamx,nregmx)
     double precision :: px, py
+    
+    logical, dimension(nsepsegmx) :: sepSegUpdated ! work array to track which par
+
 
     ! Map from original grid indices (1:grid%np(iReg), 1:grid%nr(iReg))
     ! to current grid situation (with added radial lines)
@@ -713,8 +716,9 @@ contains
                     ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
                     !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
                     ! is inaccurate and will be recomputed 
+                    sepSegUpdated(:) = .false.
                     call addRadialLine( equ, struct, grid, &
-                         & iReg, &
+                         & iReg, sepSegUpdated, &
                          & grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg), &
                          & grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg), &
                          & recomputeIntersection = .true., &
@@ -763,7 +767,7 @@ contains
   !> Optionally, the indices of the face (ip,ir) can be given, where
   !> (iFcP,iFcR) is the left point (start point) of the face. 
   recursive subroutine addRadialLine( equ, struct, grid, &
-       & iReg, &
+       & iReg, sepSegUpdated, &
        & px, py, &
        & recomputeIntersection, &
        & iFcR, iRegOrigin )
@@ -771,6 +775,7 @@ contains
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
     integer, intent(in) :: iReg
+    logical, dimension(nsepsegmx), intent(inout) :: sepSegUpdated
     double precision, intent(in) :: px, py
     logical, intent(in), optional :: recomputeIntersection
     integer, intent(in), optional :: iFcR, iRegOrigin
@@ -845,6 +850,17 @@ contains
     grid%xmail(liFcP + 1, liFcR, iReg) = newPx
     grid%ymail(liFcP + 1, liFcR, iReg) = newPy
 
+    ! Update the number of points on the separatrix segment associated with the radial
+    ! cell strip we are refining.
+    if ( .not. sepSegUpdated(grid%radLineSepSeg(liFcP,iReg)) ) then
+        grid%nptseg(grid%radLineSepSeg(liFcP,iReg)) = grid%nptseg(grid%radLineSepSeg(liFcP,iReg)) + 1
+        sepSegUpdated(grid%radLineSepSeg(liFcP,iReg)) = .true.
+    end if
+
+    ! ...and set pointer to separatrix segment this line emanates from
+    grid%radLineSepSeg(liFcP + 2 : grid%np1(iReg) + 1, iReg) = &
+         & grid%radLineSepSeg(liFcP + 1 : grid%np1(iReg), iReg)
+    grid%radLineSepSeg(liFcP + 1, iReg) = grid%radLineSepSeg(liFcP, iReg)
 
 #ifdef USE_SILO
     ! Debug output
@@ -929,7 +945,7 @@ contains
             call logmsg(LOGDEBUGBULK,  'addRadialLine: region '//int2str(iReg)&
                  &//' extending into region '//int2str(iRegOther) )
             call addRadialLine( equ, struct, grid, &
-                 & iRegOther, &
+                 & iRegOther, sepSegUpdated, &
                  & grid%xmail(liFcP+1, 1, iReg), &
                  & grid%ymail(liFcP+1, 1, iReg), &
                  & recomputeIntersection = .false., &
@@ -949,7 +965,7 @@ contains
             call logmsg(LOGDEBUGBULK,  'addRadialLine: region '//int2str(iReg)&
                  &//' extending into region '//int2str(iRegOther) )
             call addRadialLine( equ, struct, grid, &
-                 & iRegOther, &
+                 & iRegOther, sepSegUpdated, &
                  & grid%xmail(liFcP+1, grid%nr(iReg), iReg), &
                  & grid%ymail(liFcP+1, grid%nr(iReg), iReg), &
                  & recomputeIntersection = .false., &
@@ -1185,10 +1201,14 @@ contains
     ! internal
     integer :: iReg, ip, ir, np
     logical :: removeRadialLine(npmamx,nregmx), removeable
+    logical :: sepSegsDelta(nsepsegmx)
+    
 
     ! Figure out what radial grid lines have to be removed
     ! to remove excessively fine cells
+    ! Also compute how many points are removed from every separatrix segment by this
     removeRadialLine = .false.
+    sepSegsDelta = 0
     do iReg = 1, grid%nreg
         do ip = 1, grid%np1(iReg) - 1
             do ir = 1, grid%nr(iReg) - 1
@@ -1211,6 +1231,7 @@ contains
     end do
 
     ! Remove lines region by region
+    ! FIXME: do accounting for separatrix segments
     do iReg = 1, grid%nreg
         np = 0
         do ip = 1, grid%np1(iReg)
@@ -1224,10 +1245,14 @@ contains
         grid%np1(iReg) = np
     end do
 
+    ! update number of points on separatrix segments
+    grid%nptseg = grid%nptseg - sepSegsDelta
+
   contains
 
     ! Check whether the radial line going through ir, ireg can be removed, and 
     ! if yes, mark it to be removed in array removeRadialLine for all regions.
+    ! Also note the indices of the separatrix segments to update
     subroutine markRadialLine(ip, iReg, removeable) 
       integer, intent(in) :: ip, ireg
       logical, intent(out) :: removeable
@@ -1236,13 +1261,20 @@ contains
       integer :: iContinue, iRegOther, ipOther, irOther, i
       integer :: ipRegions(grid%nreg)
       double precision :: xBnd, yBnd
+      logical :: updateSegSegs(nsepsegmx)
 
       removeable = .false.
       ipRegions = GRID_UNDEFINED
 
+      ! already marked for removal?
+      if ( removeRadialLine(ip, ireg) ) return
+
+      updateSegSegs = .false.
+
       ! origin region
       if ( grid%lineFlagRad(ip, ireg) == GRIDLINE_REQUIRED ) return
       ipRegions(iReg) = ip
+      updateSegSegs( grid%radLineSepSeg(ip, iReg) ) = .true.
 
       ! continuation in other regions
       do iContinue = 1, 2
@@ -1261,6 +1293,7 @@ contains
               if (ipOther /= GRID_UNDEFINED) then
                   if ( grid%lineFlagRad(ipOther, ireg) == GRIDLINE_REQUIRED ) return
                   ipRegions(iRegOther) = ipOther
+                  updateSegSegs( grid%radLineSepSeg(ipOther, iRegOther) ) = .true.
               end if
           end do
       end do
@@ -1270,6 +1303,11 @@ contains
       do i = 1, grid%nreg
           if (ipRegions(i) /= GRID_UNDEFINED) &
                & removeRadialLine(ipRegions(i), i) = .true.
+      end do
+
+      ! Update point deltas for separatrix segments touched by removing this radial line
+      do i = 1, nsepsegmx
+          if ( updateSegSegs(i) ) sepSegsDelta(i) = sepSegsDelta(i) + 1
       end do
 
     end subroutine markRadialLine
