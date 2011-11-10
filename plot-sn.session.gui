@@ -26,13 +26,13 @@
             <Field name="defaultOrientation" type="int">0</Field>
         </Object>
         <Object name="Annotation">
-            <Field name="x" type="int">1109</Field>
+            <Field name="x" type="int">366</Field>
             <Field name="y" type="int">25</Field>
             <Field name="width" type="int">490</Field>
             <Field name="height" type="int">700</Field>
             <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
-            <Field name="activeTab" type="int">5</Field>
+            <Field name="activeTab" type="int">0</Field>
         </Object>
         <Field name="postWhenShown" type="bool">false</Field>
         <Object name="Color tables">
@@ -45,22 +45,22 @@
             <Field name="currentColorTable" type="string">cellflag</Field>
         </Object>
         <Object name="File open">
-            <Field name="x" type="int">190</Field>
-            <Field name="y" type="int">566</Field>
+            <Field name="x" type="int">191</Field>
+            <Field name="y" type="int">591</Field>
             <Field name="width" type="int">534</Field>
             <Field name="height" type="int">427</Field>
             <Field name="visible" type="bool">false</Field>
         </Object>
         <Object name="Information">
-            <Field name="x" type="int">320</Field>
-            <Field name="y" type="int">702</Field>
+            <Field name="x" type="int">321</Field>
+            <Field name="y" type="int">727</Field>
             <Field name="width" type="int">411</Field>
             <Field name="height" type="int">291</Field>
-            <Field name="visible" type="bool">true</Field>
+            <Field name="visible" type="bool">false</Field>
         </Object>
         <Object name="Pick">
-            <Field name="x" type="int">1260</Field>
-            <Field name="y" type="int">172</Field>
+            <Field name="x" type="int">1261</Field>
+            <Field name="y" type="int">197</Field>
             <Field name="width" type="int">338</Field>
             <Field name="height" type="int">821</Field>
             <Field name="visible" type="bool">false</Field>
@@ -77,22 +77,22 @@
             <Field name="SPLITTER_VALUES_V2" type="floatVector">0 0.543046 0.452539 </Field>
         </Object>
         <Object name="Mesh plot attributes">
-            <Field name="x" type="int">174</Field>
-            <Field name="y" type="int">490</Field>
+            <Field name="x" type="int">164</Field>
+            <Field name="y" type="int">396</Field>
             <Field name="width" type="int">338</Field>
             <Field name="height" type="int">528</Field>
             <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
         </Object>
         <Object name="Pseudocolor plot attributes">
-            <Field name="x" type="int">1191</Field>
-            <Field name="y" type="int">419</Field>
+            <Field name="x" type="int">1192</Field>
+            <Field name="y" type="int">444</Field>
             <Field name="width" type="int">408</Field>
             <Field name="height" type="int">599</Field>
             <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
         </Object>
-        <Field name="plotDatabases" type="stringVector">"localhost:/scratch/hmk/svn/carre-hmk/carrePostPrcA*.silo database" "localhost:/scratch/hmk/svn/carre-hmk/carreFinal00000.silo" </Field>
+        <Field name="plotDatabases" type="stringVector">"localhost:/scratch/hmk/svn/carre-hmk/carreFinal00000.silo" </Field>
         <Object name="TimeFormat">
             <Field name="displayMode" type="string">Cycles</Field>
             <Field name="precision" type="int">5</Field>

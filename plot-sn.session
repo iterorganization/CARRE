@@ -426,8 +426,68 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
+                    <Field name="name" type="string">operators/ConnectedComponents/separatrix_xpoint1_branch1</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">ConnectedComponents</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/ConnectedComponents/separatrix_xpoint1_branch2</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">ConnectedComponents</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/ConnectedComponents/separatrix_xpoint1_branch4</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch4, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">ConnectedComponents</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
                     <Field name="name" type="string">operators/ConnectedComponents/structure</Field>
                     <Field name="definition" type="string">"cell_constant(structure, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">ConnectedComponents</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/ConnectedComponents/structure_1</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_1, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">ConnectedComponents</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/ConnectedComponents/structure_2</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_2, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -882,6 +942,114 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/1D/separatrix_xpoint1_branch1</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">CurveMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/2D/separatrix_xpoint1_branch1</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/3D/separatrix_xpoint1_branch1</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/1D/separatrix_xpoint1_branch2</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">CurveMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/2D/separatrix_xpoint1_branch2</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/3D/separatrix_xpoint1_branch2</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/1D/separatrix_xpoint1_branch4</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch4, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">CurveMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/2D/separatrix_xpoint1_branch4</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch4, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/3D/separatrix_xpoint1_branch4</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch4, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
                     <Field name="name" type="string">operators/DataBinning/1D/structure</Field>
                     <Field name="definition" type="string">"cell_constant(structure, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -908,6 +1076,78 @@
                 <Object name="Expression">
                     <Field name="name" type="string">operators/DataBinning/3D/structure</Field>
                     <Field name="definition" type="string">"cell_constant(structure, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/1D/structure_1</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_1, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">CurveMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/2D/structure_1</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_1, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/3D/structure_1</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_1, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/1D/structure_2</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_2, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">CurveMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/2D/structure_2</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_2, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/3D/structure_2</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_2, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -1290,8 +1530,68 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
+                    <Field name="name" type="string">operators/Flux/separatrix_xpoint1_branch1</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">Flux</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/Flux/separatrix_xpoint1_branch2</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">Flux</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/Flux/separatrix_xpoint1_branch4</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch4, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">Flux</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
                     <Field name="name" type="string">operators/Flux/structure</Field>
                     <Field name="definition" type="string">"cell_constant(structure, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">Flux</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/Flux/structure_1</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_1, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">Flux</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/Flux/structure_2</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_2, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -3810,8 +4110,68 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
+                    <Field name="name" type="string">operators/SurfaceNormal/separatrix_xpoint1_branch1</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">VectorMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">SurfaceNormal</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/SurfaceNormal/separatrix_xpoint1_branch2</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">VectorMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">SurfaceNormal</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/SurfaceNormal/separatrix_xpoint1_branch4</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch4, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">VectorMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">SurfaceNormal</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
                     <Field name="name" type="string">operators/SurfaceNormal/structure</Field>
                     <Field name="definition" type="string">"cell_constant(structure, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">VectorMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">SurfaceNormal</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/SurfaceNormal/structure_1</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_1, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">VectorMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">SurfaceNormal</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/SurfaceNormal/structure_2</Field>
+                    <Field name="definition" type="string">"cell_constant(structure_2, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">VectorMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -4357,7 +4717,7 @@
                 <Field name="rangeScale" type="int">0</Field>
             </Object>
             <Object name="View2DAttributes">
-                <Field name="windowCoords" type="doubleArray" length="4">1.99594 3.26067 -1.86542 -0.919325 </Field>
+                <Field name="windowCoords" type="doubleArray" length="4">0.832416 2.40262 -1.31971 1.50032 </Field>
                 <Field name="viewportCoords" type="doubleArray" length="4">0.2 0.95 0.15 0.95 </Field>
                 <Field name="fullFrameActivationMode" type="string">Auto</Field>
                 <Field name="fullFrameAutoThreshold" type="double">100</Field>
@@ -7072,11 +7432,9 @@
         <Object name="ViewerSubject">
             <Object name="SourceMap">
                 <Field name="SOURCE00" type="string">localhost:/scratch/hmk/svn/carre-hmk/carreFinal00000.silo</Field>
-                <Field name="SOURCE01" type="string">"localhost:/scratch/hmk/svn/carre-hmk/carrePostPrcA*.silo database"</Field>
             </Object>
             <Object name="SourcePlugins">
                 <Field name="localhost:/scratch/hmk/svn/carre-hmk/carreFinal00000.silo" type="string">Silo_1.0</Field>
-                <Field name="localhost:/scratch/hmk/svn/carre-hmk/carrePostPrcA*.silo database" type="string">Silo_1.0</Field>
             </Object>
             <Object name="DatabaseCorrelationList">
                 <Field name="needPermission" type="bool">true</Field>
@@ -7430,7 +7788,7 @@
                                     <Field name="italic" type="bool">false</Field>
                                 </Object>
                             </Object>
-                            <Field name="databaseInfoFlag" type="bool">true</Field>
+                            <Field name="databaseInfoFlag" type="bool">false</Field>
                             <Object name="databaseInfoFont">
                                 <Object name="FontAttributes">
                                     <Field name="font" type="string">Arial</Field>
@@ -7448,7 +7806,7 @@
                             <Field name="databaseInfoExpansionMode" type="string">File</Field>
                             <Field name="databaseInfoTimeScale" type="double">1</Field>
                             <Field name="databaseInfoTimeOffset" type="double">0</Field>
-                            <Field name="legendInfoFlag" type="bool">true</Field>
+                            <Field name="legendInfoFlag" type="bool">false</Field>
                             <Object name="backgroundColor">
                                 <Object name="ColorAttribute">
                                     <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
@@ -7688,7 +8046,7 @@
                             <Field name="rangeScale" type="int">0</Field>
                         </Object>
                         <Object name="View2DAttributes">
-                            <Field name="windowCoords" type="doubleArray" length="4">1.99594 3.26067 -1.86542 -0.919325 </Field>
+                            <Field name="windowCoords" type="doubleArray" length="4">0.832416 2.40262 -1.31971 1.50032 </Field>
                             <Field name="viewportCoords" type="doubleArray" length="4">0.2 0.95 0.15 0.95 </Field>
                             <Field name="fullFrameActivationMode" type="string">Auto</Field>
                             <Field name="fullFrameAutoThreshold" type="double">100</Field>
@@ -7719,186 +8077,6 @@
                             <Field name="viewportCoords" type="doubleArray" length="4">0.15 0.9 0.1 0.85 </Field>
                         </Object>
                         <Object name="AnnotationObjectList">
-                            <Object name="AnnotationObject">
-                                <Field name="objectName" type="string">Plot0000</Field>
-                                <Field name="objectType" type="string">LegendAttributes</Field>
-                                <Field name="visible" type="bool">true</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="position" type="doubleArray" length="3">0.05 0.9 9.72541e-317 </Field>
-                                <Field name="position2" type="doubleArray" length="3">1 1 0.05 </Field>
-                                <Object name="textColor">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="useForegroundForTextColor" type="bool">true</Field>
-                                <Object name="color1">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 50 </Field>
-                                    </Object>
-                                </Object>
-                                <Object name="color2">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="text" type="stringVector">"%# -9.4g" </Field>
-                                <Field name="fontFamily" type="string">Arial</Field>
-                                <Field name="fontBold" type="bool">false</Field>
-                                <Field name="fontItalic" type="bool">false</Field>
-                                <Field name="fontShadow" type="bool">false</Field>
-                                <Field name="doubleAttribute1" type="double">0.015</Field>
-                                <Field name="intAttribute1" type="int">993</Field>
-                                <Field name="intAttribute2" type="int">5</Field>
-                                <Field name="intAttribute3" type="int">0</Field>
-                                <Field name="doubleVector1" type="doubleVector"></Field>
-                                <Field name="stringVector1" type="stringVector"></Field>
-                                <Field name="stringVector2" type="stringVector"></Field>
-                            </Object>
-                            <Object name="AnnotationObject">
-                                <Field name="objectName" type="string">Plot0002</Field>
-                                <Field name="objectType" type="string">LegendAttributes</Field>
-                                <Field name="visible" type="bool">true</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="position" type="doubleArray" length="3">0.05 0.9 1.11001e-316 </Field>
-                                <Field name="position2" type="doubleArray" length="3">1 1 0.05 </Field>
-                                <Object name="textColor">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="useForegroundForTextColor" type="bool">true</Field>
-                                <Object name="color1">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 50 </Field>
-                                    </Object>
-                                </Object>
-                                <Object name="color2">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="text" type="stringVector">"%# -9.4g" </Field>
-                                <Field name="fontFamily" type="string">Arial</Field>
-                                <Field name="fontBold" type="bool">false</Field>
-                                <Field name="fontItalic" type="bool">false</Field>
-                                <Field name="fontShadow" type="bool">false</Field>
-                                <Field name="doubleAttribute1" type="double">0.015</Field>
-                                <Field name="intAttribute1" type="int">993</Field>
-                                <Field name="intAttribute2" type="int">5</Field>
-                                <Field name="intAttribute3" type="int">0</Field>
-                                <Field name="doubleVector1" type="doubleVector"></Field>
-                                <Field name="stringVector1" type="stringVector"></Field>
-                                <Field name="stringVector2" type="stringVector"></Field>
-                            </Object>
-                            <Object name="AnnotationObject">
-                                <Field name="objectName" type="string">Plot0003</Field>
-                                <Field name="objectType" type="string">LegendAttributes</Field>
-                                <Field name="visible" type="bool">true</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="position" type="doubleArray" length="3">0.05 0.9 3.66451e-317 </Field>
-                                <Field name="position2" type="doubleArray" length="3">1 1 0.05 </Field>
-                                <Object name="textColor">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="useForegroundForTextColor" type="bool">true</Field>
-                                <Object name="color1">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 50 </Field>
-                                    </Object>
-                                </Object>
-                                <Object name="color2">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="text" type="stringVector">"%# -9.4g" </Field>
-                                <Field name="fontFamily" type="string">Arial</Field>
-                                <Field name="fontBold" type="bool">false</Field>
-                                <Field name="fontItalic" type="bool">false</Field>
-                                <Field name="fontShadow" type="bool">false</Field>
-                                <Field name="doubleAttribute1" type="double">0.015</Field>
-                                <Field name="intAttribute1" type="int">993</Field>
-                                <Field name="intAttribute2" type="int">5</Field>
-                                <Field name="intAttribute3" type="int">0</Field>
-                                <Field name="doubleVector1" type="doubleVector"></Field>
-                                <Field name="stringVector1" type="stringVector"></Field>
-                                <Field name="stringVector2" type="stringVector"></Field>
-                            </Object>
-                            <Object name="AnnotationObject">
-                                <Field name="objectName" type="string">Plot0004</Field>
-                                <Field name="objectType" type="string">LegendAttributes</Field>
-                                <Field name="visible" type="bool">true</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="position" type="doubleArray" length="3">0.05 0.9 1.93444e-316 </Field>
-                                <Field name="position2" type="doubleArray" length="3">1 1 0.05 </Field>
-                                <Object name="textColor">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="useForegroundForTextColor" type="bool">true</Field>
-                                <Object name="color1">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 50 </Field>
-                                    </Object>
-                                </Object>
-                                <Object name="color2">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="text" type="stringVector">"%# -9.4g" </Field>
-                                <Field name="fontFamily" type="string">Arial</Field>
-                                <Field name="fontBold" type="bool">false</Field>
-                                <Field name="fontItalic" type="bool">false</Field>
-                                <Field name="fontShadow" type="bool">false</Field>
-                                <Field name="doubleAttribute1" type="double">0.015</Field>
-                                <Field name="intAttribute1" type="int">993</Field>
-                                <Field name="intAttribute2" type="int">5</Field>
-                                <Field name="intAttribute3" type="int">0</Field>
-                                <Field name="doubleVector1" type="doubleVector"></Field>
-                                <Field name="stringVector1" type="stringVector"></Field>
-                                <Field name="stringVector2" type="stringVector"></Field>
-                            </Object>
-                            <Object name="AnnotationObject">
-                                <Field name="objectName" type="string">Plot0005</Field>
-                                <Field name="objectType" type="string">LegendAttributes</Field>
-                                <Field name="visible" type="bool">true</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="position" type="doubleArray" length="3">0.05 0.9 2.57203e-316 </Field>
-                                <Field name="position2" type="doubleArray" length="3">1 1 0.05 </Field>
-                                <Object name="textColor">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="useForegroundForTextColor" type="bool">true</Field>
-                                <Object name="color1">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 50 </Field>
-                                    </Object>
-                                </Object>
-                                <Object name="color2">
-                                    <Object name="ColorAttribute">
-                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                    </Object>
-                                </Object>
-                                <Field name="text" type="stringVector">"%# -9.4g" </Field>
-                                <Field name="fontFamily" type="string">Arial</Field>
-                                <Field name="fontBold" type="bool">false</Field>
-                                <Field name="fontItalic" type="bool">false</Field>
-                                <Field name="fontShadow" type="bool">false</Field>
-                                <Field name="doubleAttribute1" type="double">0.015</Field>
-                                <Field name="intAttribute1" type="int">993</Field>
-                                <Field name="intAttribute2" type="int">5</Field>
-                                <Field name="intAttribute3" type="int">0</Field>
-                                <Field name="doubleVector1" type="doubleVector"></Field>
-                                <Field name="stringVector1" type="stringVector"></Field>
-                                <Field name="stringVector2" type="stringVector"></Field>
-                            </Object>
                             <Object name="AnnotationObject">
                                 <Field name="objectName" type="string">Plot0006</Field>
                                 <Field name="objectType" type="string">LegendAttributes</Field>
@@ -8083,8 +8261,8 @@
                                 <Field name="objectName" type="string">Plot0012</Field>
                                 <Field name="objectType" type="string">LegendAttributes</Field>
                                 <Field name="visible" type="bool">true</Field>
-                                <Field name="active" type="bool">true</Field>
-                                <Field name="position" type="doubleArray" length="3">0.05 0.9 4.99232e-316 </Field>
+                                <Field name="active" type="bool">false</Field>
+                                <Field name="position" type="doubleArray" length="3">0.05 0.9 0 </Field>
                                 <Field name="position2" type="doubleArray" length="3">1 1 0.05 </Field>
                                 <Object name="textColor">
                                     <Object name="ColorAttribute">
@@ -8111,7 +8289,43 @@
                                 <Field name="intAttribute1" type="int">993</Field>
                                 <Field name="intAttribute2" type="int">5</Field>
                                 <Field name="intAttribute3" type="int">0</Field>
-                                <Field name="doubleVector1" type="doubleVector">0 1.5 3 4.5 6 </Field>
+                                <Field name="doubleVector1" type="doubleVector"></Field>
+                                <Field name="stringVector1" type="stringVector">"" "" "" "" "" </Field>
+                                <Field name="stringVector2" type="stringVector"></Field>
+                            </Object>
+                            <Object name="AnnotationObject">
+                                <Field name="objectName" type="string">Plot0013</Field>
+                                <Field name="objectType" type="string">LegendAttributes</Field>
+                                <Field name="visible" type="bool">true</Field>
+                                <Field name="active" type="bool">true</Field>
+                                <Field name="position" type="doubleArray" length="3">0.05 0.9 1.13603e-316 </Field>
+                                <Field name="position2" type="doubleArray" length="3">1 1 0.05 </Field>
+                                <Object name="textColor">
+                                    <Object name="ColorAttribute">
+                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
+                                    </Object>
+                                </Object>
+                                <Field name="useForegroundForTextColor" type="bool">true</Field>
+                                <Object name="color1">
+                                    <Object name="ColorAttribute">
+                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 50 </Field>
+                                    </Object>
+                                </Object>
+                                <Object name="color2">
+                                    <Object name="ColorAttribute">
+                                        <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
+                                    </Object>
+                                </Object>
+                                <Field name="text" type="stringVector">"%# -9.4g" </Field>
+                                <Field name="fontFamily" type="string">Arial</Field>
+                                <Field name="fontBold" type="bool">false</Field>
+                                <Field name="fontItalic" type="bool">false</Field>
+                                <Field name="fontShadow" type="bool">false</Field>
+                                <Field name="doubleAttribute1" type="double">0.015</Field>
+                                <Field name="intAttribute1" type="int">993</Field>
+                                <Field name="intAttribute2" type="int">5</Field>
+                                <Field name="intAttribute3" type="int">0</Field>
+                                <Field name="doubleVector1" type="doubleVector"></Field>
                                 <Field name="stringVector1" type="stringVector"></Field>
                                 <Field name="stringVector2" type="stringVector"></Field>
                             </Object>
@@ -8126,582 +8340,9 @@
                         </Object>
                         <Object name="ViewerPlotList">
                             <Object name="timeSliders">
-                                <Field name="SOURCE01" type="int">8</Field>
+                                <Field name="localhost:/scratch/hmk/svn/carre-hmk/carrePostPrcA*.silo database" type="int">8</Field>
                             </Object>
-                            <Field name="activeTimeSlider" type="string">SOURCE01</Field>
                             <Object name="plot00">
-                                <Field name="plotName" type="string">Plot0000</Field>
-                                <Field name="pluginID" type="string">Mesh_1.0</Field>
-                                <Field name="sourceID" type="string">SOURCE01</Field>
-                                <Field name="variableName" type="string">region1</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="hidden" type="bool">true</Field>
-                                <Field name="realized" type="bool">true</Field>
-                                <Object name="ViewerPlot">
-                                    <Field name="plotDescription" type="string"></Field>
-                                    <Field name="cacheIndex" type="int">8</Field>
-                                    <Field name="spatialExtentsType" type="string">AVT_ORIGINAL_EXTENTS</Field>
-                                    <Field name="bgColor" type="doubleArray" length="3">1 1 1 </Field>
-                                    <Field name="fgColor" type="doubleArray" length="3">0 0 0 </Field>
-                                    <Field name="expandedFlag" type="bool">false</Field>
-                                    <Field name="followsTime" type="bool">true</Field>
-                                    <Object name="MeshAttributes">
-                                        <Field name="legendFlag" type="bool">true</Field>
-                                        <Field name="lineStyle" type="int">0</Field>
-                                        <Field name="lineWidth" type="int">0</Field>
-                                        <Object name="meshColor">
-                                            <Object name="ColorAttribute">
-                                                <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                            </Object>
-                                        </Object>
-                                        <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                        <Field name="errorTolerance" type="double">0.01</Field>
-                                        <Field name="meshColorSource" type="string">Foreground</Field>
-                                        <Field name="opaqueColorSource" type="string">Background</Field>
-                                        <Field name="opaqueMode" type="string">Auto</Field>
-                                        <Field name="pointSize" type="double">0.05</Field>
-                                        <Object name="opaqueColor">
-                                            <Object name="ColorAttribute">
-                                                <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                            </Object>
-                                        </Object>
-                                        <Field name="smoothingLevel" type="string">None</Field>
-                                        <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                        <Field name="pointSizeVar" type="string">default</Field>
-                                        <Field name="pointType" type="string">Point</Field>
-                                        <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                        <Field name="showInternal" type="bool">false</Field>
-                                        <Field name="pointSizePixels" type="int">2</Field>
-                                        <Field name="opacity" type="double">1</Field>
-                                    </Object>
-                                    <Object name="plotKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 8 </Field>
-                                            <Object name="attributes">
-                                                <Object name="MeshAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">0</Field>
-                                                    <Object name="meshColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                                    <Field name="errorTolerance" type="double">0.01</Field>
-                                                    <Field name="meshColorSource" type="string">Foreground</Field>
-                                                    <Field name="opaqueColorSource" type="string">Background</Field>
-                                                    <Field name="opaqueMode" type="string">Auto</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Object name="opaqueColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="smoothingLevel" type="string">None</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                                    <Field name="showInternal" type="bool">false</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                </Object>
-                                                <Object name="MeshAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">0</Field>
-                                                    <Object name="meshColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                                    <Field name="errorTolerance" type="double">0.01</Field>
-                                                    <Field name="meshColorSource" type="string">Foreground</Field>
-                                                    <Field name="opaqueColorSource" type="string">Background</Field>
-                                                    <Field name="opaqueMode" type="string">Auto</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Object name="opaqueColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="smoothingLevel" type="string">None</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                                    <Field name="showInternal" type="bool">false</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="databaseKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 20 </Field>
-                                            <Object name="attributes">
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">0</Field>
-                                                </Object>
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">20</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="CompactSILRestrictionAttributes">
-                                        <Field name="useSet" type="unsignedCharVector">2 2 </Field>
-                                        <Field name="topSet" type="string">region1</Field>
-                                    </Object>
-                                    <Field name="namedSelection" type="string"></Field>
-                                </Object>
-                            </Object>
-                            <Object name="plot01">
-                                <Field name="plotName" type="string">Plot0002</Field>
-                                <Field name="pluginID" type="string">Mesh_1.0</Field>
-                                <Field name="sourceID" type="string">SOURCE01</Field>
-                                <Field name="variableName" type="string">region2</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="hidden" type="bool">true</Field>
-                                <Field name="realized" type="bool">true</Field>
-                                <Object name="ViewerPlot">
-                                    <Field name="plotDescription" type="string"></Field>
-                                    <Field name="cacheIndex" type="int">8</Field>
-                                    <Field name="spatialExtentsType" type="string">AVT_ORIGINAL_EXTENTS</Field>
-                                    <Field name="bgColor" type="doubleArray" length="3">1 1 1 </Field>
-                                    <Field name="fgColor" type="doubleArray" length="3">0 0 0 </Field>
-                                    <Field name="expandedFlag" type="bool">false</Field>
-                                    <Field name="followsTime" type="bool">true</Field>
-                                    <Object name="MeshAttributes">
-                                        <Field name="legendFlag" type="bool">true</Field>
-                                        <Field name="lineStyle" type="int">0</Field>
-                                        <Field name="lineWidth" type="int">0</Field>
-                                        <Object name="meshColor">
-                                            <Object name="ColorAttribute">
-                                                <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                            </Object>
-                                        </Object>
-                                        <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                        <Field name="errorTolerance" type="double">0.01</Field>
-                                        <Field name="meshColorSource" type="string">Foreground</Field>
-                                        <Field name="opaqueColorSource" type="string">Background</Field>
-                                        <Field name="opaqueMode" type="string">Auto</Field>
-                                        <Field name="pointSize" type="double">0.05</Field>
-                                        <Object name="opaqueColor">
-                                            <Object name="ColorAttribute">
-                                                <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                            </Object>
-                                        </Object>
-                                        <Field name="smoothingLevel" type="string">None</Field>
-                                        <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                        <Field name="pointSizeVar" type="string">default</Field>
-                                        <Field name="pointType" type="string">Point</Field>
-                                        <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                        <Field name="showInternal" type="bool">false</Field>
-                                        <Field name="pointSizePixels" type="int">2</Field>
-                                        <Field name="opacity" type="double">1</Field>
-                                    </Object>
-                                    <Object name="plotKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 8 </Field>
-                                            <Object name="attributes">
-                                                <Object name="MeshAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">0</Field>
-                                                    <Object name="meshColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                                    <Field name="errorTolerance" type="double">0.01</Field>
-                                                    <Field name="meshColorSource" type="string">Foreground</Field>
-                                                    <Field name="opaqueColorSource" type="string">Background</Field>
-                                                    <Field name="opaqueMode" type="string">Auto</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Object name="opaqueColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="smoothingLevel" type="string">None</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                                    <Field name="showInternal" type="bool">false</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                </Object>
-                                                <Object name="MeshAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">0</Field>
-                                                    <Object name="meshColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                                    <Field name="errorTolerance" type="double">0.01</Field>
-                                                    <Field name="meshColorSource" type="string">Foreground</Field>
-                                                    <Field name="opaqueColorSource" type="string">Background</Field>
-                                                    <Field name="opaqueMode" type="string">Auto</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Object name="opaqueColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="smoothingLevel" type="string">None</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                                    <Field name="showInternal" type="bool">false</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="databaseKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 20 </Field>
-                                            <Object name="attributes">
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">0</Field>
-                                                </Object>
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">20</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="CompactSILRestrictionAttributes">
-                                        <Field name="useSet" type="unsignedCharVector">2 2 </Field>
-                                        <Field name="topSet" type="string">region2</Field>
-                                    </Object>
-                                    <Field name="namedSelection" type="string"></Field>
-                                </Object>
-                            </Object>
-                            <Object name="plot02">
-                                <Field name="plotName" type="string">Plot0003</Field>
-                                <Field name="pluginID" type="string">Pseudocolor_1.0</Field>
-                                <Field name="sourceID" type="string">SOURCE01</Field>
-                                <Field name="variableName" type="string">cellflag1</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="hidden" type="bool">true</Field>
-                                <Field name="realized" type="bool">true</Field>
-                                <Object name="ViewerPlot">
-                                    <Field name="plotDescription" type="string"></Field>
-                                    <Field name="cacheIndex" type="int">8</Field>
-                                    <Field name="spatialExtentsType" type="string">AVT_ORIGINAL_EXTENTS</Field>
-                                    <Field name="bgColor" type="doubleArray" length="3">1 1 1 </Field>
-                                    <Field name="fgColor" type="doubleArray" length="3">0 0 0 </Field>
-                                    <Field name="expandedFlag" type="bool">false</Field>
-                                    <Field name="followsTime" type="bool">true</Field>
-                                    <Object name="PseudocolorAttributes">
-                                        <Field name="legendFlag" type="bool">true</Field>
-                                        <Field name="lightingFlag" type="bool">true</Field>
-                                        <Field name="minFlag" type="bool">true</Field>
-                                        <Field name="maxFlag" type="bool">true</Field>
-                                        <Field name="centering" type="string">Natural</Field>
-                                        <Field name="scaling" type="string">Linear</Field>
-                                        <Field name="limitsMode" type="string">OriginalData</Field>
-                                        <Field name="min" type="double">0</Field>
-                                        <Field name="max" type="double">6</Field>
-                                        <Field name="pointSize" type="double">0.05</Field>
-                                        <Field name="pointType" type="string">Point</Field>
-                                        <Field name="skewFactor" type="double">1</Field>
-                                        <Field name="opacity" type="double">1</Field>
-                                        <Field name="colorTableName" type="string">cellflag</Field>
-                                        <Field name="invertColorTable" type="bool">false</Field>
-                                        <Field name="smoothingLevel" type="int">0</Field>
-                                        <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                        <Field name="pointSizeVar" type="string">default</Field>
-                                        <Field name="pointSizePixels" type="int">2</Field>
-                                        <Field name="lineStyle" type="int">0</Field>
-                                        <Field name="lineWidth" type="int">0</Field>
-                                        <Field name="opacityType" type="string">Explicit</Field>
-                                    </Object>
-                                    <Object name="plotKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 </Field>
-                                            <Object name="attributes">
-                                                <Object name="PseudocolorAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lightingFlag" type="bool">true</Field>
-                                                    <Field name="minFlag" type="bool">true</Field>
-                                                    <Field name="maxFlag" type="bool">true</Field>
-                                                    <Field name="centering" type="string">Natural</Field>
-                                                    <Field name="scaling" type="string">Linear</Field>
-                                                    <Field name="limitsMode" type="string">OriginalData</Field>
-                                                    <Field name="min" type="double">0</Field>
-                                                    <Field name="max" type="double">6</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="skewFactor" type="double">1</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                    <Field name="colorTableName" type="string">cellflag</Field>
-                                                    <Field name="invertColorTable" type="bool">false</Field>
-                                                    <Field name="smoothingLevel" type="int">0</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">0</Field>
-                                                    <Field name="opacityType" type="string">Explicit</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="databaseKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 20 </Field>
-                                            <Object name="attributes">
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">0</Field>
-                                                </Object>
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">20</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="CompactSILRestrictionAttributes">
-                                        <Field name="useSet" type="unsignedCharVector">2 2 </Field>
-                                        <Field name="topSet" type="string">region1</Field>
-                                    </Object>
-                                    <Field name="namedSelection" type="string"></Field>
-                                </Object>
-                            </Object>
-                            <Object name="plot03">
-                                <Field name="plotName" type="string">Plot0004</Field>
-                                <Field name="pluginID" type="string">Pseudocolor_1.0</Field>
-                                <Field name="sourceID" type="string">SOURCE01</Field>
-                                <Field name="variableName" type="string">cellflag2</Field>
-                                <Field name="active" type="bool">false</Field>
-                                <Field name="hidden" type="bool">true</Field>
-                                <Field name="realized" type="bool">true</Field>
-                                <Object name="ViewerPlot">
-                                    <Field name="plotDescription" type="string"></Field>
-                                    <Field name="cacheIndex" type="int">8</Field>
-                                    <Field name="spatialExtentsType" type="string">AVT_ORIGINAL_EXTENTS</Field>
-                                    <Field name="bgColor" type="doubleArray" length="3">1 1 1 </Field>
-                                    <Field name="fgColor" type="doubleArray" length="3">0 0 0 </Field>
-                                    <Field name="expandedFlag" type="bool">false</Field>
-                                    <Field name="followsTime" type="bool">true</Field>
-                                    <Object name="PseudocolorAttributes">
-                                        <Field name="legendFlag" type="bool">true</Field>
-                                        <Field name="lightingFlag" type="bool">true</Field>
-                                        <Field name="minFlag" type="bool">true</Field>
-                                        <Field name="maxFlag" type="bool">true</Field>
-                                        <Field name="centering" type="string">Natural</Field>
-                                        <Field name="scaling" type="string">Linear</Field>
-                                        <Field name="limitsMode" type="string">OriginalData</Field>
-                                        <Field name="min" type="double">0</Field>
-                                        <Field name="max" type="double">6</Field>
-                                        <Field name="pointSize" type="double">0.05</Field>
-                                        <Field name="pointType" type="string">Point</Field>
-                                        <Field name="skewFactor" type="double">1</Field>
-                                        <Field name="opacity" type="double">1</Field>
-                                        <Field name="colorTableName" type="string">cellflag</Field>
-                                        <Field name="invertColorTable" type="bool">false</Field>
-                                        <Field name="smoothingLevel" type="int">0</Field>
-                                        <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                        <Field name="pointSizeVar" type="string">default</Field>
-                                        <Field name="pointSizePixels" type="int">2</Field>
-                                        <Field name="lineStyle" type="int">0</Field>
-                                        <Field name="lineWidth" type="int">0</Field>
-                                        <Field name="opacityType" type="string">Explicit</Field>
-                                    </Object>
-                                    <Object name="plotKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 </Field>
-                                            <Object name="attributes">
-                                                <Object name="PseudocolorAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lightingFlag" type="bool">true</Field>
-                                                    <Field name="minFlag" type="bool">true</Field>
-                                                    <Field name="maxFlag" type="bool">true</Field>
-                                                    <Field name="centering" type="string">Natural</Field>
-                                                    <Field name="scaling" type="string">Linear</Field>
-                                                    <Field name="limitsMode" type="string">OriginalData</Field>
-                                                    <Field name="min" type="double">0</Field>
-                                                    <Field name="max" type="double">6</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="skewFactor" type="double">1</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                    <Field name="colorTableName" type="string">cellflag</Field>
-                                                    <Field name="invertColorTable" type="bool">false</Field>
-                                                    <Field name="smoothingLevel" type="int">0</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">0</Field>
-                                                    <Field name="opacityType" type="string">Explicit</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="databaseKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 20 </Field>
-                                            <Object name="attributes">
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">0</Field>
-                                                </Object>
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">20</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="CompactSILRestrictionAttributes">
-                                        <Field name="useSet" type="unsignedCharVector">2 2 </Field>
-                                        <Field name="topSet" type="string">region2</Field>
-                                    </Object>
-                                    <Field name="namedSelection" type="string"></Field>
-                                </Object>
-                            </Object>
-                            <Object name="plot04">
-                                <Field name="plotName" type="string">Plot0005</Field>
-                                <Field name="pluginID" type="string">Mesh_1.0</Field>
-                                <Field name="sourceID" type="string">SOURCE01</Field>
-                                <Field name="variableName" type="string">structure</Field>
-                                <Field name="active" type="bool">true</Field>
-                                <Field name="hidden" type="bool">false</Field>
-                                <Field name="realized" type="bool">true</Field>
-                                <Object name="ViewerPlot">
-                                    <Field name="plotDescription" type="string"></Field>
-                                    <Field name="cacheIndex" type="int">8</Field>
-                                    <Field name="spatialExtentsType" type="string">AVT_ORIGINAL_EXTENTS</Field>
-                                    <Field name="bgColor" type="doubleArray" length="3">1 1 1 </Field>
-                                    <Field name="fgColor" type="doubleArray" length="3">0 0 0 </Field>
-                                    <Field name="expandedFlag" type="bool">false</Field>
-                                    <Field name="followsTime" type="bool">true</Field>
-                                    <Object name="MeshAttributes">
-                                        <Field name="legendFlag" type="bool">true</Field>
-                                        <Field name="lineStyle" type="int">0</Field>
-                                        <Field name="lineWidth" type="int">2</Field>
-                                        <Object name="meshColor">
-                                            <Object name="ColorAttribute">
-                                                <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                            </Object>
-                                        </Object>
-                                        <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                        <Field name="errorTolerance" type="double">0.01</Field>
-                                        <Field name="meshColorSource" type="string">Foreground</Field>
-                                        <Field name="opaqueColorSource" type="string">Background</Field>
-                                        <Field name="opaqueMode" type="string">Auto</Field>
-                                        <Field name="pointSize" type="double">0.05</Field>
-                                        <Object name="opaqueColor">
-                                            <Object name="ColorAttribute">
-                                                <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                            </Object>
-                                        </Object>
-                                        <Field name="smoothingLevel" type="string">None</Field>
-                                        <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                        <Field name="pointSizeVar" type="string">default</Field>
-                                        <Field name="pointType" type="string">Point</Field>
-                                        <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                        <Field name="showInternal" type="bool">false</Field>
-                                        <Field name="pointSizePixels" type="int">2</Field>
-                                        <Field name="opacity" type="double">1</Field>
-                                    </Object>
-                                    <Object name="plotKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 8 </Field>
-                                            <Object name="attributes">
-                                                <Object name="MeshAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">2</Field>
-                                                    <Object name="meshColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                                    <Field name="errorTolerance" type="double">0.01</Field>
-                                                    <Field name="meshColorSource" type="string">Foreground</Field>
-                                                    <Field name="opaqueColorSource" type="string">Background</Field>
-                                                    <Field name="opaqueMode" type="string">Auto</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Object name="opaqueColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="smoothingLevel" type="string">None</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                                    <Field name="showInternal" type="bool">false</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                </Object>
-                                                <Object name="MeshAttributes">
-                                                    <Field name="legendFlag" type="bool">true</Field>
-                                                    <Field name="lineStyle" type="int">0</Field>
-                                                    <Field name="lineWidth" type="int">2</Field>
-                                                    <Object name="meshColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="outlineOnlyFlag" type="bool">false</Field>
-                                                    <Field name="errorTolerance" type="double">0.01</Field>
-                                                    <Field name="meshColorSource" type="string">Foreground</Field>
-                                                    <Field name="opaqueColorSource" type="string">Background</Field>
-                                                    <Field name="opaqueMode" type="string">Auto</Field>
-                                                    <Field name="pointSize" type="double">0.05</Field>
-                                                    <Object name="opaqueColor">
-                                                        <Object name="ColorAttribute">
-                                                            <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
-                                                        </Object>
-                                                    </Object>
-                                                    <Field name="smoothingLevel" type="string">None</Field>
-                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
-                                                    <Field name="pointSizeVar" type="string">default</Field>
-                                                    <Field name="pointType" type="string">Point</Field>
-                                                    <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
-                                                    <Field name="showInternal" type="bool">false</Field>
-                                                    <Field name="pointSizePixels" type="int">2</Field>
-                                                    <Field name="opacity" type="double">1</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="databaseKeyframes">
-                                        <Object name="AttributeSubjectMap">
-                                            <Field name="indices" type="intVector">0 20 </Field>
-                                            <Object name="attributes">
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">0</Field>
-                                                </Object>
-                                                <Object name="DatabaseAttributes">
-                                                    <Field name="state" type="int">20</Field>
-                                                </Object>
-                                            </Object>
-                                        </Object>
-                                    </Object>
-                                    <Object name="CompactSILRestrictionAttributes">
-                                        <Field name="useSet" type="unsignedCharVector">2 2 </Field>
-                                        <Field name="topSet" type="string">structure</Field>
-                                    </Object>
-                                    <Field name="namedSelection" type="string"></Field>
-                                </Object>
-                            </Object>
-                            <Object name="plot05">
                                 <Field name="plotName" type="string">Plot0006</Field>
                                 <Field name="pluginID" type="string">Mesh_1.0</Field>
                                 <Field name="sourceID" type="string">SOURCE00</Field>
@@ -8799,7 +8440,7 @@
                                     <Field name="namedSelection" type="string"></Field>
                                 </Object>
                             </Object>
-                            <Object name="plot06">
+                            <Object name="plot01">
                                 <Field name="plotName" type="string">Plot0008</Field>
                                 <Field name="pluginID" type="string">Mesh_1.0</Field>
                                 <Field name="sourceID" type="string">SOURCE00</Field>
@@ -8897,7 +8538,7 @@
                                     <Field name="namedSelection" type="string"></Field>
                                 </Object>
                             </Object>
-                            <Object name="plot07">
+                            <Object name="plot02">
                                 <Field name="plotName" type="string">Plot0009</Field>
                                 <Field name="pluginID" type="string">Mesh_1.0</Field>
                                 <Field name="sourceID" type="string">SOURCE00</Field>
@@ -8995,7 +8636,7 @@
                                     <Field name="namedSelection" type="string"></Field>
                                 </Object>
                             </Object>
-                            <Object name="plot08">
+                            <Object name="plot03">
                                 <Field name="plotName" type="string">Plot0010</Field>
                                 <Field name="pluginID" type="string">Pseudocolor_1.0</Field>
                                 <Field name="sourceID" type="string">SOURCE00</Field>
@@ -9083,7 +8724,7 @@
                                     <Field name="namedSelection" type="string"></Field>
                                 </Object>
                             </Object>
-                            <Object name="plot09">
+                            <Object name="plot04">
                                 <Field name="plotName" type="string">Plot0011</Field>
                                 <Field name="pluginID" type="string">Pseudocolor_1.0</Field>
                                 <Field name="sourceID" type="string">SOURCE00</Field>
@@ -9171,7 +8812,7 @@
                                     <Field name="namedSelection" type="string"></Field>
                                 </Object>
                             </Object>
-                            <Object name="plot10">
+                            <Object name="plot05">
                                 <Field name="plotName" type="string">Plot0012</Field>
                                 <Field name="pluginID" type="string">Pseudocolor_1.0</Field>
                                 <Field name="sourceID" type="string">SOURCE00</Field>
@@ -9259,8 +8900,106 @@
                                     <Field name="namedSelection" type="string"></Field>
                                 </Object>
                             </Object>
+                            <Object name="plot06">
+                                <Field name="plotName" type="string">Plot0013</Field>
+                                <Field name="pluginID" type="string">Mesh_1.0</Field>
+                                <Field name="sourceID" type="string">SOURCE00</Field>
+                                <Field name="variableName" type="string">structure</Field>
+                                <Field name="active" type="bool">true</Field>
+                                <Field name="hidden" type="bool">false</Field>
+                                <Field name="realized" type="bool">true</Field>
+                                <Object name="ViewerPlot">
+                                    <Field name="plotDescription" type="string"></Field>
+                                    <Field name="cacheIndex" type="int">0</Field>
+                                    <Field name="spatialExtentsType" type="string">AVT_ORIGINAL_EXTENTS</Field>
+                                    <Field name="bgColor" type="doubleArray" length="3">1 1 1 </Field>
+                                    <Field name="fgColor" type="doubleArray" length="3">0 0 0 </Field>
+                                    <Field name="expandedFlag" type="bool">false</Field>
+                                    <Field name="followsTime" type="bool">true</Field>
+                                    <Object name="MeshAttributes">
+                                        <Field name="legendFlag" type="bool">true</Field>
+                                        <Field name="lineStyle" type="int">0</Field>
+                                        <Field name="lineWidth" type="int">3</Field>
+                                        <Object name="meshColor">
+                                            <Object name="ColorAttribute">
+                                                <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
+                                            </Object>
+                                        </Object>
+                                        <Field name="outlineOnlyFlag" type="bool">false</Field>
+                                        <Field name="errorTolerance" type="double">0.01</Field>
+                                        <Field name="meshColorSource" type="string">Foreground</Field>
+                                        <Field name="opaqueColorSource" type="string">Background</Field>
+                                        <Field name="opaqueMode" type="string">Auto</Field>
+                                        <Field name="pointSize" type="double">0.05</Field>
+                                        <Object name="opaqueColor">
+                                            <Object name="ColorAttribute">
+                                                <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
+                                            </Object>
+                                        </Object>
+                                        <Field name="smoothingLevel" type="string">None</Field>
+                                        <Field name="pointSizeVarEnabled" type="bool">false</Field>
+                                        <Field name="pointSizeVar" type="string">default</Field>
+                                        <Field name="pointType" type="string">Point</Field>
+                                        <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
+                                        <Field name="showInternal" type="bool">false</Field>
+                                        <Field name="pointSizePixels" type="int">2</Field>
+                                        <Field name="opacity" type="double">1</Field>
+                                    </Object>
+                                    <Object name="plotKeyframes">
+                                        <Object name="AttributeSubjectMap">
+                                            <Field name="indices" type="intVector">0 </Field>
+                                            <Object name="attributes">
+                                                <Object name="MeshAttributes">
+                                                    <Field name="legendFlag" type="bool">true</Field>
+                                                    <Field name="lineStyle" type="int">0</Field>
+                                                    <Field name="lineWidth" type="int">3</Field>
+                                                    <Object name="meshColor">
+                                                        <Object name="ColorAttribute">
+                                                            <Field name="color" type="unsignedCharArray" length="4">0 0 0 255 </Field>
+                                                        </Object>
+                                                    </Object>
+                                                    <Field name="outlineOnlyFlag" type="bool">false</Field>
+                                                    <Field name="errorTolerance" type="double">0.01</Field>
+                                                    <Field name="meshColorSource" type="string">Foreground</Field>
+                                                    <Field name="opaqueColorSource" type="string">Background</Field>
+                                                    <Field name="opaqueMode" type="string">Auto</Field>
+                                                    <Field name="pointSize" type="double">0.05</Field>
+                                                    <Object name="opaqueColor">
+                                                        <Object name="ColorAttribute">
+                                                            <Field name="color" type="unsignedCharArray" length="4">255 255 255 255 </Field>
+                                                        </Object>
+                                                    </Object>
+                                                    <Field name="smoothingLevel" type="string">None</Field>
+                                                    <Field name="pointSizeVarEnabled" type="bool">false</Field>
+                                                    <Field name="pointSizeVar" type="string">default</Field>
+                                                    <Field name="pointType" type="string">Point</Field>
+                                                    <Field name="opaqueMeshIsAppropriate" type="bool">false</Field>
+                                                    <Field name="showInternal" type="bool">false</Field>
+                                                    <Field name="pointSizePixels" type="int">2</Field>
+                                                    <Field name="opacity" type="double">1</Field>
+                                                </Object>
+                                            </Object>
+                                        </Object>
+                                    </Object>
+                                    <Object name="databaseKeyframes">
+                                        <Object name="AttributeSubjectMap">
+                                            <Field name="indices" type="intVector">0 </Field>
+                                            <Object name="attributes">
+                                                <Object name="DatabaseAttributes">
+                                                    <Field name="state" type="int">0</Field>
+                                                </Object>
+                                            </Object>
+                                        </Object>
+                                    </Object>
+                                    <Object name="CompactSILRestrictionAttributes">
+                                        <Field name="useSet" type="unsignedCharVector">2 2 </Field>
+                                        <Field name="topSet" type="string">structure</Field>
+                                    </Object>
+                                    <Field name="namedSelection" type="string"></Field>
+                                </Object>
+                            </Object>
                             <Field name="activeSource" type="string">SOURCE00</Field>
-                            <Field name="nPlots" type="int">11</Field>
+                            <Field name="nPlots" type="int">7</Field>
                             <Field name="keyframeMode" type="bool">false</Field>
                             <Field name="nKeyframes" type="int">1</Field>
                             <Object name="AnimationAttributes">
@@ -9306,7 +9045,7 @@
                 <Object name="RunningEngines">
                     <Object name="MachineProfile">
                         <Field name="hostNickname" type="string"></Field>
-                        <Field name="host" type="string">qa10.bc.rzg.mpg.de</Field>
+                        <Field name="host" type="string">qa04.bc.rzg.mpg.de</Field>
                         <Field name="userName" type="string">hmk</Field>
                         <Field name="hostAliases" type="string"></Field>
                         <Field name="directory" type="string"></Field>
