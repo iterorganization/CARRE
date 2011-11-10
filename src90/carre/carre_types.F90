@@ -1,6 +1,7 @@
 module carre_types
 
   use Logging
+  use carre_constants
 
   implicit none
 
@@ -8,19 +9,12 @@ module carre_types
 
 #include <CARREDIM.F>
 
+  ! forward from carre_constants
+  public GRID_UNDEFINED, GRID_INTERNAL, GRID_EXTERNAL, GRID_BOUNDARY, GRID_BOUNDARY_REFINE, GRID_BOUNDARY_REFINE_FIX,&
+       & GRID_INTERNAL_COARSEN, GRID_BOUNDARY_COARSEN
+
   ! Carre version string
   character(len=8), parameter, public :: CARRE_VERSION = "carre71"
-
-  integer, parameter, public :: GRID_UNDEFINED = 0
-
-  ! Grid object labels
-  integer, parameter, public :: GRID_INTERNAL = 1
-  integer, parameter, public :: GRID_EXTERNAL = 2
-  integer, parameter, public :: GRID_BOUNDARY = 3
-  integer, parameter, public :: GRID_BOUNDARY_REFINE = 4
-  integer, parameter, public :: GRID_BOUNDARY_REFINE_FIX = 5
-  integer, parameter, public :: GRID_INTERNAL_COARSEN = 6
-  integer, parameter, public :: GRID_BOUNDARY_COARSEN = 7
 
   ! Grid line flags
   integer, parameter, public :: GRIDLINE_BASELINE = 1
