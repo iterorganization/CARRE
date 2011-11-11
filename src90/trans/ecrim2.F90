@@ -16,7 +16,7 @@
       integer b2cflag(0:nxmax,0:nymax,2)
 
 !  local variables
-      integer ix,iy
+      integer ix,iy,i
       real*8 x0,y0,fpsi0
 !
 !  procedures
@@ -27,9 +27,9 @@
 
       write(nfin,'(a)') "VERSION01.001.028"
       if (niso == 0) then
-          write(nfin,*) nx,"  ",ny,"  ",niso
+          write(nfin,*) nx,"  ",ny,"  ",niso,"  ",(0,i=1,nisomx)
       else
-          write(nfin,*) nx,"  ",ny,"  ",niso,"  ",nxiso(1:niso)
+          write(nfin,*) nx,"  ",ny,"  ",niso,"  ",nxiso(1:nisomx)
       end if
 
       do iy=0,ny-1

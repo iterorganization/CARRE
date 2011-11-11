@@ -16,6 +16,7 @@
 #endif
       use carre_types
       use carre_parameter_io
+      use tradui_constants
       
       implicit none
 
@@ -24,8 +25,6 @@
 #include <CARREDIM.F>
 
 !  variables locales
-      integer nxmx,nymx,ncutmx,nisomx
-      parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1)
       integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), & 
            & ifail,nx,ny, & 
            & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
