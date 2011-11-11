@@ -2,7 +2,7 @@
      &                  r,z,nreg,nppol,nprad,npolmx,nradmx, & 
      &                  nptseg,psidx,psidy,psi,psidxm,psidym,&
      &                  cflag,b0r0, & 
-     &                  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+     &                  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,doGuardCells)
 !
 !  version : 12.01.99 13:10
 !
@@ -30,13 +30,14 @@
       integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10), & 
      &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx),&
      &  cflag(npolmx,nradmx,nreg,2)
-      integer b2cflag(0:nxmax,0:nymax,2)
-      real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
-     &  fpsi(0:nxmax,0:nymax,0:3),ffbz(0:nxmax,0:nymax,0:3), & 
+      integer b2cflag(-1:nxmax,-1:nymax,2)
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
+     &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), & 
      &  r(npolmx,nradmx,nreg),z(npolmx,nradmx,nreg), & 
-     &  psidx(0:nxmax,0:nymax,0:3),psidy(0:nxmax,0:nymax,0:3), & 
+     &  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3), & 
      &  psi(npolmx,nradmx,nreg),psidxm(npolmx,nradmx,nreg), & 
      &  psidym(npolmx,nradmx,nreg),b0r0
+      logical :: doGuardCells
 !======================================================================
 !*** Input:
 !***  nxmax,nymax: array dimensions for B2 grid (poloidal & radial)
@@ -161,6 +162,14 @@
 !***  n[a-i][pr]: number of cells in poloidal or radial direction
 !======================================================================
 !.computation
+      
+! cleanly initialize output arrays
+
+      crx = 0.0
+      cry = 0.0
+      fpsi = 0.0
+      ffbz = 0.0
+      b2cflag = 0
 
 !<<<
       write(0,*) '===> Entering b2agfz. nreg = ',nreg
@@ -941,7 +950,33 @@
               end do     ! }
             end do     ! }
           end do
+          if (doGuardCells) then
+!*** Reserve room for the guard cells
+              ix=ix+2     ! }
+          end if
         end do
+      
+	if (doGuardCells) then
+!*** periphery
+        ix=-1
+        do ihg=1,2     ! {
+!<<<
+!	  write(0,*) 'b2agfz: call periph. ix,nxx=',ix,nxx(ihg)
+!>>>
+!*** This subroutine creates the guard cells around the grid block
+
+          call periph(nxx(ihg),ny, & 
+     &                crx(ix,-1,0),cry(ix,-1,0),fpsi(ix,-1,0), & 
+     &                ffbz(ix,-1,0),psidx(ix,-1,0),psidy(ix,-1,0), & 
+     &                                                del,nxmax,nymax)
+          ix=ix+nxx(1)+2      ! }
+        end do
+        nx=nx+2
+!<<<
+!        write(0,*) 'After periph. nx = ',nx
+!>>>
+	end if
+
 
 !*** Determine the cut positions and lengths
 
@@ -1145,6 +1180,10 @@
           end do      ! }
         end do
 
+	if (doGuardCells) then
+!  periphery
+        call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
+	end if
 !*** Specify the cuts
        ncut=2
         if(ncut.gt.ncutmx) then ! {
@@ -1258,6 +1297,10 @@
             b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
           end do      ! }
         end do
+	if (doGuardCells) then
+!  periphery
+        call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
+	end if
 !----------------------------------------------------------------------  ! }
       else     ! {
 !----------------------------------------------------------------------

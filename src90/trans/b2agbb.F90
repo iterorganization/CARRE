@@ -9,11 +9,11 @@
 !======================================================================
 !   ..input arguments (unchanged on exit)
       integer nx, ny,nxmax,nymax
-      real*8 fpsi(0:nxmax,0:nymax,0:3), ffbz(0:nxmax,0:nymax,0:3)
-      real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
-     &  psidx(0:nxmax,0:nymax,0:3),psidy(0:nxmax,0:nymax,0:3)
+      real*8 fpsi(-1:nxmax,-1:nymax,0:3), ffbz(-1:nxmax,-1:nymax,0:3)
+      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
+     &  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3)
 !   ..output arguments (unspecified on entry)
-      real*8 bb(0:nxmax,0:nymax,0:3)
+      real*8 bb(-1:nxmax,-1:nymax,0:3)
 
 !-----------------------------------------------------------------------
 !.documentation
@@ -81,14 +81,18 @@
       r0=0.86
       b0=2.
 
-      do iy = 0, ny-1
+      bb = 0.0
+
+      do iy = -1, ny
 !***
 !       print*,'iy=',iy
 !***
-        do ix = 0, nx-1
+        do ix = -1, nx
 !     ..compute magnetic field at cell center
          t0=0.5*pi*(crx(ix,iy,0)+crx(ix,iy,1)+crx(ix,iy,2) & 
      &     +crx(ix,iy,3))
+         
+         if (t0 == 0.0) cycle
 
          bb(ix,iy,0) = & 
      &     (fpsi(ix,iy,2)-fpsi(ix,iy,0)+fpsi(ix,iy,3)-fpsi(ix,iy,1))

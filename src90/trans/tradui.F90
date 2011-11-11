@@ -142,10 +142,15 @@
              & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
              & par%nptseg,psidx,psidy,&
              & psi,psidxm,psidym,cflag,b0r0, & 
-             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
-        call ecrim2(nfin,nx,ny,crx,cry,fpsi,bb,b2cflag,nxmx,nymx)
+        call ecrim2(nfin,nx,ny,&
+             & crx(0:nxmx,0:nymx,0:3),&
+             & cry(0:nxmx,0:nymx,0:3),&
+             & fpsi(0:nxmx,0:nymx,0:3),&
+             & bb(0:nxmx,0:nymx,0:3),&
+             & b2cflag(0:nxmx,0:nymx,1:2),nxmx,nymx)
 !
 ! Original SONNET/DIVIMP format
 !
@@ -155,7 +160,7 @@
              & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
              & par%nptseg,psidx,psidy,&
              & psi,psidxm,psidym,cflag,b0r0, & 
-             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &    crx,cry,psidx,psidy,nxmx,nymx)
         call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
@@ -168,7 +173,7 @@
              & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
              & par%nptseg,psidx,psidy,&
              & psi,psidxm,psidym,cflag,b0r0, & 
-             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
 !<<<
 !        write(0,*) 'call b2agbb'
 !>>>
@@ -195,7 +200,7 @@
              & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
              & par%nptseg,psidx,psidy,&
              & psi,psidxm,psidym,cflag,b0r0, & 
-             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
         call b2agbb (nx,ny,fpsi,ffbz,bb, & 
      &   crx,cry,psidx,psidy,nxmx,nymx)
 ! jdemod - added fpsi to call to ecrim5
@@ -212,7 +217,7 @@
              & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
              & par%nptseg,psidx,psidy,&
              & psi,psidxm,psidym,cflag,b0r0, & 
-             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+             & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
               
               ! allocate connectivity arrays 
               allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
