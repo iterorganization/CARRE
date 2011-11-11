@@ -1,4 +1,5 @@
-      subroutine ecrim2(nfin,nx,ny,crx,cry,fpsi,bb,b2cflag,nxmax,nymax)
+      subroutine ecrim2(nfin,nx,ny,crx,cry,fpsi,bb,b2cflag,nxmax,nymax,&
+           & niso,nxiso,nisomx)
 !
 !  version : 02.12.98 20:49
 !
@@ -9,7 +10,7 @@
       implicit none
 !
 !  arguments
-      integer nfin,nx,ny,nxmax,nymax
+      integer nfin,nx,ny,nxmax,nymax,niso,nisomx,nxiso(nisomx+1)
       real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
      &  bb(0:nxmax,0:nymax,0:3),fpsi(0:nxmax,0:nymax,0:3)
       integer b2cflag(0:nxmax,0:nymax,2)
@@ -25,7 +26,11 @@
 !* 2.   print mesh parameters
 
       write(nfin,'(a)') "VERSION01.001.028"
-      write(nfin,*) nx,"  ",ny
+      if (niso == 0) then
+          write(nfin,*) nx,"  ",ny,"  ",niso
+      else
+          write(nfin,*) nx,"  ",ny,"  ",niso,"  ",nxiso(1:niso)
+      end if
 
       do iy=0,ny-1
         do ix=0,nx-1

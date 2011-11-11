@@ -150,7 +150,8 @@
              & cry(0:nxmx,0:nymx,0:3),&
              & fpsi(0:nxmx,0:nymx,0:3),&
              & bb(0:nxmx,0:nymx,0:3),&
-             & b2cflag(0:nxmx,0:nymx,1:2),nxmx,nymx)
+             & b2cflag(0:nxmx,0:nymx,1:2),nxmx,nymx,&
+             & niso,nxiso,nisomx)
 !
 ! Original SONNET/DIVIMP format
 !
