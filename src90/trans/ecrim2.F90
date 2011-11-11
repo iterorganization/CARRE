@@ -18,6 +18,7 @@
 !  local variables
       integer ix,iy,i
       real*8 x0,y0,fpsi0
+      character(len=24) :: hlp_format
 !
 !  procedures
 !======================================================================
@@ -26,10 +27,11 @@
 !* 2.   print mesh parameters
 
       write(nfin,'(a)') "VERSION01.001.028"
+      write(hlp_format,'(a,i2,a)') '(3(i4,a2),', nisomx, '(i4,1x))'
       if (niso == 0) then
-          write(nfin,*) nx,"  ",ny,"  ",niso,"  ",(0,i=1,nisomx)
+          write(nfin,hlp_format) nx,"  ",ny,"  ",niso,"  ",(0,i=1,nisomx)
       else
-          write(nfin,*) nx,"  ",ny,"  ",niso,"  ",nxiso(1:nisomx)
+          write(nfin,hlp_format) nx,"  ",ny,"  ",niso,"  ",nxiso(1:nisomx)
       end if
 
       do iy=0,ny-1

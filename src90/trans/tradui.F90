@@ -25,6 +25,8 @@
 #include <CARREDIM.F>
 
 !  variables locales
+      integer :: nxmx, nymx, ncutmx
+      parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4)
       integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), & 
            & ifail,nx,ny, & 
            & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
