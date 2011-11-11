@@ -313,6 +313,10 @@ contains
                 vtmaxpsi = maxpsitot
              end select
 
+             ! EXPERIMENTAL: we make the targets a bit bigger in psi range
+             vtminpsi = vtminpsi * 1.1
+             vtmaxpsi = vtmaxpsi * 1.1
+
              !write (0,*) 'Global psi range'
              !write (0,*) 'min psi: ', minpsitot, ', max psi: ', maxpsitot
 
@@ -404,7 +408,7 @@ contains
        ! choose a stepsize
        dx = 1 / norm( gx, gy ) * & 
             &        norm( ptx( vtargetipx( itarget ) ) - tx, & 
-            &              pty( vtargetipx( itarget ) ) - ty ) * 0.1
+            &              pty( vtargetipx( itarget ) ) - ty ) * 0.05
 
        if ( p == 0 ) stop 'Grad psi pointing towards x-point'
        if ( p > 0 ) then

@@ -30,11 +30,11 @@
       integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10), & 
      &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx),&
      &  cflag(npolmx,nradmx,nreg,2)
-      integer b2cflag(-1:nxmax,-1:nymax,2)
-      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
-     &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), & 
+      integer b2cflag(0:nxmax,0:nymax,2)
+      real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
+     &  fpsi(0:nxmax,0:nymax,0:3),ffbz(0:nxmax,0:nymax,0:3), & 
      &  r(npolmx,nradmx,nreg),z(npolmx,nradmx,nreg), & 
-     &  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3), & 
+     &  psidx(0:nxmax,0:nymax,0:3),psidy(0:nxmax,0:nymax,0:3), & 
      &  psi(npolmx,nradmx,nreg),psidxm(npolmx,nradmx,nreg), & 
      &  psidym(npolmx,nradmx,nreg),b0r0
 !======================================================================
@@ -941,28 +941,7 @@
               end do     ! }
             end do     ! }
           end do
-!*** Reserve room for the guard cells
-          ix=ix+2     ! }
         end do
-
-!*** periphery
-        ix=-1
-        do ihg=1,2     ! {
-!<<<
-!	  write(0,*) 'b2agfz: call periph. ix,nxx=',ix,nxx(ihg)
-!>>>
-!*** This subroutine creates the guard cells around the grid block
-
-          call periph(nxx(ihg),ny, & 
-     &                crx(ix,-1,0),cry(ix,-1,0),fpsi(ix,-1,0), & 
-     &                ffbz(ix,-1,0),psidx(ix,-1,0),psidy(ix,-1,0), & 
-     &                                                del,nxmax,nymax)
-          ix=ix+nxx(1)+2      ! }
-        end do
-        nx=nx+2
-!<<<
-!        write(0,*) 'After periph. nx = ',nx
-!>>>
 
 !*** Determine the cut positions and lengths
 
@@ -1165,8 +1144,6 @@
             b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
           end do      ! }
         end do
-!  periphery
-        call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
 
 !*** Specify the cuts
        ncut=2
@@ -1281,8 +1258,6 @@
             b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
           end do      ! }
         end do
-!  periphery
-        call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
 !----------------------------------------------------------------------  ! }
       else     ! {
 !----------------------------------------------------------------------

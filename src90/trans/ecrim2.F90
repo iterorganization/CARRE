@@ -10,9 +10,9 @@
 !
 !  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
-     &  bb(-1:nxmax,-1:nymax,0:3),fpsi(-1:nxmax,-1:nymax,0:3)
-      integer b2cflag(-1:nxmax,-1:nymax,2)
+      real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
+     &  bb(0:nxmax,0:nymax,0:3),fpsi(0:nxmax,0:nymax,0:3)
+      integer b2cflag(0:nxmax,0:nymax,2)
 
 !  local variables
       integer ix,iy
@@ -27,8 +27,8 @@
       write(nfin,'(a)') "VERSION01.001.028"
       write(nfin,*) nx,"  ",ny
 
-      do iy=-1,ny
-        do ix=-1,nx
+      do iy=0,ny-1
+        do ix=0,nx-1
 
 !* 2.1  calculate coordinates of cell centre
 

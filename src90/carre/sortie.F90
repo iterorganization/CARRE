@@ -10,34 +10,12 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
   type(CarreParameters), intent(in) :: par
   integer, intent(in) :: numero
 
-!!$nsep,nreg,np1, & 
-!!$     &    equ%distxo,xmail,ymail, & 
-!!$     &    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero, & 
-!!$     &    fctpx,diag,par,psim,grid%psidxm,psidym)
-
 !======================================================================
 
 !..  Cette sous-routine imprime les resultats dans un fichier de sortie:
 !  maille.sor
 
-!ank-970707: dimensions from the file
-!  dimensions
 #include <CARREDIM.F>
-
-!!$      INTEGER nsep,nreg,np1(nreg), & 
-!!$     &        nx,ny,npx,numero
-!!$      REAL*8 & 
-!!$     &     xmail(npmamx,nrmamx,nreg),ymail(npmamx,nrmamx,nreg), & 
-!!$     &     equ%distxo,x(nxmax),y(nymax), & 
-!!$     &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-!!$     &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
-!!$     &     ptx(npx+1),pty(npx+1),fctpx(npx+1), &
-!!$     &  psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
-!!$     &  psidym(npmamx,nrmamx,nregmx)
-
-      
-!!$      logical racord
-
      
 !  variables en common
 #include <COMRLX.F>
