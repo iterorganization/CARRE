@@ -394,7 +394,7 @@ contains
        ! choose a stepsize
        dx = 1 / norm( gx, gy ) * & 
             &        norm( equ%ptx( vtargetipx( itarget ) ) - tx, & 
-            &              equ%pty( vtargetipx( itarget ) ) - ty ) * 0.05
+            &              equ%pty( vtargetipx( itarget ) ) - ty ) * 0.1
 
        if ( p == 0 ) stop 'Grad psi pointing towards x-point'
        if ( p > 0 ) then
