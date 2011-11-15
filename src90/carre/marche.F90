@@ -2,9 +2,7 @@
      &        nbcrb,xt,yt,nt,stp0,stpmin,nx,ny,x,y,psi, & 
      &        nstruc,npstru,xstruc,ystruc,a00,a10, & 
      &        a01,a11,indlim)
-!
-!  version : 07.07.97 20:42
-!
+
 !======================================================================
 !..  Cette sous-routine parametrise des lignes de niveau jusqu'a
 !  ce qu'on obtienne la derniere courbe de niveau qui va d'un deflectur
@@ -16,11 +14,10 @@
 ! hitting a structure.
 !======================================================================
       use carre_niveau
+      use Logging
 
       IMPLICIT NONE
 
-!ank-970707: dimensions from the file
-!  dimensions
 #include <CARREDIM.F>
 
 !  arguments
@@ -120,44 +117,23 @@
 !=========================
 
 !..Initialisation
-!***
-!     print*,'entree dans marche'
-!     print*,'nx,ny=',nx,ny
-!     print*,'strumx=',strumx
-!     print*,'nbcrb, nt(nbcrb)=',nbcrb,nt(nbcrb)
-!     do j=1,nt(nbcrb)
-!       print*,'j, x/yt=',j,xt(j,nbcrb),yt(j,nbcrb)
-!     enddo
-!     pause
-!***
 
       x2 = x0
       y2 = y0
 
       ouvert=xstruc(1,plaque).ne.xstruc(npstru(plaque),plaque) & 
      &  .or. ystruc(1,plaque).ne.ystruc(npstru(plaque),plaque)
-
-!..Calcul de la valeur de la fonction au premier point.
-!dps
-!  Calculate psi value at first point.
+      
+      !..Calcul de la valeur de la fonction au premier point / Calculate psi value at first point.
 
       ii = ifind(x2,x,nx,1)
       jj = ifind(y2,y,ny,1)
-!***
-!     print*,'ii, jj=',ii,jj
-!***
+
       psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
      &       a11(ii,jj,1)*x2*y2
-!***
-!     print*,'psi2=',psi2
-!     print*,'plaque=',plaque
-!***
 
       ind2 = indsgm(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
      &              x2,y2)
-!***
-!     print*,'ind2=',ind2
-!***
 
 !..Initialisation.
 
@@ -165,23 +141,16 @@
       repart = 1
       pastmp = pas
 
-      DO 5 j=1, nt(nbcrb)
+      DO j=1, nt(nbcrb)
          nivox(j) = xt(j,nbcrb)
          nivoy(j) = yt(j,nbcrb)
-    5 CONTINUE
-!***
-!     print*,'apres la definition: nbcrb, nt()=',nbcrb,nt(nbcrb)
-!     do j=1,nt(nbcrb)
-!       print*,'j, x/yt=',j,xt(j,nbcrb),yt(j,nbcrb)
-!     enddo
-!     do j=1,nt(nbcrb)
-!       print*,'j, nivox/y=',j,nivox(j),nivoy(j)
-!     enddo
-!***
+     end do
 
       nvotot = nt(nbcrb)
 
    10 CONTINUE
+
+      call logmsg(LOGDEBUGBULK, "marche: (x,y)=("//real2str(x2)//", "//real2str(y2)//"), pas="//real2str(pas))
 
       IF (pastmp .LT. 0.5*stpmin) then
          write (*,*) 'marche: stopping level line search because minimum stepping delta reached'
@@ -194,31 +163,19 @@
       ind1 = ind2
       coin = .FALSE.
 
-!..On recherche le prochain point.
-!dps
-!  Look for the next point.
-
+!..On recherche le prochain point / Look for the next point.
+      
       CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
-     &           x1,y1,psi1,x2,y2,pas,sens,repart,nx,ny,x,y, & 
-     &           a00,a10,a01,a11,nxmax,nymax)
+           & x1,y1,psi1,x2,y2,pas,sens,repart,nx,ny,x,y, & 
+           & a00,a10,a01,a11,nxmax,nymax)
 
-!     TODO: check that we are inside the given psi range
+      ! TODO: check that we are inside the given psi range
 
-!***
-!     print*,' '
-!     print*,'pas=',pas
-!     print*,'apres saute: x1,y1=',x1,y1
-!     print*,'             x2,y2=',x2,y2
-!     pause
-!***
+      !..On s'assure que l'on ne depasse pas la maille / Make sure we did not go past the end of the mesh.
 
-!..On s'assure que l'on ne depasse pas la maille.
-!dps
-!  Make sure we did not go past the end of the mesh.
-
-      IF ((x2 .LT. x(1)) .OR. (x2 .GT. x(nx)) .OR. (y2 .LT. y(1)) .OR. & 
-     &      (y2 .GT. y(ny))) THEN
-
+      IF ((x2 .LT. x(1)) .OR. (x2 .GT. x(nx)) &
+           & .OR. (y2 .LT. y(1)) .OR.(y2 .GT. y(ny))) THEN
+          
          pastmp = pastmp/2.
          pas = pastmp
          x2 = x1
@@ -230,22 +187,13 @@
 
       ENDIF
 
-!..Indice du segment de structure sur lequel se trouve x2,y2.
-!dps
-!  Index of the segment of the structure containing x2, y2.
+      ! Indice du segment de structure sur lequel se trouve x2,y2 / Index of the segment of the structure containing x2, y2.
 
-      ind2 = indsgm(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
-     &              x2,y2)
-!***
-!     print*,'ind1, ind2=',ind1,ind2
-!***
+      ind2 = indsgm(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque),x2,y2)
 
       ! If we stepped onto the next structure segment, 
       ! set the current stepping point to the node connecting
       ! the two segments. 
-      ! FIXME: this is pretty broken, because if we are unlucky
-      ! pas is set to a very small value, which causes the 
-      ! iterative last-level-line-search to terminate
       IF (ind1 .NE. ind2) THEN
 
          COIN = .TRUE.
@@ -259,41 +207,31 @@
          x2 = xstruc(ind3,plaque)
          y2 = ystruc(ind3,plaque)
 
-         pastmp = pas
+         ! FIXME: this is pretty broken. This step modification
+         ! can send marche into an infinite loop. Disabled for the moment.
 
-         pas = SQRT((x1-x2)**2 + (y1-y2)**2)
+         !pastmp = pas
+         !pas = SQRT((x1-x2)**2 + (y1-y2)**2)
 
       ENDIF
 
-!..Calcul de la fonction pour le point 2.
-!dps
-!  Calculate the psi function at point 2.
+      ! Calcul de la fonction pour le point 2 / Calculate the psi function at point 2.
 
       ii = ifind(x2,x,nx,1)
       jj = ifind(y2,y,ny,1)
 
-      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
-     &       a11(ii,jj,1)*x2*y2
-!***
-!     print*,'psi2=',psi2
-!***
+      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + a11(ii,jj,1)*x2*y2
 
-!..Definition du premier point du vecteur de niveau.
-!dps
-!  Define the first point of the level vector.
+      !..Definition du premier point du vecteur de niveau / Define the first point of the level vector.
 
       niv1x(1) = x2
       niv1y(1) = y2
 
-!..Recheche du deuxieme point sur le perimetre du carre ii,jj.
-!dps
-!  Search for the second point on the perimeter of cross section ii,jj.
+      !..Recheche du deuxieme point sur le perimetre du carre ii,jj.
+      ! Search for the second point on the perimeter of cross section ii,jj.
 
-      ecart1 = SQRT((x2-xstruc(ind2,plaque))**2 + & 
-     &                       (y2-ystruc(ind2,plaque))**2)
-
-      ecart2 = SQRT((x2-xstruc(ind2+1,plaque))**2 + & 
-     &                       (y2-ystruc(ind2+1,plaque))**2)
+      ecart1 = SQRT((x2-xstruc(ind2,plaque))**2 + (y2-ystruc(ind2,plaque))**2)
+      ecart2 = SQRT((x2-xstruc(ind2+1,plaque))**2 + (y2-ystruc(ind2+1,plaque))**2)
 
       echec = .FALSE.
       dir = 0
@@ -302,12 +240,6 @@
      &            niv1x,niv1y, & 
      &            nstruc,npstru,xstruc,ystruc, & 
      &            indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
-!***
-!     print*,'apres crbniv1: k, indstr=',k,indstr
-!     do j=1,k
-!       print*,'j, niv1x/y=',j,niv1x(j),niv1y(j)
-!     enddo
-!***
 
 !..Si on est rendu a l'extremite du segment, on verifie si ce point est
 !  a l'interieur de la structure ou si le sens est change. Si on est pas
@@ -342,21 +274,13 @@
             CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
      &             niv1x,niv1y,nstruc,npstru, & 
      &             xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
+
             if(indstr.ne.0 .and. indstr.ne.fraplq) indlim=indstr
-!***
-!     print*,'apres crbniv2: k, indstr=',k,indstr
-!     do j=1,k
-!       print*,'j, niv1x/y=',j,niv1x(j),niv1y(j)
-!     enddo
-!***
 
             IF (cross(ind2,niv1x,niv1y,xstruc(1,plaque), & 
      &                         ystruc(1,plaque),npstru(plaque)))   THEN
 
                echec = .TRUE.
-!***
-!        print*,'point 2: echec=',echec
-!***
 
             ENDIF
 
@@ -374,15 +298,6 @@
          ENDIF
 
       ELSE
-!***
-!     do j=1,k
-!       print*,'j, niv1x/y=',j,niv1x(j),niv1y(j)
-!     enddo
-!     do j=1,k
-!       print*,'j, nivox/y=',j,nivox(j),nivoy(j)
-!     enddo
-!     print*,'chgdir=',chgdir(niv1x,niv1y,nivox,nivoy)
-!***
 
          IF (chgdir(niv1x,niv1y,nivox,nivoy))     THEN
 
@@ -398,12 +313,7 @@
                jj = jj - MOD(dir-3,2)
 
             ELSE
-
                echec = .TRUE.
-!***
-!              print*,'point 3: echec=',echec
-!***
-
             ENDIF
 
          ELSE
@@ -415,26 +325,21 @@
      &                          ystruc(1,plaque),npstru(plaque)))) THEN
 
                echec = .TRUE.
-!***
-!              print*,'point 4: echec=',echec
-!***
-
             ENDIF
            endif
          ENDIF
       ENDIF
 
-!..Pour les points successifs, on poursuit jusqu'a ce qu'on frappe une
-!  structure.
-!dps
-!  For subsequent points, continue until one strikes a structure.
-
+      !..Pour les points successifs, on poursuit jusqu'a ce qu'on frappe une
+      !  structure.
+      !  For subsequent points, continue until one strikes a structure.
+      
       IF (.NOT.(echec)) THEN
 
          CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-     &          niv1x,niv1y,nstruc,npstru,xstruc, & 
-     &          ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2, &
-     &          allowFail = .true., failed = crbnivFailed)
+              &          niv1x,niv1y,nstruc,npstru,xstruc, & 
+              &          ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2, &
+              &          allowFail = .true., failed = crbnivFailed)
          
          if (crbnivFailed) then 
             ! finding the level line failed, try error handling
@@ -443,44 +348,28 @@
             ! ...everything ok, continue normally
             if(indstr.ne.0 .and. indstr.ne.fraplq) indlim=indstr
          end if
-!***
-!     print*,'apres crbniv3: k, indstr=',k,indstr
-!     do j=1,k
-!       print*,'j, niv1x/y=',j,niv1x(j),niv1y(j)
-!     enddo
-!***
-
       ENDIF
 
 !..Si on a frappe une plaque, on verifie si on est rendu a l'extremite
 !  de notre plaque de depart, sinon on avance d'un pas et on recommence.
-!dps
 !  If we do strike a plate, check to see if we have returned to the end of
 !  our starting plate.  If not, advance one step and start over.
 
-!***
-!     print*,'indstr, fraplq=',indstr,fraplq
-!     print*,'k=',k
-!***
       IF ((indstr .EQ. fraplq) .AND. (.NOT.(echec))) THEN
+          
+          DO j=1, k
+              nivox(j) = niv1x(j)
+              nivoy(j) = niv1y(j)
+          end do
+       
+          nvotot = k
 
-        DO 15 j=1, k
-           nivox(j) = niv1x(j)
-           nivoy(j) = niv1y(j)
-   15   CONTINUE
-
-         nvotot = k
-
-         IF (pastmp .LT. stp0) THEN
-
-            pastmp = pastmp/2.
-            pas = pastmp
-
-         ELSE
-
-            pas = pastmp
-
-         ENDIF
+          IF (pastmp .LT. stp0) THEN
+              pastmp = pastmp/2.
+              pas = pastmp              
+          ELSE
+              pas = pastmp             
+          ENDIF
 
       ELSE
 

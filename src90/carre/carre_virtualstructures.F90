@@ -22,6 +22,10 @@ contains
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(inout) :: struct
 
+    ! internal
+    double precision :: limpoint_min(2), limpoint_max(2)
+
+
     if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
 
     select case(par%gridExtensionMode)
@@ -33,13 +37,14 @@ contains
 
     struct%nstruc = 0
 
-    CALL virtualTargets(par, equ, struct)
+    CALL virtualTargets(par, equ, struct, limpoint_min, limpoint_max)
 
     !..   10.2  Set up virtual limiters if in target mode
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
        call virtualLimiters_targetMode(equ, struct)
     else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
-       !call virtualLimiters_vesselMode(equ, struct)
+       call add_virtual_limiter(equ, struct, limpoint_min(1), limpoint_min(2))
+       call add_virtual_limiter(equ, struct, limpoint_max(1), limpoint_max(2))
     end if
 
 !!$    !..   10.2.1 Diagnostics: Write out resulting structures
@@ -66,13 +71,14 @@ contains
 
 
   !> This routine creates virtual target plates
-  subroutine virtualTargets(par, equ, struct)
+  subroutine virtualTargets(par, equ, struct, limpoint_min, limpoint_max)
 
     !  arguments
     type(CarreParameters), intent(in) :: par
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(inout) :: struct
-
+    double precision, intent(out) :: limpoint_min(2), limpoint_max(2)
+    
     !  variables locales
     integer :: ipx, isep, istru, i
     integer :: ip, itarget, istep, istepTot
@@ -90,7 +96,9 @@ contains
     double precision :: gnorm, structsize
     integer :: nvtarget, idir, vtargetipx(struct%nbdef), vtistruc(struct%nbdef)
     integer :: nptmp(2), npvtmp
+    double precision :: limpoint_min_psi, limpoint_max_psi
     parameter(pi=3.141592654)
+
 !    logical :: istarget
 
     !  procedures
@@ -122,16 +130,12 @@ contains
     seppy = huge(seppy)
 
     ! also find structure points covered by the grid with minimal and maximal psi value
-!    extpoint_psi
-
+    limpoint_min_psi = huge(limpoint_min_psi)
+    limpoint_max_psi = -huge(limpoint_max_psi)
 
 !!$    ! min/maxpsi: range of psi contours to be covered by the grid
 !!$    minpsitot = huge(minpsitot)
 !!$    maxpsitot = -minpsitot
-
-
-    
-
 
     do istru = 1, struct%rnstruc
 
@@ -171,6 +175,18 @@ contains
           maxpsi(istru) = max( maxpsi(istru), ppsi(ip,istru) )
 !!$          minpsitot = min( minpsitot, ppsi(ip,istru) )
 !!$          maxpsitot = max( maxpsitot, ppsi(ip,istru) )
+
+          ! bookkeeping to find points with min/max psi
+          if ( ppsi(ip,istru) < limpoint_min_psi ) then
+              limpoint_min_psi = ppsi(ip,istru)
+              limpoint_min(1) = tx
+              limpoint_min(2) = ty
+          end if
+          if ( ppsi(ip,istru) > limpoint_max_psi ) then
+              limpoint_max_psi = ppsi(ip,istru)
+              limpoint_max(1) = tx
+              limpoint_max(2) = ty
+          end if
 
           ! find projection on separatrix for this point
 
@@ -283,6 +299,11 @@ contains
                 vtminpsi = minval(minpsi) !minpsitot
                 vtmaxpsi = maxval(maxpsi) !maxpsitot
              end select
+
+             ! make the targets a little bit bigger in psi range
+             ! to avoid trouble in frtier
+             vtminpsi = vtminpsi * 1.1
+             vtmaxpsi = vtmaxpsi * 1.1
 
              !write (0,*) 'Global psi range'
              !write (0,*) 'min psi: ', minpsitot, ', max psi: ', maxpsitot
