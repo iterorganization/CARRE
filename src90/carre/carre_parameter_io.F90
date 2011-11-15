@@ -21,6 +21,8 @@ module carre_parameter_io
 
 CONTAINS
 
+  !> In noninteractive mode, the code parameters are initialized 
+  !> at the entry into the ITMCARRE main subroutine using this routine.
   subroutine read_code_parameters_noninteractive(par)
     implicit none
     type(CarreParameters), intent(inout) :: par
@@ -29,11 +31,6 @@ CONTAINS
     integer :: ient,isor,ifail
 
 #ifdef CARRE_NONINTERACTIVE
-    ! In noninteractive mode, the code parameters are initialized 
-    ! at the entry into the ITMCARRE main subroutine.
-    ! Don't read from file or user.
-    return
-#else
     !..1.1  Read all the necessary data from the file    
     ient = 9
     isor = 0
@@ -44,7 +41,8 @@ CONTAINS
        ! In this routine we don't care whether some parameters are broken
        call logmsg( LOGWARNING, "Input values read from carre.dat are inconsistent")
     ENDIF
-#endif    
+#endif
+
   end subroutine read_code_parameters_noninteractive
 
 

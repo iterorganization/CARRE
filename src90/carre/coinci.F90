@@ -68,6 +68,11 @@
      &  'A separatrix misses the X-point by more than ', & 
      &  'the hard-wired tolerance (',rmn,' vs.',const,' )'
       print *,'Are you sure the X-points should be connected? (y/n)'
+
+#ifdef CARRE_NONINTERACTIVE  
+        coinci = imn
+        return     
+#else
  10   read '(a1)',c
       if(c.eq.'y' .or. c.eq.'Y') then
         coinci = imn
@@ -78,5 +83,7 @@
       end if
       print *,'Please answer with Y or N'
       go to 10
+#endif
+
 !=======================================================================
       end

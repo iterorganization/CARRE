@@ -186,16 +186,6 @@ contains
                   &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
                   &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
 
-!!$#ifdef USE_SILO
-!!$             call csioOpenFile('carreLevelLines')
-!!$             ! limiting level lines
-!!$             do iLine = 1, struct%nbniv
-!!$                call siloWriteLineSegmentGridFromPoints( csioDbfile, "limlevelline"//int2str(iLine), &
-!!$                     & struct%nivx(1:struct%nivtot(iLine), iLine), &
-!!$                     & struct%nivy(1:struct%nivtot(iLine), iLine) )
-!!$             end do
-!!$#endif
-
           end if
 
        end do ! end equilibrium loop

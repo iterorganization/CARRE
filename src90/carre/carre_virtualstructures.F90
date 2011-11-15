@@ -39,10 +39,10 @@ contains
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
        call virtualLimiters_targetMode(equ, struct)
     else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
-       call virtualLimiters_vesselMode(equ, struct)
+       !call virtualLimiters_vesselMode(equ, struct)
     end if
 
-    !..   10.2.1 Diagnostics: Write out resulting structures
+!!$    !..   10.2.1 Diagnostics: Write out resulting structures
 #ifdef USE_SILO
     call csioGetStructureSegments( struct%nstruc, struct%npstru, &
          & struct%xstruc, struct%ystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
@@ -76,7 +76,7 @@ contains
     !  variables locales
     integer :: ipx, isep, istru, i
     integer :: ip, itarget, istep, istepTot
-    real*8 :: minpsitot, maxpsitot, & 
+    real*8 :: &  ! minpsitot, maxpsitot, 
          &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, & 
          &     dir, tol
     real*8 :: tx, ty, tpsi, gx, gy, dx, dxmax, pi, alpha, p
@@ -87,30 +87,30 @@ contains
     real*8 :: tmpx(npstmx,2), tmpy(npstmx,2)
     real*8 :: vtmp1, vtmp2
     double precision :: limPsiMax, limPsiMin, limPsi, pointPsi
-    double precision :: gnorm
+    double precision :: gnorm, structsize
     integer :: nvtarget, idir, vtargetipx(struct%nbdef), vtistruc(struct%nbdef)
     integer :: nptmp(2), npvtmp
     parameter(pi=3.141592654)
-    logical :: istarget
+!    logical :: istarget
 
     !  procedures
     real*8 feval2d, angle, dist, norm
     external feval2d, angle, dist, rotate, norm
 
 
-    ! Figure out psi values for limiting curves 
-    limPsiMin = huge(limPsiMin)
-    limPsiMax = -huge(limPsiMax)
-
-    do i = 1, struct%nbniv       
-       ! compute psi value for first point on the curve
-       limPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
-            & struct%nivx(1,i), struct%nivy(1,i) )
-
-       limPsiMin = min(limPsiMin, limPsi)
-       limPsiMax = max(limPsiMax, limPsi)
-    end do
+!!$    ! Figure out psi values for limiting curves 
+!!$    limPsiMin = huge(limPsiMin)
+!!$    limPsiMax = -huge(limPsiMax)
+!!$
+!!$    do i = 1, struct%nbniv       
+!!$       ! compute psi value for first point on the curve
+!!$       limPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+!!$            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+!!$            & struct%nivx(1,i), struct%nivy(1,i) )
+!!$
+!!$       limPsiMin = min(limPsiMin, limPsi)
+!!$       limPsiMax = max(limPsiMax, limPsi)
+!!$    end do
 
     ! we create one virtual target for every separatrix segment intersecting
     ! a target
@@ -118,31 +118,41 @@ contains
     ! First figure out psi range(s) to be covered by grid
     ! and project structure points to separatrix
 
-    ! min/maxpsi: range of psi contours to be covered by the grid
-    minpsitot = huge(minpsitot)
-    maxpsitot = -minpsitot
-
     seppx = huge(seppx)
     seppy = huge(seppy)
+
+    ! also find structure points covered by the grid with minimal and maximal psi value
+!    extpoint_psi
+
+
+!!$    ! min/maxpsi: range of psi contours to be covered by the grid
+!!$    minpsitot = huge(minpsitot)
+!!$    maxpsitot = -minpsitot
+
+
+    
+
 
     do istru = 1, struct%rnstruc
 
        ! if in target mode, only consider points of target structures
        if ( par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET ) then
+          if ( .not. any( struct%inddef(1:struct%nbdef) == istru ) ) cycle
 
-          istarget = .false.
-          do i = 1, struct%nbdef
-             if ( struct%inddef(i) == istru ) then
-                istarget = .true.
-                exit
-             endif
-          enddo
-          if ( .not. istarget ) cycle
+!!$          istarget = .false.
+!!$          do i = 1, struct%nbdef
+!!$             if ( struct%inddef(i) == istru ) then
+!!$                istarget = .true.
+!!$                exit
+!!$             endif
+!!$          enddo
+!!$          if ( .not. istarget ) cycle
        endif
 
+       ! track psi range of points for every structure
        minpsi(istru) = huge(minpsi)
        maxpsi(istru) = -huge(minpsi)
-
+       
        write (0,*) 'virtualtargets: Structure ', istru, & 
             &        ': ', struct%rnpstru(istru), ' points'
        ! loop over all points in structure
@@ -155,13 +165,12 @@ contains
           ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
                &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
                &           tx, ty )
-          !write (0,*) 'Point', ip, ', psi:', ppsi(ip,istru)
 
           ! update min/max psi values
           minpsi(istru) = min( minpsi(istru), ppsi(ip,istru) )
           maxpsi(istru) = max( maxpsi(istru), ppsi(ip,istru) )
-          minpsitot = min( minpsitot, ppsi(ip,istru) )
-          maxpsitot = max( maxpsitot, ppsi(ip,istru) )
+!!$          minpsitot = min( minpsitot, ppsi(ip,istru) )
+!!$          maxpsitot = max( maxpsitot, ppsi(ip,istru) )
 
           ! find projection on separatrix for this point
 
@@ -173,14 +182,9 @@ contains
              ! TODO: step towards psi value of closest separatrix,
              ! i.e. the x-point psi value closest to the current psi value
              ipx = 1
-             ! check distance (in psi) to separatrix
-             !$$$               write (0,*) 'rel. diff psi ',
-             !$$$     $              abs( tpsi - fctpx(ipx) ) / abs( fctpx(ipx) )
              if ( abs( tpsi - equ%fctpx(ipx) ) & 
                   &              / abs( equ%fctpx(ipx) ) < tol ) then
                 ! close enough: stop and store
-                !$$$                  write (0,*) 'Separatrix projection for point ', ip,
-                !$$$     $                 ': ', tx, ty
                 seppx(ip,istru) = tx
                 seppy(ip,istru) = ty
                 exit
@@ -276,8 +280,8 @@ contains
 !!$                vtmaxpsi = min( vtmaxpsi, limPsiMax )
 
              case ( GRID_EXTENSION_MODE_VESSEL )
-                vtminpsi = minpsitot
-                vtmaxpsi = maxpsitot
+                vtminpsi = minval(minpsi) !minpsitot
+                vtmaxpsi = maxval(maxpsi) !maxpsitot
              end select
 
              !write (0,*) 'Global psi range'
@@ -473,14 +477,15 @@ contains
        ! close target by wrapping it around
        
        ! get current extent of new structure
-       dx =  maxval(struct%xstruc(1:npvtmp, struct%nstruc)) &
+       structsize =  maxval(struct%xstruc(1:npvtmp, struct%nstruc)) &
             &   - minval(struct%xstruc(1:npvtmp, struct%nstruc))
-
+       
        vtmp1 = struct%xstruc(npvtmp, itarget) - struct%xstruc(npvtmp - 1, itarget)
        vtmp2 = struct%ystruc(npvtmp, itarget) - struct%ystruc(npvtmp - 1, itarget)
        call rotate( vtmp1, vtmp2, pi * 1.25 )
-       vtmp1 = vtmp1 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
-       vtmp2 = vtmp2 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
+       dx = 1 / norm( vtmp1, vtmp2 ) * structsize * 0.3
+       vtmp1 = vtmp1 * dx
+       vtmp2 = vtmp2 * dx
 
        npvtmp = npvtmp + 1
        struct%xstruc(npvtmp, itarget) = struct%xstruc(npvtmp - 1, itarget) + vtmp1
@@ -489,8 +494,9 @@ contains
        vtmp1 = struct%xstruc(2, itarget) - struct%xstruc(1, itarget)
        vtmp2 = struct%ystruc(2, itarget) - struct%ystruc(1, itarget)
        call rotate( vtmp1, vtmp2, pi * 1.75 )
-       vtmp1 = vtmp1 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
-       vtmp2 = vtmp2 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
+       dx = 1 / norm( vtmp1, vtmp2 ) *  structsize * 0.3
+       vtmp1 = vtmp1 * dx
+       vtmp2 = vtmp2 * dx
 
        npvtmp = npvtmp + 1
        struct%xstruc(npvtmp, itarget) = struct%xstruc(1, itarget) + vtmp1

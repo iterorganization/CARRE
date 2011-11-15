@@ -15,6 +15,8 @@
 !*** direction of the search along the target and then calls MARCHE to
 !*** find and parametrise the limiting level line.
 !======================================================================
+        use Logging
+
       IMPLICIT NONE
 
 !ank-970707: dimensions from the file
@@ -1040,6 +1042,20 @@
 !c<<<
 !      write(0,*) 'Leaving frtier'
 !c>>>
+      ! Write out psi values for level lines
+      call logmsg(LOGDEBUG, "FRTIER: psi values of level lines")
+      do i = 1, nbniv
+          x0 = nivx(1,i)
+          y0 = nivy(1,i)
+          ii = ifind(x0,x,nx,1)
+          jj = ifind(y0,y,ny,1)          
+          psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
+               & a11(ii,jj,1)*x0*y0
+          call logmsg(LOGDEBUG, "FRTIER: level line "//int2str(i)&
+               & //" : psi="//real2str(psi0))
+      end do
+
+
       RETURN
 !======================================================================
       END

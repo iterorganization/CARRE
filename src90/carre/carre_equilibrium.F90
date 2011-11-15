@@ -16,7 +16,7 @@ module carre_equilibrium
 #include <CARREDIM.F>
 
   private
-  public extend_equilibrium  
+  public extend_equilibrium, insideEquGrid
 
 contains
 
@@ -440,5 +440,17 @@ contains
 
   end subroutine equilibrium_vessel_cutoff
 
+  !> Check whether the given position (x,y) is
+  !> inside the region covered by the equilibrium grid.
+  logical function insideEquGrid(equ, x, y)
+    type(CarreEquilibrium), intent(in) :: equ
+    double precision, intent(in) :: x, y
+
+    insideEquGrid = ( (x >= equ%x(1)) &
+         & .and. (x <= equ%x(equ%nx)) &
+         & .and. (y >= equ%y(1)) &
+         & .and. (y <= equ%y(equ%ny)) )
+
+  end function insideEquGrid
 
 end module carre_equilibrium

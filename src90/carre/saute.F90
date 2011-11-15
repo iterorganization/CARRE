@@ -55,24 +55,6 @@
 !======================================================================
 
       n_call=n_call+1
-!c<<<
-!      l_dbg=n_call.gt.225
-!      if(l_dbg) then
-!        write(0,*) '===> Entering SAUTE. n_call = ',n_call
-!        write(0,'(1x,6a5,a9,3a12)') 'npst','sens','nx','ny',
-!     ,                               'nm1','nm2','x1','y1','psi1','pas'
-!        write(0,'(6i5,1p,4e12.4)') npst,sens,nx,ny,nm1,nm2,
-!     ,                                                   x1,y1,psi1,pas
-!        write(0,'(1x,a9,5a12)')
-!     -                      'x(1)','y(1)','x(2)','y(2)','x(nx)','y(ny)'
-!        write(0,'(1x,1p,6e12.4)') x(1),y(1),x(2),y(2),x(nx),y(nx)
-!        write(0,*) 'xst'
-!        write(0,'(1p,10e12.4)') xst
-!        write(0,*) 'yst'
-!        write(0,'(1p,10e12.4)') yst
-!        call trc_stk
-!      end if
-!c>>>
 
 !..Initialisation.
 
@@ -94,14 +76,6 @@
       x0=x1
       y0=y1
       psi0 = psi1
-!c<<<
-!      if(l_dbg) then
-!        write(0,'(1x,4a5,a9,5a12)') 'sens','npst','ind1','ind2',
-!     ,              'x1','y1','xst(i1)','yst(i1)','xst(i2)','yst(i2)'
-!        write(0,'(1x,4i5,1p,6e12.2)') sens,npst,ind1,ind2,
-!     ,                    x1,y1,xst(ind1),yst(ind1),xst(ind2),yst(ind2)
-!      end if
-!c>>>
 
 !..Make a step according to selected distribution of the grid points
 
@@ -119,12 +93,6 @@
           x2=x0+zpas/dist*(xst(ind2)-x0)
           y2=y0+zpas/dist*(yst(ind2)-y0)
 
-!c<<<
-!          if(l_dbg) then
-!            write(0,*) '<=== Leaving SAUTE (dist found). x2,y2 = ',
-!     ,                                                            x2,y2
-!          end if
-!c>>>
           RETURN
 
         else
@@ -146,11 +114,6 @@
 
       else if (repart .EQ. 2) then
 
-!c<<<
-!        if(l_dbg) then
-!          write(0,'(2x,2a4,a9,3a12)') 'ii','jj','x','y','psi','pas'
-!        end if
-!c>>>
 !---------------------------------------------------------------------{
    10   CONTINUE
 
@@ -238,23 +201,11 @@
         psi3 = a00(ii,jj,1) + a10(ii,jj,1)*x3 + a01(ii,jj,1)*y3 + & 
      &         a11(ii,jj,1)*x3*y3
 
-!c<<<
-!        if(l_dbg) then
-!          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x3,y3,psi3,pas
-!        end if
-!c>>>
         IF (ABS(psi3 - pas) .LT. psimi2) then
 
           x2 = x3
           y2 = y3
 
-!c<<<
-!          if(l_dbg) then
-!            write(0,'(2a,1p,3e12.4)')
-!     -                   ' <=== Leaving SAUTE (psi3 found). ',
-!     ,                                        'x2,y2,psi3 = ',x2,y2,psi
-!          end if
-!c>>>
           RETURN
 
         end if
@@ -273,24 +224,10 @@
           psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
      &           a11(ii,jj,1)*x2*y2
 
-!c<<<
-!        if(l_dbg) then
-!          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x2,y2,psi2,pas
-!        end if
-!c>>>
           IF (ABS(psi2-pas) .LT. psimin) then
-
-!c<<<
-!            if(l_dbg) then
-!              write(0,'(2a,1p,3e12.4)')
-!     -                   ' <=== Leaving SAUTE (psi2 found). ',
-!     ,                                        'x2,y2,psi3 = ',x2,y2,psi
-!            end if
-!c>>>
             RETURN
-
           else if ((MIN(psi0,psi2).LE.pas) .AND. & 
-     &                         (MAX(psi0,psi2).GE.pas)) then
+     &             (MAX(psi0,psi2).GE.pas)) then
             x3 = x2
             y3 = y2
             psi3 = psi2
@@ -304,9 +241,6 @@
 !---------------------------------------------------------------------}
         else
           IF (compt .EQ. npst) then
-
-!            PRINT *,'On a fait le tour de la structure sans trouver'
-!     .                ,' la fonction dans SAUTE'
 
             if(sellan(1:8).eq.'francais') then
             write(*,*) 'On a fait le tour de la structure sans trouver' & 
