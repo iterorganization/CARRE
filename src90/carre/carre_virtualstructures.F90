@@ -6,6 +6,7 @@ module carre_virtualstructures
   use SiloIO
 #endif
   use CarreSiloIO
+  use carre_equilibrium
 
   implicit none
 
@@ -32,16 +33,13 @@ contains
 
     struct%nstruc = 0
 
-    CALL virtualTargets(par, equ, struct, &
-         & equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
-         & equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
-         & equ%a00,equ%a10,equ%a01,equ%a11 )
+    CALL virtualTargets(par, equ, struct)
 
     !..   10.2  Set up virtual limiters if in target mode
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
-       call VIRTUALLIMITERS(struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
-            & equ%npx,equ%xpto,equ%ypto, & 
-            & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc)
+       call virtualLimiters_targetMode(equ, struct)
+    else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
+       call virtualLimiters_vesselMode(equ, struct)
     end if
 
     !..   10.2.1 Diagnostics: Write out resulting structures
@@ -63,46 +61,17 @@ contains
 !!$             write (100,*) ''
 !!$          enddo
 !!$          close(UNIT=100)
+
   end subroutine setupVirtualStructures
 
 
   !> This routine creates virtual target plates
-  subroutine virtualTargets(par, equ, struct, nx,ny,x,y,psi,npx,ptx,pty, & 
-       & fctpx,separx,separy,nptot, & 
-       & a00,a10,a01,a11)
+  subroutine virtualTargets(par, equ, struct)
 
     !  arguments
     type(CarreParameters), intent(in) :: par
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(inout) :: struct
-
-    integer nx,ny,npx, & 
-         &     nptot(4,npxmx)
-    real*8 x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx), & 
-         &     fctpx(npxmx),separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), & 
-         &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-         &     a01(nxmax,nymax,3),a11(nxmax,nymax,3)
-
-    ! nx, ny : size of 2d eqilibrium arrays
-    ! x(nxmax), y(nymax), psi(nxmax,nymax) : equilibrium arrays
-    ! npx : no. of special (x,o) points
-    !.. npx   : number of the X-points
-    !.. ptx,pty: X-point co-ordinates
-    !.. iptx,jptx: x and y indices of the cells containing the X-points
-    !.. fctpx: the psi values at each X- or O-point
-    !.. separx,separy: coordinates of the points of the parametrised
-    !               separatrices (point index, branch index, X-point index)
-    !.. nptot : number of parametrisation points for each separatrix
-    !           (separatrix index, point index)
-    !.. struct%nstruc: number of structures
-    !.. struct%npstru: number of points per structure
-    !.. struct%xstruc,struct%ystruc: coordinates of the structure points
-    !                  (point index, structure index)
-    !.. struct%indplq: table of the structure indices (0 means not a target)
-    !           (separatrix index, X-point index)
-    !.. struct%inddef: table of indices of the divertor plates
-    !.. struct%nbdef : number of the divertor plates
-
 
     !  variables locales
     integer :: ipx, isep, istru, i
@@ -116,7 +85,6 @@ contains
     real*8 :: vtstartx(struct%nbdef), vtstarty(struct%nbdef)
     real*8 :: ppsi(npstmx,struct%rnstruc)
     real*8 :: tmpx(npstmx,2), tmpy(npstmx,2)
-    real*8 :: rx(2), ry(2)
     real*8 :: vtmp1, vtmp2
     double precision :: limPsiMax, limPsiMin, limPsi, pointPsi
     double precision :: gnorm
@@ -184,8 +152,8 @@ contains
           ty = struct%rystruc( ip, istru )
 
           ! compute psi at point
-          ppsi(ip,istru) = feval2d( nx, ny, x, y, & 
-               &           a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1), & 
+          ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+               &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
                &           tx, ty )
           !write (0,*) 'Point', ip, ', psi:', ppsi(ip,istru)
 
@@ -208,8 +176,8 @@ contains
              ! check distance (in psi) to separatrix
              !$$$               write (0,*) 'rel. diff psi ',
              !$$$     $              abs( tpsi - fctpx(ipx) ) / abs( fctpx(ipx) )
-             if ( abs( tpsi - fctpx(ipx) ) & 
-                  &              / abs( fctpx(ipx) ) < tol ) then
+             if ( abs( tpsi - equ%fctpx(ipx) ) & 
+                  &              / abs( equ%fctpx(ipx) ) < tol ) then
                 ! close enough: stop and store
                 !$$$                  write (0,*) 'Separatrix projection for point ', ip,
                 !$$$     $                 ': ', tx, ty
@@ -220,20 +188,20 @@ contains
 
              ! not close enough: step along grad psi towards separatrix
              ! compute grad psi at current position
-             gx = feval2d( nx, ny, x, y, & 
-                  &              a00(:,:,2), a10(:,:,2), a01(:,:,2), a11(:,:,2), & 
+             gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+                  &              equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
                   &              tx, ty )
-             gy = feval2d( nx, ny, x, y, & 
-                  &              a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3), & 
+             gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+                  &              equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
                   &              tx, ty )
              ! take a step, including a security factor
-             dx = 0.02 * (tpsi - fctpx(ipx)) & 
+             dx = 0.02 * (tpsi - equ%fctpx(ipx)) & 
                   &              / sqrt( gx**2 + gy**2 );
              tx = tx - dx * gx
              ty = ty - dx * gy
              ! compute psi at new position
-             tpsi = feval2d( nx, ny, x, y, & 
-                  &              a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1), & 
+             tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+                  &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
                   &              tx, ty )
              ! TODO: if psi not moving in the right direction,
              ! decrease step size and try again
@@ -257,7 +225,7 @@ contains
     nvtarget = 0
 
     ! loop over x-points
-    do ipx = 1, npx
+    do ipx = 1, equ%npx
 
        ! loop over separatrix segments
        do isep = 1, 4
@@ -275,13 +243,12 @@ contains
           vtargetipx(nvtarget) = ipx
           ! vtistruc stores index of structure associated w.t. target
           vtistruc(nvtarget) = itarget
-          vtstartx(nvtarget) = ptx(ipx)
-          vtstarty(nvtarget) = pty(ipx)
+          vtstartx(nvtarget) = equ%ptx(ipx)
+          vtstarty(nvtarget) = equ%pty(ipx)
 
           dxmax = 0
 
           ! find the starting point for the target
-
           do istru = 1, struct%rnstruc
 
              ! only look at targets
@@ -312,10 +279,6 @@ contains
                 vtminpsi = minpsitot
                 vtmaxpsi = maxpsitot
              end select
-
-             ! EXPERIMENTAL: we make the targets a bit bigger in psi range
-             vtminpsi = vtminpsi * 1.1
-             vtmaxpsi = vtmaxpsi * 1.1
 
              !write (0,*) 'Global psi range'
              !write (0,*) 'min psi: ', minpsitot, ', max psi: ', maxpsitot
@@ -352,9 +315,9 @@ contains
 
                 if (tx == huge(seppx)) cycle
 
-                alpha = angle( ptx(ipx), pty(ipx), & 
-                     &                 separx( nptot( isep, ipx ), isep, ipx ), & 
-                     &                 separy( nptot( isep, ipx ), isep, ipx ), & 
+                alpha = angle( equ%ptx(ipx), equ%pty(ipx), & 
+                     &                 equ%separx( equ%nptot( isep, ipx ), isep, ipx ), & 
+                     &                 equ%separy( equ%nptot( isep, ipx ), isep, ipx ), & 
                      &                 tx, ty )
 
                 !write (0,*) 'X/Strike point angle is ', alpha
@@ -365,7 +328,7 @@ contains
                 endif
 
                 ! Point on correct sep. branch. Check distance to x-point
-                dx = dist( ptx(ipx), pty(ipx), tx, ty )
+                dx = dist( equ%ptx(ipx), equ%pty(ipx), tx, ty )
                 ! if further away than previous projections, keep
                 if (  dx > dxmax ) then
                    vtstartx(nvtarget) = tx
@@ -378,37 +341,35 @@ contains
        enddo ! separatrix segment loop
     enddo ! x-point loop
 
-    ! TODO: refactor building the virtual targets out into subroutine
+    ! Diagnostic output: psi range of virtual targets vtminpsi
+    call logmsg(LOGDEBUG, "virtualTargets: psi range "//real2str(vtminpsi)&
+         & // " to " // real2str(vtmaxpsi))
 
     ! build the virtual targets
+    ! TODO: refactor building the virtual targets out into subroutine
     ! build individual targets
     do itarget = 1, nvtarget
-
-       ! track the target extent to get a reference length
-       rx(1) = huge(rx)
-       ry(1) = huge(rx)
-       rx(2) = -huge(rx)
-       ry(2) = -huge(rx)
 
        ! compute grad psi at starting point (again)
        tx = vtstartx(itarget)
        ty = vtstarty(itarget)
-       gx = feval2d( nx, ny, x, y, & 
-            &        a00(:,:,2), a10(:,:,2), a01(:,:,2), a11(:,:,2), & 
+       gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+            &        equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
             &        tx, ty )
-       gy = feval2d( nx, ny, x, y, & 
-            &        a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3), & 
+       gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+            &        equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
             &        tx, ty )
        ! check in which direction the associated x-point is
-       p = gx * ( pty( vtargetipx( itarget ) ) - ty ) & 
-            &        - gy * ( ptx( vtargetipx( itarget ) ) - tx )
+       p = gx * ( equ%pty( vtargetipx( itarget ) ) - ty ) & 
+            &        - gy * ( equ%ptx( vtargetipx( itarget ) ) - tx )
 
        ! take a step along the separatrix away from the x-point
+       ! to gain some distance between virtual and real structures
 
        ! choose a stepsize
        dx = 1 / norm( gx, gy ) * & 
-            &        norm( ptx( vtargetipx( itarget ) ) - tx, & 
-            &              pty( vtargetipx( itarget ) ) - ty ) * 0.05
+            &        norm( equ%ptx( vtargetipx( itarget ) ) - tx, & 
+            &              equ%pty( vtargetipx( itarget ) ) - ty ) * 0.05
 
        if ( p == 0 ) stop 'Grad psi pointing towards x-point'
        if ( p > 0 ) then
@@ -423,10 +384,11 @@ contains
           vtstarty(itarget) = vtstarty(itarget) + dx * gx
        endif
 
+
        ! build virtual structure starting from the given points on the sep.
        ! step in both directions away from the separatrix
        istepTot = 0
-       do idir = 1, 2
+       do idir = 1, 2 ! idir=1: along grad psi, idir=2: along minus grad psi
           istep = 1
           if ( idir == 1 ) then
              dir = 1
@@ -434,36 +396,34 @@ contains
              dir = -1
           endif
 
-          !           build virtual structure starting from the given points on the sep.
+          ! build virtual structure starting from the given points on the sep.
           tx = vtstartx(itarget)
           ty = vtstarty(itarget)
 
           do
-             !              compute grad psi
-             gx = feval2d( nx, ny, x, y, & 
-                  &              a00(:,:,2), a10(:,:,2), a01(:,:,2), a11(:,:,2), & 
-                  &              tx, ty )
-             gy = feval2d( nx, ny, x, y, & 
-                  &              a00(:,:,3), a10(:,:,3), a01(:,:,3), a11(:,:,3), & 
-                  &              tx, ty )
+             ! compute grad psi
+             gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+                  & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
+                  & tx, ty )
+             gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+                  & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
+                  & tx, ty )
              gnorm = norm(gx, gy)             
 
-             dx = 1/gnorm * (x(2) - x(1)) * 0.5 ;
+             dx = 1/gnorm * (equ%x(2) - equ%x(1)) * 0.5 ;
              tx = tx + dir * dx * gx
              ty = ty + dir * dx * gy
 
-             tpsi = feval2d( nx, ny, x, y, & 
-                  &              a00(:,:,1), a10(:,:,1), a01(:,:,1), a11(:,:,1), & 
-                  &              tx, ty )
+             ! did we step outside the equilibrium grid?
+             if (.not. insideEquGrid(equ, tx, ty)) exit
+
+             tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+                  & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+                  & tx, ty )
 
              nptmp(idir) = istep
              tmpx(istep,idir) = tx
              tmpy(istep,idir) = ty
-
-             rx(1) = min( rx(1), tx )
-             ry(1) = min( ry(1), ty )
-             rx(2) = max( rx(2), tx )
-             ry(2) = max( ry(2), ty )
 
              if ( tpsi > vtmaxpsi ) exit
              if ( tpsi < vtminpsi ) exit
@@ -481,7 +441,6 @@ contains
        ! arrange points according to orientation
        tx = vtstartx(itarget)
        ty = vtstarty(itarget)
-
 
        if ( p == 0 ) stop 'Grad psi pointing towards x-point'
        if ( p > 0 ) then
@@ -503,12 +462,6 @@ contains
           struct%ystruc(npvtmp, struct%nstruc) = tmpy(istep,idir)
        enddo
 
-       ! insert starting point into middle
-       ! TODO: this point is ommitted because it triggers a problem in marche
-!!$       npvtmp = npvtmp + 1
-!!$       struct%xstruc(npvtmp, struct%nstruc) = vtstartx(itarget)
-!!$       struct%ystruc(npvtmp, struct%nstruc) = vtstarty(itarget)
-
        idir = idir + 1
        if ( idir > 2 ) idir = 1
        do istep = 1, nptmp(idir)
@@ -518,13 +471,16 @@ contains
        enddo
 
        ! close target by wrapping it around
+       
+       ! get current extent of new structure
+       dx =  maxval(struct%xstruc(1:npvtmp, struct%nstruc)) &
+            &   - minval(struct%xstruc(1:npvtmp, struct%nstruc))
 
        vtmp1 = struct%xstruc(npvtmp, itarget) - struct%xstruc(npvtmp - 1, itarget)
        vtmp2 = struct%ystruc(npvtmp, itarget) - struct%ystruc(npvtmp - 1, itarget)
        call rotate( vtmp1, vtmp2, pi * 1.25 )
-       dx = 1 / norm( vtmp1, vtmp2 ) * ( ( rx(2) - rx(1) ) * 0.3 )
-       vtmp1 = vtmp1 * dx
-       vtmp2 = vtmp2 * dx
+       vtmp1 = vtmp1 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
+       vtmp2 = vtmp2 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
 
        npvtmp = npvtmp + 1
        struct%xstruc(npvtmp, itarget) = struct%xstruc(npvtmp - 1, itarget) + vtmp1
@@ -533,9 +489,8 @@ contains
        vtmp1 = struct%xstruc(2, itarget) - struct%xstruc(1, itarget)
        vtmp2 = struct%ystruc(2, itarget) - struct%ystruc(1, itarget)
        call rotate( vtmp1, vtmp2, pi * 1.75 )
-       dx = 1 / norm( vtmp1, vtmp2 ) * ( ( rx(2) - rx(1) ) * 0.3 )
-       vtmp1 = vtmp1 * dx
-       vtmp2 = vtmp2 * dx
+       vtmp1 = vtmp1 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
+       vtmp2 = vtmp2 * 1 / norm( vtmp1, vtmp2 ) *  dx * 0.3
 
        npvtmp = npvtmp + 1
        struct%xstruc(npvtmp, itarget) = struct%xstruc(1, itarget) + vtmp1
@@ -553,80 +508,79 @@ contains
   end subroutine virtualtargets
 
 
-  !=======================================================================
-  !*** This routine creates virtual limiters.
+  !> Add one virtual limiter for every limiting curve.
+  !>
+  !> The virtual limiters are triangles, the tip of which is placed
+  !> in the middle of the limiting curve (measured
+  !> in physical length along the curve) and the triangle is oriented
+  !> away from the O-point
+  subroutine virtualLimiters_targetMode(equ, struct)
 
-  !*** One virtual limiter is created for every limiting curve.
-  !*** The virtual limiters are triangles, the tip of which is placed
-  !*** in the middle of the limiting curve (measured
-  !*** in physical length along the curve) and the triangle is oriented
-  !*** away from the O-point
-  !=======================================================================
+    type(CarreEquilibrium), intent(in) :: equ
+    type(CarreStructures), intent(inout) :: struct
 
-  subroutine virtualLimiters(nivx,nivy,nivtot,nbniv,npx,xpto,ypto, & 
-       & nstruc,npstru,xstruc,ystruc)
-
-
-    implicit none
-#include <CARREDIM.F>
-
-    !  arguments
-    real*8 :: nivx(npnimx,nivmx),nivy(npnimx,nivmx)
-    real*8 :: xpto, ypto
-    real*8 :: xstruc(npstmx,strumx),ystruc(npstmx,strumx)
-    integer :: nbniv, nivtot(nbniv), npx, nstruc, npstru(strumx)
-
-    !  variables locales
-    real*8 :: l, x, y, ox, oy, length, pi
+    ! internal
+    real*8 :: l, x, y
     integer :: iniv
-    parameter(pi=3.141592654)
 
-    double precision, parameter :: TRIANGLE_SIZE = 0.1
-    double precision, parameter :: TRIANGLE_ANGLE = pi / 2.5
     !  procedures
     real*8 :: long
     external long
 
-    !.. nbniv : number of the limiting level lines
-    !.. nivx,nivy: coordinates of the points of the parametrised
-    !              limiting level lines (point index, curve index)
-    !.. nivtot: number of points for each parametrised limiting level line
+    do iniv = 1, struct%nbniv
 
-    !=======================================================================
+       l = long( struct%nivx(:,iniv), struct%nivy(:,iniv), struct%nivtot(iniv) )
+       call coord( struct%nivx(:,iniv), struct%nivy(:,iniv), struct%nivtot(iniv), &
+            & l/2.0, x, y )
 
-    do iniv = 1, nbniv
-
-       l = long( nivx(:,iniv), nivy(:,iniv), nivtot(iniv) )
-       call coord( nivx(:,iniv), nivy(:,iniv), nivtot(iniv), & 
-            &        l/2.0, x, y )
-
-!!$         ox = ( x - ptx(npx) ) * 0.1
-!!$         oy = ( y - pty(npx) ) * 0.1
-
-       ox = ( x - xpto ) 
-       oy = ( y - ypto ) 
-       length = sqrt( ox ** 2 + oy ** 2 )
-       ox = ox / length
-       oy = oy / length
-
-       nstruc = nstruc + 1
-       npstru(nstruc) = 4
-       xstruc(1,nstruc) = x
-       ystruc(1,nstruc) = y
-
-       call rotate( ox, oy, TRIANGLE_ANGLE / 2.0 )
-       xstruc(2,nstruc) = x + ox * TRIANGLE_SIZE
-       ystruc(2,nstruc) = y + oy * TRIANGLE_SIZE
-
-       call rotate( ox, oy, - TRIANGLE_ANGLE )
-       xstruc(3,nstruc) = x + ox * TRIANGLE_SIZE
-       ystruc(3,nstruc) = y + oy * TRIANGLE_SIZE
-
-       xstruc(4,nstruc) = x
-       ystruc(4,nstruc) = y
-
+       call add_virtual_limiter(equ, struct, x, y)       
     enddo
 
-  end subroutine virtualLimiters
+  end subroutine virtualLimiters_targetMode
+
+
+  !> Add a virtual limiter structure at point x, y
+  !>
+  !> The virtual limiters are triangles, the tip of which is placed
+  !> at the given point  and the triangle is oriented away from the O-point
+  subroutine add_virtual_limiter(equ, struct, x, y)
+
+    type(CarreEquilibrium), intent(in) :: equ
+    type(CarreStructures), intent(inout) :: struct
+    double precision, intent(in) :: x, y
+
+    ! internal
+    real*8 :: ox, oy, length
+    double precision, parameter :: pi=3.141592654
+
+    double precision, parameter :: TRIANGLE_SIZE = 0.1
+    double precision, parameter :: TRIANGLE_ANGLE = pi / 2.5
+
+    external :: rotate
+
+    ox = ( x - equ%xpto ) 
+    oy = ( y - equ%ypto ) 
+    length = sqrt( ox ** 2 + oy ** 2 )
+    ox = ox / length
+    oy = oy / length
+    
+    struct%nstruc = struct%nstruc + 1
+    struct%npstru(struct%nstruc) = 4
+    struct%xstruc(1,struct%nstruc) = x
+    struct%ystruc(1,struct%nstruc) = y
+    
+    call rotate( ox, oy, TRIANGLE_ANGLE / 2.0 )
+    struct%xstruc(2,struct%nstruc) = x + ox * TRIANGLE_SIZE
+    struct%ystruc(2,struct%nstruc) = y + oy * TRIANGLE_SIZE
+    
+    call rotate( ox, oy, - TRIANGLE_ANGLE )
+    struct%xstruc(3,struct%nstruc) = x + ox * TRIANGLE_SIZE
+    struct%ystruc(3,struct%nstruc) = y + oy * TRIANGLE_SIZE
+    
+    struct%xstruc(4,struct%nstruc) = x
+    struct%ystruc(4,struct%nstruc) = y
+    
+  end subroutine add_virtual_limiter
+
 
 end module carre_virtualStructures
