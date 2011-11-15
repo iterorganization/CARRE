@@ -6,7 +6,7 @@ CPP	= /usr/lib/cpp
 # Source form: src is old fixed form source (no longer maintained), src90 is current free form source
 SRCDIR = src90
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_assert
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_assert:${SRCDIR}/carre_shared
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr

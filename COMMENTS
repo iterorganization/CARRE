@@ -1,0 +1,5 @@
+Create a grid plot in grid.ps with VisIt (requires VisIt support in CARRE)
+(currently only works for single null)
+
+visit -cli -nowin -s plot-sn.py
+

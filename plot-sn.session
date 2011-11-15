@@ -7431,10 +7431,10 @@
         </Object>
         <Object name="ViewerSubject">
             <Object name="SourceMap">
-                <Field name="SOURCE00" type="string">localhost:/scratch/hmk/svn/carre-hmk/carreFinal00000.silo</Field>
+                <Field name="SOURCE00" type="string">carreFinal00000.silo</Field>
             </Object>
             <Object name="SourcePlugins">
-                <Field name="localhost:/scratch/hmk/svn/carre-hmk/carreFinal00000.silo" type="string">Silo_1.0</Field>
+                <Field name="carreFinal00000.silo" type="string">Silo_1.0</Field>
             </Object>
             <Object name="DatabaseCorrelationList">
                 <Field name="needPermission" type="bool">true</Field>
@@ -8340,7 +8340,7 @@
                         </Object>
                         <Object name="ViewerPlotList">
                             <Object name="timeSliders">
-                                <Field name="localhost:/scratch/hmk/svn/carre-hmk/carrePostPrcA*.silo database" type="int">8</Field>
+                                <Field name="carrePostPrcA*.silo database" type="int">8</Field>
                             </Object>
                             <Object name="plot00">
                                 <Field name="plotName" type="string">Plot0006</Field>
@@ -9041,24 +9041,6 @@
                     <Field name="discretizationMode" type="string">Uniform</Field>
                     <Field name="discretizeBoundaryOnly" type="bool">false</Field>
                     <Field name="passNativeCSG" type="bool">false</Field>
-                </Object>
-                <Object name="RunningEngines">
-                    <Object name="MachineProfile">
-                        <Field name="hostNickname" type="string"></Field>
-                        <Field name="host" type="string">qa04.bc.rzg.mpg.de</Field>
-                        <Field name="userName" type="string">hmk</Field>
-                        <Field name="hostAliases" type="string"></Field>
-                        <Field name="directory" type="string"></Field>
-                        <Field name="shareOneBatchJob" type="bool">false</Field>
-                        <Field name="sshPortSpecified" type="bool">false</Field>
-                        <Field name="sshPort" type="int">22</Field>
-                        <Field name="useGateway" type="bool">false</Field>
-                        <Field name="gatewayHost" type="string"></Field>
-                        <Field name="clientHostDetermination" type="string">MachineName</Field>
-                        <Field name="manualClientHostName" type="string"></Field>
-                        <Field name="tunnelSSH" type="bool">false</Field>
-                        <Field name="activeProfile" type="int">-1</Field>
-                    </Object>
                 </Object>
             </Object>
         </Object>

@@ -26,30 +26,31 @@
             <Field name="defaultOrientation" type="int">0</Field>
         </Object>
         <Object name="Annotation">
-            <Field name="x" type="int">779</Field>
-            <Field name="y" type="int">318</Field>
+            <Field name="x" type="int">698</Field>
+            <Field name="y" type="int">293</Field>
             <Field name="width" type="int">490</Field>
             <Field name="height" type="int">700</Field>
             <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
-            <Field name="activeTab" type="int">0</Field>
+            <Field name="activeTab" type="int">5</Field>
         </Object>
         <Field name="postWhenShown" type="bool">false</Field>
+        <Object name="Appearance">
+            <Field name="x" type="int">803</Field>
+            <Field name="y" type="int">752</Field>
+            <Field name="width" type="int">257</Field>
+            <Field name="height" type="int">239</Field>
+            <Field name="visible" type="bool">false</Field>
+            <Field name="posted" type="bool">false</Field>
+        </Object>
         <Object name="Color tables">
-            <Field name="x" type="int">89</Field>
-            <Field name="y" type="int">52</Field>
+            <Field name="x" type="int">47</Field>
+            <Field name="y" type="int">80</Field>
             <Field name="width" type="int">363</Field>
             <Field name="height" type="int">633</Field>
-            <Field name="visible" type="bool">true</Field>
+            <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
             <Field name="currentColorTable" type="string">cellflag</Field>
-        </Object>
-        <Object name="File open">
-            <Field name="x" type="int">189</Field>
-            <Field name="y" type="int">541</Field>
-            <Field name="width" type="int">534</Field>
-            <Field name="height" type="int">427</Field>
-            <Field name="visible" type="bool">false</Field>
         </Object>
         <Object name="Information">
             <Field name="x" type="int">319</Field>
@@ -59,8 +60,8 @@
             <Field name="visible" type="bool">false</Field>
         </Object>
         <Object name="Pick">
-            <Field name="x" type="int">1260</Field>
-            <Field name="y" type="int">172</Field>
+            <Field name="x" type="int">1261</Field>
+            <Field name="y" type="int">197</Field>
             <Field name="width" type="int">338</Field>
             <Field name="height" type="int">821</Field>
             <Field name="visible" type="bool">false</Field>
@@ -68,6 +69,31 @@
             <Field name="autoShow" type="bool">true</Field>
             <Field name="savePicks" type="bool">false</Field>
             <Field name="userMaxTabs" type="int">8</Field>
+        </Object>
+        <Object name="Plugin Manager">
+            <Field name="x" type="int">355</Field>
+            <Field name="y" type="int">528</Field>
+            <Field name="width" type="int">618</Field>
+            <Field name="height" type="int">490</Field>
+            <Field name="visible" type="bool">false</Field>
+            <Field name="posted" type="bool">false</Field>
+            <Field name="activeTab" type="int">2</Field>
+        </Object>
+        <Object name="Preferences">
+            <Field name="x" type="int">803</Field>
+            <Field name="y" type="int">372</Field>
+            <Field name="width" type="int">323</Field>
+            <Field name="height" type="int">646</Field>
+            <Field name="visible" type="bool">false</Field>
+            <Field name="posted" type="bool">false</Field>
+        </Object>
+        <Object name="Set save options">
+            <Field name="x" type="int">1160</Field>
+            <Field name="y" type="int">369</Field>
+            <Field name="width" type="int">438</Field>
+            <Field name="height" type="int">624</Field>
+            <Field name="visible" type="bool">false</Field>
+            <Field name="posted" type="bool">false</Field>
         </Object>
         <Object name="MainWin">
             <Field name="x" type="int">0</Field>
@@ -77,24 +103,24 @@
             <Field name="SPLITTER_VALUES_V2" type="floatVector">0 0.543046 0.452539 </Field>
         </Object>
         <Object name="Contour plot attributes">
-            <Field name="x" type="int">126</Field>
-            <Field name="y" type="int">99</Field>
+            <Field name="x" type="int">127</Field>
+            <Field name="y" type="int">124</Field>
             <Field name="width" type="int">402</Field>
             <Field name="height" type="int">700</Field>
-            <Field name="visible" type="bool">true</Field>
+            <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
         </Object>
         <Object name="Mesh plot attributes">
-            <Field name="x" type="int">175</Field>
-            <Field name="y" type="int">515</Field>
+            <Field name="x" type="int">165</Field>
+            <Field name="y" type="int">490</Field>
             <Field name="width" type="int">338</Field>
             <Field name="height" type="int">528</Field>
             <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
         </Object>
         <Object name="Pseudocolor plot attributes">
-            <Field name="x" type="int">1192</Field>
-            <Field name="y" type="int">444</Field>
+            <Field name="x" type="int">-96</Field>
+            <Field name="y" type="int">394</Field>
             <Field name="width" type="int">408</Field>
             <Field name="height" type="int">599</Field>
             <Field name="visible" type="bool">false</Field>
