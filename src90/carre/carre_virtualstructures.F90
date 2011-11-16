@@ -80,7 +80,7 @@ contains
     double precision, intent(out) :: limpoint_min(2), limpoint_max(2)
     
     !  variables locales
-    integer :: ipx, isep, istru, i
+    integer :: ipx, ipxOther, isep, istru, i
     integer :: ip, itarget, istep, istepTot
     real*8 :: &  ! minpsitot, maxpsitot, 
          &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, & 
@@ -99,7 +99,7 @@ contains
     double precision :: limpoint_min_psi, limpoint_max_psi
     parameter(pi=3.141592654)
 
-!    logical :: istarget
+    logical :: doTarget
 
     !  procedures
     real*8 feval2d, angle, dist, norm
@@ -255,8 +255,27 @@ contains
           ! if separatrix segment does not intersect target, skip
           if ( itarget == 0 ) cycle
 
+
+          ! for complex cases (disconnected double null), some targets
+          ! will be listed for multiple x-points. We only want to treat every target once here.
+          ! Look at all other x-points, and only treat the target if it's not listed 
+          ! for another x-point that has a lower total number of associated targets.
+          doTarget = .true.
+          do ipxOther = 1, equ%npx
+              if (ipxOther == ipx) cycle
+
+              if ( any( struct%indplq(:, ipxOther) == itarget ) .and. &
+                   & ( count( struct%indplq(:, ipxOther) /= 0 ) < count( struct%indplq(:, ipx) /= 0 )) ) then
+                  ! found another x-point associate with the same target but
+                  ! lower number of associated targets. Give the target to the other x-point
+                  doTarget = .false.
+                  exit
+              end if
+          end do         
+          if (.not. doTarget) cycle
+
           write (0,*) 'x-point : ', ipx, ', separatrix segment: ', & 
-               &           isep, ', structure no. ', itarget
+               &           isep, ', creating virtual structure taking the role of structure no. ', itarget
 
           nvtarget = nvtarget + 1
           ! vtargetipx stores index of x-point associated with this target

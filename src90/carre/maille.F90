@@ -1451,8 +1451,6 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Define the primary curve and the grid points
 
-            ! FIXME
-
          ireg=1
          grid%np1(ireg) = 0
 
