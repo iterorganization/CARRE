@@ -1219,7 +1219,7 @@ contains
                     call markRadialLine(ip, iReg, removeable)
                     if (.not. removeable) call markRadialLine(ip + 1, iReg, removeable)
                     if (.not. removeable) then
-                        ! Found no radial line that can be removed
+                        ! Found no radial line that can be removed to coarsen this radial cell strip
                         !call logmsg(LOGWARNING, "coarsenCells: cannot coarsen cell")
                     end if
                 end if
@@ -1240,6 +1240,7 @@ contains
                 grid%xmail(np, :, iReg) = grid%xmail(ip, :, iReg)
                 grid%ymail(np, :, iReg) = grid%ymail(ip, :, iReg)
                 grid%lineFlagRad(np, iReg) = grid%lineFlagRad(ip, iReg)
+                grid%radLineSepSeg(np, iReg) = grid%radLineSepSeg(ip, iReg)
             end if
         end do
         grid%np1(iReg) = np

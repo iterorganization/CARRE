@@ -1,4 +1,4 @@
-      SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, & 
+SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, & 
      &            plaque,x2,y2,nx,ny,x,y,psi,xpto,ypto,nstruc,npstru, & 
      &            xstruc,ystruc,a00,a10,a01,a11, & 
      &            repart,gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2, & 
@@ -401,11 +401,8 @@
          endif
 
 !..Definition de xn2 et yn2 pour le bloc common comort.
-
-         DO 18 ipas=1,nn(inouv)
-            xn2(ipas)=xn(ipas,inouv)
-            yn2(ipas)=yn(ipas,inouv)
-   18    CONTINUE
+         xn2(1:nn(inouv)) = xn(1:nn(inouv), inouv)
+         yn2(1:nn(inouv)) = yn(1:nn(inouv), inouv)
 
          npni2=nn(inouv)
 
@@ -432,8 +429,8 @@
              if(ir.eq.2) l0(ipol)=d1
 !            l1(ipol)=(d1/ll1)*ll
              l1(ipol)=(l0(ipol)/l0(nppol))*ll
-             CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),l1(ipol), & 
-     &               mailx(ipol,ir),maily(ipol,ir))
+             CALL COORD(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv),&
+                  & l1(ipol),mailx(ipol,ir),maily(ipol,ir))
            enddo
 !
            mailx(nppol,ir)=xn(nn(inouv),inouv)

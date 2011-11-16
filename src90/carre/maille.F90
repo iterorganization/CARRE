@@ -626,21 +626,21 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ireg=1
          grid%np1(ireg) = 0
 
-         DO 50 ipas=par%nptseg(1), 1, -1
+         DO 50 ipas=par%nptseg(1), 2, -1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
             grid%radLineSepSeg(grid%np1(ireg), ireg) = 1
    50    CONTINUE
 
-         DO 51 ipas=2, par%nptseg(3)
+         DO 51 ipas=1, par%nptseg(3)-1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
             grid%radLineSepSeg(grid%np1(ireg), ireg) = 3
    51    CONTINUE
 
-         DO 52 ipas=2, par%nptseg(5)
+         DO 52 ipas=1, par%nptseg(5)
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,5)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,5)
@@ -719,14 +719,14 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ireg=2
          grid%np1(ireg) = 0
 
-         DO 60 ipas=par%nptseg(1), 1, -1
+         DO 60 ipas=par%nptseg(1), 2, -1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,1)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,1)
             grid%radLineSepSeg(grid%np1(ireg), ireg) = 1
    60    CONTINUE
 
-         DO 61 ipas=2, par%nptseg(2)
+         DO 61 ipas=1, par%nptseg(2)
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
@@ -796,21 +796,21 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ireg=3
          grid%np1(ireg) = 0
 
-         DO 70 ipas=par%nptseg(2), 1, -1
+         DO 70 ipas=par%nptseg(2), 2, -1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,2)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,2)
             grid%radLineSepSeg(grid%np1(ireg), ireg) = 2
    70    CONTINUE
 
-         DO 71 ipas=2, par%nptseg(4)
+         DO 71 ipas=1, par%nptseg(4)-1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,4)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,4)
             grid%radLineSepSeg(grid%np1(ireg), ireg) = 4
    71    CONTINUE
 
-         DO 72 ipas=2, par%nptseg(6)
+         DO 72 ipas=1, par%nptseg(6)
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
@@ -888,14 +888,14 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ireg=4
          grid%np1(ireg) = 0
 
-         DO 80 ipas=par%nptseg(5), 1, -1
+         DO 80 ipas=par%nptseg(5), 2, -1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,5)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,5)
             grid%radLineSepSeg(grid%np1(ireg), ireg) = 5
    80    CONTINUE
 
-         DO 81 ipas=2, par%nptseg(6)
+         DO 81 ipas=1, par%nptseg(6)
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
@@ -967,14 +967,14 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          grid%np1(ireg) = 0
          ipx = 1
 
-         DO 90 ipas=1, par%nptseg(3)
+         DO 90 ipas=1, par%nptseg(3)-1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,3)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,3)
             grid%radLineSepSeg(grid%np1(ireg), ireg) = 3
    90    CONTINUE
 
-         DO 91 ipas=par%nptseg(4)-1,1,-1
+         DO 91 ipas=par%nptseg(4),1,-1
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,4)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,4)
