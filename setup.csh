@@ -10,11 +10,13 @@ if(! $?OBJECTCODE) then
 endif
 
 setenv USE_ITMCARRE '-DUSE_ITMCARRE'
+setenv SOLPSTOP '/scratch//hmk/svn/solps5.0/'
+
 #setenv SOLPS_LIB '/efda1/s1/pfs/scratch/imp3/klingshi/solps5.0/src/lib/'$OBJECTCODE
 setenv SOLPS_LIB "$SOLPSTOP/src/lib/$OBJECTCODE"
 #setenv SOLPS_LIB '/home/hajo/svn/solps5.0/src/lib/'$OBJECTCODE
-setenv NCARG_ROOT "${SOLPSTOP}/../solps_other/NCARG/linux.ifort64"
-setenv NCARG '-L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm'
+#setenv NCARG_ROOT "${SOLPSTOP}/../solps_other/NCARG/linux.ifort64"
+#setenv NCARG '-L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm'
 
 setenv CARRE_DEBUG yes
 
