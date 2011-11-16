@@ -78,8 +78,6 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       integer :: ntt, sensspe
       REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
 
-
-
 !  procedures
       INTEGER indsgm,ifind,drctio
       REAL*8 aazero,long,nulort,ruban
@@ -215,19 +213,19 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
 !..Copie de la derniere courbe parametrisee passee en argument.
 
-            DO 13 i=1, nnlast
-
-               xn(i,inouv)=xnlast(i)
-               yn(i,inouv)=ynlast(i)
-
-   13       CONTINUE
+            xn(1:nnlast, inouv) = xnlast(1:nnlast)
+            yn(1:nnlast, inouv) = ynlast(1:nnlast)
 
             nn(inouv)=nnlast
 
             mailx(1,ir)=xnlast(1)
             maily(1,ir)=ynlast(1)
 
-         ENDIF
+            ! in this case, do not search for the level line
+
+        else
+            ! in the default situation, we have to find the level line 
+
 
          IF (repart .EQ. 1) THEN
 
@@ -381,24 +379,28 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
-!.. Calcul de grand psi
-         diag%gdpsi(ir,ireg)= (valfct-fctxo)/(fctini-fctxo)
-         diag%racpsi(ir,ireg)= sqrt(diag%gdpsi(ir,ireg))
 
-         if (solregion) then
-                 x1 = diag%gdr(ir-1,ireg)
-                 y1=ypto
-                 sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
-                 CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe, & 
-                      & repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+         end if
 
-                 !..Calcul des longueurs
-                 
-                 diag%gdr(ir,ireg)=x23
-                 diag%r(ir,ireg)=x23-xpto
-                 diag%ra(ir,ireg)=diag%r(ir,ireg)-diag%a(ireg)
-                 diag%rho(ir,ireg)=diag%r(ir,ireg)/diag%a(ireg)
-         endif
+         ! FIXME: broken for disconnected double null case
+!!$!.. Calcul de grand psi
+!!$         diag%gdpsi(ir,ireg)= (valfct-fctxo)/(fctini-fctxo)
+!!$         diag%racpsi(ir,ireg)= sqrt(diag%gdpsi(ir,ireg))
+!!$
+!!$         if (solregion) then
+!!$                 x1 = diag%gdr(ir-1,ireg)
+!!$                 y1=ypto
+!!$                 sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
+!!$                 CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe, & 
+!!$                      & repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+!!$
+!!$                 !..Calcul des longueurs
+!!$                 
+!!$                 diag%gdr(ir,ireg)=x23
+!!$                 diag%r(ir,ireg)=x23-xpto
+!!$                 diag%ra(ir,ireg)=diag%r(ir,ireg)-diag%a(ireg)
+!!$                 diag%rho(ir,ireg)=diag%r(ir,ireg)/diag%a(ireg)
+!!$         endif
 
 !..Definition de xn2 et yn2 pour le bloc common comort.
          xn2(1:nn(inouv)) = xn(1:nn(inouv), inouv)

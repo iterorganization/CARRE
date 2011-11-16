@@ -11,6 +11,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !======================================================================
     
       use CarreSiloIO
+      use SiloIO
       use CarreDiagnostics
       use carre_types
       use carre_parameter_io
@@ -1450,6 +1451,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Define the primary curve and the grid points
 
+            ! FIXME
+
          ireg=1
          grid%np1(ireg) = 0
 
@@ -1502,7 +1505,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
   137       CONTINUE
 
          ENDIF
-
+         
 !..Initialise the guard indices and starting target
 
          IF (equ%ptxint .EQ. 1) THEN
@@ -1583,8 +1586,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast(1:nnlast), & 
+              &               ynlast(1:nnlast),nnlast,nuldec,.true.,diag,ireg)
 
 !..Arangement of the mesh point which must coinside with outer X-point
 
@@ -1601,6 +1604,19 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ENDIF
 
          nuldec = .FALSE.
+
+!!$         grid % nr = par % npr
+!!$         grid % nptseg = par % nptseg
+!!$         call writeGridStateToSiloFile('carreDEBUGMAIL0', equ, struct, grid)
+!!$         call csioOpenFile('carreDEBUGMAIL1')
+!!$         call siloWriteLineSegmentGridFromPoints( csioDbfile, 'primarylevelline', grid%xn(1:nn), grid%yn(1:nn) )
+!!$         call siloWriteLineSegmentGridFromPoints( csioDbfile, 'lastlevelline', xnlast(1:nnlast), ynlast(1:nnlast) )
+!!$         call siloWriteLineSegmentGridFromPoints( csioDbfile, 'firstgridline', &
+!!$              &  grid%xmail(1:grid%np1(ireg),1,ireg), &
+!!$              &  grid%ymail(1:grid%np1(ireg),1,ireg) )
+!!$         call csioCloseFile()                                     
+!!$         stop
+
 
 !..3.3.2 Region 2: right
 

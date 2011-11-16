@@ -1231,7 +1231,6 @@ contains
     end do
 
     ! Remove lines region by region
-    ! FIXME: do accounting for separatrix segments
     do iReg = 1, grid%nreg
         np = 0
         do ip = 1, grid%np1(iReg)
