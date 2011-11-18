@@ -192,7 +192,7 @@ contains
 
           ! stepping loop towards separatrix psi value
           tpsi = ppsi(ip,istru)
-          tol = 1e-2
+          tol = 1.0e-2
           istep = 0
           do
              ! TODO: step towards psi value of closest separatrix,

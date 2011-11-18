@@ -24,6 +24,7 @@
       INTEGER n,ind1,ind2,ii,jj, compt
       REAL*8 zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
       REAL*8 fracx,fracy
+      double precision :: bestX, bestY, bestPsi
       PARAMETER (psimin=1.E-08,psimi2=1.E-07)
       logical l_dbg
       integer n_call
@@ -115,6 +116,9 @@
       else if (repart .EQ. 2) then
 
 !---------------------------------------------------------------------{
+
+        bestPsi = huge(bestPsi)
+
    10   CONTINUE
 
 !xpb  We make sure that the end of the structure lies within the
@@ -240,7 +244,22 @@
           GO TO 20
 !---------------------------------------------------------------------}
         else
+
+          ! Note point closest to requested psi value found so far
+          ! x3, y3, psi3
+
+          if ( abs(psi3 - pas) < abs(bestPsi - pas)) then
+              bestX = x3
+              bestY = y3
+              bestPsi = psi3
+          end if
+
           IF (compt .EQ. npst) then
+
+              ! EXPERIMENTAL: return best point
+              x2 = bestX
+              y2 = bestY
+              return
 
             if(sellan(1:8).eq.'francais') then
             write(*,*) 'On a fait le tour de la structure sans trouver' & 

@@ -59,9 +59,14 @@ contains
     ! Initialize grid line flags
     grid%lineFlagRad = GRIDLINE_BASELINE
     do iReg = 1, grid%nreg
+
         ! first and last radial line is required
-        grid%lineFlagRad(1, iReg) = GRIDLINE_REQUIRED
-        grid%lineFlagRad(grid%np1(iReg), iReg) = GRIDLINE_REQUIRED
+        call markRadialLineRequired(grid, iReg, 1)
+        call markRadialLineRequired(grid, iReg, grid%np1(iReg))
+
+        ! first and last radial line is required
+        !grid%lineFlagRad(1, iReg) = GRIDLINE_REQUIRED
+        !grid%lineFlagRad(grid%np1(iReg), iReg) = GRIDLINE_REQUIRED
 
         ! The grid lines going into the x-point are also required...
         do ipx = 1, equ%npx
@@ -69,12 +74,14 @@ contains
             if (xipol1 /= GRID_UNDEFINED) then
                 call logmsg(LOGINFO,  'carre_postprocess_computation: marking radial line required&
                      & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
-                grid%lineFlagRad(xipol1, iReg) = GRIDLINE_REQUIRED
+                !grid%lineFlagRad(xipol1, iReg) = GRIDLINE_REQUIRED
+                call markRadialLineRequired(grid, iReg, xipol1)
             end if
             if (xipol2 /= GRID_UNDEFINED) then
                 call logmsg(LOGINFO,  'carre_postprocess_computation: marking radial line required&
                      & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
-                grid%lineFlagRad(xipol2, iReg) = GRIDLINE_REQUIRED
+                !grid%lineFlagRad(xipol2, iReg) = GRIDLINE_REQUIRED
+                call markRadialLineRequired(grid, iReg, xipol2)
             end if
         end do
     end do
@@ -357,6 +364,49 @@ contains
     end subroutine computeConnectionInformation
 
   end subroutine carre_postprocess_computation
+
+
+  !> Mark the radial grid line at poloidal position iPol in region iReg as required in the grid.
+  !> Also follows the grid line in neighbouring regions
+  recursive subroutine markRadialLineRequired(grid, iReg, iPol)
+    type(CarreGrid), intent(inout) :: grid
+    integer, intent(in) :: iReg, iPol
+    
+    ! internal
+    integer :: iRegOther, iBnd, iPolOther, iRadOther
+    double precision :: xBnd, yBnd
+
+    if (grid%lineFlagRad(iPol, iReg) == GRIDLINE_REQUIRED ) then
+        ! already touched this region
+        return
+    else
+        grid%lineFlagRad(iPol, iReg) = GRIDLINE_REQUIRED    
+    end if
+
+    ! Follow into other regions
+    do iBnd = 1, 2
+
+        select case (iBnd)            
+        case(1)
+            xBnd = grid%xmail(iPol, 1, iReg)
+            yBnd = grid%ymail(iPol, 1, iReg)
+        case(2)
+            xBnd = grid%xmail(iPol, grid%nr(iReg), iReg)
+            yBnd = grid%ymail(iPol, grid%nr(iReg), iReg)
+        end select
+
+        do iRegOther = 1, grid%nreg
+            if (iRegOther == iReg) cycle
+
+            call findPointInRegion(grid, iRegOther, xBnd, yBnd, iPolOther, iRadOther)
+            if (iPolOther /= GRID_UNDEFINED) then
+                call markRadialLineRequired(grid, iRegOther, iPolOther)
+            end if
+        end do
+
+    end do    
+
+  end subroutine markRadialLineRequired
 
 
   ! Compute characteristic cell size in x and y direction
@@ -1263,56 +1313,107 @@ contains
       double precision :: xBnd, yBnd
       logical :: updateSegSegs(nsepsegmx)
 
+
+      logical, dimension(grid%nreg) :: inRegion
+      integer, dimension(grid%nreg) :: iPolRegion
+
+
       removeable = .false.
       ipRegions = GRID_UNDEFINED
 
       ! already marked for removal?
       if ( removeRadialLine(ip, ireg) ) return
 
-      updateSegSegs = .false.
-
-      ! origin region
-      if ( grid%lineFlagRad(ip, ireg) == GRIDLINE_REQUIRED ) return
-      ipRegions(iReg) = ip
-      updateSegSegs( grid%radLineSepSeg(ip, iReg) ) = .true.
-
-      ! continuation in other regions
-      do iContinue = 1, 2
-          select case (iContinue)
-          case(1)
-              xBnd = grid%xmail(ip, 1, ireg)
-              yBnd = grid%ymail(ip, 1, ireg)
-          case(2)
-              xBnd = grid%xmail(ip, grid%nr(iReg), ireg)
-              yBnd = grid%ymail(ip, grid%nr(iReg), ireg)
-          end select
-
-          do iRegOther = 1, grid%nreg
-              if (iRegOther == ireg) cycle
-              call findPointInRegion(grid, iRegOther, xBnd, yBnd, ipOther, irOther)
-              if (ipOther /= GRID_UNDEFINED) then
-                  if ( grid%lineFlagRad(ipOther, ireg) == GRIDLINE_REQUIRED ) return
-                  ipRegions(iRegOther) = ipOther
-                  updateSegSegs( grid%radLineSepSeg(ipOther, iRegOther) ) = .true.
-              end if
-          end do
-      end do
-
-      ! radial line is removeable in all regions. Mark to be removed in all regions
+      ! trace radial line through regions
+      call followRadialLine(grid, iReg, ip, inRegion, iPolRegion) 
+     
+      ! is it removeable?
       removeable = .true.
       do i = 1, grid%nreg
-          if (ipRegions(i) /= GRID_UNDEFINED) &
-               & removeRadialLine(ipRegions(i), i) = .true.
+          if (.not. inRegion(i)) cycle
+          if ( grid%lineFlagRad(iPolRegion(i), i) == GRIDLINE_REQUIRED ) then
+              removeable = .false.
+              exit
+          end if
       end do
 
-      ! Update point deltas for separatrix segments touched by removing this radial line
-      do i = 1, nsepsegmx
-          if ( updateSegSegs(i) ) sepSegsDelta(i) = sepSegsDelta(i) + 1
-      end do
+      ! if removeable, mark for removal and do bookkeeping
+      if (removeable) then
+
+          updateSegSegs = .false.
+          do i = 1, grid%nreg
+              if (inRegion(i)) then 
+                  removeRadialLine(iPolRegion(i), i) = .true.
+                  updateSegSegs( grid%radLineSepSeg(iPolRegion(i), i) ) = .true.
+              end if
+          end do
+          
+          ! Update point deltas for separatrix segments touched by removing this radial line
+          do i = 1, nsepsegmx
+              if ( updateSegSegs(i) ) sepSegsDelta(i) = sepSegsDelta(i) + 1
+          end do
+      end if
 
     end subroutine markRadialLine
 
   end subroutine coarsenCells
+
+  ! Follow a radial line, note through which regions it passes 
+  ! and note the poloidal positions for every region
+  recursive subroutine followRadialLine(grid, iReg, iPol, inRegion, iPolRegion, regionVisited) 
+    type(CarreGrid), intent(in) :: grid
+    integer, intent(in) :: iReg, iPol
+    logical, intent(inout), dimension(grid%nreg) :: inRegion
+    integer, intent(inout), dimension(grid%nreg) :: iPolRegion
+    logical, intent(inout), dimension(grid%nreg), optional :: regionVisited
+
+    ! internal
+    integer :: iRegOther, iContinue, iPolOther, iRadOther
+    logical :: lRegionVisited(grid%nreg)
+    double precision :: xBnd, yBnd
+
+    ! Set up tracking for visited regions at top of recursion
+    if (present(regionVisited)) then 
+        lRegionVisited = regionVisited
+    else
+        lRegionVisited = .false.
+        inRegion = .false.
+        iPolRegion = GRID_UNDEFINED
+    end if
+
+    if (lregionVisited(iReg)) return
+
+    inRegion(iReg) = .true.
+    iPolRegion(iReg) = iPol
+    lregionVisited(iReg) = .true.
+
+    ! continuation in other regions
+    do iContinue = 1, 2
+        select case (iContinue)
+        case(1)
+            xBnd = grid%xmail(iPol, 1, iReg)
+            yBnd = grid%ymail(iPol, 1, iReg)
+        case(2)
+            xBnd = grid%xmail(iPol, grid%nr(iReg), iReg)
+            yBnd = grid%ymail(iPol, grid%nr(iReg), iReg)
+        end select
+        
+        do iRegOther = 1, grid%nreg
+            if (iRegOther == iReg) cycle
+            call findPointInRegion(grid, iRegOther, xBnd, yBnd, iPolOther, iRadOther)
+            if (iPolOther /= GRID_UNDEFINED) then
+                call followRadialLine(grid, iRegOther, iPolOther, inRegion, iPolRegion, lRegionVisited)
+            end if
+        end do
+    end do
+
+    if (present(regionVisited)) then 
+        regionVisited = lRegionVisited
+    end if
+
+  end subroutine followRadialLine
+    
+
 
 
 
@@ -1674,7 +1775,7 @@ contains
 
     ! internal
     integer :: ipol, irad, nfound
-    double precision, parameter :: POINT_TOL = 1e-6
+    double precision, parameter :: POINT_TOL = 1e-4
     real*8 :: dist
     external dist
 
