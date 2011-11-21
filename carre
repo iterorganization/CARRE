@@ -119,7 +119,9 @@ do {
     ( s|S )                                               # save the control data:
             cp carre.out carre.dat; q=c; break;;
     ( c|C )                                               # convert:
-            /bin/echo -e "carre.out\n2" | $OBJECTCODE/traduit 2>traduit.log; q=t; break;;
+            /bin/echo -e "carre.out\n4" | $OBJECTCODE/traduit 2>traduit.log; mv traduit.out traduit.sno ;
+            /bin/echo -e "carre.out\n2" | $OBJECTCODE/traduit 2>traduit.log; 
+            q=t; break;;
     ( t|T )                                               # store the grid:
             [ -r traduit.out ] && {
                 [ -d "$griddir" ] || {
@@ -145,8 +147,10 @@ do {
                 [ ${#n} -lt 2 ] && n=00$n || {
                     [ ${#n} -lt 3 ] && n=0$n
                 }
+                mv -f traduit.sno $u.sno && \
+                  /bin/echo -e "The grid in DG format is stored as $u.sno"
                 mv -f traduit.out $griddir/$grid_stem.v$n.geo && \
-                  /bin/echo -e "The grid is stored as $griddir/$grid_stem.v$n.geo"
+                  /bin/echo -e "The grid in B2.5 format is stored as $griddir/$grid_stem.v$n.geo"
                 ictrans -e 'spooler postfilea4' -e '3Print' gmeta && mv ictrans.tmp.ps $griddir/$grid_stem.v$n.ps
                 touch CARRE.HISTORY
 		echo $user `date +%Y-%m-%d_%H:%M:%S` >> CARRE.HISTORY
