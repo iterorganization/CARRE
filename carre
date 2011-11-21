@@ -38,6 +38,7 @@ the files carre.log and traduit.log, respectively.
 
 # griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${Model_Class-iter}}
 # griddir=${CARRE_GRIDDIR-$SOLPSTOP/src/Sonnet/output/ascii/${DEVICE-iter}}
+dgdir=${CARRE_GRIDDIR-$SOLPSTOP/data/Sonnet/output/ascii/${DEVICE-iter}}
 griddir=${CARRE_GRIDDIR-$SOLPSTOP/data/meshes}
 class=$DEVICE
 indir=${CARRE_INPUTDIR-.}
@@ -147,8 +148,8 @@ do {
                 [ ${#n} -lt 2 ] && n=00$n || {
                     [ ${#n} -lt 3 ] && n=0$n
                 }
-                mv -f traduit.sno $u.sno && \
-                  /bin/echo -e "The grid in DG format is stored as $u.sno"
+                mv -f traduit.sno $dgdir/$grid_stem.v$n.sno && \
+                  /bin/echo -e "The grid in DG format is stored as $dgdir/$grid_stem.v$n.sno"
                 mv -f traduit.out $griddir/$grid_stem.v$n.geo && \
                   /bin/echo -e "The grid in B2.5 format is stored as $griddir/$grid_stem.v$n.geo"
                 ictrans -e 'spooler postfilea4' -e '3Print' gmeta && mv ictrans.tmp.ps $griddir/$grid_stem.v$n.ps
