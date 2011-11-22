@@ -14,6 +14,7 @@ module carre_constants
   integer, parameter, public :: GRID_BOUNDARY_REFINE_FIX = 5
   integer, parameter, public :: GRID_INTERNAL_COARSEN = 6
   integer, parameter, public :: GRID_BOUNDARY_COARSEN = 7
+  integer, parameter, public :: GRID_REFINE = 8
 
 
 

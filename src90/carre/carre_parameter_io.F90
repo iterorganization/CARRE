@@ -413,6 +413,10 @@ CONTAINS
          call rdfrin(11,vari(ieg+1:80),par%gridExtensionMode,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:len('targetResolution')) .EQ. 'targetResolution') THEN
+         call rdfrre(11,vari(ieg+1:80),par%targetRes,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('loglevel')) .EQ. 'loglevel') THEN
          call rdfrin(11,vari(ieg+1:80),par%logLevel,ierror)
          if(ierror.eq.1) go to 98

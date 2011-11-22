@@ -20,6 +20,7 @@ contains
 
     ! Mark faces intersected by structure elements
     grid%faceISec = .false.
+    grid%faceISecIStruct = GRID_UNDEFINED
 
     do iReg = 1, grid%nreg
 
@@ -39,9 +40,11 @@ contains
                     call getFace(iFace)
 
                     call intersect_all_structures( xx, yy, &
-                        & struct, grid%faceISec(iFace, iPol, iRad, iReg), &
+                        & struct, &
+                        & doesIntersect = grid%faceISec(iFace, iPol, iRad, iReg), &
+                        & iStruct = grid%faceISecIStruct(iFace, iPol, iRad, iReg), &
                         & ipx = grid%faceISecPx(iFace, iPol, iRad, iReg), &
-                        & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )                    
+                        & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )
 
                 end do
             end do

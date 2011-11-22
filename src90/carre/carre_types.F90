@@ -11,7 +11,7 @@ module carre_types
 
   ! forward from carre_constants
   public GRID_UNDEFINED, GRID_INTERNAL, GRID_EXTERNAL, GRID_BOUNDARY, GRID_BOUNDARY_REFINE, GRID_BOUNDARY_REFINE_FIX,&
-       & GRID_INTERNAL_COARSEN, GRID_BOUNDARY_COARSEN
+       & GRID_INTERNAL_COARSEN, GRID_BOUNDARY_COARSEN, GRID_REFINE
 
   ! Carre version string
   character(len=8), parameter, public :: CARRE_VERSION = "carre71"
@@ -19,6 +19,7 @@ module carre_types
   ! Grid line flags
   integer, parameter, public :: GRIDLINE_BASELINE = 1
   integer, parameter, public :: GRIDLINE_REQUIRED = 2
+  integer, parameter, public :: GRIDLINE_REFINED = 1
 
   ! Face number of a cell
   integer, parameter, public :: FACE_LEFT = 1
@@ -77,6 +78,10 @@ module carre_types
       
       ! extension size for equilibrium grid at the boundaries
       integer :: addLeft = 0, addRight = 0, addTop = 0, addBottom = 0      
+
+      ! Desired maximal poloidal cell size at targets in extended grid mode
+      ! Default value is chosen to cause no refinement at targets.
+      double precision :: targetRes = huge(0.0d0)
 
       ! Extended grid mode
       integer :: gridExtensionMode = GRID_EXTENSION_OFF
@@ -181,9 +186,11 @@ module carre_types
           logical :: faceISec(2,npmamx,nrmamx,nregmx)
           double precision :: faceISecPx(2,npmamx,nrmamx,nregmx)
           double precision :: faceISecPy(2,npmamx,nrmamx,nregmx)
+          integer :: faceISecIStruct(2,npmamx,nrmamx,nregmx)
 
           integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
           integer :: cellFaceFlag(npmamx-1,nrmamx-1,nregmx)
+          integer :: cellFaceIStruct(1:4,npmamx-1,nrmamx-1,nregmx)
 
           integer :: pointFlag(npmamx,nrmamx,nregmx)
 

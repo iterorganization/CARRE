@@ -29,6 +29,10 @@ module carre_postprocess
   integer, parameter :: INDEX_FACE_RIGHT = 3
   integer, parameter :: INDEX_FACE_TOP = 4
 
+  ! Task parameters for subroutine fixCells
+  integer, parameter :: FIXCELLS_MODE_FIX = 1       ! Fix geometry issues
+  integer, parameter :: FIXCELLS_MODE_REFINE = 2    ! Fix resolution
+
   logical, parameter :: DEBUGFILES_ADDRADIALLINE = .false.
   logical, parameter :: DEBUGFILES_INSERTPOINTS = .false.
 
@@ -45,7 +49,7 @@ contains
     type(CarreStructures), intent(in) :: struct
 
     ! internal
-    integer :: iReg, iPostProcess, nCellsToRefine, nCellsToCoarsen
+    integer :: iReg, iPostProcess, nCellsToRefine, nCellsToRefineFix, nCellsToCoarsen
     logical :: doesIntersect
     integer :: npReg(nregmx), npDiffRefine, npDiffCoarsen, nIterNoAction
     integer :: ipx, xipol1, xirad1, xipol2, xirad2
@@ -90,7 +94,27 @@ contains
     npDiffCoarsen = 0
     nIterNoAction = 0
 
-    do iPostProcess = 1, 21
+
+
+    ! Main iteration sequence
+
+    ! Actions are:
+    ! FIX: fix geometry issues
+    ! REFINE: refine too coarse cells
+    ! COARSEN: coarsen too fine cells, honoring required lines
+    ! COARSEN-FORCE: coarsen too fine cells, not honoring required lines
+
+    ! Main sequence rules are:
+    ! If broken cells exist, FIX
+    ! If previous iteration was FIX, next is always COARSEN
+    ! If no broken cells, but coarse cells exist, REFINE
+    ! If no broken cells, no cells to refine the main iteration is converged. Start cleanup sequence
+
+    ! Cleanup sequence rules are:
+    ! If too fine cells exist, do COARSEN-FORCE
+    ! Stop when no cells were removed in last step
+
+    do iPostProcess = 1, 31
         if ( mod( iPostProcess, 2 ) == 1 ) then
             call logmsg(LOGINFO,  'carre_postprocess_computation: pass '//int2str(iPostProcess)//": refinement")
         else
@@ -115,35 +139,37 @@ contains
             call writeGridStateToSiloFile('carrePostPrcA0'//int2str(iPostProcess), equ, struct, grid)
         end if
 
+        npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
         if ( mod( iPostProcess, 2 ) == 1 ) then
             ! On odd iterations, do refinement.
-            npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
-            ! Cells need refinement because of broken geometry?
-            nCellsToRefine = count( grid%cellflag == GRID_BOUNDARY_REFINE_FIX )
-            if ( nCellsToRefine > 0 ) then
+
+            nCellsToRefineFix = count( grid%cellflag == GRID_BOUNDARY_REFINE_FIX )
+            nCellsToRefine = count( grid%cellflag == GRID_REFINE ) &
+                 & + count( grid%cellflag == GRID_BOUNDARY_REFINE )
+
+            if ( nCellsToRefineFix > 0 ) then
+                ! Cells need refinement because of broken geometry                
                 call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
-                     &int2str(nCellsToRefine)//' cells to refine because of broken geometry')
+                     &int2str(nCellsToRefineFix)//' cells to refine due to broken geometry')
 
                 ! Fix cells by modifying the grid accordingly
-                call fixCells(equ, struct, grid)
+                call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
 
-                ! If we had broken cells, skip normal refinement 
+            else if (nCellsToRefine > 0) then
+                ! cells need refinement due to low resolution. Only do this if no broken cells need to be fixed.
+                if ( nCellsToRefine > 0 ) then
+                    call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
+                         &int2str(nCellsToRefine)//' cells to refine due to low resolution')
+
+                    ! Refine cells
+                    call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)
+
+                end if
             end if
 
-!!$       ! cells need refinement due to low resolution?
-!!$       nCellsToRefine = count( grid%cellflag == GRID_REFINE )
-!!$       if ( nCellsToRefine > 0 ) then
-!!$           call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
-!!$               &int2str(nCellsToRefine)//' cells to refine')
-!!$
-!!$           ! Fix cells by modifying the grid accordingly
-!!$           !call coarsenCells(equ, struct, grid)
-!!$           cycle
-!!$       end if
-
-            npDiffRefine = sum(npReg(1:grid%nReg) - grid%np1(1:grid%nReg))
+            npDiffRefine = sum(grid%np1(1:grid%nReg)-npReg(1:grid%nReg))
             call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess)//&
-                 &": added "//int2str(npDiffCoarsen)//" radial lines in all regions")
+                 &": added "//int2str(npDiffRefine)//" radial lines in all regions")
             if (npDiffRefine == 0) then
                 nIterNoAction = nIterNoAction + 1
             else
@@ -188,6 +214,7 @@ contains
     ! write results of postprocessing iteration
     call writeGridStateToSiloFile('carrePostProcC0', equ, struct, grid)
 
+
     ! Finalize grid cell fixes by moving external points
     ! of faces onto boundary intersections
     call finalizeCells(grid)
@@ -216,12 +243,20 @@ contains
                       select case (iFace)
                       case(FACE_LEFT) ! left
                           doesIntersect = grid%faceISec(FACE_RADIAL, iPol, iRad, iReg)
+                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
+                               & grid%faceISecIStruct(FACE_RADIAL, iPol, iRad, iReg)
                       case(FACE_BOTTOM) ! bottom
                           doesIntersect = grid%faceISec(FACE_POLOIDAL, iPol, iRad, iReg)
+                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
+                               & grid%faceISecIStruct(FACE_POLOIDAL, iPol, iRad, iReg)
                       case(FACE_RIGHT) ! right
                           doesIntersect = grid%faceISec(FACE_RADIAL, iPol + 1, iRad, iReg)
+                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
+                               & grid%faceISecIStruct(FACE_RADIAL, iPol+1, iRad, iReg)
                       case(FACE_TOP) ! top
                           doesIntersect = grid%faceISec(FACE_POLOIDAL, iPol, iRad + 1, iReg)
+                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
+                               & grid%faceISecIStruct(FACE_POLOIDAL, iPol, iRad+1, iReg)
                       end select
 
                       if (doesIntersect) then     
@@ -285,9 +320,21 @@ contains
 
       ! Figure out which must be refined due to too low resolution 
       ! Increase resolution at the targets
-      where ( (grid%cellflag == GRID_BOUNDARY) &
-           & .and. (grid%hx > pasmin) ) grid%cellflag = GRID_BOUNDARY_REFINE
+      do iReg = 1, grid%nreg
+          do iPol = 1, grid%np1(iReg) - 1
+              do iRad = 1, grid%nr(iReg) - 1
+                  if (.not. (grid%cellflag(iPol, iRad, iReg) == GRID_BOUNDARY)) cycle
+                  if (.not. (grid%hx(iPol, iRad, iReg) > par%targetRes)) cycle
 
+                  do iFace = 1, 4
+                      if (.not. structIsTarget(struct, grid%cellFaceIStruct(iFace, iPol, iRad, iReg)) ) cycle
+                      grid%cellflag(iPol, iRad, iReg) = GRID_BOUNDARY_REFINE
+                      exit
+                  end do
+                 
+              end do
+          end do
+      end do
 
     end subroutine categorizeCellsAndFaces
 
@@ -304,6 +351,18 @@ contains
 
       isExternal = (pointFlag == GRID_EXTERNAL)
     end function isExternal
+
+    ! Check whether the given structure with index iStruct is a target
+    logical function structIsTarget( struct, iStruct )
+      type(CarreStructures), intent(in) :: struct
+      integer, intent(in) :: iStruct
+
+      structIsTarget = .false.
+      if (iStruct /= GRID_UNDEFINED) then
+          structIsTarget = ( count(struct%inddef == iStruct) > 0 )
+      end if
+    end function structIsTarget
+
 
     ! Compute connection information between regions
     subroutine computeConnectionInformation()
@@ -641,21 +700,26 @@ contains
   end subroutine labelPointsInsideOutside
 
 
-  !> Fix broken cells by modifying the grid 
-  subroutine fixCells(equ, struct, grid)
+  !> Fix broken cells by modifying the grid / adding radial lines.
+  !> This subroutine has two operation modes: 
+  !> FIXCELLS_MODE_FIX fixes geometry issues arising from face/wall intersections
+  !> FIXCELLS_MODE_REFINE refines grid cells
+
+  subroutine fixCells(equ, struct, grid, mode)
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
+    integer, intent(in) :: mode
 
     ! internal
     integer :: iReg, ip, ir, iBrokenCell
     logical :: isecTopFace, isecBotFace
 
-    logical :: refineFace(2,npmamx,nrmamx,nregmx)
+    logical :: refineFace(2,npmamx,nrmamx,nregmx), recomputeIntersection, isRequired
+    double precision, dimension(2,npmamx,nrmamx,nregmx) :: refineFacePx, refineFacePy
     double precision :: px, py
     
     logical, dimension(nsepsegmx) :: sepSegUpdated ! work array to track which par
-
 
     ! Map from original grid indices (1:grid%np(iReg), 1:grid%nr(iReg))
     ! to current grid situation (with added radial lines)
@@ -664,6 +728,15 @@ contains
 
     ! flags marking strips of cells in the radial direction as refined
     logical :: cellsRefinedFlag(nregmx, npmamx-1)
+
+    ! Storage for level lines
+    double precision :: llx(npnimx), lly(npnimx)
+    integer :: llNp
+
+    double precision :: long
+    external long
+    
+
 
     ! Set up identity maps for radial and poloidal point indices
     npRadOriginal = grid%nr
@@ -680,51 +753,86 @@ contains
         do ip = 1, npPolOriginal(iReg) - 1
             do ir = 1, npRadOriginal(iReg) - 1
 
-                if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE_FIX) then
-                    ! broken cell should have one intersected poloidal face               
-                    isecTopFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_TOP)
-                    isecBotFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_BOTTOM)
+                
+                select case (mode)
+                case(FIXCELLS_MODE_FIX)
 
-                    ! If more than two intersections per cell,  grid/geometry has issues
-                    if ( isecTopFace .and. isecBotFace ) then
-                        call logmsg(LOGDEBUG,  'fixCells: broken cell has two intersected poloidal faces:'//&
-                             & int2str(ip)//', '//int2str(ir)//', '//int2str(iReg)//' corner at '//&
-                             & real2str(grid%xmail(ip,ir,iReg))//' '//real2str(grid%ymail(ip,ir,iReg)))
-                    end if
+                    if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE_FIX) then
+                        ! broken cell should have one intersected poloidal face               
+                        isecTopFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_TOP)
+                        isecBotFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_BOTTOM)
 
-                    ! Here, we are only interested in "real" intersections, i.e.
-                    ! intersections in the middle of the face, not directly in the face 
-                    ! endpoints
-
-                    if (iSecTopFace) then
-                        px = grid%faceISecPx(FACE_POLOIDAL, ip, ir+1, iReg)
-                        py = grid%faceISecPy(FACE_POLOIDAL, ip, ir+1, iReg)
-
-                        if (.not. ( &
-                             & pointsIdentical(px, py, grid%xmail(ip,ir+1,iReg), grid%ymail(ip,ir+1,iReg)) &
-                             & .or. &
-                             & pointsIdentical(px, py, grid%xmail(ip+1,ir+1,iReg), grid%ymail(ip+1,ir+1,iReg)) &
-                             & ) ) &
-                             & then
-                            refineFace(FACE_POLOIDAL, ip, ir+1, iReg) = .true.
-                        end if
-                    end if
-
-                    if (iSecBotFace) then
-                        px = grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg)
-                        py = grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg)
-
-                        if (.not. ( &
-                             & pointsIdentical(px, py, grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) &
-                             & .or. &
-                             & pointsIdentical(px, py, grid%xmail(ip+1,ir,iReg), grid%ymail(ip+1,ir,iReg)) &
-                             & ) ) &
-                             & then
-                            refineFace(FACE_POLOIDAL, ip, ir, iReg) = .true.
+                        ! If more than two intersections per cell,  grid/geometry has issues
+                        if ( isecTopFace .and. isecBotFace ) then
+                            call logmsg(LOGDEBUG,  'fixCells: broken cell has two intersected poloidal faces:'//&
+                                 & int2str(ip)//', '//int2str(ir)//', '//int2str(iReg)//' corner at '//&
+                                 & real2str(grid%xmail(ip,ir,iReg))//' '//real2str(grid%ymail(ip,ir,iReg)))
                         end if
 
+                        ! Here, we are only interested in "real" intersections, i.e.
+                        ! intersections in the middle of the face, not directly in the face 
+                        ! endpoints
+
+                        if (iSecTopFace) then
+                            px = grid%faceISecPx(FACE_POLOIDAL, ip, ir+1, iReg)
+                            py = grid%faceISecPy(FACE_POLOIDAL, ip, ir+1, iReg)
+
+                            if (.not. ( &
+                                 & pointsIdentical(px, py, grid%xmail(ip,ir+1,iReg), grid%ymail(ip,ir+1,iReg)) &
+                                 & .or. &
+                                 & pointsIdentical(px, py, grid%xmail(ip+1,ir+1,iReg), grid%ymail(ip+1,ir+1,iReg)) &
+                                 & ) ) &
+                                 & then
+                                refineFace(FACE_POLOIDAL, ip, ir+1, iReg) = .true.
+                                refineFacePx(FACE_POLOIDAL, ip, ir+1, iReg) = px
+                                refineFacePy(FACE_POLOIDAL, ip, ir+1, iReg) = py
+                            end if
+                        end if
+
+                        if (iSecBotFace) then
+                            px = grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg)
+                            py = grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg)
+
+                            if (.not. ( &
+                                 & pointsIdentical(px, py, grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) &
+                                 & .or. &
+                                 & pointsIdentical(px, py, grid%xmail(ip+1,ir,iReg), grid%ymail(ip+1,ir,iReg)) &
+                                 & ) ) &
+                                 & then
+                                refineFace(FACE_POLOIDAL, ip, ir, iReg) = .true.
+                                refineFacePx(FACE_POLOIDAL, ip, ir, iReg) = px
+                                refineFacePy(FACE_POLOIDAL, ip, ir, iReg) = py
+                            end if
+                        end if
                     end if
-                end if
+                case (FIXCELLS_MODE_REFINE)
+                    select case (grid%cellflag(ip, ir, iReg))
+                    case(GRID_BOUNDARY_REFINE)
+                        refineFace(FACE_POLOIDAL, ip, ir, iReg) = .true.
+
+                        ! To refine cell, split bottom face of cell in the middle.
+                        ! Just splitting the line segment is not good enough. We have to
+                        ! go back to the flux surface.
+                        
+                        ! Find poloidal level line going through the poloidally aligned face
+                        call findLevelLineForPoints( equ, &
+                             & grid%xmail(ip, ir, iReg), grid%ymail(ip, ir, iReg), &
+                             & grid%xmail(ip+1, ir, iReg), grid%ymail(ip+1, ir, iReg), &
+                             & llX, llY, llNp )
+                        
+                        call coord(llX(1:llNp),llY(1:llNp),llNp,&
+                             & long(llX(1:llNp), llY(1:llNp), llNp) / 2.0d0,&
+                             & refineFacePx(FACE_POLOIDAL, ip, ir, iReg),&
+                             & refineFacePy(FACE_POLOIDAL, ip, ir, iReg) )                        
+!!$
+!!$                        refineFacePx(FACE_POLOIDAL, ip, ir, iReg) = &
+!!$                             & (grid%xmail(ip, ir, iReg) + grid%xmail(ip+1, ir, iReg)) / 2.0d0
+!!$                        refineFacePy(FACE_POLOIDAL, ip, ir, iReg) = &
+!!$                             & (grid%ymail(ip, ir, iReg) + grid%ymail(ip+1, ir, iReg)) / 2.0d0
+                    case(GRID_BOUNDARY_REFINE_FIX)
+                        stop "fixCells: cell flag GRID_BOUNDARY_REFINE_FIX unexpected in mode REFINE"
+                    end select
+                end select
 
             end do
 
@@ -742,6 +850,12 @@ contains
 
     iBrokenCell = 0
     cellsRefinedFlag = .false.    
+
+    ! Only recompute the intersection between flux surface and structure when
+    ! fixing geometry issues.    
+    recomputeIntersection = (mode == FIXCELLS_MODE_FIX)
+    isRequired = (mode == FIXCELLS_MODE_FIX)
+
 
     do iReg = 1, grid%nreg
         do ip = 1, npPolOriginal(iReg) - 1
@@ -769,9 +883,12 @@ contains
                     sepSegUpdated(:) = .false.
                     call addRadialLine( equ, struct, grid, &
                          & iReg, sepSegUpdated, &
-                         & grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg), &
-                         & grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg), &
-                         & recomputeIntersection = .true., &
+                         & refineFacePx(FACE_POLOIDAL, ip, ir, iReg), &
+                         & refineFacePy(FACE_POLOIDAL, ip, ir, iReg), &
+                         & isRequired = isRequired, &
+!!$                         & grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg), &
+!!$                         & grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg), &
+                         & recomputeIntersection = recomputeIntersection, &
                          & iFcR = irMap(ir, iReg) )
 
                     call markRefined(iReg, ip)
@@ -812,13 +929,14 @@ contains
   !> The new radial grid line should go through the the point (px, py).
   !> (This point has to be positioned exactly on a  poloidally/x-aligned face).
   !> If recomputeIntersection is true, (px,py) will be recomputed as the intersection
-  !> of the face with a structure. 
+  !> of the face with a structure.
   !> The region index iReg in which the face is located has to be given. 
   !> Optionally, the indices of the face (ip,ir) can be given, where
   !> (iFcP,iFcR) is the left point (start point) of the face. 
+  !> The flag isRequired is 
   recursive subroutine addRadialLine( equ, struct, grid, &
        & iReg, sepSegUpdated, &
-       & px, py, &
+       & px, py, isRequired, &
        & recomputeIntersection, &
        & iFcR, iRegOrigin )
     type(CarreEquilibrium), intent(in) :: equ
@@ -827,6 +945,7 @@ contains
     integer, intent(in) :: iReg
     logical, dimension(nsepsegmx), intent(inout) :: sepSegUpdated
     double precision, intent(in) :: px, py
+    logical, intent(in) :: isRequired
     logical, intent(in), optional :: recomputeIntersection
     integer, intent(in), optional :: iFcR, iRegOrigin
 
@@ -998,6 +1117,7 @@ contains
                  & iRegOther, sepSegUpdated, &
                  & grid%xmail(liFcP+1, 1, iReg), &
                  & grid%ymail(liFcP+1, 1, iReg), &
+                 & isRequired, &
                  & recomputeIntersection = .false., &
                  & iFcR = iOtherFcR, iRegOrigin = iReg ) 
         end if
@@ -1018,6 +1138,7 @@ contains
                  & iRegOther, sepSegUpdated, &
                  & grid%xmail(liFcP+1, grid%nr(iReg), iReg), &
                  & grid%ymail(liFcP+1, grid%nr(iReg), iReg), &
+                 & isRequired, &
                  & recomputeIntersection = .false., &
                  & iFcR = iOtherFcR, iRegOrigin = iReg ) 
         end if
@@ -1040,7 +1161,11 @@ contains
 #endif
 
     ! Mark the new radial line segment as required
-    grid%lineFlagRad(liFcP + 1, iReg) = GRIDLINE_REQUIRED
+    if (isRequired) then
+        grid%lineFlagRad(liFcP + 1, iReg) = GRIDLINE_REQUIRED
+    else
+        grid%lineFlagRad(liFcP + 1, iReg) = GRIDLINE_REFINED
+    end if
 
   end subroutine addRadialLine
 
