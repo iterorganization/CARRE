@@ -417,6 +417,14 @@ CONTAINS
          call rdfrre(11,vari(ieg+1:80),par%targetRes,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:len('maxResJump')) .EQ. 'maxResJump') THEN
+         call rdfrre(11,vari(ieg+1:80),par%maxResJump,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
+      ELSE IF (vari(1:len('cleanupPasmin')) .EQ. 'cleanupPasmin') THEN
+         call rdfrre(11,vari(ieg+1:80),par%cleanupPasmin,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('loglevel')) .EQ. 'loglevel') THEN
          call rdfrin(11,vari(ieg+1:80),par%logLevel,ierror)
          if(ierror.eq.1) go to 98

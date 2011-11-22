@@ -36,6 +36,12 @@ module carre_postprocess
   logical, parameter :: DEBUGFILES_ADDRADIALLINE = .false.
   logical, parameter :: DEBUGFILES_INSERTPOINTS = .false.
 
+  ! Actions for postprocessing iteration
+  integer, parameter :: ACTION_REFINE_FIX = 1
+  integer, parameter :: ACTION_COARSEN = 2
+  integer, parameter :: ACTION_REFINE = 3
+  integer, parameter :: ACTION_COARSEN_FORCE = 4
+
 contains
 
   !> Perform postprocessing on the grid as generated in carre_main.
@@ -51,9 +57,9 @@ contains
     ! internal
     integer :: iReg, iPostProcess, nCellsToRefine, nCellsToRefineFix, nCellsToCoarsen
     logical :: doesIntersect
-    integer :: npReg(nregmx), npDiffRefine, npDiffCoarsen, nIterNoAction
+    integer :: npReg(nregmx), npDiff, action
     integer :: ipx, xipol1, xirad1, xipol2, xirad2
-
+    double precision :: lPasMin
 
     ! Only do postprocessing when doing grid extension
     if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
@@ -65,36 +71,26 @@ contains
     do iReg = 1, grid%nreg
 
         ! first and last radial line is required
-        call markRadialLineRequired(grid, iReg, 1)
-        call markRadialLineRequired(grid, iReg, grid%np1(iReg))
+        call setRadialLineFlag(grid, iReg, 1, GRIDLINE_BOUNDARY)
+        call setRadialLineFlag(grid, iReg, grid%np1(iReg), GRIDLINE_BOUNDARY)
 
         ! first and last radial line is required
-        !grid%lineFlagRad(1, iReg) = GRIDLINE_REQUIRED
-        !grid%lineFlagRad(grid%np1(iReg), iReg) = GRIDLINE_REQUIRED
 
         ! The grid lines going into the x-point are also required...
         do ipx = 1, equ%npx
             call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), xipol1, xirad1, xipol2, xirad2)
             if (xipol1 /= GRID_UNDEFINED) then
-                call logmsg(LOGINFO,  'carre_postprocess_computation: marking radial line required&
+                call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required&
                      & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
-                !grid%lineFlagRad(xipol1, iReg) = GRIDLINE_REQUIRED
-                call markRadialLineRequired(grid, iReg, xipol1)
+                call setRadialLineFlag(grid, iReg, xipol1, GRIDLINE_XPOINT)
             end if
             if (xipol2 /= GRID_UNDEFINED) then
-                call logmsg(LOGINFO,  'carre_postprocess_computation: marking radial line required&
+                call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required&
                      & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
-                !grid%lineFlagRad(xipol2, iReg) = GRIDLINE_REQUIRED
-                call markRadialLineRequired(grid, iReg, xipol2)
+                call setRadialLineFlag(grid, iReg, xipol2, GRIDLINE_XPOINT)
             end if
         end do
     end do
-
-    npDiffRefine = 0
-    npDiffCoarsen = 0
-    nIterNoAction = 0
-
-
 
     ! Main iteration sequence
 
@@ -114,12 +110,11 @@ contains
     ! If too fine cells exist, do COARSEN-FORCE
     ! Stop when no cells were removed in last step
 
-    do iPostProcess = 1, 31
-        if ( mod( iPostProcess, 2 ) == 1 ) then
-            call logmsg(LOGINFO,  'carre_postprocess_computation: pass '//int2str(iPostProcess)//": refinement")
-        else
-            call logmsg(LOGINFO,  'carre_postprocess_computation: pass '//int2str(iPostProcess)//": coarsening")
-        end if
+    action = GRID_UNDEFINED
+    lPasMin = pasmin
+
+    do iPostProcess = 1, 42
+        call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess))            
 
         ! Compute face/structure intersections
         call computeFaceStructureIntersections( struct, grid )
@@ -128,7 +123,7 @@ contains
         call labelPointsInsideOutside(equ, grid)
 
         ! Compute the object categorization
-        call categorizeCellsAndFaces()
+        call categorizeCellsAndFaces(lPasmin)
 
         ! Compute connection information between regions
         call computeConnectionInformation()
@@ -139,76 +134,79 @@ contains
             call writeGridStateToSiloFile('carrePostPrcA0'//int2str(iPostProcess), equ, struct, grid)
         end if
 
-        npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
-        if ( mod( iPostProcess, 2 ) == 1 ) then
-            ! On odd iterations, do refinement.
+        ! Cell counts
+        nCellsToRefineFix = count( grid%cellflag == GRID_BOUNDARY_REFINE_FIX )
+        nCellsToRefine = count( grid%cellflag == GRID_REFINE ) &
+             & + count( grid%cellflag == GRID_BOUNDARY_REFINE )
+        nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
+             & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
 
-            nCellsToRefineFix = count( grid%cellflag == GRID_BOUNDARY_REFINE_FIX )
-            nCellsToRefine = count( grid%cellflag == GRID_REFINE ) &
-                 & + count( grid%cellflag == GRID_BOUNDARY_REFINE )
-
-            if ( nCellsToRefineFix > 0 ) then
-                ! Cells need refinement because of broken geometry                
-                call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
-                     &int2str(nCellsToRefineFix)//' cells to refine due to broken geometry')
-
-                ! Fix cells by modifying the grid accordingly
-                call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
-
-            else if (nCellsToRefine > 0) then
-                ! cells need refinement due to low resolution. Only do this if no broken cells need to be fixed.
-                if ( nCellsToRefine > 0 ) then
-                    call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
-                         &int2str(nCellsToRefine)//' cells to refine due to low resolution')
-
-                    ! Refine cells
-                    call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)
-
+        ! Determine next action
+        select case (action)
+        case(ACTION_REFINE_FIX)
+            action = ACTION_COARSEN
+        case(ACTION_COARSEN_FORCE)
+            action = ACTION_COARSEN_FORCE
+        case default
+            if (nCellsToRefineFix > 0) then
+                action = ACTION_REFINE_FIX
+            else
+                if (nCellsToRefine > 0) then
+                    action = ACTION_REFINE
+                else
+                    action = ACTION_COARSEN_FORCE
+                    ! switch to cleanup resolution for coarsening
+                    lPasMin = par%cleanupPasmin
+                    ! recompute object categorization
+                    call categorizeCellsAndFaces(lPasmin)
+                    nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
+                         & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
                 end if
             end if
+        end select
 
-            npDiffRefine = sum(grid%np1(1:grid%nReg)-npReg(1:grid%nReg))
-            call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess)//&
-                 &": added "//int2str(npDiffRefine)//" radial lines in all regions")
-            if (npDiffRefine == 0) then
-                nIterNoAction = nIterNoAction + 1
-            else
-                nIterNoAction = 0
-            end if
+        ! Save number of poloidal points before modifications
+        npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
 
-        else
-            ! On even iterations, do coarsening.
-            npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
-            ! cells need coarsening?
-            nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
-                 & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
+        select case (action)
+        case (ACTION_REFINE_FIX)
+            ! Cells need refinement because of broken geometry                
+            ! Fix cells by modifying the grid accordingly
+            call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                 & //int2str(nCellsToRefineFix)//' cells with critical geometry')
+            call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
+        case (ACTION_COARSEN)
             if ( nCellsToCoarsen > 0 ) then
-                call logmsg(LOGDEBUG,  'carre_postprocess, iteration '//int2str(iPostProcess)//': '//&
-                     &int2str(nCellsToCoarsen)//' cells to coarsen')
-
-                ! Fix cells by modifying the grid accordingly
-                call coarsenCells(grid)
-            end if
-
-            npDiffCoarsen = sum(npReg(1:grid%nReg) - grid%np1(1:grid%nReg))
-            call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess)//&
-                 &": removed "//int2str(npDiffCoarsen)//" radial lines in all regions")
-
-            if (npDiffRefine == 0) then
-                nIterNoAction = nIterNoAction + 1
+                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
+                     &//int2str(nCellsToCoarsen)//' cells to coarsen')
+                call coarsenCells(grid, force = .false.)
             else
-                nIterNoAction = 0
+                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. No cells to coarsen")
             end if
-        end if
+        case (ACTION_REFINE)
+            call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                 &int2str(nCellsToRefine)//' cells with too low resolution')
+            ! Refine cells
+            call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)            
+        case (ACTION_COARSEN_FORCE)            
+            call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN_FORCE. "&
+                 &//int2str(nCellsToCoarsen)//' cells to coarsen')
+            call coarsenCells(grid, force = .true.)
+        end select
 
-        ! If no changes, exit
-        if ( nIterNoAction == 3 ) exit
+        npDiff = sum(grid%np1(1:grid%nReg)-npReg(1:grid%nReg))
+        call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess)//&
+             &": radial line delta is "//int2str(npDiff)//" (in all regions)")
+
+        ! Stop iteration if no delta in final coarsen step
+        if ((action == ACTION_COARSEN_FORCE) .and. (npDiff == 0)) exit
     end do
 
-    if ( (npDiffRefine == 0) .and. (npDiffCoarsen == 0) ) then
-        call logmsg(LOGDEBUG,  'carre_postprocess: grid state converged at iteration '//int2str(iPostProcess))
+    ! Did we converge, or stop because too many iterations?
+    if (npDiff == 0) then
+        call logmsg(LOGDEBUG, "carre_postprocess: converged at iteration "//int2str(iPostProcess))
     else
-        call logmsg(LOGDEBUG,  'carre_postprocess: grid state did not converge after iteration '//int2str(iPostProcess))
+        call logmsg(LOGDEBUG, "carre_postprocess: did NOT CONVERGE after iteration "//int2str(iPostProcess))
     end if
 
     ! write results of postprocessing iteration
@@ -224,7 +222,9 @@ contains
 
   contains
 
-    subroutine categorizeCellsAndFaces()
+    subroutine categorizeCellsAndFaces(pasmin)
+      double precision, intent(in) :: pasmin
+
 
       ! internal
       integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
@@ -319,6 +319,7 @@ contains
            & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
 
       ! Figure out which must be refined due to too low resolution 
+
       ! Increase resolution at the targets
       do iReg = 1, grid%nreg
           do iPol = 1, grid%np1(iReg) - 1
@@ -335,6 +336,33 @@ contains
               end do
           end do
       end do
+
+      ! Refine coarse cells at resolution jumps
+      do iReg = 1, grid%nreg
+          do iPol = 1, grid%np1(iReg) - 1
+              do iRad = 1, grid%nr(iReg) - 1
+                  ! only consider normal internal grid cells for this
+                  ! which were not marked for anything else
+                  if ( .not. ((grid%cellflag(iPol, iRad, iReg) == GRID_BOUNDARY) &
+                       & .or. (grid%cellflag(iPol, iRad, iReg) == GRID_INTERNAL)) ) cycle
+
+                  if ( iPol > 1 ) then
+                      if (grid%hx(iPol, iRad, iReg) / grid%hx(iPol - 1, iRad, iReg) > par%maxResJump) then
+                          grid%cellflag(iPol, iRad, iReg) = GRID_REFINE
+                      end if
+                  end if
+
+                  if ( iPol < grid%np1(iReg) - 1 ) then
+                      if (grid%hx(iPol, iRad, iReg) / grid%hx(iPol + 1, iRad, iReg) > par%maxResJump) then
+                          grid%cellflag(iPol, iRad, iReg) = GRID_REFINE
+                      end if
+                  end if
+
+              end do
+          end do
+      end do
+
+
 
     end subroutine categorizeCellsAndFaces
 
@@ -427,19 +455,19 @@ contains
 
   !> Mark the radial grid line at poloidal position iPol in region iReg as required in the grid.
   !> Also follows the grid line in neighbouring regions
-  recursive subroutine markRadialLineRequired(grid, iReg, iPol)
+  recursive subroutine setRadialLineFlag(grid, iReg, iPol, flag)
     type(CarreGrid), intent(inout) :: grid
-    integer, intent(in) :: iReg, iPol
+    integer, intent(in) :: iReg, iPol, flag
     
     ! internal
     integer :: iRegOther, iBnd, iPolOther, iRadOther
     double precision :: xBnd, yBnd
 
-    if (grid%lineFlagRad(iPol, iReg) == GRIDLINE_REQUIRED ) then
+    if (grid%lineFlagRad(iPol, iReg) == flag ) then
         ! already touched this region
         return
     else
-        grid%lineFlagRad(iPol, iReg) = GRIDLINE_REQUIRED    
+        grid%lineFlagRad(iPol, iReg) = flag
     end if
 
     ! Follow into other regions
@@ -459,13 +487,13 @@ contains
 
             call findPointInRegion(grid, iRegOther, xBnd, yBnd, iPolOther, iRadOther)
             if (iPolOther /= GRID_UNDEFINED) then
-                call markRadialLineRequired(grid, iRegOther, iPolOther)
+                call setRadialLineFlag(grid, iRegOther, iPolOther, flag)
             end if
         end do
 
     end do    
 
-  end subroutine markRadialLineRequired
+  end subroutine setRadialLineFlag
 
 
   ! Compute characteristic cell size in x and y direction
@@ -807,7 +835,7 @@ contains
                     end if
                 case (FIXCELLS_MODE_REFINE)
                     select case (grid%cellflag(ip, ir, iReg))
-                    case(GRID_BOUNDARY_REFINE)
+                    case(GRID_BOUNDARY_REFINE, GRID_REFINE)
                         refineFace(FACE_POLOIDAL, ip, ir, iReg) = .true.
 
                         ! To refine cell, split bottom face of cell in the middle.
@@ -856,7 +884,6 @@ contains
     recomputeIntersection = (mode == FIXCELLS_MODE_FIX)
     isRequired = (mode == FIXCELLS_MODE_FIX)
 
-
     do iReg = 1, grid%nreg
         do ip = 1, npPolOriginal(iReg) - 1
             do ir = 1, npRadOriginal(iReg)
@@ -864,7 +891,7 @@ contains
                 if (refineFace(FACE_POLOIDAL, ip, ir, iReg)) then        
 
                     if (cellsRefinedFlag(iReg, ip)) then
-                        call logmsg( LOGDEBUG, "fixCells: skipping refinement of radial cell strip in &
+                        call logmsg( LOGDEBUGBULK, "fixCells: skipping refinement of radial cell strip in &
                              & region "//int2str(iReg)//", ipol="//int2str(ip)//" - was already refined in&
                              & this iteration")
                         cycle
@@ -906,17 +933,20 @@ contains
 
   contains
 
-    subroutine markRefined(iReg, iPol)
+    recursive subroutine markRefined(iReg, iPol)
       integer, intent(in) :: iReg, iPol
 
       ! internal
       integer :: iDir
 
+      if (cellsRefinedFlag(iReg, iPol)) return
+
       cellsRefinedFlag(iReg, iPol) = .true.
 
       do iDir = 1, 2
           if (grid%nbFaceReg(iReg, iPol, iDir) /= GRID_UNDEFINED) then
-              cellsRefinedFlag(grid%nbFaceReg(iReg, iPol, iDir), grid%nbFaceIPol(iReg, iPol, iDir)) = .true.              
+              call markRefined(grid%nbFaceReg(iReg, iPol, iDir), grid%nbFaceIPol(iReg, iPol, iDir))
+              !cellsRefinedFlag(grid%nbFaceReg(iReg, iPol, iDir), grid%nbFaceIPol(iReg, iPol, iDir)) = .true.              
           end if
       end do
 
@@ -933,7 +963,8 @@ contains
   !> The region index iReg in which the face is located has to be given. 
   !> Optionally, the indices of the face (ip,ir) can be given, where
   !> (iFcP,iFcR) is the left point (start point) of the face. 
-  !> The flag isRequired is 
+  !> The flag isRequired indicates whether the gridline is required to fix geometry problems,
+  !> i.e. should not be removed by a standard coarsening step.
   recursive subroutine addRadialLine( equ, struct, grid, &
        & iReg, sepSegUpdated, &
        & px, py, isRequired, &
@@ -1363,21 +1394,21 @@ contains
 
         if(ortmax > rlcept) then
             ! The relaxation failed to produce good results with the
-            ! given number of iterations
+            ! given number of iterations            
         end if
 
     endif
   end subroutine insertPoints
 
   !> Coarsen grid by removing excessively fine rows of grid cells
-  subroutine coarsenCells(grid)
-    type(CarreGrid), intent(inout) :: grid  
+  subroutine coarsenCells(grid, force)
+    type(CarreGrid), intent(inout) :: grid
+    logical, intent(in) :: force
 
     ! internal
     integer :: iReg, ip, ir, np
     logical :: removeRadialLine(npmamx,nregmx), removeable
-    logical :: sepSegsDelta(nsepsegmx)
-    
+    logical :: sepSegsDelta(nsepsegmx)    
 
     ! Figure out what radial grid lines have to be removed
     ! to remove excessively fine cells
@@ -1391,8 +1422,8 @@ contains
                 if ( ( grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_COARSEN ) .or. &
                      & ( grid%cellflag(ip, ir, iReg) == GRID_INTERNAL_COARSEN ) ) then
 
-                    call markRadialLine(ip, iReg, removeable)
-                    if (.not. removeable) call markRadialLine(ip + 1, iReg, removeable)
+                    call markRadialLine(ip, iReg, removeable, force)
+                    if (.not. removeable) call markRadialLine(ip + 1, iReg, removeable, force)
                     if (.not. removeable) then
                         ! Found no radial line that can be removed to coarsen this radial cell strip
                         !call logmsg(LOGWARNING, "coarsenCells: cannot coarsen cell")
@@ -1428,9 +1459,12 @@ contains
     ! Check whether the radial line going through ir, ireg can be removed, and 
     ! if yes, mark it to be removed in array removeRadialLine for all regions.
     ! Also note the indices of the separatrix segments to update
-    subroutine markRadialLine(ip, iReg, removeable) 
+    !
+    ! The flag force indicates whether required lines can be removed or not
+    subroutine markRadialLine(ip, iReg, removeable, force) 
       integer, intent(in) :: ip, ireg
       logical, intent(out) :: removeable
+      logical, intent(in) :: force
 
       ! internal
       integer :: iContinue, iRegOther, ipOther, irOther, i
@@ -1454,13 +1488,24 @@ contains
      
       ! is it removeable?
       removeable = .true.
+      ! 1) marked as required in any region? Can be overridden by force option.
       do i = 1, grid%nreg
           if (.not. inRegion(i)) cycle
-          if ( grid%lineFlagRad(iPolRegion(i), i) == GRIDLINE_REQUIRED ) then
+          if ( .not. radialLineCoarseable(grid%lineFlagRad(iPolRegion(i), i), force) ) then
               removeable = .false.
-              exit
           end if
       end do
+
+      ! 2) any neighbour radial lines marked for removal
+      if (ip > 1) then
+          if (removeRadialLine(ip - 1, ireg)) removeable = .false.
+      end if
+
+      if (ip < grid%np1(iReg)) then
+          if (removeRadialLine(ip + 1, ireg)) removeable = .false.
+      end if
+
+      if (.not. removeable) return
 
       ! if removeable, mark for removal and do bookkeeping
       if (removeable) then
@@ -1480,6 +1525,29 @@ contains
       end if
 
     end subroutine markRadialLine
+
+    logical function radialLineCoarseable( flag, force )
+      integer, intent(in) :: flag
+      logical, intent(in) :: force
+
+      ! Can never coarsen radial lines forming the basic grid structure
+      if  ( (flag == GRIDLINE_XPOINT) .or. &
+           & (flag == GRIDLINE_BOUNDARY) ) then
+          radialLineCoarseable = .false.
+          return
+      end if
+
+      ! If forced, can remove the line no matter what the status
+      if (force) then
+          radialLineCoarseable = .true.
+          return
+      end if
+
+      ! If not forced, do not remove lines marked as required
+      radialLineCoarseable = .not. (flag == GRIDLINE_REQUIRED)
+
+    end function radialLineCoarseable
+
 
   end subroutine coarsenCells
 

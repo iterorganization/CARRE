@@ -18,8 +18,10 @@ module carre_types
 
   ! Grid line flags
   integer, parameter, public :: GRIDLINE_BASELINE = 1
-  integer, parameter, public :: GRIDLINE_REQUIRED = 2
-  integer, parameter, public :: GRIDLINE_REFINED = 1
+  integer, parameter, public :: GRIDLINE_XPOINT = 2
+  integer, parameter, public :: GRIDLINE_BOUNDARY = 3
+  integer, parameter, public :: GRIDLINE_REQUIRED = 4
+  integer, parameter, public :: GRIDLINE_REFINED = 5
 
   ! Face number of a cell
   integer, parameter, public :: FACE_LEFT = 1
@@ -77,11 +79,16 @@ module carre_types
       double precision :: zMin = -huge(0.0d0), zMax = huge(0.0d0)
       
       ! extension size for equilibrium grid at the boundaries
-      integer :: addLeft = 0, addRight = 0, addTop = 0, addBottom = 0      
+      integer :: addLeft = 0, addRight = 0, addTop = 0, addBottom = 0
 
       ! Desired maximal poloidal cell size at targets in extended grid mode
       ! Default value is chosen to cause no refinement at targets.
       double precision :: targetRes = huge(0.0d0)
+
+      double precision :: maxResJump = 4.0d0
+
+      double precision :: cleanupPasmin = huge(0.0d0)
+
 
       ! Extended grid mode
       integer :: gridExtensionMode = GRID_EXTENSION_OFF

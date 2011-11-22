@@ -629,7 +629,7 @@ contains
        ! This happens if the equilibrium data has issues. 
        ! Usually happens for faces going ino the x-point. Fortunately there the 
        ! level lines are pretty straight anyway, so it's not a problem.
-       call logmsg( LOGKNOWNWARNING, 'findLevelLineForPoints: WARNING: unable to find connecting level line.&
+       call logmsg( LOGDEBUGBULK, 'findLevelLineForPoints: WARNING: unable to find connecting level line.&
             & Substituting direct connection line' )
        npniv = 2
        nivx(1) = xFrom
