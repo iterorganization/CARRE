@@ -253,6 +253,8 @@ c---
             mailx(1,ir)=xnlast(1)
             maily(1,ir)=ynlast(1)
 
+            GO TO 17
+
          ENDIF
 
          IF (repart .EQ. 1) THEN
@@ -267,7 +269,7 @@ c---
 
             CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),
      .                npstru(plaque),x1,y1,valfct,x2,y2,fctnew,sens,
-     .                2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+     .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
          ENDIF
 c***
@@ -424,6 +426,8 @@ c***
 	   ra(ir)= r(ir)-a
            rho(ir)=r(ir)/a
          endif
+
+   17    CONTINUE
 
 *..Definition de xn2 et yn2 pour le bloc common comort.
 
