@@ -382,7 +382,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
          end if
 
-         ! FIXME: broken for disconnected double null case
+         ! FIXME: broken for disconnected double null case?
 !!$!.. Calcul de grand psi
 !!$         diag%gdpsi(ir,ireg)= (valfct-fctxo)/(fctini-fctxo)
 !!$         diag%racpsi(ir,ireg)= sqrt(diag%gdpsi(ir,ireg))

@@ -201,8 +201,8 @@ module carre_types
 
           integer :: pointFlag(npmamx,nrmamx,nregmx)
 
-          ! logical flags marking grid lines as required
-          integer :: lineFlagRad(nrmamx, nregmx)
+          ! logical flags marking radial grid lines as required
+          integer :: lineFlagRad(npmamx, nregmx)
 
           ! neighbour information for following cells in the radial direction
           ! from region to region

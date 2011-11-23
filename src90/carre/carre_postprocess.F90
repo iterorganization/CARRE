@@ -122,7 +122,7 @@ contains
         ! Mark points to be inside/outside of vessel
         call labelPointsInsideOutside(equ, grid)
 
-        ! Compute the object categorization
+        ! Compute the object categorization 
         call categorizeCellsAndFaces(lPasmin)
 
         ! Compute connection information between regions
@@ -212,10 +212,12 @@ contains
     ! write results of postprocessing iteration
     call writeGridStateToSiloFile('carrePostProcC0', equ, struct, grid)
 
-
     ! Finalize grid cell fixes by moving external points
     ! of faces onto boundary intersections
-    call finalizeCells(grid)
+    call finalizeCells(grid, par)
+
+    ! write final postprocessing result
+    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
     ! write final postprocessing result
     call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
@@ -780,7 +782,6 @@ contains
     do iReg = 1, grid%nreg
         do ip = 1, npPolOriginal(iReg) - 1
             do ir = 1, npRadOriginal(iReg) - 1
-
                 
                 select case (mode)
                 case(FIXCELLS_MODE_FIX)
@@ -1608,17 +1609,106 @@ contains
     
 
 
-
-
-  subroutine finalizeCells(grid)
+  subroutine finalizeCells(grid, par)
     type(CarreGrid), intent(inout) :: grid
+    type(CarreParameters), intent(in) :: par
 
     ! internal
     integer :: iReg, ir, ip, iFace, ip2, ir2
     integer :: nExt
 
-    integer :: iPass, dx, dy, ipFace, irFace, nInt, ipl, irl, ipFix, irFix, ipNb, irNb
+    integer :: iPass, dx, dy, nInt, ipl, irl, ipFix, irFix, ipNb, irNb
+    integer :: ipFace, irFace
+    integer :: ipPolFace, irPolFace,  ipRadFace, irRadFace
+    integer :: ipNbRad, irNbRad, ipNbPol, irNbPol
     logical :: pointMoved, pointOk
+    double precision :: dIntRad, dIntPol
+
+    logical :: pointWasMoved(npmamx,nrmamx,nregmx)
+
+    external :: dist
+    double precision :: dist
+
+    pointWasMoved = .false.
+
+    ! First fix cells with broken geometry (can happen at this stage due to 
+    ! forced coarsening)
+
+    do iReg = 1, grid%nReg
+        do ip = 1, grid%np1(iReg) - 1
+            do ir = 1, grid%nr(iReg) - 1
+
+                ! we are interested in broken boundary cells
+                if (grid%cellflag(ip, ir, iReg) /= GRID_BOUNDARY_REFINE_FIX) cycle
+
+                ! this fix can only treat cells with 5 sides (3 internal, 1 external point)
+                nInt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_INTERNAL )
+                nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
+                if (.not. ((nInt == 3) .and. (nExt == 1)) ) cycle
+                                
+                call findPoint( ip, ir, iReg, GRID_EXTERNAL, ipFix, irFix )
+               
+                ! Consider the internal points connected to the external point
+                ! by a face. The internal point closer to the intersection point on its
+                ! face is moved onto this intersection point
+                
+                ! radial face
+                ! neighbour point
+                ipNbRad = ipFix
+                irNbRad = irFix + 1
+                if (irNbRad > ir + 1) irNbRad = irFix
+
+                ! figure out indices of the radial face this point is on
+                ipRadFace = min(ipFix, ipNbRad)
+                irRadFace = min(irFix, irNbRad)
+
+                ! length of internal piece of the face
+                dIntRad = dist( &
+                     & grid%xmail(ipNbRad,irNbRad,iReg), &
+                     & grid%ymail(ipNbRad,irNbRad,iReg), &
+                     & grid%faceISecPx(FACE_RADIAL,ipRadFace,irRadFace,iReg), &
+                     & grid%faceISecPy(FACE_RADIAL,ipRadFace,irRadFace,iReg) )
+
+                ! poloidal face
+                ! neighbour point
+                ipNbPol = ipFix + 1
+                if (ipNbPol > ip + 1) ipNbPol = ipFix
+                irNbPol = irFix
+
+                ! figure out indices and type of face this point is on
+                ipPolFace = min(ipFix, ipNbPol)
+                irPolFace = min(irFix, irNbPol)
+
+                ! length of internal piece of the face
+                dIntPol = dist( &
+                     & grid%xmail(ipNbPol,irNbPol,iReg), &
+                     & grid%ymail(ipNbPol,irNbPol,iReg), &
+                     & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                     & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
+                
+                ! Move internal point on the shorter internal face segment
+                if (dIntRad < dIntPol) then
+                    call movePoint( &
+                         & grid%xmail(ipNbRad,irNbRad,iReg), &
+                         & grid%ymail(ipNbRad,irNbRad,iReg), &
+                         & grid%faceISecPx(FACE_RADIAL,ipRadFace,irRadFace,iReg), &
+                         & grid%faceISecPy(FACE_RADIAL,ipRadFace,irRadFace,iReg) )
+                else
+                    call movePoint( &
+                         & grid%xmail(ipNbPol,irNbPol,iReg), &
+                         & grid%ymail(ipNbPol,irNbPol,iReg), &
+                         & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                         & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
+                end if
+
+                ! Mark as fixed
+                grid%cellflag(ip, ir, iReg) = GRID_BOUNDARY
+
+            end do
+        end do
+    end do
+
+
 
     ! For all intersected faces with an internal point on one and
     ! an external point on the other side, move the external point
@@ -1637,6 +1727,7 @@ contains
         do ip = 1, grid%np1(iReg)
             do ir = 1, grid%nr(iReg)
 
+                ! Only consider external points
                 if (grid%pointFlag(ip, ir, iReg) /= GRID_EXTERNAL) cycle
 
                 ! apply correction strategies one after another
@@ -1666,9 +1757,6 @@ contains
                             ! First pass: move onto intersection
                             if ( (iPass==1) .and. &
                                  & (grid%pointFlag(ip2, ir2, iReg) == GRID_INTERNAL) ) then
-
-                                ! external and internal point: 
-                                ! move external point onto intersection (in all regions!)                         
                                 call movePoint( grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
                                      & grid%faceISecPx(iFace,ipFace,irFace,iReg), grid%faceISecPy(iFace,ipFace,irFace,iReg) )
                                 pointMoved = .true.
@@ -1718,18 +1806,8 @@ contains
                 call logmsg(LOGDEBUG,  'finalizeCells: candidate cell '//int2str(ip)&
                      &//', '//int2str(ir)//', '//int2str(iReg) )
 
-                ! find the internal point
-                ipFix = GRID_UNDEFINED
-                irFix = GRID_UNDEFINED
-                do ipL = 0, 1
-                    do irL = 0, 1
-                        if ( grid%pointflag(ip + ipL, ir + irL, iReg) == GRID_INTERNAL ) then
-                            ipFix = ip + ipL
-                            irFix = ir + irL
-                        end if
-                    end do
-                end do
-                call assert( ipFix /= GRID_UNDEFINED )
+                ! find the internal point                
+                call findPoint( ip, ir, iReg, GRID_INTERNAL, ipFix, irFix )
 
                 ! the external point we are interested in is on the opposite corner
                 ipFix = ipFix + 1
@@ -1771,6 +1849,30 @@ contains
 
   contains
 
+    !> In cell (ip, ir, iReg), find a point with given flag
+    subroutine findPoint( ip, ir, iReg, flag, ipFix, irFix )
+      integer, intent(in) :: ip, ir, iReg, flag
+      integer, intent(out) :: ipFix, irFix
+
+      ! internal
+      integer :: ipL, irL
+      
+      ! find the internal point
+      ipFix = GRID_UNDEFINED
+      irFix = GRID_UNDEFINED
+      do ipL = 0, 1
+          do irL = 0, 1
+              if ( grid%pointflag(ip + ipL, ir + irL, iReg) == flag ) then
+                  ipFix = ip + ipL
+                  irFix = ir + irL
+              end if
+          end do
+      end do
+      call assert( ipFix /= GRID_UNDEFINED )
+
+    end subroutine findPoint
+
+
     subroutine movePoint( xFrom, yFrom, xTo, yTo )
       double precision, intent(in) :: xFrom, yFrom, xTo, yTo
 
@@ -1782,10 +1884,14 @@ contains
           call findPointInRegion(grid, iReg, xFrom, yFrom, ip, ir)
           ! if no point found, go to next region
           if (ip == GRID_UNDEFINED) cycle
-          grid%xmail(ip, ir, iReg) = xTo
-          grid%ymail(ip, ir, iReg) = yTo
-      end do
 
+          if (.not. pointWasMoved(ip, ir, iReg)) then
+              grid%xmail(ip, ir, iReg) = xTo
+              grid%ymail(ip, ir, iReg) = yTo
+              pointWasMoved(ip, ir, iReg) = .true.
+          end if
+      end do
+          
     end subroutine movePoint
 
 

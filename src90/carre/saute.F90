@@ -259,7 +259,7 @@
               ! EXPERIMENTAL: return best point
               x2 = bestX
               y2 = bestY
-              return
+              return ! FIXME: re-enable below error condition for non-extended grid
 
             if(sellan(1:8).eq.'francais') then
             write(*,*) 'On a fait le tour de la structure sans trouver' & 
