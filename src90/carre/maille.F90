@@ -11,12 +11,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !======================================================================
     
       use CarreSiloIO
+#ifdef USE_SILO      
       use SiloIO
+#endif
       use CarreDiagnostics
       use carre_types
       use carre_parameter_io
       use logging
-  
+      use Helper
+
       IMPLICIT NONE
       
       !  dimensions

@@ -2,7 +2,7 @@
 DEFINES 	+= 
 
 #FC		= pgf95
-FC		= mpif90
+FC		= pgf95
 CPP		= /lib/cpp -C -traditional
 
 ifdef CARRE_DEBUG

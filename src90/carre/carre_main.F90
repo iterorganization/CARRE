@@ -8,8 +8,8 @@ module carre_main
   use carre_postprocess ! for writeSilo...
 #ifdef USE_SILO
   use SiloIO
-  use CarreSiloIO
 #endif
+  use CarreSiloIO
 
   implicit none
 

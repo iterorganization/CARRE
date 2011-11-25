@@ -6,6 +6,7 @@ module carre_postprocess
   use carre_criteria
   use itm_assert
   use Logging
+  use Helper
   use carre_intersect
 
 #ifdef USE_SILO
@@ -1409,7 +1410,7 @@ contains
     ! internal
     integer :: iReg, ip, ir, np
     logical :: removeRadialLine(npmamx,nregmx), removeable
-    logical :: sepSegsDelta(nsepsegmx)    
+    integer :: sepSegsDelta(nsepsegmx)    
 
     ! Figure out what radial grid lines have to be removed
     ! to remove excessively fine cells
@@ -1434,7 +1435,7 @@ contains
             end do
         end do
         call logmsg(LOGDEBUG, "coarsenCells: region "//int2str(iReg)//": can remove " &
-             & //int2str(count(removeRadialLine(:, iReg) == .true.))//" lines.")
+             & //int2str(count(removeRadialLine(:, iReg)))//" lines.")
     end do
 
     ! Remove lines region by region

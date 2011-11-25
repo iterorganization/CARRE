@@ -1,6 +1,6 @@
 module Logging
 
-  use Helper
+  !use Helper
 
   ! Loglevels: if ( LEVEL <= LOG... ) then write...
    

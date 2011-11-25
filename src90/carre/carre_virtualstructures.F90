@@ -2,6 +2,7 @@ module carre_virtualstructures
 
   use carre_types
   use Logging
+  use Helper
 #ifdef USE_SILO
   use SiloIO
 #endif

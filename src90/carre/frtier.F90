@@ -16,6 +16,7 @@
 !*** find and parametrise the limiting level line.
 !======================================================================
         use Logging
+        use Helper
 
       IMPLICIT NONE
 

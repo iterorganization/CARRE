@@ -15,6 +15,7 @@
 !======================================================================
       use carre_niveau
       use Logging
+      use Helper
 
       IMPLICIT NONE
 

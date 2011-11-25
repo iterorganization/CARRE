@@ -161,6 +161,11 @@ contains
     integer, parameter :: PERIODIC_BC = 0
     integer, parameter :: istyle = -1 ! hard-wired to DG format
     
+
+    ! arrays for cell flags (currently not used in ITM Carre)
+    integer :: b2cflag(-1:nxmax,-1:nymax,2)
+    integer :: cflag(npmamx,nrmamx,nreg,2)
+
 !!$    integer nxmx,nymx,ncutmx,nisomx
 !!$    parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1)
 
@@ -176,11 +181,13 @@ contains
   
     type(B2ITMGridMap) :: gmap
 
+    b2cflag = 0
+
     ! assemble the crx, cry arrays
-    call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx, & 
+    call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
         &    grid%xmail,grid%ymail,grid%nreg,grid%np1,par%npr,npmamx,nrmamx, & 
-        &    par%nptseg,psidx,psidy,grid%psim,grid%psidxm,grid%psidym,b0r0, & 
-        &   ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+        &    par%nptseg,psidx,psidy,grid%psim,grid%psidxm,grid%psidym,cflag,b0r0, & 
+        &    ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
 
     ! allocate connectivity arrays 
     allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),&

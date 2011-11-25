@@ -1,4 +1,4 @@
-#  VERSION : --> see SVN
+# VERSION : --> see SVN
 
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
@@ -6,7 +6,7 @@ CPP	= /usr/lib/cpp
 # Source form: src is old fixed form source (no longer maintained), src90 is current free form source
 SRCDIR = src90
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_assert:${SRCDIR}/carre_shared
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_types:${SRCDIR}/itm_assert
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
@@ -25,8 +25,7 @@ ifdef USE_ITMCARRE
 
 EXCLUDELIST +=
 ALLTARGETS += ${OBJECTCODE}/itmcarre_wrapper
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/itmcarre:${SRCDIR}/usol:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared
-
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itmcarre:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared:${SRCDIR}/itm_grid_external/orderpack
 
 # Some variables are expected to be set up properly by the ITMv1 script
 # -${UAL} is the path to the UAL library files
