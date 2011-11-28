@@ -12,7 +12,7 @@ module SiloIO
   !private
   !public siloSetDisabled, siloGetDisabled, siloOpen, siloClose, siloWriteLineSegmentGrid
 
-  include'silo.inc'
+  include 'silo.inc'
 
   logical :: SILOIO_DISABLED = .false.
 

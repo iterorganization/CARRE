@@ -545,7 +545,6 @@ contains
 
 
 
-
   !> Label points to be in/outside of the vessel by stepping along faces
   !> and exploiting the intersection information
   subroutine labelPointsInsideOutside( equ, grid )      
@@ -1709,6 +1708,7 @@ contains
         end do
     end do
 
+    return
 
 
     ! For all intersected faces with an internal point on one and
