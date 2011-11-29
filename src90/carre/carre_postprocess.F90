@@ -1656,7 +1656,7 @@ contains
                 ! neighbour point
                 ipNbRad = ipFix
                 irNbRad = irFix + 1
-                if (irNbRad > ir + 1) irNbRad = irFix
+                if (irNbRad > ir + 1) irNbRad = ir
 
                 ! figure out indices of the radial face this point is on
                 ipRadFace = min(ipFix, ipNbRad)
@@ -1672,7 +1672,7 @@ contains
                 ! poloidal face
                 ! neighbour point
                 ipNbPol = ipFix + 1
-                if (ipNbPol > ip + 1) ipNbPol = ipFix
+                if (ipNbPol > ip + 1) ipNbPol = ip
                 irNbPol = irFix
 
                 ! figure out indices and type of face this point is on
@@ -1692,24 +1692,23 @@ contains
                          & grid%xmail(ipNbRad,irNbRad,iReg), &
                          & grid%ymail(ipNbRad,irNbRad,iReg), &
                          & grid%faceISecPx(FACE_RADIAL,ipRadFace,irRadFace,iReg), &
-                         & grid%faceISecPy(FACE_RADIAL,ipRadFace,irRadFace,iReg) )
+                         & grid%faceISecPy(FACE_RADIAL,ipRadFace,irRadFace,iReg), &
+                         & markFixed = .true. )
                 else
                     call movePoint( &
                          & grid%xmail(ipNbPol,irNbPol,iReg), &
                          & grid%ymail(ipNbPol,irNbPol,iReg), &
                          & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
-                         & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
+                         & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                         & markFixed = .true. )
                 end if
 
                 ! Mark as fixed
                 grid%cellflag(ip, ir, iReg) = GRID_BOUNDARY
-
+ 
             end do
         end do
     end do
-
-    return
-
 
     ! For all intersected faces with an internal point on one and
     ! an external point on the other side, move the external point
@@ -1759,7 +1758,9 @@ contains
                             if ( (iPass==1) .and. &
                                  & (grid%pointFlag(ip2, ir2, iReg) == GRID_INTERNAL) ) then
                                 call movePoint( grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
-                                     & grid%faceISecPx(iFace,ipFace,irFace,iReg), grid%faceISecPy(iFace,ipFace,irFace,iReg) )
+                                     & grid%faceISecPx(iFace,ipFace,irFace,iReg), &
+                                     & grid%faceISecPy(iFace,ipFace,irFace,iReg), &
+                                     & markFixed = .false. )
                                 pointMoved = .true.
                                 exit
                             end if
@@ -1771,7 +1772,8 @@ contains
                                 ! external and boundary point: 
                                 ! move external point onto boundary point (-> triangle cell)
                                 call movePoint( grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
-                                     & grid%xmail(ip2,ir2,iReg), grid%ymail(ip2,ir2,iReg) )
+                                     & grid%xmail(ip2,ir2,iReg), grid%ymail(ip2,ir2,iReg), &
+                                     & markFixed = .false. )
                                 pointMoved = .true.
                                 exit
                             end if
@@ -1841,7 +1843,8 @@ contains
                          &//' '//int2str(iReg)//', fixing node '//int2str(ipFix)//' '&
                          &//int2str(irFix)//' with node '//int2str(ipNb)//' '//int2str(irNb) )
                     call movePoint( grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
-                         & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) )
+                         & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg), &
+                         & markFixed = .false. )
                 end if
 
             end do
@@ -1874,8 +1877,9 @@ contains
     end subroutine findPoint
 
 
-    subroutine movePoint( xFrom, yFrom, xTo, yTo )
+    subroutine movePoint( xFrom, yFrom, xTo, yTo, markFixed )
       double precision, intent(in) :: xFrom, yFrom, xTo, yTo
+      logical, intent(in) :: markFixed 
 
       ! internal
       integer :: iReg, ip, ir
@@ -1890,9 +1894,22 @@ contains
               grid%xmail(ip, ir, iReg) = xTo
               grid%ymail(ip, ir, iReg) = yTo
               pointWasMoved(ip, ir, iReg) = .true.
+
+              if (markFixed) then                
+                  ! Mark as boundary point
+                  grid%pointflag(ip, ir, iReg) = GRID_BOUNDARY
+                  
+                  ! Mark all faces connected to this point as not intersected
+                  grid%faceISec(FACE_RADIAL,ip,ir,iReg) = .false.
+                  grid%faceISec(FACE_POLOIDAL,ip,ir,iReg) = .false.
+                  if (ir-1 > 0) grid%faceISec(FACE_RADIAL,ip,ir-1,iReg) = .false.
+                  if (ip-1 > 0) grid%faceISec(FACE_POLOIDAL,ip-1,ir,iReg) = .false.
+              end if              
+
           end if
       end do
-          
+
+
     end subroutine movePoint
 
 

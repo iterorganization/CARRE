@@ -1,0 +1,70 @@
+aazero.F	Find zeros of real function
+aire.F		Area of polygon
+argsep.F	Arrange and index separatrices
+carre.F		Main program
+change.F	Parameter I/O (user interaction)
+chgdir.F	Check whether two vectors are oriented in opposing directions
+clort.F		Compute "orthogonality" criterium 
+coeff.F		Compute interpolation coefficients on rectangular grid
+coinci.F	Find point close to a reference point on a curve
+coord1.F	Return coordinates of point on a parametrized curve
+coord.F		Return coordinates of point on a parametrized curve
+crbniv.F	Find contour line (with intersection treatment)
+cross.F		Check whether a segment intersects a structure
+defaut.F	Default values for parameters
+derive.F	Compute derivatives on a 2d rectangular grid
+deriv.F		Compute derivatives of a 1d function 
+doubld.F	Double-null separatrix treatment
+drctio.F	Determine direction (clockwise/anti-clockwise) along a struct.
+entete.F	File I/O: read up to a line
+frtier.F	Find limiting (outermost) curves not touching a structure
+grad0.F		Find cells with zero gradient
+horair.F	Determine direction (clockwise/anti-clockwise) along a struct.
+ifind.F		Find index of cell containing a given point on a 1d grid
+indcrb.F	Find segment index for a point along a parametrized curve
+indsgm.F	Find associated segment of a structure for a given point
+in.F		Check whether point is inside or outside of a closed structure
+inipsi.F	Compute interpolation coefficients for psi, grad psi
+insert.F	Create vector of indices of the divertor targets
+interp.F	Compute interpolation coeffs. for a 1d function
+intrsc.F	Compute intersection point between a segment and a param. curve
+leccle.F	Interactive I/O for configuration
+lecclf.F	Interactive I/O for configuration
+limfnd.F	Find innermost point of limiter
+listru.F	I/O for structure data
+long.F		Compute length of a param. curve
+mailcn.F	Gridding of central region
+maille.F	Main gridding routine
+mailrg.F	Gridding of a region
+marche.F	Parametrize contour lines (with structure intersection treatm.)
+milieu.F	Check whether value is in interval
+nulort.F	!Unclear, probably unused
+nunifo.F	Distribute of grid spacings, parabolic profile
+orddef.F	Order indices in a vector geometrically
+plqdst.F	Compute distance along structure segments
+plurap.F	Determine point on a structure closest to a curve
+rappel.F	I/O: output of parameters
+rdfrch.F	Read character string from a string
+rdfrin.F	Read integer from a string
+rdfrre.F	Read real from a string
+ruban.F		Distance from beginning of curve to a point
+saute.F		Find next point on a structure
+selptx.F	I/O: print cells with vanishing gradient
+sortie.F	I/O: output file
+sptris.F	Build separatrix segments
+tourne.F	Cycle an index with wrap-around
+trc_stk.F	Debugging: trace stack
+trvers.F	Check whether a segment intersects a curve
+tsplaq.F	Check whether a curve increases monotonically / curvature
+untang.F	Unit vector tangential to curve at a point
+virtualtargets.F Create the virtual targets
+warnings.F      I/O: create warnings file for AGG
+
+
+
+Dierks: 
+
+ITM svn: ETS
+SOLPS-MDSPLUS: rwshot
+
+recgrid

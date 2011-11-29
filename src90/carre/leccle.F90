@@ -567,8 +567,9 @@
          READ(5,*)deltrn(5)
 
          WRITE(6,289)distxo
-  289    format(//'Number of nodes in radial direction in region 6'/ & 
-     &   '(interior):')
+  289    format(/'Number of nodes in radial direction in region 6 (interior) and' & 
+     &     ,' penetration:'/'maximum penetration = ',f11.8)
+
          READ(5,*)npr(6),pntrat
 
          pntrat = MIN(pntrat,distxo)

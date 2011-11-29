@@ -15,7 +15,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       use CarreDiagnostics
       use carre_types
       use carre_parameter_io
-      use logging
+      use Logging
+      use Helper
   
       IMPLICIT NONE
       
