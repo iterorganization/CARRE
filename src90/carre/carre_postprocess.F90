@@ -8,6 +8,7 @@ module carre_postprocess
   use Logging
   use Helper
   use carre_intersect
+  use carre_find
 
 #ifdef USE_SILO
   use SiloIO
@@ -59,7 +60,7 @@ contains
     integer :: iReg, iPostProcess, nCellsToRefine, nCellsToRefineFix, nCellsToCoarsen
     logical :: doesIntersect
     integer :: npReg(nregmx), npDiff, action
-    integer :: ipx, xipol1, xirad1, xipol2, xirad2
+    integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
     double precision :: lPasMin
 
     ! Only do postprocessing when doing grid extension
@@ -79,17 +80,12 @@ contains
 
         ! The grid lines going into the x-point are also required...
         do ipx = 1, equ%npx
-            call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), xipol1, xirad1, xipol2, xirad2)
-            if (xipol1 /= GRID_UNDEFINED) then
-                call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required&
+            call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), npoint, xipol, xirad, findAll = .true.)
+            do ipoint = 1, npoint
+                call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required &
                      & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
-                call setRadialLineFlag(grid, iReg, xipol1, GRIDLINE_XPOINT)
-            end if
-            if (xipol2 /= GRID_UNDEFINED) then
-                call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required&
-                     & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
-                call setRadialLineFlag(grid, iReg, xipol2, GRIDLINE_XPOINT)
-            end if
+                call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
+            end do
         end do
     end do
 
@@ -118,10 +114,10 @@ contains
         call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess))            
 
         ! Compute face/structure intersections
-        call computeFaceStructureIntersections( struct, grid )
+        call computeFaceStructureIntersections(struct, grid, finalized = .false.)
 
         ! Mark points to be inside/outside of vessel
-        call labelPointsInsideOutside(equ, grid)
+        call labelPointsInsideOutside(equ, grid, finalized = .false.)
 
         ! Compute the object categorization 
         call categorizeCellsAndFaces(lPasmin)
@@ -158,7 +154,7 @@ contains
                     action = ACTION_COARSEN_FORCE
                     ! switch to cleanup resolution for coarsening
                     lPasMin = par%cleanupPasmin
-                    ! recompute object categorization
+                    ! recompute object categorization with cleanup minimum cell length
                     call categorizeCellsAndFaces(lPasmin)
                     nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
                          & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
@@ -217,20 +213,22 @@ contains
     ! of faces onto boundary intersections
     call finalizeCells(grid, par)
 
-    ! write final postprocessing result
+    ! write cell finalization result
     call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
-!!$    ! Compute face/structure intersections
-!!$    call computeFaceStructureIntersections( struct, grid )
-!!$
-!!$    ! Mark points to be inside/outside of vessel
-!!$    call labelPointsInsideOutside(equ, grid)
-!!$    ! Recompute the object categorization 
-!!$    call categorizeCellsAndFaces(lPasmin)
-!!$        
-!!$
-!!$    ! write final postprocessing result
-!!$    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
+    ! Re-compute object categorizations
+    ! At this stage we postulate that all face-structure intersections 
+    ! coincide with grid nodes
+
+    ! Compute face/structure intersections<
+    call computeFaceStructureIntersections(struct, grid, finalized=.true.)
+    ! Mark points to be inside/outside of vessel
+    call labelPointsInsideOutside(equ, grid, finalized = .true.)
+    ! Recompute the object categorization 
+    call categorizeCellsAndFaces(lPasmin)
+        
+    ! write final postprocessing result
+    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
   contains
 
@@ -472,7 +470,7 @@ contains
     integer, intent(in) :: iReg, iPol, flag
     
     ! internal
-    integer :: iRegOther, iBnd, iPolOther, iRadOther
+    integer :: iRegOther, iBnd, iPolOther(MAX_POINT_OCCUR), iRadOther(MAX_POINT_OCCUR), npoint
     double precision :: xBnd, yBnd
 
     if (grid%lineFlagRad(iPol, iReg) == flag ) then
@@ -497,9 +495,9 @@ contains
         do iRegOther = 1, grid%nreg
             if (iRegOther == iReg) cycle
 
-            call findPointInRegion(grid, iRegOther, xBnd, yBnd, iPolOther, iRadOther)
-            if (iPolOther /= GRID_UNDEFINED) then
-                call setRadialLineFlag(grid, iRegOther, iPolOther, flag)
+            call findPointInRegion(grid, iRegOther, xBnd, yBnd, npoint, iPolOther, iRadOther)
+            if (npoint > 0) then
+                call setRadialLineFlag(grid, iRegOther, iPolOther(1), flag)
             end if
         end do
 
@@ -556,9 +554,10 @@ contains
 
   !> Label points to be in/outside of the vessel by stepping along faces
   !> and exploiting the intersection information
-  subroutine labelPointsInsideOutside( equ, grid )      
+  subroutine labelPointsInsideOutside( equ, grid, finalized )      
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreGrid), intent(inout) :: grid
+    logical, intent(in) :: finalized
 
     ! internal
     integer :: iReg, xip, xir
@@ -593,7 +592,7 @@ contains
 
       ! internal
       logical :: faceIntersect
-      integer :: ipOther, irOther, iRegOther
+      integer :: ipOther(MAX_POINT_OCCUR), irOther(MAX_POINT_OCCUR), npoint, iRegOther
 
       ! Is this point inside the region?
       if ( (ip < 1) .or. (ir < 1) &
@@ -611,7 +610,7 @@ contains
       ! So this point is internal
       points(ip, ir, iReg) = GRID_INTERNAL
 
-      ! Now go to all points connect to this one via a face that
+      ! Now go to all points connected to this one via a face that
       ! is not intersect by a structure element
 
       ! radial direction
@@ -669,10 +668,10 @@ contains
       do iRegOther = 1, grid%nreg
           if (iRegOther == iReg) cycle
           call findPointInRegion(grid, iRegOther, grid%xmail(ip, ir, iReg), &
-               & grid%ymail(ip, ir, iReg), &
+               & grid%ymail(ip, ir, iReg), npoint, &
                & ipOther, irOther)
 
-          call markInternalPoints(ipOther, irOther, iRegOther, points)
+          call markInternalPoints(ipOther(1), irOther(1), iRegOther, points)
       end do
 
     end subroutine markInternalPoints
@@ -1571,7 +1570,7 @@ contains
     logical, intent(inout), dimension(grid%nreg), optional :: regionVisited
 
     ! internal
-    integer :: iRegOther, iContinue, iPolOther, iRadOther
+    integer :: iRegOther, iContinue, iPolOther(MAX_POINT_OCCUR), iRadOther(MAX_POINT_OCCUR), npoint
     logical :: lRegionVisited(grid%nreg)
     double precision :: xBnd, yBnd
 
@@ -1603,9 +1602,9 @@ contains
         
         do iRegOther = 1, grid%nreg
             if (iRegOther == iReg) cycle
-            call findPointInRegion(grid, iRegOther, xBnd, yBnd, iPolOther, iRadOther)
-            if (iPolOther /= GRID_UNDEFINED) then
-                call followRadialLine(grid, iRegOther, iPolOther, inRegion, iPolRegion, lRegionVisited)
+            call findPointInRegion(grid, iRegOther, xBnd, yBnd, npoint, iPolOther, iRadOther)
+            if (npoint > 0) then
+                call followRadialLine(grid, iRegOther, iPolOther(1), inRegion, iPolRegion, lRegionVisited)
             end if
         end do
     end do
@@ -1891,28 +1890,28 @@ contains
       logical, intent(in) :: markFixed 
 
       ! internal
-      integer :: iReg, ip, ir
+      integer :: iReg, ip(MAX_POINT_OCCUR), ir(MAX_POINT_OCCUR), npoint
 
       do iReg = 1, grid%nreg
           ip = GRID_UNDEFINED
-          call findPointInRegion(grid, iReg, xFrom, yFrom, ip, ir)
+          call findPointInRegion(grid, iReg, xFrom, yFrom, npoint, ip, ir)
           ! if no point found, go to next region
-          if (ip == GRID_UNDEFINED) cycle
+          if (npoint == 0) cycle
 
-          if (.not. pointWasMoved(ip, ir, iReg)) then
-              grid%xmail(ip, ir, iReg) = xTo
-              grid%ymail(ip, ir, iReg) = yTo
-              pointWasMoved(ip, ir, iReg) = .true.
+          if (.not. pointWasMoved(ip(1), ir(1), iReg)) then
+              grid%xmail(ip(1), ir(1), iReg) = xTo
+              grid%ymail(ip(1), ir(1), iReg) = yTo
+              pointWasMoved(ip(1), ir(1), iReg) = .true.
 
               if (markFixed) then                
                   ! Mark as boundary point
-                  grid%pointflag(ip, ir, iReg) = GRID_BOUNDARY
+                  grid%pointflag(ip(1), ir(1), iReg) = GRID_BOUNDARY
                   
                   ! Mark all faces connected to this point as not intersected
-                  grid%faceISec(FACE_RADIAL,ip,ir,iReg) = .false.
-                  grid%faceISec(FACE_POLOIDAL,ip,ir,iReg) = .false.
-                  if (ir-1 > 0) grid%faceISec(FACE_RADIAL,ip,ir-1,iReg) = .false.
-                  if (ip-1 > 0) grid%faceISec(FACE_POLOIDAL,ip-1,ir,iReg) = .false.
+                  grid%faceISec(FACE_RADIAL,ip(1),ir(1),iReg) = .false.
+                  grid%faceISec(FACE_POLOIDAL,ip(1),ir(1),iReg) = .false.
+                  if (ir(1)-1 > 0) grid%faceISec(FACE_RADIAL,ip(1),ir(1)-1,iReg) = .false.
+                  if (ip(1)-1 > 0) grid%faceISec(FACE_POLOIDAL,ip(1)-1,ir(1),iReg) = .false.
               end if              
 
           end if
@@ -1923,254 +1922,6 @@ contains
 
 
   end subroutine finalizeCells
-
-
-
-  !> Find the face in region iReg to which the given point (px, py) is closest.
-  !> The starting point of the face (lowest in dex in poloidal and radial direction)
-  !> is returned as (liFcP, liFcR). The alignment of the face is returned as the
-  !> flag alignment, where .true. means the poloidal face and .false. the radial face.
-  !> 
-  !> By default, both radial and poloidal faces are considered. One can override
-  !> this using the optional flags doPoloidal and doRadial.
-  !> 
-  !> The optional parameter iRad can be used to constrain the search to one radial coordinate.
-  subroutine findFaceForPoint(grid, px, py, iReg, liFcP, liFcR, alignment, doPoloidal, doRadial, iRad)
-    type(CarreGrid), intent(in) :: grid
-    double precision, intent(in) :: px, py
-    integer, intent(in) :: iReg
-    integer, intent(out) :: liFcP, liFcR
-    logical, intent(out) :: alignment
-    logical, intent(in), optional :: doPoloidal, doRadial
-    integer, intent(in), optional :: iRad
-
-    ! internal
-    logical :: lDoPoloidal = .true., lDoRadial = .true.   
-    integer :: ip, ir, irFrom, irTo
-    double precision :: dist, minDist
-
-    if (present(doPoloidal)) lDoPoloidal = doPoloidal
-    if (present(doRadial)) lDoRadial = doRadial
-
-    liFcP = GRID_UNDEFINED
-    liFcR = GRID_UNDEFINED
-    alignment = .true.
-
-    minDist = huge(minDist)
-
-
-    irFrom = 1
-    irTo = grid%nr(iReg)
-    if (present(iRad)) then
-        irFrom = iRad
-        irTo = iRad
-    end if
-
-    do ip = 1, grid%np1(iReg) 
-        do ir = irFrom, irTo
-
-            ! compute distance to poloidal face from (ip,ir) -> (ip+1,ir)
-            if (lDoPoloidal .and. (ip < grid%np1(iReg))) then            
-                dist = normFaceDist( grid%xmail(ip, ir,iReg), grid%ymail(ip,ir,iReg), &
-                     & grid%xmail(ip+1,ir,iReg), grid%ymail(ip+1,ir,iReg), px, py )
-                if ( dist < minDist ) then
-                    minDist = dist
-                    liFcP = ip
-                    liFcR = ir
-                    alignment = .true. ! poloidal face
-                end if
-            end if
-
-            ! compute distance to radial face from (ip,ir) -> (ip,ir+1)
-            if (lDoRadial .and. (ir < grid%nr(iReg))) then
-                dist = normFaceDist( grid%xmail(ip, ir,iReg), grid%ymail(ip,ir,iReg), &
-                     & grid%xmail(ip,ir+1,iReg), grid%ymail(ip,ir+1,iReg), px, py )
-                if ( dist < minDist ) then
-                    minDist = dist
-                    liFcP = ip
-                    liFcR = ir
-                    alignment = .false. ! radial face
-                end if
-            end if
-
-        end do
-    end do
-
-    call assert( (liFcP /= GRID_UNDEFINED) .and. (liFcR /= GRID_UNDEFINED), &
-         & "findFaceForPoint: did not find a face close to the given point - something is broken." )
-
-  contains
-
-    ! Compute a normalized measure of point-face distance for the purpose
-    ! of finding the face closest to a point. This is not a proper distance
-    ! measure! Just a simple thing that seems to work, at least for the
-    ! assumption that the (px,py) is really close to the face we are looking
-    ! for, compared to all other faces.
-    double precision function normFaceDist(fx1, fy1, fx2, fy2, px, py)      
-      double precision, intent(in) :: fx1, fy1, fx2, fy2, px, py
-
-      double precision :: dist
-      external :: dist
-
-      normFaceDist = ( dist(fx1, fy1, px, py) + dist(px, py, fx2, fy2) ) &
-           & / dist( fx1, fy1, fx2, fy2 )
-
-    end function normFaceDist
-
-  end subroutine findFaceForPoint
-
-  !> Check whether a given face is part of a region, and return information
-  !> about its location and alignment.
-  !> Alignment, as usual: .true. = poloidal, .false. = radial
-  subroutine findFaceInRegion( grid, iReg, &
-       & xFrom, yFrom, xTo, yTo, &
-       & iFcP, iFcR, regionHasFace, alignment )
-
-    type(CarreGrid), intent(in) :: grid
-    integer, intent(in) :: iReg
-    double precision, intent(in) :: xFrom, yFrom, xTo, yTo
-    integer, intent(out), optional :: iFcP, iFcR
-    logical, intent(out), optional :: regionHasFace, alignment    
-
-    ! internal
-    integer :: ip, ir, ipTo, irTo, iAlign
-    logical :: match, lAlignment
-
-    do ip = 1, grid%np1(iReg)
-        do ir = 1, grid%nr(iReg)
-
-            do iAlign = 1, 2
-
-                select case (iAlign)
-                case(1) ! poloidal direction                
-                    if (ip == grid%np1(iReg)) cycle
-                    ipTo = ip + 1
-                    irTo = ir
-                    lAlignment = .true.
-                case(2) ! radial direction
-                    if (ir == grid%nr(iReg)) cycle
-                    ipTo = ip
-                    irTo = ir + 1
-                    lAlignment = .false.
-                end select
-
-                ! test face identity, accounting for switched points
-                match = &
-                     & ( pointsIdentical(grid%xmail(ip, ir, iReg), &
-                     &             grid%ymail(ip, ir, iReg), xFrom, yFrom)&
-                     & .and. &
-                     &   pointsIdentical(grid%xmail(ipTo, irTo, iReg), &
-                     &             grid%ymail(ipTo, irTo, iReg), xTo, yTo) ) &
-                     & .or. &
-                     &  ( pointsIdentical(grid%xmail(ip, ir, iReg), &
-                     &              grid%ymail(ip, ir, iReg), xTo, yTo)&
-                     & .and. &
-                     &    pointsIdentical(grid%xmail(ipTo, irTo, iReg), &
-                     &              grid%ymail(ipTo, irTo, iReg), xFrom, yFrom) )
-
-                if (match) then
-                    ! return results
-                    if (present(alignment)) alignment = lAlignment
-                    if (present(iFcP)) iFcP = ip
-                    if (present(iFcR)) iFcR = ir
-                    if (present(regionHasFace)) regionHasFace = .true.
-                    return
-                end if
-
-            end do
-        end do
-    end do
-
-    ! if we arrive here, nothing was found
-    if (present(iFcP)) iFcP = GRID_UNDEFINED
-    if (present(iFcR)) iFcR = GRID_UNDEFINED
-    if (present(regionHasFace)) regionHasFace = .false.    
-  end subroutine findFaceInRegion
-
-
-  !> Find the indices (xipol, xirad) of a given point (x,y) in the region iReg of the grid.
-  !> If no point is found, GRID_UNDEFINED is returned for the indices.
-  !> If the optional return arguments xipol2, xirad2 are given, a possible second occurrence of the point
-  !> in the region is also returned.
-  subroutine findPointInRegion(grid, iReg, x, y, xipol, xirad, xipol2, xirad2)
-    type(CarreGrid), intent(in) :: grid
-    integer, intent(in) :: iReg
-    double precision, intent(in) :: x, y
-    integer, intent(out) :: xipol, xirad
-    integer, intent(out), optional :: xipol2, xirad2
-
-    ! internal
-    integer :: ipol, irad, nfound
-    double precision, parameter :: POINT_TOL = 1e-4
-    real*8 :: dist
-    external dist
-
-    xipol = GRID_UNDEFINED
-    xirad = GRID_UNDEFINED
-    if (present(xipol2)) xipol2 = GRID_UNDEFINED
-    if (present(xirad2)) xirad2 = GRID_UNDEFINED
-
-    ! search point in this region
-    do iPol = 1, grid%np1(iReg)
-        do iRad = 1, grid%nr(iReg)
-
-            if ( pointsIdentical( x, y, &
-                 & grid%xmail(iPol, iRad, iReg), &
-                 & grid%ymail(iPol, iRad, iReg) ) ) then
-
-                ! found point, return indices
-                if (xipol == GRID_UNDEFINED) then                     
-                    xipol = ipol
-                    xirad = irad                     
-                    if (.not. present(xipol2)) return
-                    if (.not. present(xirad2)) return
-                else
-                    xipol2 = ipol
-                    xirad2 = irad
-                    return
-                end if
-            end if
-
-        end do
-    end do
-
-    ! Nothing found, return GRID_UNDEFINED
-  end subroutine findPointInRegion
-
-
-  ! Find index of of an x-point in this region
-  ! Note it's possible an x-point occurs multiple time, or multiple x-points occur.
-  ! The first one found will be returned.
-  subroutine findXPointInRegion(equ, grid, iReg, xipol, xirad)
-    type(CarreEquilibrium), intent(in) :: equ
-    type(CarreGrid), intent(in) :: grid
-    integer, intent(in) :: iReg
-    integer, intent(out) :: xipol, xirad
-
-    ! internal
-    integer :: ipx
-    double precision, parameter :: XPOINT_TOL = 1e-6
-    real*8 :: dist
-    external dist
-
-    ! check all x-points
-    do ipx = 1, equ%npx
-        call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), &
-             & xipol, xirad )
-
-        if ( ( xipol /= GRID_UNDEFINED ) .and. ( xirad /= GRID_UNDEFINED ) ) then         
-            call logmsg(LOGDEBUGBULK,  "findXPointInRegion: region "//int2str(iReg)//", found x-point&
-                 & at "//int2str(xipol)//' '//int2str(xirad)//", position "//real2str(equ%ptx(ipx))//&
-                 & ' '//real2str(equ%pty(ipx)) )
-            return
-        end if
-    end do
-
-    ! if we arrive here, no cell next to an x-point was found
-    xipol = GRID_UNDEFINED
-    xirad = GRID_UNDEFINED
-
-  end subroutine findXPointInRegion
 
 
   !> Compute minimum distance of a point to a curve, by 

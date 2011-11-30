@@ -3,6 +3,7 @@ module carre_intersect
   use carre_types
   use itm_assert
   use Logging
+  use carre_find
 
   implicit none
 
@@ -10,13 +11,20 @@ contains
 
   !> Compute face/structure intersections for all faces in the grid to fill the
   !> grid%faceISec, grid%faceISecPx/y arrays
-  subroutine computeFaceStructureIntersections( struct, grid )
+  !> The finalized flag indicates whether the grid has been finalized, in which case
+  !> it is assumed that all face-structure intersections coincide with a grid node.
+  !> In this case all faces connected to the boundary node are marked as intersected.
+  !> (This is in order to make the final classification robust).
+  subroutine computeFaceStructureIntersections( struct, grid, finalized )
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
+    logical, intent(in) :: finalized
 
     ! internal
-    integer :: iReg, iPol, iRad, iFace
-    double precision :: xx(2), yy(2)
+    integer :: iReg, iPol, iRad, iFace, ix(2), iy(2), istruct, iReg2, ipoint
+    integer :: iClosest, pipol(MAX_POINT_OCCUR), pirad(MAX_POINT_OCCUR), npoint
+    double precision :: xx(2), yy(2), ipx, ipy
+    logical :: doesIntersect
 
     ! Mark faces intersected by structure elements
     grid%faceISec = .false.
@@ -40,11 +48,29 @@ contains
                     call getFace(iFace)
 
                     call intersect_all_structures( xx, yy, &
-                        & struct, &
-                        & doesIntersect = grid%faceISec(iFace, iPol, iRad, iReg), &
-                        & iStruct = grid%faceISecIStruct(iFace, iPol, iRad, iReg), &
-                        & ipx = grid%faceISecPx(iFace, iPol, iRad, iReg), &
-                        & ipy = grid%faceISecPy(iFace, iPol, iRad, iReg) )
+                        & struct, doesIntersect, iStruct, &
+                        & ipx=ipx, ipy=ipy )
+
+                    if (.not. doesIntersect) cycle
+
+                    if (.not. finalized) then
+                        ! store the intersection for this face
+                        grid%faceISec(iFace, iPol, iRad, iReg) = doesIntersect
+                        grid%faceISecIStruct(iFace, iPol, iRad, iReg) = istruct
+                        grid%faceISecPx(iFace, iPol, iRad, iReg) = ipx
+                        grid%faceISecPy(iFace, iPol, iRad, iReg) = ipy
+                    else
+                        ! find the face end point closest to the intersection, and declare it to be the intersection
+                        ! for all faces connected to it
+                        iClosest = closestPoint(ipx, ipy, xx, yy)
+
+                        do iReg2 = 1, grid%nreg
+                            call findPointInRegion(grid, iReg2, xx(iClosest), yy(iClosest), npoint, pipol, pirad)
+                            do ipoint = 1, npoint
+                                call markNodeAsIntersection(pipol(ipoint), pirad(ipoint), ireg2, istruct)
+                            end do
+                        end do
+                    end if
 
                 end do
             end do
@@ -53,26 +79,66 @@ contains
 
   contains
 
+    subroutine markNodeAsIntersection(ipol, irad, ireg, istruct)
+      integer, intent(in) :: ipol, irad, ireg, istruct
+
+      ! internal
+      integer :: iFace, iAlign, ipfc, irfc
+
+      ! mark all faces connected to this point that are not yet intersected as intersected
+      
+      do iFace = 1, 4 ! left, bottom, right, top
+
+          ipfc = ipol 
+          irfc = irad
+          select case (iFace)
+          case(FACE_LEFT)
+              if (ipol == 1) cycle
+              iAlign = FACE_POLOIDAL
+              ipfc = ipol - 1
+          case(FACE_BOTTOM)
+              if (irad == 1) cycle
+              iAlign = FACE_RADIAL
+              irfc = irad - 1
+          case(FACE_RIGHT)
+              if (ipol == grid%np1(ireg)) cycle
+              iAlign = FACE_POLOIDAL
+          case(FACE_TOP)
+              if (irad == grid%nr(ireg)) cycle
+              iAlign = FACE_RADIAL
+          end select
+
+          if (grid%faceISec(iAlign, ipfc, irfc, iReg)) cycle
+
+          grid%faceISec(iAlign, ipfc, irfc, iReg) = .true.
+          grid%faceISecIStruct(iAlign, ipfc, irfc, iReg) = istruct
+          grid%faceISecPx(iAlign, ipfc, irfc, iReg) = grid%xmail(ipol, irad, ireg)
+          grid%faceISecPy(iAlign, ipfc, irfc, iReg) = grid%ymail(ipol, irad, ireg)
+      end do
+
+    end subroutine markNodeAsIntersection
+
     subroutine getFace(iFace)
       integer, intent(in) :: iFace
 
+      ix(1) = iPol
+      iy(1) = iRad
       select case (iFace)
       case(1) ! Poloidal face (iPol, iRad) -> (iPol+1, iRad)
-          xx(1) = grid%xmail(iPol, iRad, iReg)
-          yy(1) = grid%ymail(iPol, iRad, iReg)
-          xx(2) = grid%xmail(iPol + 1, iRad, iReg)
-          yy(2) = grid%ymail(iPol + 1, iRad, iReg)              
+          ix(2) = iPol + 1
+          iy(2) = iRad
       case(2) ! Radial face (iPol, iRad) -> (iPol, iRad + 1)
-          xx(1) = grid%xmail(iPol, iRad, iReg)
-          yy(1) = grid%ymail(iPol, iRad, iReg)
-          xx(2) = grid%xmail(iPol, iRad + 1, iReg)
-          yy(2) = grid%ymail(iPol, iRad + 1, iReg)
+          ix(2) = iPol
+          iy(2) = iRad + 1
       end select
 
+      xx(1) = grid%xmail(ix(1), iy(1), iReg)
+      yy(1) = grid%ymail(ix(1), iy(1), iReg)
+      xx(2) = grid%xmail(ix(2), iy(2), iReg)
+      yy(2) = grid%ymail(ix(2), iy(2), iReg)              
     end subroutine getFace
 
   end subroutine computeFaceStructureIntersections
-
 
   !> Compute intersection of a line segment curve with the structure elements
   !>
@@ -110,7 +176,7 @@ contains
                & struct%rxstruc(1:abs(struct%rnpstru(is)), is), &
                & struct%rystruc(1:abs(struct%rnpstru(is)), is), &
                & tmpDoesIntersect, tmpISegment, tmpIpx, tmpIpy, &
-               & testEndPoints = .true., oldipx=oldipx, oldipy=oldipy)
+               & testEndPoints = .false., oldipx=oldipx, oldipy=oldipy)
 
           if (tmpDoesIntersect) then
               if (present(oldipx)) then
@@ -245,27 +311,27 @@ contains
     doesIntersectRobust = segments_intersect( xx(1), yy(1), xx(2), yy(2), &
          & xst(1), yst(1), xst(2), yst(2) )
 
-    if (present(testEndPoints)) then
-        if (testEndPoints) then
-            do j = 1, 2 ! start point, end point of structure segment
-                do k = 1, 2 ! start point, end point of line segment
-                    if (pointsIdentical(xx(k), yy(k), xst(j), yst(j), &
-                         & absTol=1.0d-6 )) then
-
-                        doesIntersect = .true.
-                        if (present(ipx) .and. present(ipy)) then
-                            ipx = xx(k)
-                            ipy = yy(k)
-                        end if
-                        call assert( doesIntersect .eqv. doesIntersectRobust, &
-                             & "intersect and segments_intersect disagree" )
-                        return
-
-                    end if
-                end do
-            end do
-        end if
-    end if
+!!$    if (present(testEndPoints)) then
+!!$        if (testEndPoints) then
+!!$            do j = 1, 2 ! start point, end point of structure segment
+!!$                do k = 1, 2 ! start point, end point of line segment
+!!$                    if (pointsIdentical(xx(k), yy(k), xst(j), yst(j), &
+!!$                         & absTol=1.0d-6 )) then
+!!$
+!!$                        doesIntersect = .true.
+!!$                        if (present(ipx) .and. present(ipy)) then
+!!$                            ipx = xx(k)
+!!$                            ipy = yy(k)
+!!$                        end if
+!!$                        call assert( doesIntersect .eqv. doesIntersectRobust, &
+!!$                             & "intersect and segments_intersect disagree" )
+!!$                        return
+!!$
+!!$                    end if
+!!$                end do
+!!$            end do
+!!$        end if
+!!$    end if
 
     !..Calcul du determinant de la matrice.
     determ = (-(xx(2) - xx(1))) * (yst(2) - yst(1)) + & 
@@ -356,24 +422,7 @@ contains
   END function segments_intersect
 
 
-  !> Check if points (x1,y1) and (x2,y2) are identical
-  !> (i.e, very very close to each other)
-  logical function pointsIdentical( x1, y1, x2, y2, absTol )     
-    double precision, intent(in) :: x1, y1, x2, y2
-    double precision, intent(in), optional :: absTol
-    
-    ! internal
-    double precision :: dist, lAbsTol
-    external :: dist
-    
-    double precision, parameter :: DEFAULTABSTOL = 1e-6
 
-    lAbsTol = DEFAULTABSTOL
-    if (present(absTol)) lAbsTol = absTol
-
-    pointsIdentical = ( dist(x1, y1, x2, y2) < lAbsTol )
-    
-  end function pointsIdentical
 
 
 end module carre_intersect
