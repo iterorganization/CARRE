@@ -220,8 +220,17 @@ contains
     ! write final postprocessing result
     call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
-    ! write final postprocessing result
-    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
+!!$    ! Compute face/structure intersections
+!!$    call computeFaceStructureIntersections( struct, grid )
+!!$
+!!$    ! Mark points to be inside/outside of vessel
+!!$    call labelPointsInsideOutside(equ, grid)
+!!$    ! Recompute the object categorization 
+!!$    call categorizeCellsAndFaces(lPasmin)
+!!$        
+!!$
+!!$    ! write final postprocessing result
+!!$    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
   contains
 

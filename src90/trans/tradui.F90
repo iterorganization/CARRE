@@ -11,6 +11,7 @@
 #ifdef USE_ITMCARRE
       use b2mod_connectivity
       use b2ITMMapping
+      use b2mod_ual
       use euITM_schemas  
       use euITM_routines
 #endif
@@ -60,8 +61,8 @@
       ! variables for UAL I/O
 #ifdef USE_ITMCARRE
       type (type_edge),pointer :: cpoedge(:) => null()
-      integer :: idx, shot, run, refshot, refrun
-      character(len=5)::treename
+      integer :: idx, shot, run
+      double precision :: time
 #endif
 
 
@@ -263,16 +264,17 @@
 
               cpoedge(1)%grid = itmgrid
 
-              shot =12
+              shot = 1
               run = 1
-              refshot = 10
-              refrun =0
-              treename = 'euitm'
+              time = 0.0
+              
+              call open_ual(idx, shot, run, time, &
+                  & nmlFile = 'ual.namelist.edge.out', doCreate = .true.)
 
-              call euitm_create_hdf5(treename, shot, run, refshot, refrun, idx)
-              !call euitm_open_hdf5(treename,shot,run,idx)
               call euitm_put(idx,"edge",cpoedge)
               call euitm_deallocate(cpoedge)
+
+              call close_ual(idx)
 #endif      
               
 
