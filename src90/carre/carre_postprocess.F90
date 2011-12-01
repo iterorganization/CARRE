@@ -117,7 +117,7 @@ contains
         call computeFaceStructureIntersections(struct, grid, finalized = .false.)
 
         ! Mark points to be inside/outside of vessel
-        call labelPointsInsideOutside(equ, grid, finalized = .false.)
+        call labelPointsInsideOutside(equ, struct, grid, finalized = .false.)
 
         ! Compute the object categorization 
         call categorizeCellsAndFaces(lPasmin)
@@ -223,7 +223,7 @@ contains
     ! Compute face/structure intersections<
     call computeFaceStructureIntersections(struct, grid, finalized=.true.)
     ! Mark points to be inside/outside of vessel
-    call labelPointsInsideOutside(equ, grid, finalized = .true.)
+    call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
     ! Recompute the object categorization 
     call categorizeCellsAndFaces(lPasmin)
         
@@ -554,8 +554,9 @@ contains
 
   !> Label points to be in/outside of the vessel by stepping along faces
   !> and exploiting the intersection information
-  subroutine labelPointsInsideOutside( equ, grid, finalized )      
+  subroutine labelPointsInsideOutside( equ, struct, grid, finalized )      
     type(CarreEquilibrium), intent(in) :: equ
+    type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
     logical, intent(in) :: finalized
 
@@ -565,6 +566,8 @@ contains
 
     points = GRID_UNDEFINED
 
+    if (finalized) call markBoundaryPointsFinal(points)
+
     do iReg = 1, grid%nreg
         ! For region, find an x-point (which is declared to be on the inside)
         ! TODO: for limiter, just take any point on the core boundary.
@@ -572,11 +575,10 @@ contains
 
         ! Walk away from there (recursively) until all points are marked.
         ! (this recursion will do transitions between the regions)
-        call markInternalPoints(xip, xir, iReg, points)
+        call markInternalPoints(xip, xir, iReg, points, finalized)
 
-        call markBoundaryPoints(iReg, points)
+        if (.not. finalized) call markBoundaryPointsIteration(iReg, points)
     end do
-
 
     ! all points that are still undefined are external
     where (points == GRID_UNDEFINED) points = GRID_EXTERNAL
@@ -586,13 +588,15 @@ contains
   contains
 
     !> Mark point (ip,ir) as internal and mark connected points recursively
-    recursive subroutine markInternalPoints(ip, ir, iReg, points)
+    recursive subroutine markInternalPoints(ip, ir, iReg, points, finalized)
       integer, intent(in) :: ip, ir, iReg
       integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
+      logical, intent(in) :: finalized
 
       ! internal
-      logical :: faceIntersect
+      logical :: faceIntersect, propagate
       integer :: ipOther(MAX_POINT_OCCUR), irOther(MAX_POINT_OCCUR), npoint, iRegOther
+      integer :: iFace, iAlign, ipNext, irNext, ipFace, irFace
 
       ! Is this point inside the region?
       if ( (ip < 1) .or. (ir < 1) &
@@ -611,57 +615,50 @@ contains
       points(ip, ir, iReg) = GRID_INTERNAL
 
       ! Now go to all points connected to this one via a face that
-      ! is not intersect by a structure element
+      ! is not intersected by a structure element
 
-      ! radial direction
-      ! ...go along top face
-      if (ir < grid%nr(iReg)) then
-          faceIntersect = grid%faceISec(FACE_RADIAL, ip, ir, iReg)
-          if (.not. faceIntersect) then
-              ! Internal point! Recursive propagation.
-              call markInternalPoints(ip, ir+1, iReg, points)
-          else
-              ! Boundary point? (non-recursive)
-              call checkBoundaryPoint(ip, ir+1, iReg, &
-                   & grid%faceISecPx(FACE_RADIAL, ip, ir, iReg), &
-                   & grid%faceISecPy(FACE_RADIAL, ip, ir, iReg), points )
-          end if
-      end if
-      ! ...go along bottom face
-      if (ir > 1) then
-          faceIntersect = grid%faceISec(FACE_RADIAL, ip, ir-1, iReg)
-          if (.not. faceIntersect) then
-              call markInternalPoints(ip, ir-1, iReg, points)
-          else
-              call checkBoundaryPoint(ip, ir-1, iReg,&
-                   & grid%faceISecPx(FACE_RADIAL, ip, ir-1, iReg), &
-                   & grid%faceISecPy(FACE_RADIAL, ip, ir-1, iReg), points )
-          end if
-      end if
+      do iFace = 1, 4 ! left, bottom, right, top
 
-      ! poloidal direction
-      ! ...go along right face
-      if (ip < grid%np1(iReg)) then
-          faceIntersect = grid%faceISec(FACE_POLOIDAL, ip, ir, iReg)
-          if (.not. faceIntersect) then
-              call markInternalPoints(ip+1, ir, iReg, points)
+          ipFace = ip
+          irFace = ir
+          ipNext = ip
+          irNext = ir
+          select case (iFace)
+          case(FACE_LEFT)
+              if (ip == 1) cycle
+              iAlign = FACE_POLOIDAL
+              ipFace = ip - 1
+              ipNext = ip - 1
+          case(FACE_BOTTOM)
+              cycle
+              if (ir == 1) cycle
+              iAlign = FACE_RADIAL
+              !irFace = ir - 1
+              irNext = ir - 1
+          case(FACE_RIGHT)
+              if (ip == grid%np1(ireg)) cycle
+              iAlign = FACE_POLOIDAL
+              ipNext = ip + 1
+          case(FACE_TOP)
+              if (ir == grid%nr(ireg)) cycle
+              iAlign = FACE_RADIAL
+              irNext = ir + 1
+          end select
+
+          if (finalized) then
+              ! if the grid was finalized, we know the boundary points
+              ! and stop when we encounter one
+              propagate = .not. (points(ipNext, irNext, iReg) == GRID_BOUNDARY)
           else
-              call checkBoundaryPoint(ip+1, ir, iReg, &
-                   & grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg), &
-                   & grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg), points )
+              propagate = .not. grid%faceISec(iAlign, ipFace, irFace, iReg)
           end if
-      end if
-      ! ...go along left face
-      if (ip > 1) then
-          faceIntersect = grid%faceISec(FACE_POLOIDAL, ip-1, ir, iReg)
-          if (.not. faceIntersect) then
-              call markInternalPoints(ip-1, ir, iReg, points)
-          else
-              call checkBoundaryPoint(ip-1, ir, iReg, &
-                   & grid%faceISecPx(FACE_POLOIDAL, ip-1, ir, iReg), &
-                   & grid%faceISecPy(FACE_POLOIDAL, ip-1, ir, iReg), points )
+
+          faceIntersect = grid%faceISec(iAlign, ipFace, irFace, iReg)
+          if (propagate) then
+              ! Next point is internal. Recursive propagation.
+              call markInternalPoints(ipNext, irNext, iReg, points, finalized)
           end if
-      end if
+      end do
 
       ! Finally, also propagate the information that this point
       ! is internal to the other grid regions
@@ -671,31 +668,16 @@ contains
                & grid%ymail(ip, ir, iReg), npoint, &
                & ipOther, irOther)
 
-          call markInternalPoints(ipOther(1), irOther(1), iRegOther, points)
+          call markInternalPoints(ipOther(1), irOther(1), iRegOther, points, finalized)
       end do
 
     end subroutine markInternalPoints
 
-    !> Check whether the given point coincides with the given intersection
-    !> point. If yes, mark it as a boundary point.
-    subroutine checkBoundaryPoint( ip, ir, iReg, isecPx, isecPy, points )
-      integer, intent(in) :: ip, ir, iReg
-      double precision, intent(in) :: isecPx, isecPy
-      integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
-
-      return
-      if ( pointsIdentical( grid%xmail(ip, ir, iReg), grid%ymail(ip, ir, iReg), &
-           & isecPx, isecPy ) ) then
-          points(ip, ir, iReg) = GRID_BOUNDARY
-      end if
-
-    end subroutine checkBoundaryPoint
-
     !> This a brute-force routine identifying all grid points in the region coinciding
-    !> with a face-structure intersection, and marking them to boundary points.
-    !> This is supposed to be done by checkBoundaryPoint during the recursion,
-    !> but somehow this is unreliable.
-    subroutine markBoundaryPoints(iReg, points)
+    !> with a face-structure intersection, and marking them as boundary points.
+    !> This routine is only used during the grid modification iteration, not in the finalization step.
+    !> (see markBoundaryPointsFinal).
+    subroutine markBoundaryPointsIteration(iReg, points)
       integer, intent(in) :: iReg
       integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
 
@@ -733,7 +715,35 @@ contains
           end do
       end do
 
-    end subroutine markBoundaryPoints
+    end subroutine markBoundaryPointsIteration
+
+    !> Mark points as boundary points which are very close to a line segment
+    !> This routine is used for the finalized grid, with the intention of 
+    !> using the result for the final object classification.
+    subroutine markBoundaryPointsFinal(points)
+      integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
+
+      
+      ! internal
+      integer :: iReg, iPol, iRad, iStruct
+      logical :: onStructure
+            
+      do iReg = 1, grid%nreg
+          do iPol = 1, grid%np1(iReg)
+              do iRad = 1, grid%nr(iReg)
+
+                  call isPointOnStructure(grid%xmail(iPol, iRad, iReg), grid%ymail(iPol, iRad, iReg), struct, &
+                       & onStructure, iStruct)
+                  if (onStructure) then
+                      points(iPol, iRad, iReg) = GRID_BOUNDARY
+                      ! TODO: save structure index
+                  end if
+
+              end do
+          end do
+      end do
+
+    end subroutine markBoundaryPointsFinal
 
   end subroutine labelPointsInsideOutside
 

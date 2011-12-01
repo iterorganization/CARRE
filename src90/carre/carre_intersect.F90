@@ -311,27 +311,27 @@ contains
     doesIntersectRobust = segments_intersect( xx(1), yy(1), xx(2), yy(2), &
          & xst(1), yst(1), xst(2), yst(2) )
 
-!!$    if (present(testEndPoints)) then
-!!$        if (testEndPoints) then
-!!$            do j = 1, 2 ! start point, end point of structure segment
-!!$                do k = 1, 2 ! start point, end point of line segment
-!!$                    if (pointsIdentical(xx(k), yy(k), xst(j), yst(j), &
-!!$                         & absTol=1.0d-6 )) then
-!!$
-!!$                        doesIntersect = .true.
-!!$                        if (present(ipx) .and. present(ipy)) then
-!!$                            ipx = xx(k)
-!!$                            ipy = yy(k)
-!!$                        end if
-!!$                        call assert( doesIntersect .eqv. doesIntersectRobust, &
-!!$                             & "intersect and segments_intersect disagree" )
-!!$                        return
-!!$
-!!$                    end if
-!!$                end do
-!!$            end do
-!!$        end if
-!!$    end if
+    !if (present(testEndPoints)) then
+        if (testEndPoints) then
+            do j = 1, 2 ! start point, end point of structure segment
+                do k = 1, 2 ! start point, end point of line segment
+                    if (pointsIdentical(xx(k), yy(k), xst(j), yst(j), &
+                         & absTol=1.0d-6 )) then
+
+                        doesIntersect = .true.
+                        if (present(ipx) .and. present(ipy)) then
+                            ipx = xx(k)
+                            ipy = yy(k)
+                        end if
+                        call assert( doesIntersect .eqv. doesIntersectRobust, &
+                             & "intersect and segments_intersect disagree" )
+                        return
+
+                    end if
+                end do
+            end do
+        end if
+    !end if
 
     !..Calcul du determinant de la matrice.
     determ = (-(xx(2) - xx(1))) * (yst(2) - yst(1)) + & 
@@ -378,6 +378,44 @@ contains
   end subroutine intersection
 
 
+  !> Test whether a point is on one of the real structures
+  subroutine isPointOnStructure(x, y, struct, onStructure, iStruct )
+
+    REAL*8, intent(in) :: x, y
+    type(CarreStructures), intent(in) :: struct
+    logical, intent(out) :: onStructure
+    integer, intent(out), optional :: iStruct
+
+    ! internal      
+    integer :: iSeg, is
+    integer :: closestISegment, tmpISegment, closestIStruct
+    double precision :: closestDist, tmpIpx, tmpIpy, closestIpx, closestIpY
+    logical :: tmpDoesIntersect
+    
+    ! This tolerance parameter is basically used for floating point
+    ! equivalence tests. Increase it will increase the tolerance at
+    ! which the point is accepted to be on a structure segment.
+    double precision, parameter :: TOLERANCE = 1.0d-10
+
+    do is = 1, struct%rnstruc
+        do iSeg = 1, abs(struct%rnpstru(is)) - 1
+
+            if (on_segment( struct%rxstruc(iSeg, is), struct%rystruc(iSeg, is), &
+                 & struct%rxstruc(iSeg+1, is), struct%rystruc(iSeg+1, is), &
+                 & x, y, TOLERANCE)) then
+                if (present(iStruct)) iStruct = is
+                onStructure = .true.
+                return
+            end if
+
+        end do
+    end do
+
+    onStructure = .false.
+    if (present(iStruct)) iStruct = GRID_UNDEFINED
+  end subroutine isPointOnStructure
+
+
 
   logical function segments_intersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y)
     double precision, intent(in) :: p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y
@@ -395,31 +433,53 @@ contains
     if (   ((d1 > 0.0d0 .and. d2 < 0.0d0) .or. (d1 < 0.0d0 .and. d2 > 0.0d0)) .and. &
          & ((d3 > 0.0d0 .and. d4 < 0.0d0) .or. (d3 < 0.0d0 .and. d4 > 0.0d0))  ) return
 
-    if ( d1 == 0.0d0 .and. on_segment(p3x, p3y, p4x, p4y, p1x, p1y ) ) return
-    if ( d2 == 0.0d0 .and. on_segment(p3x, p3y, p4x, p4y, p2x, p2y ) ) return
-    if ( d3 == 0.0d0 .and. on_segment(p1x, p1y, p2x, p2y, p3x, p3y ) ) return
-    if ( d4 == 0.0d0 .and. on_segment(p1x, p1y, p2x, p2y, p4x, p4y ) ) return
+    if ( d1 == 0.0d0 .and. in_rectangle(p3x, p3y, p4x, p4y, p1x, p1y ) ) return
+    if ( d2 == 0.0d0 .and. in_rectangle(p3x, p3y, p4x, p4y, p2x, p2y ) ) return
+    if ( d3 == 0.0d0 .and. in_rectangle(p1x, p1y, p2x, p2y, p3x, p3y ) ) return
+    if ( d4 == 0.0d0 .and. in_rectangle(p1x, p1y, p2x, p2y, p4x, p4y ) ) return
    
     segments_intersect = .false.
-
-  contains
-
-    double precision function direction( pix, piy, pjx, pjy, pkx, pky )
-      double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
-      
-      direction = (pkx - pix) * (pjy - piy) - (pjx - pix) * (pky - piy) 
-
-    end function direction
-
-    logical function on_segment( pix, piy, pjx, pjy, pkx, pky )
-      double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
-
-      on_segment = (min(pix, pjx) <= pkx) .and. (pkx <= max(pix, pjx)) &
-           & .and. (min(piy, pjy) <= pky) .and. (pky <= max(piy, pjy))
-
-    end function on_segment
-
   END function segments_intersect
+
+  ! Compute cross product between vectors i->j and i->k 
+  double precision function direction( pix, piy, pjx, pjy, pkx, pky )
+    double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
+    
+    direction = (pkx - pix) * (pjy - piy) - (pjx - pix) * (pky - piy) 
+    
+  end function direction
+  
+  ! Check whether point k is in a rectangle with the diagonal
+  ! given by the points i, j
+  logical function in_rectangle( pix, piy, pjx, pjy, pkx, pky, atol)
+    double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
+    double precision, intent(in), optional :: atol
+    
+    ! internal
+    double precision :: d, latol
+
+    latol = 0.0d0
+    if (present(atol)) latol = atol
+
+    in_rectangle = (min(pix, pjx)-latol <= pkx) .and. (pkx <= max(pix, pjx)+latol) &
+         & .and. (min(piy, pjy)-latol <= pky) .and. (pky <= max(piy, pjy)+latol)
+    
+  end function in_rectangle
+
+  ! Check whether point k is on the segment defined by points i, j
+  logical function on_segment( pix, piy, pjx, pjy, pkx, pky, atol )
+    double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
+    double precision, intent(in), optional :: atol
+
+    ! internal
+    double precision :: d, latol
+
+    latol = 0.0d0
+    if (present(atol)) latol = atol
+    
+    d = direction( pix, piy, pjx, pjy, pkx, pky )
+    on_segment = (abs(d) < latol .and. in_rectangle(pix, piy, pjx, pjy, pkx, pky))    
+  end function on_segment
 
 
 
