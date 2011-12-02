@@ -16,6 +16,7 @@
       use euITM_routines
 #endif
       use carre_types
+      use carre_constants
       use carre_parameter_io
       use tradui_constants
       
@@ -31,8 +32,8 @@
       integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), & 
            & ifail,nx,ny, & 
            & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
-           & cflag(npmamx,nrmamx,nregmx,2)
-      integer b2cflag(-1:nxmx,-1:nymx,2)
+           & cflag(npmamx,nrmamx,nregmx,CARREOUT_NCELLFLAGS)
+      integer b2cflag(-1:nxmx,-1:nymx,CARREOUT_NCELLFLAGS)
       real*8 r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx), & 
      &  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
      &  psidym(npmamx,nrmamx,nregmx),distxo
@@ -152,7 +153,7 @@
              & cry(0:nxmx,0:nymx,0:3),&
              & fpsi(0:nxmx,0:nymx,0:3),&
              & bb(0:nxmx,0:nymx,0:3),&
-             & b2cflag(0:nxmx,0:nymx,1:2),nxmx,nymx,&
+             & b2cflag(0:nxmx,0:nymx,:),nxmx,nymx,&
              & niso,nxiso,nisomx)
 !
 ! Original SONNET/DIVIMP format

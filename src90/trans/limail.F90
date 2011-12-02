@@ -1,6 +1,8 @@
 !=======================================================================
       subroutine limail(nrid,nreg,nppol,nprad,r,z,psi,psidxm,psidym, & 
      &  cflag,npomax,nramax,nregmx,carre_format)
+      use carre_constants
+
       implicit none
 !
 !  lecture de la maille produite par le programme carre pour traitement
@@ -18,7 +20,7 @@
 !
 !  arguments
       integer nrid,nreg,nppol(*),nprad(*),npomax,nramax,nregmx,&
-           & cflag(npomax,nramax,nregmx,2)
+           & cflag(npomax,nramax,nregmx,CARREOUT_NCELLFLAGS)
       real*8 r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*), & 
      &     psidxm(npomax,nramax,*),psidym(npomax,nramax,*)
       character*8 carre_format
@@ -41,7 +43,7 @@
           if(trim(carre_format).eq.'carre71') then
               read(nrid,*,end=99)ligne
               read(nrid,*,end=99) &
-                   & ((cflag(ipol,irad,ireg,1),cflag(ipol,irad,ireg,2), &
+                   & ((cflag(ipol,irad,ireg,:), &
                    & ipol=1,nppol(ireg)-1),irad=1,nprad(ireg)-1)
           endif
       enddo

@@ -1,5 +1,6 @@
       subroutine ecrim2(nfin,nx,ny,crx,cry,fpsi,bb,b2cflag,nxmax,nymax,&
            & niso,nxiso,nisomx)
+        use carre_constants
 !
 !  version : 02.12.98 20:49
 !
@@ -13,7 +14,7 @@
       integer nfin,nx,ny,nxmax,nymax,niso,nisomx,nxiso(nisomx+1)
       real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
      &  bb(0:nxmax,0:nymax,0:3),fpsi(0:nxmax,0:nymax,0:3)
-      integer b2cflag(0:nxmax,0:nymax,2)
+      integer b2cflag(0:nxmax,0:nymax,CARREOUT_NCELLFLAGS)
 
 !  local variables
       integer ix,iy,i
@@ -58,7 +59,8 @@
         enddo
       enddo
 
- 117  FORMAT(I4,1X,I4,1X,17(F12.8,1X),I4,2I4)
+      ! FIXME: this format has to be updated to match the size CARROUT_NCELLFLAG in the last entry
+117   FORMAT(I4,1X,I4,1X,17(F12.8,1X),5(I4,1X))
       return
 !======================================================================
       end

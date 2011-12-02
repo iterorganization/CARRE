@@ -24,13 +24,15 @@
 !***  - guard cells for disconnected double fixed
 !***  - data on grid size and cuts added to the grid header
 !======================================================================
+      use carre_constants
+
       implicit none
 
       integer npolmx,nradmx,nxmax,nymax,ncutmx,nisomx
       integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10), & 
      &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx),&
-     &  cflag(npolmx,nradmx,nreg,2)
-      integer b2cflag(-1:nxmax,-1:nymax,2)
+     &  cflag(npolmx,nradmx,nreg,CARREOUT_NCELLFLAGS)
+      integer b2cflag(-1:nxmax,-1:nymax,CARREOUT_NCELLFLAGS)
       real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
      &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), & 
      &  r(npolmx,nradmx,nreg),z(npolmx,nradmx,nreg), & 
@@ -1077,7 +1079,10 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
-            b2cflag(ix,iy,:)=cflag(ipol+1,irad,ireg,:)
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            if (b2cflag(ix,iy,1) == 0) then
+                write (*,*) "b2agfz: broken cflag!"
+            end if
           end do      ! }
         end do
 !  private region: left side
@@ -1110,7 +1115,10 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
-            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            if (b2cflag(ix,iy,1) == 0) then
+                write (*,*) "b2agfz: broken cflag!"
+            end if
           end do      ! }
         end do
 !  central region
@@ -1143,7 +1151,10 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
-            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            if (b2cflag(ix,iy,1) == 0) then
+                write (*,*) "b2agfz: broken cflag!"
+            end if
           end do      ! }
         end do
 !  private region: right side
@@ -1176,7 +1187,10 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
-            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            if (b2cflag(ix,iy,1) == 0) then
+                write (*,*) "b2agfz: broken cflag!"
+            end if
           end do      ! }
         end do
 
@@ -1261,7 +1275,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
-            b2cflag(ix,iy,:)=cflag(ipol+1,irad,ireg,:)
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
           end do      ! }
         end do
 !  central region
@@ -1294,7 +1308,7 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
-            b2cflag(ix,iy,:)=cflag(ipol+1,irad+1,ireg,:)
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
           end do      ! }
         end do
 	if (doGuardCells) then
