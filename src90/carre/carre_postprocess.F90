@@ -24,13 +24,6 @@ module carre_postprocess
 
   public carre_postprocess_computation
 
-  ! Number of faces of a cell. 
-  ! Bit positions in grid%cellFaceFlag marking that faces of a cell are intersected
-  integer, parameter :: INDEX_FACE_LEFT = 1
-  integer, parameter :: INDEX_FACE_BOTTOM = 2
-  integer, parameter :: INDEX_FACE_RIGHT = 3
-  integer, parameter :: INDEX_FACE_TOP = 4
-
   ! Task parameters for subroutine fixCells
   integer, parameter :: FIXCELLS_MODE_FIX = 1       ! Fix geometry issues
   integer, parameter :: FIXCELLS_MODE_REFINE = 2    ! Fix resolution
@@ -43,6 +36,7 @@ module carre_postprocess
   integer, parameter :: ACTION_COARSEN = 2
   integer, parameter :: ACTION_REFINE = 3
   integer, parameter :: ACTION_COARSEN_FORCE = 4
+
 
 contains
 
@@ -120,7 +114,7 @@ contains
         call labelPointsInsideOutside(equ, struct, grid, finalized = .false.)
 
         ! Compute the object categorization 
-        call categorizeCellsAndFaces(lPasmin)
+        call categorizeCellsAndFaces(lPasmin, finalized = .false.)
 
         ! Compute connection information between regions
         call computeConnectionInformation()
@@ -155,7 +149,7 @@ contains
                     ! switch to cleanup resolution for coarsening
                     lPasMin = par%cleanupPasmin
                     ! recompute object categorization with cleanup minimum cell length
-                    call categorizeCellsAndFaces(lPasmin)
+                    call categorizeCellsAndFaces(lPasmin, finalized = .false.)
                     nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
                          & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
                 end if
@@ -225,60 +219,25 @@ contains
     ! Mark points to be inside/outside of vessel
     call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
     ! Recompute the object categorization 
-    call categorizeCellsAndFaces(lPasmin)
-        
+    call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
     ! write final postprocessing result
     call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
+    ! Finalize cell flags
+    call finalizeCellFlags()
+
   contains
 
-    subroutine categorizeCellsAndFaces(pasmin)
+    subroutine categorizeCellsAndFaces(pasmin, finalized)
       double precision, intent(in) :: pasmin
-
+      logical, intent(in) :: finalized
 
       ! internal
       integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
-      integer :: iReg, iPol, iRad, iFace, i, j
+      integer :: iReg, iPol, iRad, iFace, i, j, iStructStart, iStructEnd
+      integer :: cellBndFaceCount(npmamx-1,nrmamx-1,nregmx)
 
-      ! Transfer face intersection information to cells (filling grid%cellFaceFlag)
-      grid%cellFaceFlag = 0
-
-      do iReg = 1, grid%nreg
-
-          do iPol = 1, grid%np1(iReg) - 1
-              do iRad = 1, grid%nr(iReg) - 1
-
-                  do iFace = 1, 4 ! left, bottom, right, top
-
-                      select case (iFace)
-                      case(FACE_LEFT) ! left
-                          doesIntersect = grid%faceISec(FACE_RADIAL, iPol, iRad, iReg)
-                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
-                               & grid%faceISecIStruct(FACE_RADIAL, iPol, iRad, iReg)
-                      case(FACE_BOTTOM) ! bottom
-                          doesIntersect = grid%faceISec(FACE_POLOIDAL, iPol, iRad, iReg)
-                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
-                               & grid%faceISecIStruct(FACE_POLOIDAL, iPol, iRad, iReg)
-                      case(FACE_RIGHT) ! right
-                          doesIntersect = grid%faceISec(FACE_RADIAL, iPol + 1, iRad, iReg)
-                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
-                               & grid%faceISecIStruct(FACE_RADIAL, iPol+1, iRad, iReg)
-                      case(FACE_TOP) ! top
-                          doesIntersect = grid%faceISec(FACE_POLOIDAL, iPol, iRad + 1, iReg)
-                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
-                               & grid%faceISecIStruct(FACE_POLOIDAL, iPol, iRad+1, iReg)
-                      end select
-
-                      if (doesIntersect) then     
-                          grid%cellFaceFlag(iPol, iRad, iReg) = &
-                               & ibset(grid%cellFaceFlag(iPol, iRad, iReg), iFace)
-                      end if
-                  end do
-
-              end do
-          end do
-      end do
-
+      ! Cell flag
       ! First mark cells internal/external
       grid%cellFlag = GRID_EXTERNAL
 
@@ -311,10 +270,59 @@ contains
           end do
       end do
 
-      ! Translate the grid%cellFaceFlag array into cell flags
-      ! First assume all boundary cells are unproblematic
-      where ( (grid%cellFaceFlag /= GRID_UNDEFINED) .and. (grid%cellFlag == GRID_INTERNAL) ) &
-           & grid%cellflag = GRID_BOUNDARY
+      ! Identify boundary cells
+      cellBndFaceCount = 0
+      grid%cellFaceIStruct = GRID_UNDEFINED
+
+      do iReg = 1, grid%nreg
+
+          do iPol = 1, grid%np1(iReg) - 1
+              do iRad = 1, grid%nr(iReg) - 1
+
+                  if (finalized) then 
+                      ! Finalized grid: derive boundary cells from boundary nodes
+
+                      ! Only for internal cells
+                      if (grid%cellflag(iPol, iRad, iReg) /= GRID_INTERNAL) cycle
+
+                      do iFace = 1, 4
+                          iStructStart = grid%pointStructIndex( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg )
+                          iStructEnd = grid%pointStructIndex( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg )
+
+                          if ((iStructStart /= GRID_UNDEFINED) .and. (iStructEnd /= GRID_UNDEFINED)) then
+                              grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructStart
+                              if (iStructStart /= iStructEnd) then
+                                  call logmsg(LOGDEBUG, "categorizeCellsAndFaces: ambiguous face/structure association")
+                              end if
+                              cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
+                          end if
+                      end do
+
+                  else
+                      ! During iteration: transfer intersection information from faces to cells
+                      do iFace = 1, 4 ! left, bottom, right, top
+                          doesIntersect = grid%faceISec(CELL_FACE_ALIGN(iFace), &
+                               & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+
+                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
+                               & grid%faceISecIStruct(CELL_FACE_ALIGN(iFace), &
+                               & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+
+                          if (doesIntersect) cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
+                      end do
+                  end if 
+
+              end do
+          end do
+      end do
+
+      ! Translate the face/structure intersections into cell flags
+      ! First: all internal cells with an intersected face are boundary cells and are assumed to be unproblematic
+      where ( (cellBndFaceCount > 0) .and. (grid%cellFlag == GRID_INTERNAL) ) grid%cellflag = GRID_BOUNDARY
 
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
@@ -342,7 +350,7 @@ contains
                       grid%cellflag(iPol, iRad, iReg) = GRID_BOUNDARY_REFINE
                       exit
                   end do
-                 
+
               end do
           end do
       end do
@@ -372,9 +380,19 @@ contains
           end do
       end do
 
-
-
     end subroutine categorizeCellsAndFaces
+
+    !> Map the cell flags so that only internal, external and boundary flags remain
+    subroutine finalizeCellFlags()
+
+      where (grid%cellflag == GRID_BOUNDARY_REFINE) grid%cellflag = GRID_BOUNDARY
+      where (grid%cellflag == GRID_BOUNDARY_REFINE_FIX) grid%cellflag = GRID_BOUNDARY
+      where (grid%cellflag == GRID_BOUNDARY_COARSEN) grid%cellflag = GRID_BOUNDARY
+
+      where (grid%cellflag == GRID_INTERNAL_COARSEN) grid%cellflag = GRID_INTERNAL
+      where (grid%cellflag == GRID_REFINE) grid%cellflag = GRID_INTERNAL
+
+    end subroutine finalizeCellFlags
 
     ! For use in categorizeCellsAndFaces
     logical function isInternal(pointFlag)
@@ -728,6 +746,8 @@ contains
       integer :: iReg, iPol, iRad, iStruct
       logical :: onStructure
             
+      grid%pointStructIndex = GRID_UNDEFINED
+
       do iReg = 1, grid%nreg
           do iPol = 1, grid%np1(iReg)
               do iRad = 1, grid%nr(iReg)
@@ -736,7 +756,7 @@ contains
                        & onStructure, iStruct)
                   if (onStructure) then
                       points(iPol, iRad, iReg) = GRID_BOUNDARY
-                      ! TODO: save structure index
+                      grid%pointStructIndex(iPol, iRad, iReg) = iStruct
                   end if
 
               end do
@@ -806,8 +826,8 @@ contains
 
                     if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE_FIX) then
                         ! broken cell should have one intersected poloidal face               
-                        isecTopFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_TOP)
-                        isecBotFace = btest(grid%cellFaceFlag(ip, ir, iReg), INDEX_FACE_BOTTOM)
+                        isecTopFace = (grid%cellFaceIStruct(FACE_TOP, ip, ir, iReg) /= GRID_UNDEFINED)
+                        isecBotFace = (grid%cellFaceIStruct(FACE_BOTTOM, ip, ir, iReg) /= GRID_UNDEFINED)
 
                         ! If more than two intersections per cell,  grid/geometry has issues
                         if ( isecTopFace .and. isecBotFace ) then

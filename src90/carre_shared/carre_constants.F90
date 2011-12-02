@@ -6,7 +6,8 @@ module carre_constants
 
   integer, parameter, public :: GRID_UNDEFINED = 0
 
-  ! Grid object labels
+  ! Constants used to categorize grid objects
+  ! These are used for points, faces and cells
   integer, parameter, public :: GRID_INTERNAL = 1
   integer, parameter, public :: GRID_EXTERNAL = 2
   integer, parameter, public :: GRID_BOUNDARY = 3

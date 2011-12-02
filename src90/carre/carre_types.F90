@@ -23,7 +23,7 @@ module carre_types
   integer, parameter, public :: GRIDLINE_REQUIRED = 4
   integer, parameter, public :: GRIDLINE_REFINED = 5
 
-  ! Face number of a cell
+  ! Face number of a cell / of a point
   integer, parameter, public :: FACE_LEFT = 1
   integer, parameter, public :: FACE_BOTTOM = 2
   integer, parameter, public :: FACE_RIGHT = 3
@@ -32,6 +32,24 @@ module carre_types
   ! Numbering for face alignment
   integer, parameter, public :: FACE_POLOIDAL = 1
   integer, parameter, public :: FACE_RADIAL = 2
+
+  ! Indexing help arrays for faces of cell at position (ip,ir)
+  integer, dimension(4), parameter, public :: CELL_FACE_ALIGN = &
+       & (/ FACE_RADIAL, FACE_POLOIDAL, FACE_RADIAL, FACE_POLOIDAL /)
+  integer, dimension(4), parameter, public :: CELL_FACE_DIP = (/ 0, 0, 1, 0 /)
+  integer, dimension(4), parameter, public :: CELL_FACE_DIR = (/ 0, 0, 0, 1 /)
+
+  ! Indexing help arrays for points of cell at position (ip,ir)
+  integer, dimension(4,2), parameter, public :: CELL_FACE_POINT_DIP = &
+       & (/ (/0, 0/), (/0, 1/), (/1, 1/), (/0, 1/) /)
+  integer, dimension(4,2), parameter, public :: CELL_FACE_POINT_DIR = &
+       & (/ (/0, 1/), (/0, 0/), (/0, 1/), (/1, 1/) /)
+
+  ! Indexing help arrays for faces of point at position (ip,ir)
+  integer, dimension(4), parameter, public :: POINT_FACE_ALIGN = &
+       & (/ FACE_POLOIDAL, FACE_RADIAL, FACE_POLOIDAL, FACE_RADIAL /)
+  integer, dimension(4), parameter, public :: POINT_FACE_DIP = (/ -1,  0, 0, 0 /)
+  integer, dimension(4), parameter, public :: POINT_FACE_DIR = (/  0, -1, 0, 0 /)
 
   ! Grid extension modes
   integer, parameter, public :: GRID_EXTENSION_OFF = 0
@@ -191,15 +209,21 @@ module carre_types
           ! 2: poloidal cell index
           ! 3: radial cell index, 4: region number
           logical :: faceISec(2,npmamx,nrmamx,nregmx)
+          ! Position of the intersection point
           double precision :: faceISecPx(2,npmamx,nrmamx,nregmx)
           double precision :: faceISecPy(2,npmamx,nrmamx,nregmx)
+          ! During iteration: index of the structure intersecting the face.
+          ! After finalization: index of structure the face is aligned to.
+          ! If GRID_UNDEFINED, not intersected/in contact with a face
           integer :: faceISecIStruct(2,npmamx,nrmamx,nregmx)
 
+          ! Cell categorization flag (internal, external, ...)
+          ! See the GRID_* constants in carre_constants
           integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
-          integer :: cellFaceFlag(npmamx-1,nrmamx-1,nregmx)
+          ! Structure index 
           integer :: cellFaceIStruct(1:4,npmamx-1,nrmamx-1,nregmx)
 
-          integer :: pointFlag(npmamx,nrmamx,nregmx)
+          integer, dimension(npmamx,nrmamx,nregmx) :: pointFlag, pointStructIndex
 
           ! logical flags marking radial grid lines as required
           integer :: lineFlagRad(npmamx, nregmx)
