@@ -9,6 +9,7 @@ module carre_postprocess
   use Helper
   use carre_intersect
   use carre_find
+  use carre_constants
 
 #ifdef USE_SILO
   use SiloIO
@@ -41,7 +42,6 @@ module carre_postprocess
 contains
 
   !> Perform postprocessing on the grid as generated in carre_main.
-  !> This is only relevant if the cut-cell type extended grid generation is requested.
 
   subroutine carre_postprocess_computation(par, equ, grid, struct)
 
@@ -52,6 +52,7 @@ contains
 
     ! internal
     integer :: iReg, iPostProcess, nCellsToRefine, nCellsToRefineFix, nCellsToCoarsen
+    integer :: iBnd, iRad, iPol
     logical :: doesIntersect
     integer :: npReg(nregmx), npDiff, action
     integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
@@ -213,7 +214,7 @@ contains
         ! At this stage we postulate that all face-structure intersections 
         ! coincide with grid nodes       
 
-        ! Compute face/structure intersections<
+        ! Compute face/structure intersections
         call computeFaceStructureIntersections(struct, grid, finalized=.true.)
         ! Mark points to be inside/outside of vessel
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
@@ -229,10 +230,43 @@ contains
     else
         call logmsg( LOGINFO, "carre_postprocess_computation: doing standard grid" )
 
-        ! Compute face/structure intersections<
-        call computeFaceStructureIntersections(struct, grid, finalized=.true.)
-        ! All points are inside the vessel
+        ! All points are inside the vessel, boundary points are marked later
         grid%pointFlag = GRID_INTERNAL
+        ! Compute face/structure intersections 
+        call computeFaceStructureIntersections(struct, grid, finalized=.true.)
+        ! Mark points to be inside/outside of vessel (this identifies the boundary points)
+        call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
+
+        ! Mark faces boundary faces not on a target, using the region connection information
+        ! This currently only treats poloidally-aligned faces
+
+        ! Compute connection information between regions
+        call computeConnectionInformation()
+
+        do iReg = 1, grid%nreg
+            do iPol = 1, grid%np1(iReg)-1
+                do iBnd = 1, 2
+                    select case (iBnd)
+                    case(1)
+                        ! Top boundary faces of region
+                        iRad = grid%nr(iReg)
+                    case(2)
+                        ! Bottom boundary faces of region
+                        iRad = 1
+                    end select
+                    
+                    if (grid%nbFaceIPol(iReg, iPol, iBnd) == GRID_UNDEFINED) then
+                        ! No neighbour on this face
+                        ! Set points to be boundary points
+                        grid%pointFlag(iPol:iPol+1, iRad, iReg) = GRID_BOUNDARY
+                        ! Where no structure set yet, set generic structure number
+                        where (grid%pointStructIndex(iPol:iPol+1, iRad, iReg) == GRID_UNDEFINED) &
+                             & grid%pointStructIndex(iPol:iPol+1, iRad, iReg) = BOUNDARY_NOSTRUCTURE
+                    end if
+                end do
+            end do
+        end do
+
         ! Recompute the object categorization 
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
 

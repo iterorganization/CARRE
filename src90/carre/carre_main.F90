@@ -228,9 +228,7 @@ contains
 
     end if
 
-    ! FIXME: properly set up cell & object categorizations
-    grid%cellflag = GRID_INTERNAL
-    ! TODO: boundaries
+    call carre_postprocess_computation(par, equ, grid, struct)
 
   contains
 
