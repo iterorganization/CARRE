@@ -24,9 +24,9 @@ module carre_constants
   integer, parameter, public :: CARREOUT_NCELLFLAGS = 5
   integer, parameter, public :: CELLFLAG_TYPE = 1
   integer, parameter, public :: CELLFLAG_LEFTFACE = 2
-  integer, parameter, public :: CELLFLAG_RIGHTFACE = 3
-  integer, parameter, public :: CELLFLAG_TOPFACE = 4
-  integer, parameter, public :: CELLFLAG_BOTTOMFACE = 5
+  integer, parameter, public :: CELLFLAG_BOTTOMFACE = 3
+  integer, parameter, public :: CELLFLAG_RIGHTFACE = 4
+  integer, parameter, public :: CELLFLAG_TOPFACE = 5
 
   ! Face number marking face on a generic boundary (i.e. not on a specific
   ! structure). This is used to mark boundary faces in standard grids that 

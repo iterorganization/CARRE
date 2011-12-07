@@ -36,13 +36,13 @@ contains
             do iRad = 1, grid%nr(iReg)
                 do iFace = 1, 2 ! poloidal, radial
 
-                   ! Skip nonexisting faces
-                   select case (iFace)
-                   case(FACE_POLOIDAL) ! poloidal
-                      if (iPol == grid%np1(iReg)) cycle
-                   case(FACE_RADIAL) ! radial
-                      if (iRad == grid%nr(iReg)) cycle
-                   end select
+                    ! Skip nonexisting faces
+                    select case (iFace)
+                    case(FACE_POLOIDAL) ! poloidal
+                        if (iPol == grid%np1(iReg)) cycle
+                    case(FACE_RADIAL) ! radial
+                        if (iRad == grid%nr(iReg)) cycle
+                    end select
 
                     ! fill xx, yy with face start-, endpoint
                     call getFace(iFace)

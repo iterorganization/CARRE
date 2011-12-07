@@ -14,6 +14,7 @@ program tradui
   use b2mod_ual
   use euITM_schemas  
   use euITM_routines
+  use b2ag_ghostcells
 #endif
   use carre_types
   use carre_constants
@@ -30,7 +31,7 @@ program tradui
   integer :: nxmx, nymx, ncutmx
   parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4)
   integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), & 
-      & ifail,nx,ny, & 
+      & ifail,nx,ny, nnx, nny, & 
       & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
       & cflag(npmamx,nrmamx,nregmx,CARREOUT_NCELLFLAGS)
   integer b2cflag(-1:nxmx,-1:nymx,CARREOUT_NCELLFLAGS)
@@ -204,13 +205,18 @@ program tradui
       !
 
       ! assemble the crx, cry arrays
-      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+      ! the same applies here as in case 2 w.r.t. grid extent: no ghost cells
+      call b2agfz(nnx,nny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
           & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
 
-      ! the same applies here as in case 2 w.r.t. grid extent: no ghost cells
+      ! Figure out real grid dimension nx, ny
+      call computeGridSizeWithGhostCells(nnx, nny, niso, nx, ny)
+
+      ! add the ghost cells
+      call create_guard_cells(nx, ny, nnx, nny, niso, nxiso, crxs, crys, bp, bt, fpsis, cflags)
 
       ! allocate connectivity arrays 
       allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &

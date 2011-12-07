@@ -233,7 +233,29 @@ contains
         ! All points are inside the vessel, boundary points are marked later
         grid%pointFlag = GRID_INTERNAL
         ! Compute face/structure intersections 
-        call computeFaceStructureIntersections(struct, grid, finalized=.true.)
+        call computeFaceStructur
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+eIntersections(struct, grid, finalized=.true.)
         ! Mark points to be inside/outside of vessel (this identifies the boundary points)
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
 
