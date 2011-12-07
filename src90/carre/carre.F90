@@ -55,13 +55,6 @@ PROGRAM CARRE
   ! diagonstic output
   type(CarreDiag) :: diag
 
-  !..Procedures
-  !
-!!$      INTRINSIC ABS,MIN,index
-!!$      EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0, & 
-!!$     &   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete, & 
-!!$     &     trc_stk_in,trc_stk_out, & 
-!!$     &     virtualtargets,virtuallimiters
   !======================================================================
   !.. nxmax,nymax: maximum number of the data points in x and y
   !.. gradmx: maximum number of points where the gradient vanishes
@@ -91,27 +84,10 @@ PROGRAM CARRE
 
   call writeGridStateToSiloFile('carrePreProcA00', equ, struct, grid)
 
-!!$  call extend_equilibrium(equ, par, struct)
-!!$
-!!$  !call extend_equilibrium(equ, -0.14d0, huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), 1.2d0, 40, 40, 0, 40)
-!!$  call extend_equilibrium(equ, -huge(0.0d0), huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), 1.2d0, 40, 40, 0, 40)
-!!$  !call extend_equilibrium(equ, -0.14d0, huge(0.0d0), -huge(0.0d0), huge(0.0d0), -huge(0.0d0), huge(0.0d0), 40, 40, 0, 40)
-
-  call writeGridStateToSiloFile('carrePreProcB00', equ, struct, grid)
-
   ! Create the grid
   call carre_main_computation(equ, struct, par, grid, diag)
 
-  ! Postprocess
-  call carre_postprocess_computation(par, equ, grid, struct)
-
-  ! Output grid data piece into carre.out
-!!$  CALL SORTIE(equ%nsep,grid%nreg,grid%np1, & 
-!!$       & equ%distxo,grid%xmail,grid%ymail,equ%nx,equ%ny, & 
-!!$       & equ%x, equ%y, equ%a00, equ%a10, equ%a01, equ%a11,&
-!!$       & equ%ptx, equ%pty, equ%npx, equ%racord,&
-!!$       & 2,& ! 2 means print grid data
-!!$       & equ%fctpx,diag,par,grid%psim,grid%psidxm,grid%psidym)
+  ! Output the whole output file at once
   call SORTIE(equ, grid, diag, par, 1)
   call SORTIE(equ, grid, diag, par, 2)
 

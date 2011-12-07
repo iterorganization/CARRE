@@ -65,6 +65,9 @@
 !***  nycut : radial depth of the cuts
 !***  niso  : actual number of isolating cuts
 !***  nxiso : poloidal location of the isolating cuts (left edges)
+!***  cflag : flags associated with cells (object classifications, ...)
+!***  doGuardCells : If .true., guard cells are added and the cflag(:,:,:) 
+!     array is modified accordingly. If .false., no guard cells are added.
 !======================================================================
 
 !   ..local variables
@@ -171,7 +174,7 @@
       cry = 0.0
       fpsi = 0.0
       ffbz = 0.0
-      b2cflag = 0
+      b2cflag = GRID_UNDEFINED
 
 !<<<
       write(0,*) '===> Entering b2agfz. nreg = ',nreg
@@ -970,7 +973,7 @@
           call periph(nxx(ihg),ny, & 
      &                crx(ix,-1,0),cry(ix,-1,0),fpsi(ix,-1,0), & 
      &                ffbz(ix,-1,0),psidx(ix,-1,0),psidy(ix,-1,0), & 
-     &                                                del,nxmax,nymax)
+     &                del,nxmax,nymax)
           ix=ix+nxx(1)+2      ! }
         end do
         nx=nx+2

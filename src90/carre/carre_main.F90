@@ -228,6 +228,9 @@ contains
 
     end if
 
+    ! FIXME: properly set up cell & object categorizations
+    grid%cellflag = GRID_INTERNAL
+    ! TODO: boundaries
 
   contains
 

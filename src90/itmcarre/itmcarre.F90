@@ -6,6 +6,7 @@ module itmcarre
 
   use carre_main
   use carre_types
+  use carre_constants
   use CarreDiagnostics
   use b2ITMMapping
   use carre_parameter_io
@@ -16,7 +17,7 @@ module itmcarre
   
 contains
 
-  subroutine itmcarre_main(equcpo, limcpo, edgecpo)
+  Subroutine itmcarre_main(equcpo, limcpo, edgecpo)
         
     type(type_equilibrium), intent(in), pointer :: equcpo(:)
     type(type_limiter), intent(in) :: limcpo
@@ -163,17 +164,14 @@ contains
     
 
     ! arrays for cell flags (currently not used in ITM Carre)
-    integer :: b2cflag(-1:nxmax,-1:nymax,2)
-    integer :: cflag(npmamx,nrmamx,nreg,2)
-
-!!$    integer nxmx,nymx,ncutmx,nisomx
-!!$    parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1)
-
+    integer :: b2cflag(-1:nxmax,-1:nymax,CARREOUT_NCELLFLAGS)
+    integer :: cflag(npmamx,nrmamx,nreg,CARREOUT_NCELLFLAGS)
 
     real*8 crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), & 
         &  bb(-1:nxmx,-1:nymx,0:3),b0r0, & 
         &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), & 
         &  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3)    
+
 
     integer nreg,nppol(nregmx),nprad(nregmx), & 
         &  nx,ny, & 
@@ -196,7 +194,7 @@ contains
         & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
 
     ! assemble the connectivity arrays
-    call init_connectivity (nx,ny,crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3), &
+    call init_connectivity (nx,ny,crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),b2cflag(-1:nx,-1:ny,:), &
         & leftix,leftiy,rightix,rightiy, &
         & topix,topiy,bottomix,bottomiy, &
         & leftcut,rightcut,bottomcut,topcut, &
@@ -213,15 +211,15 @@ contains
         & crx,cry,PERIODIC_BC)
 
     ! set up the B2<->CPO mappings
-    call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
+    call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),b2cflag(-1:nx,-1:ny,:),&
         & leftix,leftiy,rightix,rightiy, &
-        & topix,topiy,bottomix,bottomiy, gmap )
+        & topix,topiy,bottomix,bottomiy,  gmap )
 
     call b2ITMFillGridDescription( gmap, edgecpo%grid, &
         & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
         & leftix,leftiy,rightix,rightiy, &
         & topix,topiy,bottomix,bottomiy, &
-        & nnreg, topcut, region )
+        & nnreg, topcut, region, b2cflag )
 
     allocate(edgecpo%datainfo%dataprovider(1))
     edgecpo%datainfo%dataprovider="IPP"

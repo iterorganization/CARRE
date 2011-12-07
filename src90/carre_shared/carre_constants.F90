@@ -16,10 +16,15 @@ module carre_constants
   integer, parameter, public :: GRID_INTERNAL_COARSEN = 6
   integer, parameter, public :: GRID_BOUNDARY_COARSEN = 7
   integer, parameter, public :: GRID_REFINE = 8
+  integer, parameter, public :: GRID_GUARD = 9
+  integer, parameter, public :: GRID_DEAD = 10
 
 
   ! Number of flags written out for every cell in cellflags blog of carre.out
   ! FIXME: when changing this, the format 117 in ecrim2 has to be updated
   integer, parameter, public :: CARREOUT_NCELLFLAGS = 5
+
+  integer, parameter, public :: CELLFLAG_TYPE = 1
+
 
 end module carre_constants

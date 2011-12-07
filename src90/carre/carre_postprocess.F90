@@ -56,175 +56,193 @@ contains
     integer :: npReg(nregmx), npDiff, action
     integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
     double precision :: lPasMin
-
+    
     ! Only do postprocessing when doing grid extension
-    if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
+    if (par%gridExtensionMode /= GRID_EXTENSION_OFF) then
+        call logmsg( LOGINFO, "carre_postprocess_computation: doing cut-cell type grid (grid extension)" )
 
-    call logmsg( LOGINFO, "carre_postprocess_computation: doing cut-cell type grid (grid extension)" )
+        ! Initialize grid line flags
+        grid%lineFlagRad = GRIDLINE_BASELINE
+        do iReg = 1, grid%nreg
 
-    ! Initialize grid line flags
-    grid%lineFlagRad = GRIDLINE_BASELINE
-    do iReg = 1, grid%nreg
+            ! first and last radial line is required
+            call setRadialLineFlag(grid, iReg, 1, GRIDLINE_BOUNDARY)
+            call setRadialLineFlag(grid, iReg, grid%np1(iReg), GRIDLINE_BOUNDARY)
 
-        ! first and last radial line is required
-        call setRadialLineFlag(grid, iReg, 1, GRIDLINE_BOUNDARY)
-        call setRadialLineFlag(grid, iReg, grid%np1(iReg), GRIDLINE_BOUNDARY)
+            ! first and last radial line is required
 
-        ! first and last radial line is required
-
-        ! The grid lines going into the x-point are also required...
-        do ipx = 1, equ%npx
-            call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), npoint, xipol, xirad, findAll = .true.)
-            do ipoint = 1, npoint
-                call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required &
-                     & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
-                call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
+            ! The grid lines going into the x-point are also required...
+            do ipx = 1, equ%npx
+                call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), npoint, xipol, xirad, findAll = .true.)
+                do ipoint = 1, npoint
+                    call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required &
+                        & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
+                    call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
+                end do
             end do
         end do
-    end do
 
-    ! Main iteration sequence
+        ! Main iteration sequence
 
-    ! Actions are:
-    ! FIX: fix geometry issues
-    ! REFINE: refine too coarse cells
-    ! COARSEN: coarsen too fine cells, honoring required lines
-    ! COARSEN-FORCE: coarsen too fine cells, not honoring required lines
+        ! Actions are:
+        ! FIX: fix geometry issues
+        ! REFINE: refine too coarse cells
+        ! COARSEN: coarsen too fine cells, honoring required lines
+        ! COARSEN-FORCE: coarsen too fine cells, not honoring required lines
 
-    ! Main sequence rules are:
-    ! If broken cells exist, FIX
-    ! If previous iteration was FIX, next is always COARSEN
-    ! If no broken cells, but coarse cells exist, REFINE
-    ! If no broken cells, no cells to refine the main iteration is converged. Start cleanup sequence
+        ! Main sequence rules are:
+        ! If broken cells exist, FIX
+        ! If previous iteration was FIX, next is always COARSEN
+        ! If no broken cells, but coarse cells exist, REFINE
+        ! If no broken cells, no cells to refine the main iteration is converged. Start cleanup sequence
 
-    ! Cleanup sequence rules are:
-    ! If too fine cells exist, do COARSEN-FORCE
-    ! Stop when no cells were removed in last step
+        ! Cleanup sequence rules are:
+        ! If too fine cells exist, do COARSEN-FORCE
+        ! Stop when no cells were removed in last step
 
-    action = GRID_UNDEFINED
-    lPasMin = pasmin
+        action = GRID_UNDEFINED
+        lPasMin = pasmin
 
-    do iPostProcess = 1, 42
-        call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess))            
+        do iPostProcess = 1, 42
+            call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess))            
 
-        ! Compute face/structure intersections
-        call computeFaceStructureIntersections(struct, grid, finalized = .false.)
+            ! Compute face/structure intersections
+            call computeFaceStructureIntersections(struct, grid, finalized = .false.)
 
-        ! Mark points to be inside/outside of vessel
-        call labelPointsInsideOutside(equ, struct, grid, finalized = .false.)
+            ! Mark points to be inside/outside of vessel
+            call labelPointsInsideOutside(equ, struct, grid, finalized = .false.)
 
-        ! Compute the object categorization 
-        call categorizeCellsAndFaces(lPasmin, finalized = .false.)
+            ! Compute the object categorization 
+            call categorizeCellsAndFaces(lPasmin, finalized = .false.)
 
-        ! Compute connection information between regions
-        call computeConnectionInformation()
+            ! Compute connection information between regions
+            call computeConnectionInformation()
 
-        if (iPostProcess > 9) then
-            call writeGridStateToSiloFile('carrePostPrcA'//int2str(iPostProcess), equ, struct, grid)
+            if (iPostProcess > 9) then
+                call writeGridStateToSiloFile('carrePostPrcA'//int2str(iPostProcess), equ, struct, grid)
+            else
+                call writeGridStateToSiloFile('carrePostPrcA0'//int2str(iPostProcess), equ, struct, grid)
+            end if
+
+            ! Cell counts
+            nCellsToRefineFix = count( grid%cellflag == GRID_BOUNDARY_REFINE_FIX )
+            nCellsToRefine = count( grid%cellflag == GRID_REFINE ) &
+                & + count( grid%cellflag == GRID_BOUNDARY_REFINE )
+            nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
+                & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
+
+            ! Determine next action
+            select case (action)
+            case(ACTION_REFINE_FIX)
+                action = ACTION_COARSEN
+            case(ACTION_COARSEN_FORCE)
+                action = ACTION_COARSEN_FORCE
+            case default
+                if (nCellsToRefineFix > 0) then
+                    action = ACTION_REFINE_FIX
+                else
+                    if (nCellsToRefine > 0) then
+                        action = ACTION_REFINE
+                    else
+                        action = ACTION_COARSEN_FORCE
+                        ! switch to cleanup resolution for coarsening
+                        lPasMin = par%cleanupPasmin
+                        ! recompute object categorization with cleanup minimum cell length
+                        call categorizeCellsAndFaces(lPasmin, finalized = .false.)
+                        nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
+                            & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
+                    end if
+                end if
+            end select
+
+            ! Save number of poloidal points before modifications
+            npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
+
+            select case (action)
+            case (ACTION_REFINE_FIX)
+                ! Cells need refinement because of broken geometry                
+                ! Fix cells by modifying the grid accordingly
+                call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                    & //int2str(nCellsToRefineFix)//' cells with critical geometry')
+                call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
+            case (ACTION_COARSEN)
+                if ( nCellsToCoarsen > 0 ) then
+                    call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
+                        &//int2str(nCellsToCoarsen)//' cells to coarsen')
+                    call coarsenCells(grid, force = .false.)
+                else
+                    call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. No cells to coarsen")
+                end if
+            case (ACTION_REFINE)
+                call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                    &int2str(nCellsToRefine)//' cells with too low resolution')
+                ! Refine cells
+                call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)            
+            case (ACTION_COARSEN_FORCE)            
+                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN_FORCE. "&
+                    &//int2str(nCellsToCoarsen)//' cells to coarsen')
+                call coarsenCells(grid, force = .true.)
+            end select
+
+            npDiff = sum(grid%np1(1:grid%nReg)-npReg(1:grid%nReg))
+            call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess)//&
+                &": radial line delta is "//int2str(npDiff)//" (in all regions)")
+
+            ! Stop iteration if no delta in final coarsen step
+            if ((action == ACTION_COARSEN_FORCE) .and. (npDiff == 0)) exit
+        end do
+
+        ! Did we converge, or stop because too many iterations?
+        if (npDiff == 0) then
+            call logmsg(LOGDEBUG, "carre_postprocess: converged at iteration "//int2str(iPostProcess))
         else
-            call writeGridStateToSiloFile('carrePostPrcA0'//int2str(iPostProcess), equ, struct, grid)
+            call logmsg(LOGDEBUG, "carre_postprocess: did NOT CONVERGE after iteration "//int2str(iPostProcess))
         end if
 
-        ! Cell counts
-        nCellsToRefineFix = count( grid%cellflag == GRID_BOUNDARY_REFINE_FIX )
-        nCellsToRefine = count( grid%cellflag == GRID_REFINE ) &
-             & + count( grid%cellflag == GRID_BOUNDARY_REFINE )
-        nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
-             & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
+        ! write results of postprocessing iteration
+        call writeGridStateToSiloFile('carrePostProcC0', equ, struct, grid)
 
-        ! Determine next action
-        select case (action)
-        case(ACTION_REFINE_FIX)
-            action = ACTION_COARSEN
-        case(ACTION_COARSEN_FORCE)
-            action = ACTION_COARSEN_FORCE
-        case default
-            if (nCellsToRefineFix > 0) then
-                action = ACTION_REFINE_FIX
-            else
-                if (nCellsToRefine > 0) then
-                    action = ACTION_REFINE
-                else
-                    action = ACTION_COARSEN_FORCE
-                    ! switch to cleanup resolution for coarsening
-                    lPasMin = par%cleanupPasmin
-                    ! recompute object categorization with cleanup minimum cell length
-                    call categorizeCellsAndFaces(lPasmin, finalized = .false.)
-                    nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
-                         & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
-                end if
-            end if
-        end select
+        ! Finalize grid cell fixes by moving external points
+        ! of faces onto boundary intersections
+        call finalizeCells(grid, par)
 
-        ! Save number of poloidal points before modifications
-        npReg(1:grid%nReg) = grid%np1(1:grid%nReg)
+        ! write cell finalization result
+        call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
-        select case (action)
-        case (ACTION_REFINE_FIX)
-            ! Cells need refinement because of broken geometry                
-            ! Fix cells by modifying the grid accordingly
-            call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
-                 & //int2str(nCellsToRefineFix)//' cells with critical geometry')
-            call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
-        case (ACTION_COARSEN)
-            if ( nCellsToCoarsen > 0 ) then
-                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
-                     &//int2str(nCellsToCoarsen)//' cells to coarsen')
-                call coarsenCells(grid, force = .false.)
-            else
-                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. No cells to coarsen")
-            end if
-        case (ACTION_REFINE)
-            call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
-                 &int2str(nCellsToRefine)//' cells with too low resolution')
-            ! Refine cells
-            call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)            
-        case (ACTION_COARSEN_FORCE)            
-            call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN_FORCE. "&
-                 &//int2str(nCellsToCoarsen)//' cells to coarsen')
-            call coarsenCells(grid, force = .true.)
-        end select
+        ! Re-compute object categorizations
+        ! At this stage we postulate that all face-structure intersections 
+        ! coincide with grid nodes       
 
-        npDiff = sum(grid%np1(1:grid%nReg)-npReg(1:grid%nReg))
-        call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess)//&
-             &": radial line delta is "//int2str(npDiff)//" (in all regions)")
+        ! Compute face/structure intersections<
+        call computeFaceStructureIntersections(struct, grid, finalized=.true.)
+        ! Mark points to be inside/outside of vessel
+        call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
+        ! Recompute the object categorization 
+        call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
+        ! write final postprocessing result
+        call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
-        ! Stop iteration if no delta in final coarsen step
-        if ((action == ACTION_COARSEN_FORCE) .and. (npDiff == 0)) exit
-    end do
+        ! Finalize cell flags
+        call finalizeCellFlags()
+        !grid%cellflag = GRID_INTERNAL
 
-    ! Did we converge, or stop because too many iterations?
-    if (npDiff == 0) then
-        call logmsg(LOGDEBUG, "carre_postprocess: converged at iteration "//int2str(iPostProcess))
     else
-        call logmsg(LOGDEBUG, "carre_postprocess: did NOT CONVERGE after iteration "//int2str(iPostProcess))
+        call logmsg( LOGINFO, "carre_postprocess_computation: doing standard grid" )
+
+        ! Compute face/structure intersections<
+        call computeFaceStructureIntersections(struct, grid, finalized=.true.)
+        ! All points are inside the vessel
+        grid%pointFlag = GRID_INTERNAL
+        ! Recompute the object categorization 
+        call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
+
+        ! write final postprocessing result
+        call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
+
+        ! Finalize cell flags
+        call finalizeCellFlags()
     end if
 
-    ! write results of postprocessing iteration
-    call writeGridStateToSiloFile('carrePostProcC0', equ, struct, grid)
-
-    ! Finalize grid cell fixes by moving external points
-    ! of faces onto boundary intersections
-    call finalizeCells(grid, par)
-
-    ! write cell finalization result
-    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
-
-    ! Re-compute object categorizations
-    ! At this stage we postulate that all face-structure intersections 
-    ! coincide with grid nodes
-
-    ! Compute face/structure intersections<
-    call computeFaceStructureIntersections(struct, grid, finalized=.true.)
-    ! Mark points to be inside/outside of vessel
-    call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
-    ! Recompute the object categorization 
-    call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
-    ! write final postprocessing result
-    call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
-
-    ! Finalize cell flags
-    call finalizeCellFlags()
 
   contains
 

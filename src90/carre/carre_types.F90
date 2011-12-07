@@ -41,9 +41,11 @@ module carre_types
 
   ! Indexing help arrays for points of cell at position (ip,ir)
   integer, dimension(4,2), parameter, public :: CELL_FACE_POINT_DIP = &
-       & (/ (/0, 0/), (/0, 1/), (/1, 1/), (/0, 1/) /)
+       & reshape( (/ (/0, 0, 1, 0, 0, 1, 1, 1/) /), (/4, 2/) )
+       ! should give (/ (/0, 0/), (/0, 1/), (/1, 1/), (/0, 1/) /)
   integer, dimension(4,2), parameter, public :: CELL_FACE_POINT_DIR = &
-       & (/ (/0, 1/), (/0, 0/), (/0, 1/), (/1, 1/) /)
+       & reshape( (/ (/0, 0, 0, 1, 1, 0, 1, 1/) /), (/4, 2/) )
+       ! should give (/ (/0, 1/), (/0, 0/), (/0, 1/), (/1, 1/) /)
 
   ! Indexing help arrays for faces of point at position (ip,ir)
   integer, dimension(4), parameter, public :: POINT_FACE_ALIGN = &
