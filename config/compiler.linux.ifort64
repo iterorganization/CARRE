@@ -24,3 +24,22 @@ endif
 ifndef NOUSE_MSCL
 LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
 endif
+
+ifdef USE_SILO
+# # SILO
+# INCLUDE += -I ${SILO_HOME}/include
+# LDLIBS += -L${SILO_HOME}/amd64_sles11/lib -lsilo
+
+# # HDF5
+# INCLUDE += -I ${HDF5}_HOME/include
+# LDLIBS += -L${HDF5_HOME}/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
+
+# HDF5
+INCLUDE += -I lib/${OBJECTCODE}/silo/include
+LDLIBS += -Llib/${OBJECTCODE}/silo/lib -lsiloh5
+
+INCLUDE += -I lib/${OBJECTCODE}/hdf5/include
+LDLIBS += -Llib/${OBJECTCODE}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
+
+
+endif

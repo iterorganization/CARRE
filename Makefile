@@ -6,7 +6,7 @@ CPP	= /usr/lib/cpp
 # Source form: src is old fixed form source (no longer maintained), src90 is current free form source
 SRCDIR = src90
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_types:${SRCDIR}/itm_assert
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_types:${SRCDIR}/itm_assert:${SRCDIR}/b2_shared
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
@@ -44,16 +44,7 @@ endif
 # SILO/VisIt graphics output
 # Set up HDF5 and SILO libraries only if specifically requested
 ifdef USE_SILO
-# Libraries from usol
-USOLLIBDIR = ./usol/lib/${OBJECTCODE}
 
-# SILO
-INCLUDE += -I ${USOLLIBDIR}/silo/include
-USOLLIBS += -L${USOLLIBDIR}/silo/lib -lsiloh5
-
-# HDF5
-INCLUDE += -I ${USOLLIBDIR}/hdf5/include
-USOLLIBS += -L${USOLLIBDIR}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
 else
 EXCLUDELIST += SiloIO.o
 endif
