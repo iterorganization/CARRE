@@ -25,7 +25,7 @@ ifdef USE_ITMCARRE
 
 EXCLUDELIST +=
 ALLTARGETS += ${OBJECTCODE}/itmcarre_wrapper
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itmcarre:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared:${SRCDIR}/itm_grid_external/orderpack
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itmcarre:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/b2_shared:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared:${SRCDIR}/itm_grid_external/orderpack
 
 # Some variables are expected to be set up properly by the ITMv1 script
 # -${UAL} is the path to the UAL library files

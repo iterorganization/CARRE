@@ -6,7 +6,7 @@ FC		= pgf95
 CPP		= /lib/cpp -C -traditional
 
 ifdef CARRE_DEBUG
-FFLAGS 		= -g  -Mnosecond_underscore  -C #-Wall -Wno=unused-vars -fbounds-check -ftrace=full -ffree-line-length-huge -fno-second-underscore
+FFLAGS 		= -g -Mnobounds  #-Wall -Wno=unused-vars -fbounds-check -ftrace=full -ffree-line-length-huge -fno-second-underscore
 FFLAGS	       += -module ${OBJECTCODE}/
 LDFLAGS		= 
 else

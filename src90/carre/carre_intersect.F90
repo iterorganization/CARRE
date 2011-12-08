@@ -3,6 +3,7 @@ module carre_intersect
   use carre_types
   use itm_assert
   use Logging
+  use Helper
   use carre_find
 
   implicit none

@@ -5,6 +5,7 @@ module carre_equilibrium
   use carre_postprocess
   use carre_intersect
   use Logging
+  use Helper
 
 #ifdef USE_SILO
   use SiloIO

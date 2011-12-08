@@ -3,6 +3,7 @@ module itmcarre
   use euITM_schemas
   use itm_assert
   use Logging
+  use Helper
 
   use carre_main
   use carre_types

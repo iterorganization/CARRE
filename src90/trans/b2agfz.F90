@@ -1414,7 +1414,10 @@
         end do     ! }
       end if
 
+      where (b2cflag == GRID_UNDEFINED) b2cflag = GRID_GUARD
+
 ! ..return
       return
+
 !======================================================================
       end

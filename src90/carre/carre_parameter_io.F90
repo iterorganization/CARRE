@@ -7,6 +7,7 @@ module carre_parameter_io
 
   use carre_types
   use Logging
+  use Helper
 
   implicit none
 

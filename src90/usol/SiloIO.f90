@@ -4,7 +4,8 @@ module SiloIO
 
   ! FIXME: error handling
 
-  use Logging 
+  use Logging
+  use Helper
   use KindDefinitions , only: iKind, rKind
 
   implicit none

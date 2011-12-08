@@ -1,6 +1,7 @@
 module carre_types
 
   use Logging
+  use Helper
   use carre_constants
 
   implicit none

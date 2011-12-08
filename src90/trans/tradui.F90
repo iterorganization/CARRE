@@ -210,13 +210,15 @@ program tradui
           & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
-          & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
+          & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
+
+      nx = nnx
+      ny = nny
 
       ! Figure out real grid dimension nx, ny
-      call computeGridSizeWithGhostCells(nnx, nny, niso, nx, ny)
-
-      ! add the ghost cells
-      call create_guard_cells(nx, ny, nnx, nny, niso, nxiso, crxs, crys, bp, bt, fpsis, cflags)
+      !call computeGridSizeWithGhostCells(nnx, nny, niso, nx, ny)
+      ! add the ghost cells      
+      !call create_guard_cells(nnx, nny, nx, ny, niso, nxiso, crx, cry, cflag)
 
       ! allocate connectivity arrays 
       allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
