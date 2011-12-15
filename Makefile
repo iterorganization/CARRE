@@ -73,19 +73,23 @@ $(OBJECTCODE)/%.o : %.F
 
 $(OBJECTCODE)/%.o : %.F90
 	- /bin/rm -f ${OBJECTCODE}/$*.f
-	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f90; \
-	case $< in \
-		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90;; \
-		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90;; \
-	esac; \
+	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f90
+	$(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
+# 	case $< in \
+# 		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90;; \
+# 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f90;; \
+# 	esac; \
+
+
 $(OBJECTCODE)/%.o : %.f90
-	case $< in \
-		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< ;; \
-		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< ; \
-	esac; \
+	$(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< 
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
+# 	case $< in \
+# 		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< ;; \
+# 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o $< ; \
+# 	esac; \
 
 # compile an executable
 ${OBJECTCODE}/%.exe : ${OBJECTCODE}/%.o
