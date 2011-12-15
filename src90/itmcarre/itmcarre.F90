@@ -214,13 +214,13 @@ contains
     ! set up the B2<->CPO mappings
     call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),b2cflag(-1:nx,-1:ny,:),&
         & leftix,leftiy,rightix,rightiy, &
-        & topix,topiy,bottomix,bottomiy,  gmap )
+        & topix,topiy,bottomix,bottomiy,.false.,gmap)
 
     call b2ITMFillGridDescription( gmap, edgecpo%grid, &
         & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
         & leftix,leftiy,rightix,rightiy, &
         & topix,topiy,bottomix,bottomiy, &
-        & nnreg, topcut, region, b2cflag )
+        & nnreg, topcut, region, b2cflag, .false. )
 
     allocate(edgecpo%datainfo%dataprovider(1))
     edgecpo%datainfo%dataprovider="IPP"

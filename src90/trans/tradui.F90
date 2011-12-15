@@ -245,13 +245,13 @@ program tradui
       call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
           & b2cflag(-1:nx,-1:ny,:),&
           & leftix,leftiy,rightix,rightiy, &
-          & topix,topiy,bottomix,bottomiy,b2gd )
+          & topix,topiy,bottomix,bottomiy,.true., b2gd)
 
       call b2ITMFillGridDescription( b2gd, itmgrid, &
           & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, &
-          & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:) )
+          & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:), .true. )
 
       allocate(cpoedge(1))
       allocate(cpoedge(1)%datainfo%dataprovider(1))
