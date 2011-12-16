@@ -19,6 +19,6 @@ COMPILE 	= ${FC} -c ${FFLAGS}
 
 # LDLIBS	= -L${SOLPS_LIB} -L${SOLPSMASTER}/@sys/lib -L/usr/local/lib -L/usr/lpp/xlC/lib
 LDLIBS		= -L${SOLPS_LIB}
-LDFLAGS 	= ${NCARG} -lmscl
+LDFLAGS 	= ${NCARG}
 # LDEXTRA	= -bloadmap:loadmap -bmap:map -bmaxdata:0x80000000 -bmaxstack:0x80000000
 LDEXTRA 	= -bloadmap:loadmap -bmap:map

@@ -3,15 +3,20 @@
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
 
+ifdef NCARG
 VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
+EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
+else
+VPATH	= src/carre:src/trans:src/fcrr:src/dummy
+EXCLUDELIS = carre.o tradui.o fcrr.o fcrblkd.o
+endif
+
 INCLUDE = -Isrc/include
 
 include config/compiler.${OBJECTCODE}
 ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no ),yes)
 include config.local/compiler.${OBJECTCODE}
 endif
-
-EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
 
 include LISTOBJ
 
@@ -30,6 +35,8 @@ $(OBJECTCODE)/%.o : %.F
 
 all: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 
+standalone: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
+
 ${OBJECTCODE}/carre: ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a
 	rm -f ${OBJECTCODE}/carre 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJECTCODE}/carre ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
@@ -40,7 +47,7 @@ ${OBJECTCODE}/traduit: ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a
 
 ${OBJECTCODE}/fcrr: ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a Makefile
 	rm -f ${OBJECTCODE}/fcrr 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
 ${OBJECTCODE}/libcarre.a: ${DEST}
 	ar r $@ $?
