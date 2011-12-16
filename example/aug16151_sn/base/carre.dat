@@ -1,0 +1,28 @@
+$parameters
+repart   =     2
+nrelax   =  500
+relax    =   0.1
+pasmin   =   1.0E-02
+rlcept   =   1.0E-06
+pntrat   =   2.0E-01
+nptseg(1) =    9
+deltp1(1) =   5.0e-02
+deltpn(1) =   5.0e-02
+nptseg(2) =    9
+deltp1(2) =   5.0e-02
+deltpn(2) =   5.0e-02 
+nptseg(3) =    25
+deltp1(3) =   1.0e-01
+deltpn(3) =   1.0e-01
+npr(1) =    9
+deltr1(1) =  -1.0E-02
+deltrn(1) =  -1.0E-02
+npr(2) =    9
+deltr1(2) =   2.0E-03
+deltrn(2) =   2.0E-03
+npr(3) =    9
+deltr1(3) =   2.0E-02
+deltrn(3) =   2.0E-02
+tgarde(1) =   0.0000000E-01
+tgarde(2) =   0.0000000E-01
+$end
