@@ -274,7 +274,7 @@ contains
         call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
         ! Finalize cell flags
-        call finalizeCellFlags()
+        !call finalizeCellFlags()
     end if
 
 
@@ -351,6 +351,14 @@ contains
                                   call logmsg(LOGDEBUG, "categorizeCellsAndFaces: ambiguous face/structure association")
                               end if
                               cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
+                          else
+                              call assert( grid%pointflag( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg ) /= GRID_BOUNDARY &
+                               & .or. &
+                               &  grid%pointflag( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg ) /= GRID_BOUNDARY )                              
                           end if
                       end do
 
@@ -375,6 +383,9 @@ contains
       ! Translate the face/structure intersections into cell flags
       ! First: all internal cells with an intersected face are boundary cells and are assumed to be unproblematic
       where ( (cellBndFaceCount > 0) .and. (grid%cellFlag == GRID_INTERNAL) ) grid%cellflag = GRID_BOUNDARY
+
+      ! If grid is finalized we are done now
+      if (finalized) return
 
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
@@ -434,17 +445,17 @@ contains
 
     end subroutine categorizeCellsAndFaces
 
-    !> Map the cell flags so that only internal, external and boundary flags remain
-    subroutine finalizeCellFlags()
-
-      where (grid%cellflag == GRID_BOUNDARY_REFINE) grid%cellflag = GRID_BOUNDARY
-      where (grid%cellflag == GRID_BOUNDARY_REFINE_FIX) grid%cellflag = GRID_BOUNDARY
-      where (grid%cellflag == GRID_BOUNDARY_COARSEN) grid%cellflag = GRID_BOUNDARY
-
-      where (grid%cellflag == GRID_INTERNAL_COARSEN) grid%cellflag = GRID_INTERNAL
-      where (grid%cellflag == GRID_REFINE) grid%cellflag = GRID_INTERNAL
-
-    end subroutine finalizeCellFlags
+!!$    !> Map the cell flags so that only internal, external and boundary flags remain
+!!$    subroutine finalizeCellFlags()
+!!$
+!!$      where (grid%cellflag == GRID_BOUNDARY_REFINE) grid%cellflag = GRID_BOUNDARY
+!!$      where (grid%cellflag == GRID_BOUNDARY_REFINE_FIX) grid%cellflag = GRID_BOUNDARY
+!!$      where (grid%cellflag == GRID_BOUNDARY_COARSEN) grid%cellflag = GRID_BOUNDARY
+!!$
+!!$      where (grid%cellflag == GRID_INTERNAL_COARSEN) grid%cellflag = GRID_INTERNAL
+!!$      where (grid%cellflag == GRID_REFINE) grid%cellflag = GRID_INTERNAL
+!!$
+!!$    end subroutine finalizeCellFlags
 
     ! For use in categorizeCellsAndFaces
     logical function isInternal(pointFlag)
@@ -809,6 +820,7 @@ contains
                   if (onStructure) then
                       points(iPol, iRad, iReg) = GRID_BOUNDARY
                       grid%pointStructIndex(iPol, iRad, iReg) = iStruct
+                      call assert(iStruct /= GRID_UNDEFINED)
                   end if
 
               end do
