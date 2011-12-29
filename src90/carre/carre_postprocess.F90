@@ -203,7 +203,7 @@ contains
         ! write results of postprocessing iteration
         call writeGridStateToSiloFile('carrePostProcC0', equ, struct, grid)
 
-        ! Finalize grid cell fixes by moving external points
+        ! Finalize grid cells by moving external points
         ! of faces onto boundary intersections
         call finalizeCells(grid, par)
 
@@ -215,20 +215,19 @@ contains
         ! coincide with grid nodes       
 
         ! Compute face/structure intersections
-        call computeFaceStructureIntersections(struct, grid, finalized=.true.)
+        call computeFaceStructureIntersections(struct, grid, finalized = .true.)
         ! Mark points to be inside/outside of vessel
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
-        ! Recompute the object categorization 
-        call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
+        ! Recompute the object categorization
+        call categorizeCellsAndFaces(lPasmin, finalized = .true.)
         ! write final postprocessing result
         call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
-        ! Finalize cell flags
-        call finalizeCellFlags()
-        !grid%cellflag = GRID_INTERNAL
-
     else
         call logmsg( LOGINFO, "carre_postprocess_computation: doing standard grid" )
+
+        ! Compute connection information between regions
+        call computeConnectionInformation()
 
         ! All points are inside the vessel, boundary points are marked later
         grid%pointFlag = GRID_INTERNAL
@@ -237,35 +236,31 @@ contains
         ! Mark points to be inside/outside of vessel (this identifies the boundary points)
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
 
-        ! Mark faces boundary faces not on a target, using the region connection information
-        ! This currently only treats poloidally-aligned faces
-
-        ! Compute connection information between regions
-        call computeConnectionInformation()
-
-        do iReg = 1, grid%nreg
-            do iPol = 1, grid%np1(iReg)-1
-                do iBnd = 1, 2
-                    select case (iBnd)
-                    case(1)
-                        ! Top boundary faces of region
-                        iRad = grid%nr(iReg)
-                    case(2)
-                        ! Bottom boundary faces of region
-                        iRad = 1
-                    end select
-                    
-                    if (grid%nbFaceIPol(iReg, iPol, iBnd) == GRID_UNDEFINED) then
-                        ! No neighbour on this face
-                        ! Set points to be boundary points
-                        grid%pointFlag(iPol:iPol+1, iRad, iReg) = GRID_BOUNDARY
-                        ! Where no structure set yet, set generic structure number
-                        where (grid%pointStructIndex(iPol:iPol+1, iRad, iReg) == GRID_UNDEFINED) &
-                             & grid%pointStructIndex(iPol:iPol+1, iRad, iReg) = BOUNDARY_NOSTRUCTURE
-                    end if
-                end do
-            end do
-        end do
+!!$        ! Mark faces boundary faces not on a target, using the region connection information
+!!$        ! This currently only treats poloidally-aligned faces
+!!$        do iReg = 1, grid%nreg
+!!$            do iPol = 1, grid%np1(iReg)-1
+!!$                do iBnd = 1, 2
+!!$                    select case (iBnd)
+!!$                    case(1)
+!!$                        ! Top boundary faces of region
+!!$                        iRad = grid%nr(iReg)
+!!$                    case(2)
+!!$                        ! Bottom boundary faces of region
+!!$                        iRad = 1
+!!$                    end select
+!!$
+!!$                    if (grid%nbFaceIPol(iReg, iPol, iBnd) == GRID_UNDEFINED) then
+!!$                        ! No neighbour on this face
+!!$                        ! Set points to be boundary points
+!!$                        grid%pointFlag(iPol:iPol+1, iRad, iReg) = GRID_BOUNDARY
+!!$                        ! Where no structure set yet, set generic structure number
+!!$                        where (grid%pointStructIndex(iPol:iPol+1, iRad, iReg) == GRID_UNDEFINED) &
+!!$                             & grid%pointStructIndex(iPol:iPol+1, iRad, iReg) = BOUNDARY_NOSTRUCTURE
+!!$                    end if
+!!$                end do
+!!$            end do
+!!$        end do
 
         ! Recompute the object categorization 
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
@@ -273,8 +268,6 @@ contains
         ! write final postprocessing result
         call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
-        ! Finalize cell flags
-        !call finalizeCellFlags()
     end if
 
 
@@ -337,6 +330,7 @@ contains
                       ! Only for internal cells
                       if (grid%cellflag(iPol, iRad, iReg) /= GRID_INTERNAL) cycle
 
+                      ! Figure out boundary face structure indices
                       do iFace = 1, 4
                           iStructStart = grid%pointStructIndex( &
                                & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
@@ -445,17 +439,6 @@ contains
 
     end subroutine categorizeCellsAndFaces
 
-!!$    !> Map the cell flags so that only internal, external and boundary flags remain
-!!$    subroutine finalizeCellFlags()
-!!$
-!!$      where (grid%cellflag == GRID_BOUNDARY_REFINE) grid%cellflag = GRID_BOUNDARY
-!!$      where (grid%cellflag == GRID_BOUNDARY_REFINE_FIX) grid%cellflag = GRID_BOUNDARY
-!!$      where (grid%cellflag == GRID_BOUNDARY_COARSEN) grid%cellflag = GRID_BOUNDARY
-!!$
-!!$      where (grid%cellflag == GRID_INTERNAL_COARSEN) grid%cellflag = GRID_INTERNAL
-!!$      where (grid%cellflag == GRID_REFINE) grid%cellflag = GRID_INTERNAL
-!!$
-!!$    end subroutine finalizeCellFlags
 
     ! For use in categorizeCellsAndFaces
     logical function isInternal(pointFlag)
@@ -632,7 +615,6 @@ contains
   end subroutine computeHxHy
 
 
-
   !> Label points to be in/outside of the vessel by stepping along faces
   !> and exploiting the intersection information
   subroutine labelPointsInsideOutside( equ, struct, grid, finalized )      
@@ -642,12 +624,11 @@ contains
     logical, intent(in) :: finalized
 
     ! internal
-    integer :: iReg, xip, xir
-    integer :: points(npmamx,nrmamx,nregmx)
+    integer :: iReg, xip, xir, iPol
 
-    points = GRID_UNDEFINED
+    grid%pointFlag = GRID_UNDEFINED
 
-    if (finalized) call markBoundaryPointsFinal(points)
+    if (finalized) call markBoundaryPointsFinal(grid%pointFlag)
 
     do iReg = 1, grid%nreg
         ! For region, find an x-point (which is declared to be on the inside)
@@ -656,15 +637,33 @@ contains
 
         ! Walk away from there (recursively) until all points are marked.
         ! (this recursion will do transitions between the regions)
-        call markInternalPoints(xip, xir, iReg, points, finalized)
+        call markInternalPoints(xip, xir, iReg, grid%pointFlag, finalized)
 
-        if (.not. finalized) call markBoundaryPointsIteration(iReg, points)
+        if (.not. finalized) call markBoundaryPointsIteration(iReg, grid%pointFlag)
     end do
 
     ! all points that are still undefined are external
-    where (points == GRID_UNDEFINED) points = GRID_EXTERNAL
+    where (grid%pointFlag == GRID_UNDEFINED) grid%pointFlag = GRID_EXTERNAL
 
-    grid%pointFlag = points
+    ! Mark boundary  points at non-wall boundaries, which are currently marked as internal points
+
+    do iReg = 1, grid%nreg
+        ! For every radial line...
+        do iPol = 1, grid%np1(iReg)
+            ! If the point on the separatrix is internal...
+            if (grid%pointFlag(iPol, 1, iReg) /= GRID_INTERNAL) cycle
+
+            ! ... and the radial line does not extend into another region...
+            if (grid%nbFaceIPol(iReg, iPol, 1) /= GRID_UNDEFINED) cycle
+
+            ! ... we check whether there is a boundary point on this radial line
+            if (count(grid%pointFlag(iPol, :, iReg) == GRID_BOUNDARY) == 0) then
+                ! ...and if not, we set the uppermost point to be a boundary point with no structure
+                grid%pointFlag(iPol, grid%nr(iReg), iReg) = GRID_BOUNDARY
+                grid%pointStructIndex(iPol, grid%nr(iReg), iReg) = BOUNDARY_NOSTRUCTURE
+            end if
+        end do
+    end do
 
   contains
 
@@ -798,7 +797,7 @@ contains
 
     end subroutine markBoundaryPointsIteration
 
-    !> Mark points as boundary points which are very close to a line segment
+    !> Mark points which are very close to a line segment ("wall points") as boundary points.
     !> This routine is used for the finalized grid, with the intention of 
     !> using the result for the final object classification.
     subroutine markBoundaryPointsFinal(points)
@@ -811,6 +810,7 @@ contains
             
       grid%pointStructIndex = GRID_UNDEFINED
 
+      ! First step: wall points
       do iReg = 1, grid%nreg
           do iPol = 1, grid%np1(iReg)
               do iRad = 1, grid%nr(iReg)
@@ -955,11 +955,6 @@ contains
                              & long(llX(1:llNp), llY(1:llNp), llNp) / 2.0d0,&
                              & refineFacePx(FACE_POLOIDAL, ip, ir, iReg),&
                              & refineFacePy(FACE_POLOIDAL, ip, ir, iReg) )                        
-!!$
-!!$                        refineFacePx(FACE_POLOIDAL, ip, ir, iReg) = &
-!!$                             & (grid%xmail(ip, ir, iReg) + grid%xmail(ip+1, ir, iReg)) / 2.0d0
-!!$                        refineFacePy(FACE_POLOIDAL, ip, ir, iReg) = &
-!!$                             & (grid%ymail(ip, ir, iReg) + grid%ymail(ip+1, ir, iReg)) / 2.0d0
                     case(GRID_BOUNDARY_REFINE_FIX)
                         stop "fixCells: cell flag GRID_BOUNDARY_REFINE_FIX unexpected in mode REFINE"
                     end select
@@ -1016,8 +1011,6 @@ contains
                          & refineFacePx(FACE_POLOIDAL, ip, ir, iReg), &
                          & refineFacePy(FACE_POLOIDAL, ip, ir, iReg), &
                          & isRequired = isRequired, &
-!!$                         & grid%faceISecPx(FACE_POLOIDAL, ip, ir, iReg), &
-!!$                         & grid%faceISecPy(FACE_POLOIDAL, ip, ir, iReg), &
                          & recomputeIntersection = recomputeIntersection, &
                          & iFcR = irMap(ir, iReg) )
 

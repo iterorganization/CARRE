@@ -67,6 +67,8 @@ program tradui
   double precision :: time
 #endif
 
+  logical, parameter :: ITM_DO_CLASSICAL_GHOSTCELLS = .false.
+
 
   !  procedures
   external limail, ecrim1, b2agfz, b2agbb, ecrim2, ecrim3, & 
@@ -141,7 +143,7 @@ program tradui
       ! B2.5 Format (Carre script default)
       !
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
@@ -164,7 +166,7 @@ program tradui
       ! Original SONNET/DIVIMP format
       !
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
@@ -176,7 +178,7 @@ program tradui
       !*** B2-Sonnet-DG format
       !
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
@@ -190,7 +192,7 @@ program tradui
       ! Revised DIVIMP format with additional grid information and PSI values
       !
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
@@ -207,25 +209,33 @@ program tradui
       ! assemble the crx, cry arrays
       ! the same applies here as in case 2 w.r.t. grid extent: no ghost cells
       call b2agfz(nnx,nny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nppol,nprad,npmamx,nrmamx, & 
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
-          & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
+          & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,&
+          & ITM_DO_CLASSICAL_GHOSTCELLS )
 
-      nx = nnx
-      ny = nny
+      ! nnx, nny is the size of the region actually filled with data
 
-      ! Figure out real grid dimension nx, ny
-      !call computeGridSizeWithGhostCells(nnx, nny, niso, nx, ny)
-      ! add the ghost cells      
-      !call create_guard_cells(nnx, nny, nx, ny, niso, nxiso, crx, cry, cflag)
+      if (ITM_DO_CLASSICAL_GHOSTCELLS) then
+          nx = nnx
+          ny = nny
+      else
+          ! Figure out real grid dimension nx, ny
+          call computeGridSizeWithGhostCells(nnx, nny, niso, nx, ny)
+          ! add the ghost cells
+          call create_guard_cells(nnx, nny, nx, ny, niso, nxiso, &
+              & crx(-1:nx,-1:ny,:), cry(-1:nx,-1:ny,:), b2cflag(-1:nx,-1:ny,:))
+      end if
 
       ! allocate connectivity arrays 
       allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
           & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
 
       ! assemble the connectivity arrays
-      call init_connectivity (nx,ny,crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),b2cflag(-1:nx,-1:ny,:),&
+      call init_connectivity (nx,ny,&
+          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),&
+          & b2cflag(-1:nx,-1:ny,:),&
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, &
           & leftcut,rightcut,bottomcut,topcut, &
@@ -245,7 +255,7 @@ program tradui
       call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
           & b2cflag(-1:nx,-1:ny,:),&
           & leftix,leftiy,rightix,rightiy, &
-          & topix,topiy,bottomix,bottomiy,.true., b2gd)
+          & topix,topiy,bottomix,bottomiy, .true., b2gd)
 
       call b2ITMFillGridDescription( b2gd, itmgrid, &
           & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &

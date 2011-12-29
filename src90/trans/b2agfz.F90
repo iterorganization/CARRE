@@ -1,5 +1,5 @@
       subroutine b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmax,nymax, & 
-     &                  r,z,nreg,nppol,nprad,npolmx,nradmx, & 
+     &                  r,z,nreg,nregmx,nppol,nprad,npolmx,nradmx, & 
      &                  nptseg,psidx,psidy,psi,psidxm,psidym,&
      &                  cflag,b0r0, & 
      &                  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,doGuardCells)
@@ -29,16 +29,16 @@
       implicit none
 
       integer npolmx,nradmx,nxmax,nymax,ncutmx,nisomx
-      integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10), & 
+      integer nx,ny,nreg,nregmx,nppol(nregmx),nprad(nregmx),nptseg(10), & 
      &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx),&
-     &  cflag(npolmx,nradmx,nreg,CARREOUT_NCELLFLAGS)
+     &  cflag(npolmx,nradmx,nregmx,CARREOUT_NCELLFLAGS)
       integer b2cflag(-1:nxmax,-1:nymax,CARREOUT_NCELLFLAGS)
       real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
      &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), & 
-     &  r(npolmx,nradmx,nreg),z(npolmx,nradmx,nreg), & 
+     &  r(npolmx,nradmx,nregmx),z(npolmx,nradmx,nregmx), & 
      &  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3), & 
-     &  psi(npolmx,nradmx,nreg),psidxm(npolmx,nradmx,nreg), & 
-     &  psidym(npolmx,nradmx,nreg),b0r0
+     &  psi(npolmx,nradmx,nregmx),psidxm(npolmx,nradmx,nregmx), & 
+     &  psidym(npolmx,nradmx,nregmx),b0r0
       logical :: doGuardCells
 !======================================================================
 !*** Input:
@@ -948,7 +948,19 @@
                   ffbz(ix,iy,1)=twopi*b0r0
                   ffbz(ix,iy,2)=twopi*b0r0
                   ffbz(ix,iy,3)=twopi*b0r0
-                  b2cflag(ix,iy,:)=cflag(j,i,irg,:)
+
+                  b2cflag(ix,iy,:)=cflag(j,i,irg,:)                                  
+                  ! If cells are inverted in poloidal or radial direction, also invert the
+                  ! flags / indices stored for the faces
+                  if (iip == -1) then
+                      b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(j,i,irg,CELLFLAG_RIGHTFACE) 
+                      b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(j,i,irg,CELLFLAG_LEFTFACE) 
+                  end if                     
+                  if (iir == -1) then
+                      b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(j,i,irg,CELLFLAG_BOTTOMFACE) 
+                      b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(j,i,irg,CELLFLAG_TOPFACE) 
+                  end if
+
                   iy=iy+1     ! }
                 end do
                 ix=ix+1     ! }
@@ -1083,6 +1095,13 @@
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)                                  
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
+!!$            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
+!!$            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
+
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
             end if
@@ -1118,7 +1137,13 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
+
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
             end if
@@ -1154,7 +1179,12 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
             end if
@@ -1190,7 +1220,12 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
             end if
@@ -1278,7 +1313,10 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
+
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
           end do      ! }
         end do
 !  central region
@@ -1311,7 +1349,12 @@
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad,ireg)
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
+
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
           end do      ! }
         end do
 	if (doGuardCells) then
@@ -1414,7 +1457,9 @@
         end do     ! }
       end if
 
-      where (b2cflag == GRID_UNDEFINED) b2cflag = GRID_GUARD
+      if (doGuardCells) then
+          where (b2cflag == GRID_UNDEFINED) b2cflag = GRID_GUARD
+      end if
 
 ! ..return
       return
