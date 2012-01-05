@@ -1,6 +1,6 @@
 $parameters
 repart   =     2
-nrelax   =  40
+nrelax   =  400
 relax    =   0.5
 pasmin   =   4.0E-02
 rlcept   =   1.0E-06
