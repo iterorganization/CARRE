@@ -120,7 +120,7 @@ contains
                   &      equ%iptx,equ%jptx,equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
                   &      struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
                   &      struct%indplq,struct%inddef,struct%nbdef, & 
-                  &      equ%a00,equ%a10,equ%a01,equ%a11)
+                  &      equ%a00,equ%a10,equ%a01,equ%a11, struct)
 
              !
              !..9.0  Arrange the separatrices

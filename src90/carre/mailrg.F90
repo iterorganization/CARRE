@@ -1,8 +1,9 @@
 SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, & 
-     &            plaque,x2,y2,nx,ny,x,y,psi,xpto,ypto,nstruc,npstru, & 
-     &            xstruc,ystruc,a00,a10,a01,a11, & 
-     &            repart,gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2, & 
-     &            xnlast,ynlast,nnlast,nuldec,solregion,diag,ireg)
+     & plaque,x2,y2,nx,ny,x,y,psi,xpto,ypto,nstruc,npstru, & 
+     & xstruc,ystruc,a00,a10,a01,a11, & 
+     & repart,gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2, & 
+     & xnlast,ynlast,nnlast,nuldec,solregion,diag,ireg,&
+     & struct)
 !
 !  version : 07.07.97 19:11
 !
@@ -11,9 +12,11 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       use CarreDiagnostics
       use carre_niveau
       use carre_criteria
+      use carre_target
 #ifdef USE_SILO
       use SiloIO
 #endif
+      use carre_target
 
       IMPLICIT NONE
       
@@ -43,6 +46,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       logical solregion ! is region part of SOL?
 
       type(CarreDiag), intent(inout) :: diag
+      type(CarreStructures), intent(in) :: struct
 
 !  variables en common
 
@@ -79,12 +83,12 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
 
 !  procedures
-      INTEGER indsgm,ifind,drctio
+      INTEGER ifind
       REAL*8 aazero,long,nulort,ruban
-      LOGICAL chgdir,in,cross
+      LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,long,COORD,indsgm,ifind,nulort, & 
-     &         UNTANG,SAUTE,chgdir,in,cross,ruban,drctio
+      EXTERNAL aazero,long,COORD,ifind,nulort, & 
+     &         UNTANG,SAUTE,chgdir,cross,ruban
 !======================================================================
 !..calculs
 !
@@ -336,12 +340,13 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
             IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) & 
      &                                                           THEN
 
-               IF ((in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
-     &                  ystruc(1,plaque),npstru(plaque))) & 
-     &            .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
-     &                    xstruc(1,plaque),ystruc(1,plaque), & 
-     &                    npstru(plaque))))   THEN
-
+               IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+                    &   ystruc(1,plaque),npstru(plaque))) & 
+                    & .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
+                    &   xstruc(1,plaque),ystruc(1,plaque), npstru(plaque)))&
+                    & .or. &
+                    & .not. onInternalSideOfStructure( xn(2,inouv), yn(2,inouv), struct, plaque )&
+                    &) THEN
                   nn(inouv)=1
                   dir=MOD(dir+1,4) + 1
                   ii=ii - MOD(dir-2,2)
@@ -357,11 +362,14 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
             ELSE
 
-               IF ((in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
-     &                  ystruc(1,plaque),npstru(plaque))) & 
-     &            .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
-     &                    xstruc(1,plaque),ystruc(1,plaque), & 
-     &                    npstru(plaque))))   THEN
+               IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+                    & ystruc(1,plaque),npstru(plaque))) & 
+                    & .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
+                    & xstruc(1,plaque),ystruc(1,plaque), & 
+                    & npstru(plaque))) &
+                    & .or. &
+                    & .not. onInternalSideOfStructure( xn(2,inouv), yn(2,inouv), struct, plaque )&
+                    &) THEN
 
                   PRINT *,'probleme de marche 2 dans mailrg'
                   call pltend

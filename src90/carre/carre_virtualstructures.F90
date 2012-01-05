@@ -104,7 +104,7 @@ contains
 
     !  procedures
     real*8 feval2d, angle, dist, norm
-    external feval2d, angle, dist, rotate, norm
+    external feval2d, angle, dist, norm
 
 
 !!$    ! Figure out psi values for limiting curves 
@@ -549,6 +549,7 @@ contains
        struct%ystruc(npvtmp, itarget) = struct%ystruc(1, itarget)
 
        struct%npstru( struct%nstruc ) = npvtmp
+       struct%closed( struct%nstruc ) = .true.
 
     enddo ! virtual target loop
 
@@ -603,8 +604,6 @@ contains
     double precision, parameter :: TRIANGLE_SIZE = 0.1
     double precision, parameter :: TRIANGLE_ANGLE = pi / 2.5
 
-    external :: rotate
-
     ox = ( x - equ%xpto ) 
     oy = ( y - equ%ypto ) 
     length = sqrt( ox ** 2 + oy ** 2 )
@@ -613,6 +612,7 @@ contains
     
     struct%nstruc = struct%nstruc + 1
     struct%npstru(struct%nstruc) = 4
+    struct%closed(struct%nstruc) = .false. ! not required
     struct%xstruc(1,struct%nstruc) = x
     struct%ystruc(1,struct%nstruc) = y
     

@@ -16,6 +16,7 @@
       use carre_niveau
       use Logging
       use Helper
+      use carre_target
 
       IMPLICIT NONE
 
@@ -40,10 +41,10 @@
       LOGICAL echec,coin,ouvert, crbnivFailed
 
 !  procedures
-      INTEGER ifind,indsgm
-      LOGICAL in, chgdir, cross
+      INTEGER ifind
+      LOGICAL chgdir, cross
       INTRINSIC MOD,SQRT
-      EXTERNAL chgdir,cross,ifind,in,indsgm
+      EXTERNAL chgdir,cross,ifind
 
 !=========================
 !.. plaque: indice de la structure (plaque) sur laquelle on marche.
@@ -209,7 +210,8 @@
          y2 = ystruc(ind3,plaque)
 
          ! FIXME: this is pretty broken. This step modification
-         ! can send marche into an infinite loop. Disabled for the moment.
+         ! can send marche into an infinite loop. Disabled for the moment, seems to
+         ! work fine without it
 
          !pastmp = pas
          !pas = SQRT((x1-x2)**2 + (y1-y2)**2)
@@ -302,7 +304,7 @@
 
          IF (chgdir(niv1x,niv1y,nivox,nivoy))     THEN
 
-            IF ((in(niv1x(2),niv1y(2),xstruc(1,plaque), & 
+            IF ((inStruct(niv1x(2),niv1y(2),xstruc(1,plaque), & 
      &                         ystruc(1,plaque),npstru(plaque))) & 
      &         .OR. (cross(ind2,niv1x,niv1y,xstruc(1,plaque), & 
      &                         ystruc(1,plaque),npstru(plaque))) & 
@@ -320,7 +322,7 @@
          ELSE
 
            if(.not. ouvert) then
-            IF ((in(niv1x(2),niv1y(2),xstruc(1,plaque), & 
+            IF ((inStruct(niv1x(2),niv1y(2),xstruc(1,plaque), & 
      &                           ystruc(1,plaque),npstru(plaque))) & 
      &        .OR. (cross(ind2,niv1x,niv1y,xstruc(1,plaque), & 
      &                          ystruc(1,plaque),npstru(plaque)))) THEN

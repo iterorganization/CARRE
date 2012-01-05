@@ -1,5 +1,5 @@
       SUBROUTINE DOUBLD(bouclx,boucly,xn1,yn1,nn1,pas, & 
-     &  nprad,plaque,xext,yext,xptxex,yptxex,xpto,ypto,nx,ny,x,y, & 
+     &  nprad,plaque,xext,yext,xextOffset,yextOffset,xptxex,yptxex,xpto,ypto,nx,ny,x,y, & 
      &  psi,nstruc,npstru,xstruc,ystruc,a00,a10,a01, & 
      &  a11,repart,xcrb2,ycrb2,npcrb2)
 !
@@ -14,7 +14,7 @@
 !*** the outer X-point)
 !======================================================================
       use carre_niveau
-
+      use carre_target
 
       IMPLICIT NONE
 
@@ -39,7 +39,7 @@
 
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), & 
      &     ystruc(npstmx,nstruc),bouclx,boucly,xptxex,yptxex,xn1(nn1), & 
-     &     yn1(nn1),pas(nrmamx),xext,yext,a00(nxmax,nymax,3), & 
+     &     yn1(nn1),pas(nrmamx),xext,yext,xextOffset,yextOffset,a00(nxmax,nymax,3), & 
      &     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
      &     xcrb2(npcrb2),ycrb2(npcrb2), & 
      &     xpto,ypto
@@ -64,12 +64,12 @@
       data n_call /0/
 
 !  procedures
-      INTEGER indsgm,ifind,drctio
+      INTEGER ifind
       REAL*8 aazero,long,nulort,ruban
-      LOGICAL chgdir,in,cross
+      LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,long,COORD,indsgm,ifind,nulort, & 
-     &         UNTANG,SAUTE,chgdir,in,cross,ruban,drctio & 
+      EXTERNAL aazero,long,COORD,ifind,nulort, & 
+     &         UNTANG,SAUTE,chgdir,cross,ruban & 
      &        ,trc_stk_in,trc_stk_out,trc_stk
 !======================================================================
 !*** Input
@@ -129,7 +129,7 @@
 
       call trc_stk_in('doubld','*5')
       sens=drctio(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
-     &       x2,y2,'gauche')
+     &       xext,yext,xextOffset,yextOffset,'gauche')
       call trc_stk_out
 !c<<<
 !      if(l_dbg) write(0,*) 'After drctio: sens = ',sens
@@ -329,7 +329,7 @@
 !     ,         inouv,ianc,xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc)
 !c>>>
           if(lc) then
-            li=in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+            li=inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
      &                  ystruc(1,plaque),npstru(plaque))
             lc=cross(ind,xn(1,inouv),yn(1,inouv), & 
      &                    xstruc(1,plaque),ystruc(1,plaque), & 
@@ -342,7 +342,7 @@
 !     ,                                         xn(2,inouv),yn(2,inouv)
 !c>>>
 
-!               IF ((in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque),
+!               IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque),
 !     .                  ystruc(1,plaque),npstru(plaque)))
 !     .            .OR. (cross(ind,xn(1,inouv),yn(1,inouv),
 !     .                    xstruc(1,plaque),ystruc(1,plaque),
@@ -377,7 +377,7 @@
 
             else
 
-               li=in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+               li=inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
      &                  ystruc(1,plaque),npstru(plaque))
                lc=cross(ind,xn(1,inouv),yn(1,inouv),xstruc(1,plaque), & 
      &                               ystruc(1,plaque),npstru(plaque))
@@ -389,7 +389,7 @@
 !     ,                                         xn(2,inouv),yn(2,inouv)
 !c>>>
                if(li .or. lc) then
-!               IF ((in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque),
+!               IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque),
 !     .                  ystruc(1,plaque),npstru(plaque)))
 !     .            .OR. (cross(ind,xn(1,inouv),yn(1,inouv),
 !     .                    xstruc(1,plaque),ystruc(1,plaque),

@@ -2011,27 +2011,27 @@ contains
   end subroutine finalizeCells
 
 
-  !> Compute minimum distance of a point to a curve, by 
-  !> computing the minimum distance to all points of the curve.
-  double precision FUNCTION distanceToCurve(vx,vy,x,y) result(dmin)
-    double precision, intent(in) :: vx(:), vy(:), x, y
-
-    ! internal
-    integer :: i
-    double precision :: d
-
-    ! external
-    double precision :: dist
-    external :: dist
-
-    dmin = huge(dmin)
-
-    do i = 1, size(vx)
-        d = dist(x, y, vx(i), vy(i))
-        dmin = min(d, dmin)
-    end do
-
-  end FUNCTION distanceToCurve
+!!$  !> Compute minimum distance of a point to a curve, by 
+!!$  !> computing the minimum distance to all points of the curve.
+!!$  double precision FUNCTION distanceToCurve(vx,vy,x,y) result(dmin)
+!!$    double precision, intent(in) :: vx(:), vy(:), x, y
+!!$
+!!$    ! internal
+!!$    integer :: i
+!!$    double precision :: d
+!!$
+!!$    ! external
+!!$    double precision :: dist
+!!$    external :: dist
+!!$
+!!$    dmin = huge(dmin)
+!!$
+!!$    do i = 1, size(vx)
+!!$        d = dist(x, y, vx(i), vy(i))
+!!$        dmin = min(d, dmin)
+!!$    end do
+!!$
+!!$  end FUNCTION distanceToCurve
 
 
 end module carre_postprocess

@@ -82,12 +82,18 @@
 !  close input unit
       close(unit=iunit)
 
+      ! compute closed flag...
+      struct%closed = (struct%npstru > 0)
+      ! ...and change sign of npstru to positive for all structures
+      struct%npstru = abs(struct%npstru)
+
 !  Copy structures to separate arrays for real structures      
       struct%rnstruc = struct%nstruc
       struct%rnpstru = struct%npstru
       struct%rxstruc = struct%xstruc
-      struct%rystruc = struct%ystruc
-      
+      struct%rystruc = struct%ystruc           
+      struct%rclosed = struct%closed
+
       return
 !
  98   continue

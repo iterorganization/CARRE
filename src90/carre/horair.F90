@@ -2,6 +2,8 @@
 !***********************************************************************
       integer function horair(xpto,ypto,x0,y0,xstruc,ystruc,npst,sens)
 !***********************************************************************
+      use carre_target
+
       implicit none
 !  Determination du sens de parcours "sens" sur une structure donnee,
 !  a partir d'un point de depart x0, y0, pour que le trajet initial
@@ -18,8 +20,6 @@
       real*8 v0x,v0y,norm,vmx,vmy,vpx,vpy
 !
 !  procedures
-      integer indsgm
-      external indsgm
       intrinsic sqrt
 !
 !  calcul

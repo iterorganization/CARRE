@@ -12,6 +12,7 @@
 !  which goes through (ptx,pty) in curve nivx(*,1,1),nivy(*,1,1).
 !======================================================================
       use carre_niveau
+      use carre_target
 
       implicit none
 
@@ -45,8 +46,8 @@
 !
 !  procedures
       integer ifind,horair
-      real*8 aire,plqdst
-      external aire,horair,ifind,plqdst
+      real*8 aire
+      external aire,horair,ifind
       intrinsic sqrt
 !
 !  calculation

@@ -283,28 +283,13 @@ contains
 
   end subroutine compute_distance_fast
 
-
-  !> Cut off psi data outside of plasma vessel. The idea is to keep the 
-  !> original psi data in the domain where we want to compute the plasma solution,
-  !> and replace it with fake data for the purpose of gridding outside of the vessel.
-  !>
-  !> To find the points inside the vessel we need some information from the geometry
-  !> and topology analysis, which is why this routine must be called after this happened.
-
-  subroutine equilibrium_vessel_cutoff(equ, struct, psi)
+  subroutine categorize_equilibrium_grid(equ, struct)
     type(CarreEquilibrium), intent(inout) :: equ
     type(CarreStructures), intent(in) :: struct
-    double precision :: psi(nxmax, nymax)
     
     ! internal
     ! How many points to grow the vessel region
     integer, parameter :: REGION_GROW_COUNT = 2
-    ! face orientation for faceISec array
-    integer, parameter :: POINT_INTERNAL = 1, POINT_EXTERNAL = 2
-    ! face orientation for faceISec array
-    integer, parameter :: FACE_RADIAL = 1, FACE_VERTICAL = 2
-    logical :: faceISec(1:nxmax, 1:nymax, 2)    
-    integer :: pointFlag(1:nxmax, 1:nymax)
     integer :: iGrow
 
     ! We do inside/outside detection on the cartesian psi grid. 
@@ -313,19 +298,11 @@ contains
     call compute_intersections()    
    
     ! Mark cells internal, starting from an internal cell. Use the first x-point for that.
-    pointFlag = GRID_UNDEFINED
+    equ%pointFlag = GRID_UNDEFINED
     call markInternalPoint( equ%iptx(1), equ%jptx(1) )
 
     ! Mark all other points as external
-    where ( pointFlag == GRID_UNDEFINED ) pointFlag = POINT_EXTERNAL
-
-    ! Now grow the region of internal points a bit to cover a bit more than the vessel
-    do iGrow = 1, REGION_GROW_COUNT
-       call growInternalRegion(pointFlag(1:equ%nx, 1:equ%ny))
-    end do
-
-    ! Set original equilibrium value on internal points
-    where ( pointFlag == POINT_INTERNAL ) psi = equ%psi
+    where ( equ%pointFlag == GRID_UNDEFINED ) equ%pointFlag = GRID_EXTERNAL
 
   contains
     
@@ -336,20 +313,20 @@ contains
       integer :: ir, iz, iFc
       double precision :: xx(2), yy(2)
 
-      faceISec = .false.
+      equ%faceISec = .false.
 
       do ir = 1, equ%nx
          do iz = 1, equ%ny
-            do iFc = FACE_RADIAL, FACE_VERTICAL
+            do iFc = FACE_EQU_RADIAL, FACE_EQU_VERTICAL
                
                select case (iFc)
-               case (FACE_RADIAL)
+               case (FACE_EQU_RADIAL)
                   if (ir == equ%nx) cycle
                   xx(1) = equ%x(ir)
                   yy(1) = equ%y(iz)
                   xx(2) = equ%x(ir + 1)
                   yy(2) = equ%y(iz)
-               case (FACE_VERTICAL)
+               case (FACE_EQU_VERTICAL)
                   if (iz == equ%ny) cycle
                   xx(1) = equ%x(ir)
                   yy(1) = equ%y(iz)
@@ -358,7 +335,7 @@ contains
                end select
 
                call intersect_all_structures( xx, yy, &
-                    & struct, faceISec(ir, iz, iFc) )
+                    & struct, equ%faceISec(ir, iz, iFc) )
 
             end do
          end do
@@ -374,9 +351,9 @@ contains
       ! internal
       integer :: dr, dz, iFc, ir2, iz2, irFc, izFc
 
-      if (pointFlag(ir, iz) /= GRID_UNDEFINED) return
+      if (equ%pointFlag(ir, iz) /= GRID_UNDEFINED) return
 
-      pointFlag(ir, iz) = POINT_INTERNAL
+      equ%pointFlag(ir, iz) = GRID_INTERNAL
 
       ! loop over all neighbour points
       do dr = -1, 1
@@ -393,15 +370,15 @@ contains
             if ( (iz2 < 1) .or. (iz2 > equ%ny) ) cycle
 
             ! Figure out face alignment
-            if (dr /= 0) iFc = FACE_RADIAL
-            if (dz /= 0) iFc = FACE_VERTICAL
+            if (dr /= 0) iFc = FACE_EQU_RADIAL
+            if (dz /= 0) iFc = FACE_EQU_VERTICAL
 
             ! Figure out face index
             irFc = ir + min(dr, 0)
             izFc = iz + min(dz, 0)
 
             ! If face not intersected, mark neighbour internal
-            if ( .not. faceISec(irFc, izFc, iFc) ) then
+            if ( .not. equ%faceISec(irFc, izFc, iFc) ) then
                call markInternalPoint(ir2, iz2)
             end if
 
@@ -409,6 +386,40 @@ contains
       end do
 
     end subroutine markInternalPoint
+
+  end subroutine categorize_equilibrium_grid
+
+
+  !> Cut off psi data outside of plasma vessel. The idea is to keep the 
+  !> original psi data in the domain where we want to compute the plasma solution,
+  !> and replace it with fake data for the purpose of gridding outside of the vessel.
+  !>
+  !> To find the points inside the vessel we need some information from the geometry
+  !> and topology analysis, which is why this routine must be called after this happened.
+  subroutine equilibrium_vessel_cutoff(equ, struct, psi)
+    type(CarreEquilibrium), intent(inout) :: equ
+    type(CarreStructures), intent(in) :: struct
+    double precision :: psi(nxmax, nymax)
+    
+    ! internal
+    ! How many points to grow the vessel region
+    integer, parameter :: REGION_GROW_COUNT = 2
+    integer :: pointFlag(1:nxmax, 1:nymax)
+    integer :: iGrow
+
+    call categorize_equilibrium_grid(equ, struct)
+
+    pointFlag = equ%pointFlag
+
+    ! Grow the region of internal points a bit to cover a bit more than the vessel
+    do iGrow = 1, REGION_GROW_COUNT
+       call growInternalRegion(pointFlag(1:equ%nx, 1:equ%ny))
+    end do
+
+    ! Set original equilibrium value on internal points
+    where ( pointFlag == GRID_INTERNAL ) psi = equ%psi    
+
+  contains
 
     ! Grow region of internal points by one point in all directions
     subroutine growInternalRegion( flag )
@@ -423,10 +434,10 @@ contains
       do ix = 1, equ%nx
          do iy = 1, equ%ny
             
-            if (flag(ix,iy) == POINT_INTERNAL) then
+            if (flag(ix,iy) == GRID_INTERNAL) then
                do ix2 = max(1, ix-1), min(ix+1, equ%nx)
                   do iy2 = max(1, iy-1), min(iy+1, equ%ny)
-                     tmpFlag(ix2, iy2) = POINT_INTERNAL
+                     tmpFlag(ix2, iy2) = GRID_INTERNAL
                   end do
                end do
             end if
@@ -440,6 +451,7 @@ contains
     end subroutine growInternalRegion
 
   end subroutine equilibrium_vessel_cutoff
+
 
   !> Check whether the given position (x,y) is
   !> inside the region covered by the equilibrium grid.

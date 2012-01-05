@@ -9,6 +9,8 @@
 !*** This subroutine finds the next point on the structure for a
 !*** starting point and the step value
 !======================================================================
+      use carre_target
+
       IMPLICIT NONE
 
 !  arguments
@@ -32,9 +34,9 @@
       data n_call /0/
 
 !  procedures
-      INTEGER indsgm,ifind
+      INTEGER ifind
       INTRINSIC MOD,SQRT,MAX,MIN
-      EXTERNAL indsgm,ifind
+      EXTERNAL ifind
       intrinsic abs
 
 !======================================================================

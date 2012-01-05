@@ -15,6 +15,7 @@
 !*** direction of the search along the target and then calls MARCHE to
 !*** find and parametrise the limiting level line.
 !======================================================================
+        use carre_target
         use Logging
         use Helper
 
@@ -41,10 +42,9 @@
       REAL*8 x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
 
 !  procedures
-      INTEGER drctio,ifind
-      REAL*8 plqdst
+      INTEGER ifind
       INTRINSIC MOD
-      EXTERNAL MARCHE,drctio,ifind,plqdst & 
+      EXTERNAL MARCHE,ifind & 
      &        ,trc_stk_in,trc_stk_out
 !======================================================================
 !.. distnv: distance along the target from the separatrix strike-point
@@ -143,7 +143,10 @@
 
          call trc_stk_in('frtier','*15')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'droite')
+              & npstru(inddef(idef)),x0,y0, &
+              & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & 'droite')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -221,7 +224,10 @@
 
          call trc_stk_in('frtier','*24')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'gauche')
+              & npstru(inddef(idef)),x0,y0,&
+              & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -363,7 +369,10 @@
 
          call trc_stk_in('frtier','*35')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'droite')
+              & npstru(inddef(idef)),x0,y0,&
+              & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &              
+              & 'droite')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -444,7 +453,10 @@
 
          call trc_stk_in('frtier','*44')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'gauche')
+              & npstru(inddef(idef)),x0,y0, &
+              & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -534,7 +546,10 @@
 
          call trc_stk_in('frtier','*55')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'gauche')
+              & npstru(inddef(idef)),x0,y0, &
+              & separx(nptot(ptsep(2,ipx),ipx)-1,ptsep(2,ipx),ipx), &
+              & separy(nptot(ptsep(2,ipx),ipx)-1,ptsep(2,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -615,7 +630,10 @@
 
          call trc_stk_in('frtier','*64')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'gauche')
+              & npstru(inddef(idef)),x0,y0,&
+              & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -756,7 +774,10 @@
 
          call trc_stk_in('frtier','*74')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'droite')
+              & npstru(inddef(idef)),x0,y0, &
+              & separx(nptot(ptsep(3,ptxext),ptxext)-1,ptsep(3,ptxext),ptxext), &
+              & separy(nptot(ptsep(3,ptxext),ptxext)-1,ptsep(3,ptxext),ptxext), &
+              & 'droite')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -835,7 +856,10 @@
 
          call trc_stk_in('frtier','*84')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'gauche')
+              & npstru(inddef(idef)),x0,y0,&
+              & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -918,7 +942,10 @@
 
          call trc_stk_in('frtier','*94')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'gauche')
+              & npstru(inddef(idef)),x0,y0,&
+              & separx(nptot(ptsep(4,ptxext),ptxext)-1,ptsep(4,ptxext),ptxext), &
+              & separy(nptot(ptsep(4,ptxext),ptxext)-1,ptsep(4,ptxext),ptxext), &
+              & 'gauche')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
@@ -997,7 +1024,10 @@
 
          call trc_stk_in('frtier','*98')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
-     &                 npstru(inddef(idef)),x0,y0,'gauche')
+              & npstru(inddef(idef)),x0,y0,&
+              & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line

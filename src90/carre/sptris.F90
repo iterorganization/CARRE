@@ -1,7 +1,7 @@
       subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, & 
      &           iptx,jptx,fctpx,separx,separy,nptot, & 
      &           nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
-     &           a00,a10,a01,a11)
+     &           a00,a10,a01,a11,struct)
 !
 !  version : 21.07.2000 13:38
 !
@@ -16,6 +16,8 @@
 !*** top to bottom.
 !=======================================================================
       use carre_niveau
+      use carre_target
+      use carre_types
 
       implicit none
 !ank-970707: dimensions from the file
@@ -31,10 +33,13 @@
      &     xstruc(npstmx,strumx),ystruc(npstmx,strumx), & 
      &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
      &     a01(nxmax,nymax,3),a11(nxmax,nymax,3)
+      type(CarreStructures), intent(inout) :: struct
+      ! FIXME/CLEANUP: remove/replace arguments also contained in struct
 
 !  variables locales
       integer ipx,ix,jx,isep,i1,i2,j1,j2,iref,jref,k,idir, & 
      &  indstr,plaque,nbdfav,nt(2),ixp_hlp(nbdmx),idirloop
+      double precision :: xin, yin, delta
       real*8 xsttmp(nbdmx),ysttmp(nbdmx)
       integer i,j     !!!
       integer incri(4),incrj(4),incrir(4),incrjr(4),ic
@@ -159,6 +164,16 @@
                 xsttmp(nbdef)=separx(k,isep,ipx)
                 ysttmp(nbdef)=separy(k,isep,ipx)
               endif !}
+
+              ! from separatrix incidence direction, derive "internal" and "external" side of target
+              ! (used for gridding with open target structures)
+              
+              ! compute an internal point by moving a small step from the strike point towards the x-point 
+              delta = (x(2) - x(1)) * 0.1
+              xin = separx(k, isep, ipx) + (separx(k-1, isep, ipx) - separx(k, isep, ipx)) * delta
+              yin = separy(k, isep, ipx) + (separy(k-1, isep, ipx) - separy(k, isep, ipx)) * delta
+              struct%internalSide(indStr) = onWhichSideOfStructure(xin, yin, struct, indstr)
+
             endif !}
           end do !}
         end do !}

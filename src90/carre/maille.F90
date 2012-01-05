@@ -11,10 +11,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !======================================================================
     
       use CarreSiloIO
-!      use SiloIO
       use CarreDiagnostics
       use carre_types
       use carre_parameter_io
+      use carre_target
       use Logging
       use Helper
   
@@ -41,7 +41,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       REAL*8 dist,x2,y2,lg(10), & 
      &  xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
      &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, & 
-     &  gardd2,xptxo,yptxo,xint,yint,xext,yext,psiint, & 
+     &  gardd2,xptxo,yptxo,xint,yint,xext,yext,xextOffset,yextOffset,psiint, & 
      &  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
       REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10), & 
      &  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx) & 
@@ -52,10 +52,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       integer :: nn1
 
       !  procedures
-      INTEGER drctio,horair,ifind
-      REAL*8 long,plqdst,ruban
-      EXTERNAL long,COORD,drctio,horair,ifind,LECCLE,lecclf,DOUBLD, & 
-     &         ruban,plqdst,trace3 & 
+      INTEGER horair,ifind
+      REAL*8 long,ruban
+      EXTERNAL long,COORD,horair,ifind,LECCLE,lecclf,DOUBLD, & 
+     &         ruban,trace3 & 
      &        ,trc_stk_in,trc_stk_out
       intrinsic max
 
@@ -305,7 +305,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*17')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
+              & struct%npstru(struct%inddef(idef)),x2,y2,&
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
+              & 'droite')
          call trc_stk_out
 
          DO 17 ipas=1, par%npr(ireg)-1
@@ -324,7 +327,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
      &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
      &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &              ynlast,nnlast,nuldec,.true.,diag,ireg)
+     &              ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
 
 !
 !  1.3.2  region 2
@@ -382,7 +385,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*25 ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
+              & struct%npstru(struct%inddef(idef)),&
+              & x2,y2,&
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
+              &  'gauche')
          call trc_stk_out
 
          DO 25 ipas=1, par%npr(ireg)-1
@@ -401,7 +408,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &              ynlast,nnlast,nuldec,.false.,diag,ireg)
+              &              ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
 !
 !  1.3.3  region 3
 
@@ -694,7 +701,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*57')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & 'droite')
          call trc_stk_out
 
          DO 57 ipas=1, par%npr(ireg)-1
@@ -713,7 +723,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
      &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
      &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec,.true.,diag,ireg)
+     &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
 
 !
 !..2.3.2 Region 2: top PFR
@@ -771,7 +781,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*67')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
          DO 67 ipas=1, par%npr(ireg)-1
@@ -790,7 +803,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
 
 !
 !..2.3.3 Region 3: left
@@ -863,7 +876,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*77')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(2,ipx),ipx)-1,equ%ptsep(2,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(2,ipx),ipx)-1,equ%ptsep(2,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
          DO 77 ipas=1, par%npr(ireg)-1
@@ -882,7 +898,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
+              &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
 
 
 !..2.3.4 Region 4: bottom PFR
@@ -940,7 +956,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*87')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
          DO 87 ipas=1, par%npr(ireg)-1
@@ -960,7 +979,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
 
 !
 !..2.3.5  Region 5: central region
@@ -1063,6 +1082,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          xext = equ%separx(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), & 
      &                 ptxext)
          yext = equ%separy(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), & 
+     &                 ptxext)
+         xextOffset = equ%separx(equ%nptot(equ%ptsep(3,ptxext),ptxext)-1,equ%ptsep(3,ptxext), & 
+     &                 ptxext)
+         yextOffset = equ%separy(equ%nptot(equ%ptsep(3,ptxext),ptxext)-1,equ%ptsep(3,ptxext), & 
      &                 ptxext)
 
          struct%distnv(1,1) = plqdst(xint,yint,xext,yext,struct%xstruc(1,struct%inddef(idef)) & 
@@ -1288,7 +1311,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
                     call trc_stk_in('maille','*114')
                     CALL DOUBLD(bouclx,boucly,grid%xn,grid%yn,nn,spacer(1,1), & 
-                        &        par%npr(1),struct%inddef(idef),xext,yext,xptxex,yptxex,equ%xpto, & 
+                        &        par%npr(1),struct%inddef(idef),xext,yext,xextOffset,yextOffset,&
+                        &        xptxex,yptxex,equ%xpto, & 
                         &        equ%ypto,equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc, & 
                         &        struct%ystruc,equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
                         &        xcrb2,ycrb2,npcrb2)
@@ -1554,7 +1578,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*145')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & 'droite')
          call trc_stk_out
 
          DO 145 ipas=1, par%npr(ireg)-1
@@ -1592,7 +1619,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast(1:nnlast), & 
-              &               ynlast(1:nnlast),nnlast,nuldec,.true.,diag,ireg)
+              &               ynlast(1:nnlast),nnlast,nuldec,.true.,diag,ireg, struct)
 
 !..Arangement of the mesh point which must coinside with outer X-point
 
@@ -1703,7 +1730,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*157')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx)-1,equ%ptsep(3,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx)-1,equ%ptsep(3,ipx),ipx), &
+              & 'droite')
          call trc_stk_out
 
          DO 157 ipas=1, par%npr(ireg)-1
@@ -1722,7 +1752,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
+              &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
 
 !..3.3.3 Region 3: top PFR
 
@@ -1780,7 +1810,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*167')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
          DO 167 ipas=1, par%npr(ireg)-1
@@ -1799,7 +1832,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
 
 
 !..3.3.4 Region 4: left
@@ -1884,7 +1917,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*177')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
+              & struct%npstru(struct%inddef(idef)),x2,y2, &
+              & equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx)-1,equ%ptsep(4,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(4,ipx),ipx)-1,equ%ptsep(4,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
          DO 177 ipas=1, par%npr(ireg)-1
@@ -1903,7 +1939,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.true.,diag,ireg)
+              &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
 
 !..3.3.5 Region 5: bottom PFR
 
@@ -1960,7 +1996,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          call trc_stk_in('maille','*187')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
-     &                 struct%npstru(struct%inddef(idef)),x2,y2,'gauche')
+              & struct%npstru(struct%inddef(idef)),x2,y2,&
+              & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
+              & 'gauche')
          call trc_stk_out
 
          DO 187 ipas=1, par%npr(ireg)-1
@@ -1979,7 +2018,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg)
+              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
 
 !..3.3.6  Region 6: central region
 
@@ -2235,7 +2274,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &              ynlast,nnlast,nuldec,.false.,diag,ireg)
+              &              ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
 
 !..4.3.2  Region 2
 
