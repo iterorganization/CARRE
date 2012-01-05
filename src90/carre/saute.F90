@@ -10,6 +10,7 @@
 !*** starting point and the step value
 !======================================================================
       use carre_target
+      use Logging
 
       IMPLICIT NONE
 
@@ -28,7 +29,7 @@
       REAL*8 fracx,fracy
       double precision :: bestX, bestY, bestPsi
       PARAMETER (psimin=1.E-08,psimi2=1.E-07)
-      logical l_dbg
+      logical l_dbg, closed
       integer n_call
       data l_dbg /.false./
       data n_call /0/
@@ -63,15 +64,19 @@
 
       compt = 0
 
-!..Go along the structure which is supposed to be closed
+      !.. is the structure closed?
 
-      n=npst-1
+      closed =  xst(1) == xst(npst) .and. yst(1) == yst(npst)
 
-!..Determine the segment index
+      !n=npst-1
 
+      !..Determine the segment index 
       ind1=indsgm(xst,yst,npst,x1,y1)
+      ! Determine next node on structure in stepping direction
       IF (sens .EQ. 1) then
-        ind2 = MOD(ind1,n)+sens
+        !ind2 = MOD(ind1,n)+sens
+        ind2 = ind1 + sens
+        if (closed .and. ind2 == npst) ind2 = 1
       else
         ind2 = ind1
       end if
@@ -88,32 +93,54 @@
 
         zpas=pas
 !---------------------------------------------------------------------{
-    1   CONTINUE
+        do 
 
-        dist = SQRT((xst(ind2)-x0)**2+(yst(ind2)-y0)**2)
+            dist = SQRT((xst(ind2)-x0)**2+(yst(ind2)-y0)**2)
 
-        IF (dist.gt.zpas) then
-          x2=x0+zpas/dist*(xst(ind2)-x0)
-          y2=y0+zpas/dist*(yst(ind2)-y0)
+            IF (dist.gt.zpas) then
+                x2=x0+zpas/dist*(xst(ind2)-x0)
+                y2=y0+zpas/dist*(yst(ind2)-y0)
 
-          RETURN
+                RETURN
 
-        else
-          zpas=zpas-dist
-          ind1=ind2
-          IF (sens .EQ. 1) then
-            ind2=MOD(ind1,n)+sens
-          else
-            ind2=MOD(ind1,npst)+sens
-            IF (ind2 .EQ. 0) ind2=n
-          end if
+            else
+                zpas=zpas-dist
+                ind1=ind2
+                ind2 = ind1 + sens
+                ! handle wraparound
+                if (closed) then 
+                    if (ind2 == 0) ind2 = npst - 1
+                    if (ind2 == npst) ind2 = 1
+                else
+                    ! We fell off the structure. Return last point of structure.
+                    if (ind2 == 0) then
+                        x2 = xst(1)
+                        y2 = yst(1)
+                        call logmsg(LOGWARNING, "saute: fell of structure at first point (repart=1)")
+                        return
+                    end if
+                    if (ind2 > npst) then
+                        x2 = xst(npst)
+                        y2 = yst(npst)
+                        call logmsg(LOGWARNING, "saute: fell of structure at last point (repart=1)")
+                        return
+                    end if
+                end if
 
-          x0=xst(ind1)
-          y0=yst(ind1)
+!!$          IF (sens .EQ. 1) then
+!!$            !ind2=MOD(ind1,n)+sens
+!!$          else
+!!$            ind2=MOD(ind1,npst)+sens
+!!$            IF (ind2 .EQ. 0) ind2=n
+!!$          end if
 
-          GO TO 1
+                x0=xst(ind1)
+                y0=yst(ind1)
+            end IF
+
+
+        end do
 !---------------------------------------------------------------------}
-        end if
 
       else if (repart .EQ. 2) then
 
@@ -279,13 +306,37 @@
           end if
 
           compt = compt + 1
+
+          
           ind1=ind2
-          IF (sens .EQ. 1) then
-            ind2=MOD(ind1,n)+sens
+          ind2 = ind1 + sens
+          ! handle wraparound
+          if (closed) then 
+              if (ind2 == 0) ind2 = npst - 1
+              if (ind2 == npst) ind2 = 1
           else
-            ind2=MOD(ind1,npst)+sens
-            IF (ind2 .EQ. 0) ind2=n
+              ! We fell off the structure. Return last point of structure.
+              if (ind2 == 0) then
+                  x2 = xst(1)
+                  y2 = yst(1)
+                  call logmsg(LOGWARNING, "saute: fell of structure at first point (repart=2)")
+                  return
+              end if
+              if (ind2 > npst) then
+                  x2 = xst(npst)
+                  y2 = yst(npst)
+                  call logmsg(LOGWARNING, "saute: fell of structure at last point (repart=2)")
+                  return
+              end if
           end if
+
+          !ind1=ind2
+          !IF (sens .EQ. 1) then
+          !  ind2=MOD(ind1,n)+sens
+          !else
+          !  ind2=MOD(ind1,npst)+sens
+          !  IF (ind2 .EQ. 0) ind2=n
+          !end if
 
           x0=xst(ind1)
           y0=yst(ind1)
