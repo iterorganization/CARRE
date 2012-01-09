@@ -14,7 +14,7 @@ module carre_virtualstructures
 #include <CARREDIM.F>
 
   private
-  public :: setupVirtualStructures
+  public :: setupVirtualStructures, writeVirtualStructuresToFile
 
 contains
 
@@ -26,7 +26,6 @@ contains
     ! internal
     double precision :: limpoint_min(2), limpoint_max(2)
 
-
     if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
 
     select case(par%gridExtensionMode)
@@ -36,7 +35,7 @@ contains
        call logmsg( LOGINFO, "setupVirtualStructures: creating virtual structures (vessel mode)" )
     end select
 
-    struct%nstruc = 0
+    struct%vnstruc = 0
 
     CALL virtualTargets(par, equ, struct, limpoint_min, limpoint_max)
 
@@ -46,7 +45,7 @@ contains
     else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
         ! move the limiter points a bit further to the outside to make sure we really cover the vessel
         ! (especially when using only a single vessel countour / open targets)
-        
+                
         call movePointAwayFromOPoint( limpoint_min(1), limpoint_min(2) )
         call movePointAwayFromOPoint( limpoint_max(1), limpoint_max(2) )
         
@@ -56,24 +55,14 @@ contains
 
 !!$    !..   10.2.1 Diagnostics: Write out resulting structures
 #ifdef USE_SILO
-    call csioGetStructureSegments( struct%nstruc, struct%npstru, &
-         & struct%xstruc, struct%ystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
+    call csioGetStructureSegments( struct%vnstruc, struct%vnpstru, &
+         & struct%vxstruc, struct%vystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
     
     call csioOpenFile('carreVirtualStr')
     call csioOpenFile()
     call csioCloseFile()                         
 #endif
     
-!!$          open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
-!!$          do is = 1, struct%nstruc
-!!$             do ip = 1, abs(struct%npstru( is ))
-!!$                write (100,*) struct%xstruc(ip,is)*1000, & 
-!!$                     &             struct%ystruc(ip,is)*1000
-!!$             enddo
-!!$             write (100,*) ''
-!!$          enddo
-!!$          close(UNIT=100)
-
   contains
 
     subroutine movePointAwayFromOPoint( x, y )
@@ -556,58 +545,58 @@ contains
           idir = 1
        endif
 
-       struct%nstruc = struct%nstruc + 1
+       struct%vnstruc = struct%vnstruc + 1
 
        npvtmp = 0
        do istep = nptmp(idir), 1, -1
           npvtmp = npvtmp + 1
-          struct%xstruc(npvtmp, struct%nstruc) = tmpx(istep,idir)
-          struct%ystruc(npvtmp, struct%nstruc) = tmpy(istep,idir)
+          struct%vxstruc(npvtmp, struct%vnstruc) = tmpx(istep,idir)
+          struct%vystruc(npvtmp, struct%vnstruc) = tmpy(istep,idir)
        enddo
 
        idir = idir + 1
        if ( idir > 2 ) idir = 1
        do istep = 1, nptmp(idir)
           npvtmp = npvtmp + 1
-          struct%xstruc(npvtmp, struct%nstruc) = tmpx(istep,idir)
-          struct%ystruc(npvtmp, struct%nstruc) = tmpy(istep,idir)
+          struct%vxstruc(npvtmp, struct%vnstruc) = tmpx(istep,idir)
+          struct%vystruc(npvtmp, struct%vnstruc) = tmpy(istep,idir)
        enddo
 
        ! close target by wrapping it around
        
        ! get current extent of new structure
-       structsize =  maxval(struct%xstruc(1:npvtmp, struct%nstruc)) &
-            &   - minval(struct%xstruc(1:npvtmp, struct%nstruc))
+       structsize =  maxval(struct%vxstruc(1:npvtmp, struct%vnstruc)) &
+            &   - minval(struct%vxstruc(1:npvtmp, struct%vnstruc))
        
-       vtmp1 = struct%xstruc(npvtmp, itarget) - struct%xstruc(npvtmp - 1, itarget)
-       vtmp2 = struct%ystruc(npvtmp, itarget) - struct%ystruc(npvtmp - 1, itarget)
+       vtmp1 = struct%vxstruc(npvtmp, itarget) - struct%vxstruc(npvtmp - 1, itarget)
+       vtmp2 = struct%vystruc(npvtmp, itarget) - struct%vystruc(npvtmp - 1, itarget)
        call rotate( vtmp1, vtmp2, pi * 1.25 )
        dx = 1 / norm( vtmp1, vtmp2 ) * structsize * 0.3
        vtmp1 = vtmp1 * dx
        vtmp2 = vtmp2 * dx
 
        npvtmp = npvtmp + 1
-       struct%xstruc(npvtmp, itarget) = struct%xstruc(npvtmp - 1, itarget) + vtmp1
-       struct%ystruc(npvtmp, itarget) = struct%ystruc(npvtmp - 1, itarget) + vtmp2
+       struct%vxstruc(npvtmp, itarget) = struct%vxstruc(npvtmp - 1, itarget) + vtmp1
+       struct%vystruc(npvtmp, itarget) = struct%vystruc(npvtmp - 1, itarget) + vtmp2
 
-       vtmp1 = struct%xstruc(2, itarget) - struct%xstruc(1, itarget)
-       vtmp2 = struct%ystruc(2, itarget) - struct%ystruc(1, itarget)
+       vtmp1 = struct%vxstruc(2, itarget) - struct%vxstruc(1, itarget)
+       vtmp2 = struct%vystruc(2, itarget) - struct%vystruc(1, itarget)
        call rotate( vtmp1, vtmp2, pi * 1.75 )
        dx = 1 / norm( vtmp1, vtmp2 ) *  structsize * 0.3
        vtmp1 = vtmp1 * dx
        vtmp2 = vtmp2 * dx
 
        npvtmp = npvtmp + 1
-       struct%xstruc(npvtmp, itarget) = struct%xstruc(1, itarget) + vtmp1
-       struct%ystruc(npvtmp, itarget) = struct%ystruc(1, itarget) + vtmp2
+       struct%vxstruc(npvtmp, itarget) = struct%vxstruc(1, itarget) + vtmp1
+       struct%vystruc(npvtmp, itarget) = struct%vystruc(1, itarget) + vtmp2
 
        ! close structure
        npvtmp = npvtmp + 1
-       struct%xstruc(npvtmp, itarget) = struct%xstruc(1, itarget)
-       struct%ystruc(npvtmp, itarget) = struct%ystruc(1, itarget)
+       struct%vxstruc(npvtmp, itarget) = struct%vxstruc(1, itarget)
+       struct%vystruc(npvtmp, itarget) = struct%vystruc(1, itarget)
 
-       struct%npstru( struct%nstruc ) = npvtmp
-       struct%closed( struct%nstruc ) = .true.
+       struct%vnpstru( struct%vnstruc ) = npvtmp
+       struct%vclosed( struct%vnstruc ) = .true.
 
     enddo ! virtual target loop
 
@@ -668,24 +657,46 @@ contains
     ox = ox / length
     oy = oy / length
     
-    struct%nstruc = struct%nstruc + 1
-    struct%npstru(struct%nstruc) = 4
-    struct%closed(struct%nstruc) = .false. ! not required
-    struct%xstruc(1,struct%nstruc) = x
-    struct%ystruc(1,struct%nstruc) = y
+    struct%vnstruc = struct%vnstruc + 1
+    struct%vnpstru(struct%vnstruc) = 4
+    struct%vclosed(struct%vnstruc) = .false. ! not required
+    struct%vxstruc(1,struct%vnstruc) = x
+    struct%vystruc(1,struct%vnstruc) = y
     
     call rotate( ox, oy, TRIANGLE_ANGLE / 2.0 )
-    struct%xstruc(2,struct%nstruc) = x + ox * TRIANGLE_SIZE
-    struct%ystruc(2,struct%nstruc) = y + oy * TRIANGLE_SIZE
+    struct%vxstruc(2,struct%vnstruc) = x + ox * TRIANGLE_SIZE
+    struct%vystruc(2,struct%vnstruc) = y + oy * TRIANGLE_SIZE
     
     call rotate( ox, oy, - TRIANGLE_ANGLE )
-    struct%xstruc(3,struct%nstruc) = x + ox * TRIANGLE_SIZE
-    struct%ystruc(3,struct%nstruc) = y + oy * TRIANGLE_SIZE
+    struct%vxstruc(3,struct%vnstruc) = x + ox * TRIANGLE_SIZE
+    struct%vystruc(3,struct%vnstruc) = y + oy * TRIANGLE_SIZE
     
-    struct%xstruc(4,struct%nstruc) = x
-    struct%ystruc(4,struct%nstruc) = y
+    struct%vxstruc(4,struct%vnstruc) = x
+    struct%vystruc(4,struct%vnstruc) = y
     
   end subroutine add_virtual_limiter
+
+
+  subroutine writeVirtualStructuresToFile( struct )
+    type(CarreStructures), intent(in) :: struct
+
+    ! internal
+    integer :: is, ip
+
+    open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
+    do is = 1, struct%vnstruc
+        do ip = 1, abs(struct%vnpstru( is ))
+            write (100,*) struct%vxstruc(ip,is)*1000, & 
+                 &             struct%vystruc(ip,is)*1000
+        enddo
+        write (100,*) ''
+    enddo
+    close(UNIT=100)
+  end subroutine writeVirtualStructuresToFile
+
+
+
+
 
 
 end module carre_virtualStructures

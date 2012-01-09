@@ -18,6 +18,14 @@ module carre_types
   ! Carre version string
   character(len=8), parameter, public :: CARRE_VERSION = "carre71"
 
+  ! Carre operation modes
+  ! classical carre algorithm, possibly with equilibrium extension
+  integer, parameter, public :: CARRE_STANDARD = 0 
+  ! classical + output of virtual structures (preprocessing for CARRE_EXTENDED)
+  integer, parameter, public :: CARRE_STANDARD_VIRTUALSTRUCTS = 1 
+  ! extended grid mode
+  integer, parameter, public :: CARRE_EXTENDED = 2
+
   ! Orientations
   integer, parameter, public :: STRUCT_LEFT = 1
   integer, parameter, public :: STRUCT_RIGHT = 2
@@ -99,6 +107,9 @@ module carre_types
       integer :: xPointNum = 0 ! Number of predefined x-points
       double precision :: xPointX(gradmx), xPointY(gradmx) ! x-point positions
       double precision :: oPointX, oPointY ! o-point positions
+
+      ! Control flag for equilibrium data extension
+      integer :: carreMode = CARRE_STANDARD
 
       ! Control flag for equilibrium data extension
       integer :: equExtensionMode = EQU_EXTENSION_OFF
@@ -277,13 +288,25 @@ module carre_types
       !           (distance selector [1=real, 2=psi], curve index)
       !.. nomstr Name of structure
       !.. closed: indicates whether the structure is closed or not
-      integer ::  nstruc, npstru(strumx), & 
+      integer ::  nstruc = 0, npstru(strumx), & 
            &    indplq(4,npxmx),inddef(nbdmx), & 
            &   nbdef, nivtot(nivmx), nbniv      
       REAL*8  & 
            &   xstruc(npstmx,strumx), ystruc(npstmx,strumx), & 
            &   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx)
       logical :: closed(strumx)
+
+      ! arrays to hold copies of structures 
+      ! r for "real", i.e. the original input structures
+      integer :: rnstruc = 0, rnpstru(strumx)
+      REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
+      logical :: rclosed(strumx)
+
+      ! arrays to hold copies of structures 
+      ! v for "virtual", i.e. the structures created by setupVirtualStructures
+      integer :: vnstruc = 0, vnpstru(strumx)
+      REAL*8 :: vxstruc(npstmx,strumx), vystruc(npstmx,strumx)
+      logical :: vclosed(strumx)
       
       ! Internal side of a structure (i.e. which side is facing the inside
       ! of the plasma vessel): going along the structure segments, either STRUCT_RIGHT
@@ -292,11 +315,6 @@ module carre_types
       ! Generally it is only known for the target plates (computed in sptris).
       integer :: internalSide(strumx) = GRID_UNDEFINED
 
-      !     arrays to hold copies of structures (r for "real")
-      !     (if virtual structures are used)
-      integer :: rnstruc, rnpstru(strumx)
-      REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
-      logical :: rclosed(strumx)
 
       character nomstr(strumx)*80
   end type CarreStructures

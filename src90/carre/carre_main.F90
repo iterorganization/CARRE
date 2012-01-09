@@ -55,15 +55,9 @@ contains
 
     CALL DERIVE(equ)
 
-!!$    !
-!!$    !..5.0  Plot the level lines for psidx=0 and psidy=0
-!!$    !
-!!$    CALL cntour(equ%psidx,equ%psidy,equ%nx,equ%ny,&
-!!$        & equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny))
-
     !
     !  interpolation coefficients for psi and its derivatives
-
+    !
     call inipsi(equ,nxmax,nymax)
 
     !
@@ -80,6 +74,8 @@ contains
 
     ! When using virtual targets, needs two passes through the analysis steps that 
     ! find and arrange the separatrix pieces and targets
+    ! First pass - with real structures: identify target plates, limiting level lines, create virtual structures (if required)
+    ! Second pass pass - with virtual structures: identify target plates, limiting level lines
     do iSetupStruct = ORIGINAL_STRUCT_STEP, VIRTUAL_STRUCT_STEP
 
        ! When using equilibrium extension, on the first pass through the structure loop
@@ -109,6 +105,8 @@ contains
              ! Before running the geometry & topology analysis again,
              ! we have to reset the related state variables
              call resetGeometryAndTopologyData()
+
+             ! TODO: output modified equilibrium (use service routines from dg tools)
           end if
 
           !..8.0  Parametrise the separatrices
@@ -189,31 +187,32 @@ contains
 
        end do ! end equilibrium loop
 
-       ! At this point the equilibrium and topology data is in the final form. 
+       ! At this point the equilibrium and topology data is in the final form.
+       if ( par%carreMode == CARRE_STANDARD ) then
+           ! If no virtual targets are to be created, exit loop and go directly to grid generation                 
+           exit
+       else
+           ! Otherwise, if we have a case with x-points, set up virtual geometry
+           if (equ%npx.gt.0)then
 
-       ! If no virtual targets are to be created, exit loop and go directly to grid generation           
-       if (par%gridExtensionMode == GRID_EXTENSION_OFF) then
-          exit
-       else           
-          ! Otherwise, if we have a case with x-points, set up virtual geometry
-          if (equ%npx.gt.0)then
+               ! If we arrive here the second time, the virtual targets have been created and the
+               ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
+               if ( iSetupStruct == VIRTUAL_STRUCT_STEP ) exit
 
-             ! If we arrive here the second time, the virtual targets have been created and the
-             ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
-             if ( iSetupStruct == VIRTUAL_STRUCT_STEP ) exit
+               !..   10.1  Set up virtual targets/structures
+               call setupVirtualStructures(par, equ, struct)
 
-             !..   10.1  Set up virtual targets
+               ! They are only actually used in extended grid mode
+               if ( par%carreMode == CARRE_EXTENDED ) then              
+                   struct%nstruc = struct%vnstruc
+                   struct%npstru = struct%vnpstru
+                   struct%xstruc = struct%vxstruc
+                   struct%ystruc = struct%vystruc
+                   struct%closed = struct%vclosed
+               end if
 
-             !..      Save current structures
-             struct%rnstruc = struct%nstruc
-             struct%rnpstru = struct%npstru
-             struct%rxstruc = struct%xstruc
-             struct%rystruc = struct%ystruc
-
-             !..   10.1  Set up virtual structures
-
-             call setupVirtualStructures(par, equ, struct)
-          end if                     ! npx.gt.0
+               call writeVirtualStructuresToFile( struct )
+           end if                     ! npx.gt.0
        end if
 
     end do                     ! end setup loop

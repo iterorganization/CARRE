@@ -38,7 +38,6 @@ module carre_postprocess
   integer, parameter :: ACTION_REFINE = 3
   integer, parameter :: ACTION_COARSEN_FORCE = 4
 
-
 contains
 
   !> Perform postprocessing on the grid as generated in carre_main.
@@ -59,7 +58,8 @@ contains
     double precision :: lPasMin
     
     ! Only do postprocessing when doing grid extension
-    if (par%gridExtensionMode /= GRID_EXTENSION_OFF) then
+    if (par%carreMode == CARRE_EXTENDED) then
+
         call logmsg( LOGINFO, "carre_postprocess_computation: doing cut-cell type grid (grid extension)" )
 
         ! Initialize grid line flags
@@ -2044,31 +2044,6 @@ contains
 
     end subroutine movePoint
 
-
   end subroutine finalizeCells
-
-
-!!$  !> Compute minimum distance of a point to a curve, by 
-!!$  !> computing the minimum distance to all points of the curve.
-!!$  double precision FUNCTION distanceToCurve(vx,vy,x,y) result(dmin)
-!!$    double precision, intent(in) :: vx(:), vy(:), x, y
-!!$
-!!$    ! internal
-!!$    integer :: i
-!!$    double precision :: d
-!!$
-!!$    ! external
-!!$    double precision :: dist
-!!$    external :: dist
-!!$
-!!$    dmin = huge(dmin)
-!!$
-!!$    do i = 1, size(vx)
-!!$        d = dist(x, y, vx(i), vy(i))
-!!$        dmin = min(d, dmin)
-!!$    end do
-!!$
-!!$  end FUNCTION distanceToCurve
-
 
 end module carre_postprocess

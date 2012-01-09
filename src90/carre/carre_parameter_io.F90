@@ -366,6 +366,10 @@ CONTAINS
          call rdfrre(11,vari(ieg+1:80),rlcept,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:len('carreMode')) .EQ. 'carreMode') THEN
+         call rdfrin(11,vari(ieg+1:80),par%carreMode,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('equExtensionMode')) .EQ. 'equExtensionMode') THEN
          call rdfrin(11,vari(ieg+1:80),par%equExtensionMode,ierror)
          if(ierror.eq.1) go to 98

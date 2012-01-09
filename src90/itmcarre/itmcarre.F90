@@ -138,6 +138,13 @@ contains
 
     end do
     
+    ! Save real structures to dedicated arrays
+    struct%rnstruc = struct%nstruc
+    struct%rnpstru = struct%npstru
+    struct%rxstruc = struct%xstruc
+    struct%rystruc = struct%ystruc
+    struct%rclosed = struct%closed
+
   end subroutine read_structures
 
   !> Transfer a grid as computed by Carre into the edge CPO.
