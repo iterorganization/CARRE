@@ -1,8 +1,8 @@
 7$parameters
 repart   =     2
-nrelax   =  40
-relax    =   1.0e-1
-pasmin   =   1.0E-2
+nrelax   =  5000
+relax    =   9.9999998E-02
+pasmin   =   4.0E-03
 rlcept   =   1.0000000E-06
 pntrat   =   3.5705161E-01
 pntrat   =   4.0E-1
@@ -53,4 +53,8 @@ psimin = -0.06
 psimin = -99999.9
 loglevel = 3
 loglevel = 6
+targetResolution = 0.08
+maxResJump = 4.0
+cleanupPasmin = 2.0e-3
+
 $end
