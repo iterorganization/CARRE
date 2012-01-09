@@ -44,20 +44,26 @@ contains
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
        call virtualLimiters_targetMode(equ, struct)
     else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
-       call add_virtual_limiter(equ, struct, limpoint_min(1), limpoint_min(2))
-       call add_virtual_limiter(equ, struct, limpoint_max(1), limpoint_max(2))
+        ! move the limiter points a bit further to the outside to make sure we really cover the vessel
+        ! (especially when using only a single vessel countour / open targets)
+        
+        call movePointAwayFromOPoint( limpoint_min(1), limpoint_min(2) )
+        call movePointAwayFromOPoint( limpoint_max(1), limpoint_max(2) )
+        
+        call add_virtual_limiter(equ, struct, limpoint_min(1), limpoint_min(2))
+        call add_virtual_limiter(equ, struct, limpoint_max(1), limpoint_max(2))
     end if
 
 !!$    !..   10.2.1 Diagnostics: Write out resulting structures
 #ifdef USE_SILO
     call csioGetStructureSegments( struct%nstruc, struct%npstru, &
          & struct%xstruc, struct%ystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
-
+    
     call csioOpenFile('carreVirtualStr')
     call csioOpenFile()
     call csioCloseFile()                         
 #endif
-
+    
 !!$          open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
 !!$          do is = 1, struct%nstruc
 !!$             do ip = 1, abs(struct%npstru( is ))
@@ -67,6 +73,57 @@ contains
 !!$             write (100,*) ''
 !!$          enddo
 !!$          close(UNIT=100)
+
+  contains
+
+    subroutine movePointAwayFromOPoint( x, y )
+      double precision, intent(inout) :: x, y
+
+      ! internal
+      double precision :: psi, psix, gx, gy, gsign, dpsiToX, delta
+      integer :: ix, ixclosest
+
+      real*8 feval2d, norm
+      external feval2d, norm
+
+      ! compute psi at point
+      psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+           & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+           & x, y )
+      
+      ! compute grad psi at point
+      gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+           & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
+           & x, y )
+      gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+           & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
+           & x, y )
+
+      ! find closest x-point in psi
+      dPsiToX = huge(dPsiToX)
+      do ix = 1, equ%npx
+          if ( abs(equ%fctpx(ix) - psi) < dpsiToX ) then
+              ixClosest = ix
+              dPsiToX = abs(equ%fctpx(ix) - psi)
+          end if
+      end do
+           
+      ! move in direction of grad psi away from o-point
+      if ( equ%fctpx(ixClosest) < psi ) then
+          gsign = +1
+      else
+          gsign = -1
+      end if
+
+      !delta = abs(equ%fctpx(ixClosest) - psi) * 0.1
+      !delta = 1.0 / norm(gx, gy) * (equ%x(2) - equ%x(1)) 
+      !delta = 1.0 / norm(gx, gy) * norm( equ%ptx(ixClosest) - x, equ%pty(ixClosest) - y ) * 0.1
+      delta = 1.0 / norm(gx, gy) * norm( equ%xpto - x, equ%ypto - y ) * 0.05
+
+      x = x + gx * gsign * delta
+      y = y + gy * gsign * delta
+
+    end subroutine movePointAwayFromOPoint
 
   end subroutine setupVirtualStructures
 
@@ -84,7 +141,7 @@ contains
     integer :: ipx, ipxOther, isep, istru, i
     integer :: ip, itarget, istep, istepTot
     real*8 :: &  ! minpsitot, maxpsitot, 
-         &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, & 
+         &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, vtaddpsi, & 
          &     dir, tol
     real*8 :: tx, ty, tpsi, gx, gy, dx, dxmax, pi, alpha, p
 
@@ -322,8 +379,9 @@ contains
 
              ! make the targets a little bit bigger in psi range
              ! to avoid trouble in frtier
-             vtminpsi = vtminpsi * 1.1
-             vtmaxpsi = vtmaxpsi * 1.1
+             vtaddpsi = (vtmaxpsi - vtminpsi) * 0.1
+             vtminpsi = vtminpsi - vtaddpsi 
+             vtmaxpsi = vtmaxpsi + vtaddpsi
 
              !write (0,*) 'Global psi range'
              !write (0,*) 'min psi: ', minpsitot, ', max psi: ', maxpsitot
@@ -414,13 +472,13 @@ contains
        ! choose a stepsize
        dx = 1 / norm( gx, gy ) * & 
             &        norm( equ%ptx( vtargetipx( itarget ) ) - tx, & 
-            &              equ%pty( vtargetipx( itarget ) ) - ty ) * 0.1
+            &              equ%pty( vtargetipx( itarget ) ) - ty ) * 0.3
 
        if ( p == 0 ) stop 'Grad psi pointing towards x-point'
        if ( p > 0 ) then
           ! x-point to the left of grad psi
           ! step in clockwise right angle to grad psi
-          vtstartx(itarget) = vtstartx(itarget) + dx * gy
+          vtstartx(itarget) = vtstartx(itarget) + dx * gy 
           vtstarty(itarget) = vtstarty(itarget) - dx * gx
        else
           ! x-point to the right of grad psi

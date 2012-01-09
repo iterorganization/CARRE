@@ -214,6 +214,8 @@ contains
         ! At this stage we postulate that all face-structure intersections 
         ! coincide with grid nodes       
 
+        ! Compute connection information between regions
+        call computeConnectionInformation()
         ! Compute face/structure intersections
         call computeFaceStructureIntersections(struct, grid, finalized = .true.)
         ! Mark points to be inside/outside of vessel
@@ -624,7 +626,8 @@ contains
     logical, intent(in) :: finalized
 
     ! internal
-    integer :: iReg, xip, xir, iPol
+    integer :: iReg, xip, xir, iPol, nBndPoints
+    logical :: setBoundary 
 
     grid%pointFlag = GRID_UNDEFINED
 
@@ -645,28 +648,62 @@ contains
     ! all points that are still undefined are external
     where (grid%pointFlag == GRID_UNDEFINED) grid%pointFlag = GRID_EXTERNAL
 
-    ! Mark boundary  points at non-wall boundaries, which are currently marked as internal points
+    if (finalized) then
 
-    do iReg = 1, grid%nreg
-        ! For every radial line...
-        do iPol = 1, grid%np1(iReg)
-            ! If the point on the separatrix is internal...
-            if (grid%pointFlag(iPol, 1, iReg) /= GRID_INTERNAL) cycle
+        ! Fix radial boundaries
+        do iReg = 1, grid%nreg
+            ! Only do the region when no continuation on top boundary
+            if (grid%nbFaceIPol(iReg, 1, 1) /= GRID_UNDEFINED) cycle
 
-            ! ... and the radial line does not extend into another region...
-            if (grid%nbFaceIPol(iReg, iPol, 1) /= GRID_UNDEFINED) cycle
+            ! For every cell at the top of the region
+            do iPol = 1, grid%np1(iReg) - 1
+                ! If it's an internal cell, both top nodes have to be boundary nodes.
+                
+                if ( count(grid%pointFlag(iPol:iPol+1, grid%nr(iReg)-1:grid%nr(iReg), iReg) == GRID_INTERNAL) > 0 ) then 
 
-            ! ... we check whether there is a boundary point on this radial line
-            if (count(grid%pointFlag(iPol, :, iReg) == GRID_BOUNDARY) == 0) then
-                ! ...and if not, we set the uppermost point to be a boundary point with no structure
-                grid%pointFlag(iPol, grid%nr(iReg), iReg) = GRID_BOUNDARY
-                grid%pointStructIndex(iPol, grid%nr(iReg), iReg) = BOUNDARY_NOSTRUCTURE
-            end if
-        end do
-    end do
+                    where (grid%pointFlag(iPol:iPol+1, grid%nr(iReg), iReg) == GRID_INTERNAL) &
+                         & grid%pointStructIndex(iPol:iPol+1, grid%nr(iReg), iReg) = BOUNDARY_NOSTRUCTURE
+                    where (grid%pointFlag(iPol:iPol+1, grid%nr(iReg), iReg) == GRID_INTERNAL) &
+                         & grid%pointFlag(iPol:iPol+1, grid%nr(iReg), iReg) = GRID_BOUNDARY
+                end if
+
+            end do
+        end do                
+
+!!$        ! Mark boundary  points at non-wall boundaries, which are currently marked as internal points
+!!$        do iReg = 1, grid%nreg
+!!$            ! For every radial line...
+!!$            do iPol = 1, grid%np1(iReg)
+!!$                ! Only if the point on the separatrix is internal...
+!!$                if (grid%pointFlag(iPol, 1, iReg) /= GRID_INTERNAL) cycle
+!!$
+!!$                ! ... and the radial line does not extend into another region...
+!!$                if (grid%nbFaceIPol(iReg, iPol, 1) /= GRID_UNDEFINED) cycle
+!!$
+!!$                ! ... we check whether we have to set the last radial point to be a boundary point
+!!$
+!!$                nBndPoints = count(grid%pointFlag(iPol, 1:grid%nr(iReg), iReg) == GRID_BOUNDARY)
+!!$
+!!$                if (grid%pointFlag(iPol, 1, iReg) == GRID_EXTERNAL) then
+!!$                    ! if point on separatrix external, no. of bnd. points away from it has to be even
+!!$                    setBoundary = .not. (mod(nBndPoints, 2) == 0)
+!!$                else
+!!$                    ! if point on separatrix is internal of boundary, no. of boundary points away from it has to be odd
+!!$                    setBoundary = .not. (mod(nBndPoints, 2) == 1)
+!!$                end if
+!!$
+!!$                if (setBoundary) then
+!!$                    ! ...and if not, we set the uppermost point to be a boundary point with no structure
+!!$                    grid%pointFlag(iPol, grid%nr(iReg), iReg) = GRID_BOUNDARY
+!!$                    grid%pointStructIndex(iPol, grid%nr(iReg), iReg) = BOUNDARY_NOSTRUCTURE
+!!$
+!!$                end if
+!!$            end do
+!!$        end do
+    end if
 
   contains
-
+    
     !> Mark point (ip,ir) as internal and mark connected points recursively
     recursive subroutine markInternalPoints(ip, ir, iReg, points, finalized)
       integer, intent(in) :: ip, ir, iReg

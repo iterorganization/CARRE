@@ -450,7 +450,7 @@ CONTAINS
          if(sellan(1:8).eq.'francais') then
            write(6,*)'Variable inexistante ou inchangeable.'
          elseif(sellan(1:7).eq.'english') then
-           write(6,*)'Invalid assignment. Please try again.'
+           write(6,*)'Invalid assignment. Please try again. Input line was: "', vari, '"'
          endif
          GO TO 10
       ENDIF
