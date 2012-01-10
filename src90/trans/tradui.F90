@@ -58,6 +58,9 @@ program tradui
   integer :: inseltop, inselbot, nnreg(0:2)
   integer, allocatable :: region(:,:,:), resignore(:,:,:)
   integer, parameter :: istyle = -1 ! hard-wired to DG format
+  
+  logical, parameter :: ITM_OUTPUT_GHOSTCELLS = .true.
+
 #endif
 
   ! variables for UAL I/O
@@ -255,13 +258,13 @@ program tradui
       call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
           & b2cflag(-1:nx,-1:ny,:),&
           & leftix,leftiy,rightix,rightiy, &
-          & topix,topiy,bottomix,bottomiy, .true., b2gd)
+          & topix,topiy,bottomix,bottomiy, ITM_OUTPUT_GHOSTCELLS, b2gd)
 
       call b2ITMFillGridDescription( b2gd, itmgrid, &
           & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, &
-          & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:), .true. )
+          & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:), ITM_OUTPUT_GHOSTCELLS )
 
       allocate(cpoedge(1))
       allocate(cpoedge(1)%datainfo%dataprovider(1))

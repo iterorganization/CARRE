@@ -74,6 +74,7 @@
 
       integer ipol,irad,npol2g,npol2d, & 
      &  ireg,ix,iy,npol1,npol2,npol3,i
+      integer :: cix, ciy
       real*8 twopi,del,zero,one,tempo
       parameter(del=1.e-2,zero=0.,one=1.)
       logical ex
@@ -949,16 +950,23 @@
                   ffbz(ix,iy,2)=twopi*b0r0
                   ffbz(ix,iy,3)=twopi*b0r0
 
-                  b2cflag(ix,iy,:)=cflag(j,i,irg,:)                                  
+                  ! Derive position cix, ciy storing the 
+                  ! values associated with the cell ix, iy
+                  cix = j
+                  ciy = i
+                  if (iip == -1) cix = cix - 1
+                  if (iir == -1) ciy = ciy - 1
+
+                  b2cflag(ix,iy,:)=cflag(cix,ciy,irg,:)                                  
                   ! If cells are inverted in poloidal or radial direction, also invert the
                   ! flags / indices stored for the faces
                   if (iip == -1) then
-                      b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(j,i,irg,CELLFLAG_RIGHTFACE) 
-                      b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(j,i,irg,CELLFLAG_LEFTFACE) 
+                      b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(cix,ciy,irg,CELLFLAG_RIGHTFACE) 
+                      b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(cix,ciy,irg,CELLFLAG_LEFTFACE) 
                   end if                     
                   if (iir == -1) then
-                      b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(j,i,irg,CELLFLAG_BOTTOMFACE) 
-                      b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(j,i,irg,CELLFLAG_TOPFACE) 
+                      b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(cix,ciy,irg,CELLFLAG_BOTTOMFACE) 
+                      b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(cix,ciy,irg,CELLFLAG_TOPFACE) 
                   end if
 
                   iy=iy+1     ! }
