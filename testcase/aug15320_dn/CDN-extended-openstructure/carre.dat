@@ -43,6 +43,7 @@ tgarde(1) =   0.0
 tgarde(2) =   0.0
 tgarde(3) =   0.0
 tgarde(4) =   0.0
+carreMode = 2
 gridExtensionMode =  2
 equExtensionMode = 2
 addLeft   = 5
