@@ -10,6 +10,7 @@ module carre_postprocess
   use carre_intersect
   use carre_find
   use carre_constants
+  use carre_equilibrium
 
 #ifdef USE_SILO
   use SiloIO
@@ -222,6 +223,8 @@ contains
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
         ! Recompute the object categorization
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)
+        ! Recompute psi on grid
+        call compute_psi_on_grid( equ, grid )
         ! write final postprocessing result
         call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 

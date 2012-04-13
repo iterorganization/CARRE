@@ -15,6 +15,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       use carre_types
       use carre_parameter_io
       use carre_target
+      use carre_equilibrium
       use Logging
       use Helper
   
@@ -2331,22 +2332,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !  6. Compute equ%psi and grad equ%psi at the grid points
 
-      do ireg=1, grid%nreg
-          do j=1, par%npr(ireg)
-              do i= 1,grid%np1(ireg)
-                  xx = grid%xmail(i,j,ireg)
-                  yy = grid%ymail(i,j,ireg)
-                  ii = ifind(xx,equ%x,equ%nx,1)
-                  jj = ifind(yy,equ%y,equ%ny,1)
-                  grid%psim(i,j,ireg) = equ%a00(ii,jj,1)+equ%a10(ii,jj,1)*xx+equ%a01(ii,jj,1)*yy & 
-                      & + equ%a11(ii,jj,1)*xx*yy
-                  grid%psidxm(i,j,ireg) = equ%a00(ii,jj,2)+equ%a10(ii,jj,2)*xx+equ%a01(ii,jj,2)*yy & 
-                      & + equ%a11(ii,jj,2)*xx*yy
-                  grid%psidym(i,j,ireg) = equ%a00(ii,jj,3)+equ%a10(ii,jj,3)*xx+equ%a01(ii,jj,3)*yy & 
-                      & + equ%a11(ii,jj,3)*xx*yy
-              end do
-          end do
-      end do
+      call compute_psi_on_grid( equ, grid )
 
       ! After finalization of gridding, set resolution arrays in grid data
       ! structure accordingly

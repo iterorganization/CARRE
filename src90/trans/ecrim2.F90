@@ -1,6 +1,9 @@
-      subroutine ecrim2(nfin,nx,ny,crx,cry,fpsi,bb,b2cflag,nxmax,nymax,&
+      subroutine ecrim2(nfin,nx,ny,crx,cry,&
+           & fpsi,psidx,psidy,bb,ffbz,b2cflag,&
+           & nxmax,nymax,&
            & niso,nxiso,nisomx)
         use carre_constants
+        use tradui_constants , only: GRID_N_CELLFLAGS
 !
 !  version : 02.12.98 20:49
 !
@@ -13,7 +16,9 @@
 !  arguments
       integer nfin,nx,ny,nxmax,nymax,niso,nisomx,nxiso(nisomx+1)
       real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
-     &  bb(0:nxmax,0:nymax,0:3),fpsi(0:nxmax,0:nymax,0:3)
+     & bb(0:nxmax,0:nymax,0:3),ffbz(0:nxmax,0:nymax,0:3),&
+     & fpsi(0:nxmax,0:nymax,0:3),&
+     & psidx(0:nxmax,0:nymax,0:3),psidy(0:nxmax,0:nymax,0:3)
       integer b2cflag(0:nxmax,0:nymax,CARREOUT_NCELLFLAGS)
 
 !  local variables
@@ -43,24 +48,20 @@
           x0=0.25*(crx(ix,iy,0)+crx(ix,iy,1)+crx(ix,iy,2)+crx(ix,iy,3))
           y0=0.25*(cry(ix,iy,0)+cry(ix,iy,1)+cry(ix,iy,2)+cry(ix,iy,3))
           fpsi0=0.25*(fpsi(ix,iy,0)+fpsi(ix,iy,1)+fpsi(ix,iy,2)+fpsi(ix,iy,3))
-
-
 !* print B2.5
-          write (nfin,117) ix+1,iy+1,x0,y0,fpsi0, &
-               & crx(ix,iy,0),cry(ix,iy,0),fpsi(ix,iy,0), & 
-               & crx(ix,iy,1),cry(ix,iy,1),fpsi(ix,iy,1), &
-               & crx(ix,iy,2),cry(ix,iy,2),fpsi(ix,iy,2), & 
-               & crx(ix,iy,3),cry(ix,iy,3),fpsi(ix,iy,3), &
-               & bb(ix,iy,0),bb(ix,iy,2), &
-               & b2cflag(ix,iy,:)
-
-
+          write (nfin,117) &
+               & ix+1,iy+1,&
+               & x0,y0,fpsi0, &  ! cell center quantities
+               & (crx(ix,iy,i),cry(ix,iy,i),&
+               &  fpsi(ix,iy,i),psidx(ix,iy,i),psidy(ix,iy,i),ffbz(ix,iy,i),i=0,3), & ! corner quantities
+               & bb(ix,iy,0),bb(ix,iy,2), & ! cell center mag. field
+               & b2cflag(ix,iy,1:GRID_N_CELLFLAGS) ! cell flags
 
         enddo
       enddo
 
       ! FIXME: this format has to be updated to match the size CARROUT_NCELLFLAG in the last entry
-117   FORMAT(I4,1X,I4,1X,17(F12.8,1X),5(I4,1X))
+117   FORMAT(I4,1X,I4,1X,29(F12.8,1X),5(I4,1X))
       return
 !======================================================================
       end

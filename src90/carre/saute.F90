@@ -231,7 +231,18 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
 
           end if
 
+          ! Note point closest to requested psi value found so far
+          ! x3, y3, psi3
+          
+          if ( abs(psi3 - pas) < abs(bestPsi - pas)) then
+              bestX = x3
+              bestY = y3
+              bestPsi = psi3
+          end if
+
           IF ((MIN(psi0,psi3).LE.pas) .AND. (MAX(psi0,psi3).GE.pas)) then
+              ! The current psi value is still in the allowed range.
+              ! Take a step along the target towards the value pas.
 
               !---------------------------------------------------------------------{
               do
@@ -261,15 +272,6 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
               end do
               !---------------------------------------------------------------------}
           else
-
-              ! Note point closest to requested psi value found so far
-              ! x3, y3, psi3
-
-              if ( abs(psi3 - pas) < abs(bestPsi - pas)) then
-                  bestX = x3
-                  bestY = y3
-                  bestPsi = psi3
-              end if
 
               IF (compt .EQ. npst) then
 

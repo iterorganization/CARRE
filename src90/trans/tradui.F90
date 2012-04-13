@@ -161,7 +161,9 @@ program tradui
           & crx(0:nxmx,0:nymx,0:3),&
           & cry(0:nxmx,0:nymx,0:3),&
           & fpsi(0:nxmx,0:nymx,0:3),&
+          & psidx(0:nxmx,0:nymx,0:3),psidy(0:nxmx,0:nymx,0:3),&
           & bb(0:nxmx,0:nymx,0:3),&
+          & ffbz(0:nxmx,0:nymx,0:3),&
           & b2cflag(0:nxmx,0:nymx,:),nxmx,nymx,&
           & niso,nxiso,nisomx)
   elseif(isel.eq.3) then

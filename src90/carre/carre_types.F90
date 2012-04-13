@@ -251,7 +251,8 @@ module carre_types
       ! Cell categorization flag (internal, external, ...)
       ! See the GRID_* constants in carre_constants
       integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
-      ! Structure index 
+      ! Structure index indicating the structure on which this face lies.
+      ! If GRID_UNDEFINED, it's not on a structure
       integer :: cellFaceIStruct(1:4,npmamx-1,nrmamx-1,nregmx)
 
       integer, dimension(npmamx,nrmamx,nregmx) :: pointFlag, pointStructIndex
