@@ -20,6 +20,7 @@ program tradui
   use carre_constants
   use carre_parameter_io
   use tradui_constants
+  use carre_b2ag
 
   implicit none
 
@@ -74,7 +75,7 @@ program tradui
 
 
   !  procedures
-  external limail, ecrim1, b2agfz, b2agbb, ecrim2, ecrim3, & 
+  external limail, ecrim1, b2agfz, ecrim2, ecrim3, & 
       &        ecrim4
   !======================================================================
   !*** nregmx: maximum number of regions
@@ -150,8 +151,8 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
-      call b2agbb (nx,ny,fpsi,ffbz,bb, & 
-          &    crx,cry,psidx,psidy,nxmx,nymx)
+      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! We don't create guard cells, but b2agfz still places
       ! the real cells starting at (0,0) (i.e. the x/y=-1 slots are empty).
       ! So here, the grid is actually stored in x=0:nx-1, y=0:ny-1, and
@@ -175,8 +176,8 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call b2agbb (nx,ny,fpsi,ffbz,bb, & 
-          &    crx,cry,psidx,psidy,nxmx,nymx)
+      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
   elseif(isel.eq.4) then
       !
@@ -187,9 +188,8 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call b2agbb (nx,ny,fpsi,ffbz,bb, & 
-          &    crx,cry,psidx,psidy,nxmx,nymx)
-
+      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmx,nymx, & 
           &                                ncut,nxcut,nycut,niso,nxiso)
   elseif(isel.eq.5) then
@@ -201,8 +201,8 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call b2agbb (nx,ny,fpsi,ffbz,bb, & 
-          &   crx,cry,psidx,psidy,nxmx,nymx)
+      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! jdemod - added fpsi to call to ecrim5
       call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
 #ifdef USE_ITMCARRE
