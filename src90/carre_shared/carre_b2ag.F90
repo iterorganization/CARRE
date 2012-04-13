@@ -4,8 +4,7 @@ module carre_b2ag
 
 contains
 
-
-  subroutine b2agbb (nx,ny,fpsi,ffbz,bb, & 
+  subroutine carre_b2agbb (nx,ny,fpsi,ffbz,bb, & 
        &  crx,cry,psidx,psidy)
 
     !======================================================================
@@ -116,6 +115,6 @@ contains
         enddo
     enddo
 
-  end subroutine b2agbb
+  end subroutine carre_b2agbb
 
 end module carre_b2ag

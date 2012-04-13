@@ -151,7 +151,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
-      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! We don't create guard cells, but b2agfz still places
       ! the real cells starting at (0,0) (i.e. the x/y=-1 slots are empty).
@@ -176,7 +176,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
   elseif(isel.eq.4) then
@@ -188,7 +188,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmx,nymx, & 
           &                                ncut,nxcut,nycut,niso,nxiso)
@@ -201,7 +201,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! jdemod - added fpsi to call to ecrim5
       call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
