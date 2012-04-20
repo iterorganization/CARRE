@@ -31,7 +31,7 @@
 
       ind = indcrb(xn,yn,n,x1,y1,d)
 
-      dist = long(xn,yn,ind)
+      dist = long(xn(1:ind),yn(1:ind),ind)
 
       ruban = dist + SQRT((x1-xn(ind))**2 + (y1-yn(ind))**2)
 

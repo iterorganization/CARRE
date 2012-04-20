@@ -2,7 +2,9 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
      & plaque,x2,y2,nx,ny,x,y,psi,xpto,ypto,nstruc,npstru, & 
      & xstruc,ystruc,a00,a10,a01,a11, & 
      & repart,gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2, & 
-     & xnlast,ynlast,nnlast,nuldec,solregion,diag,ireg,&
+     & xnlast,ynlast,nnlast,nuldec,&
+     & xpind,xpx,xpy,&
+     & solregion,diag,ireg,&
      & struct)
 !
 !  version : 07.07.97 19:11
@@ -22,24 +24,27 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       
       logical, parameter :: DEBUGFILES_MAILRG = .false.
 
-!..  Cette sous-routine fait le maillage curviligne orthogonal dans
-!  une region.
+      ! Cette sous-routine fait le maillage curviligne orthogonal dans
+      ! une region.
+      ! 
+      ! Parameters:
+      ! nuldec: if .true., indicates we are gridding the inner SOL of a disconnected double null
+      ! xpind: poloidal grid point index of the outer x-point
+      ! xpx,ypx: coordinates of outer x-point
 
-
-!ank-970707: dimensions from the file
-!  dimensions
 #include <CARREDIM.F>
 
 !  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad & 
-     &        ,plaque,repart,nbcrb,npcrb2,nnlast,ireg
+     &        ,plaque,repart,nbcrb,npcrb2,nnlast,ireg,xpind
 
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), & 
      &     ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), & 
      &     maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2, & 
      &     a00(nxmax,nymax,3),a10(nxmax,nymax,3),a01(nxmax,nymax,3), & 
      &     a11(nxmax,nymax,3),gardd1,gardd2, & 
-     &     xcrb2(npcrb2),ycrb2(npcrb2),xnlast(nnlast),ynlast(nnlast)
+     &     xcrb2(npcrb2),ycrb2(npcrb2),xnlast(nnlast),ynlast(nnlast),&
+     &     xpx, xpy
       REAL*8 :: xpto, ypto
 
       LOGICAL nuldec
@@ -80,7 +85,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       REAL*8 :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx),cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
 
       integer :: ntt, sensspe
-      REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
+      REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc, length_xp
 
 !  procedures
       INTEGER ifind
@@ -387,7 +392,6 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
      &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
      &            plaque,x2,y2)
 
-
          end if
 
          ! FIXME: broken for disconnected double null case?
@@ -411,22 +415,24 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 !!$         endif
 
 !..Definition de xn2 et yn2 pour le bloc common comort.
+! TODO: remove this
          xn2(1:nn(inouv)) = xn(1:nn(inouv), inouv)
          yn2(1:nn(inouv)) = yn(1:nn(inouv), inouv)
 
          npni2=nn(inouv)
 
-!..On definit maintenant les points de maille de la nouvelle ligne
+!..On definit maintenant les points de maille de la nouvelle ligne 
 !  de niveau a partir de ceux de la precedente.
 
          dernie=0.0
-         ll=long(xn2,yn2,npni2)
+         !ll=long(xn2,yn2,npni2)
+         ll=long(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv))
 !---
          if(nrelax.ge.0) then
            d1=0.
            ipol1=2
            ipoln=nppol-1
-!
+
 !  1.   on dispose d'abord les points proportionellement a ceux de la
 !       ligne precedente
            l1(1)=zero
@@ -434,18 +440,55 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
            l0(1)=zero
            if(ir.eq.2) l0(nppol)=ll1
            do ipol=ipol1,ipoln
-             d1=ruban(xn(1,ianc),yn(1,ianc),nn(ianc),mailx(ipol,ir-1), & 
-     &          maily(ipol,ir-1),d1)
-             if(ir.eq.2) l0(ipol)=d1
+             ! FIXME: the safeguard minimum distance mechanism is broken (17151 DDN case, set to zero as a temporary fix)
+             if(ir.eq.2) then
+                 d1=ruban(xn(1:nn(ianc),ianc),yn(1:nn(ianc),ianc),nn(ianc),&
+                      & mailx(ipol,ir-1), maily(ipol,ir-1),l0(ipol-1))
+                 l0(ipol)=d1
+             end if
 !            l1(ipol)=(d1/ll1)*ll
              l1(ipol)=(l0(ipol)/l0(nppol))*ll
+             if (l1(ipol) > ll) then
+                 write (*,*) "mailrg: exceeding length of niveau line", l1(ipol)
+                 l1(ipol)=ll                 
+             end if
+
              CALL COORD(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv),&
                   & l1(ipol),mailx(ipol,ir),maily(ipol,ir))
            enddo
 !
+ 
+
+           ! In case of the inner sol region, we have the outer x-point given
+           ! on the last radial flux surface. The position of this point is, obviously, fixed.
+           ! We have to enforce this explicitly, of else bad things will happen 
+           ! (specifically, points can end up "on the wrong side" of the x-point, and the 
+           ! optimization algorithm cannot recover from this).
+
+           IF ((ir .EQ. nprad) .AND. (nuldec)) THEN              
+               ! get length to x-point on the last surface
+               length_xp=ruban(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv),xpx,xpy,0.0d0)
+               
+               ! scale points to the left and right of the x-point 
+               ! left side
+               l1(1:xpind-1) = ( l1(1:xpind-1) / l1(xpind-1) ) * 0.9d0 * length_xp
+               ! xpoint itself
+               l1(xpind) = length_xp
+               ! right side
+               l1(xpind+1:ipoln) =  l1(xpind+1:ipoln) - l1(xpind+1)
+               l1(xpind+1:ipoln) =  ( l1(xpind+1:ipoln) / l1(ipoln) ) * 0.9d0 + 0.1d0
+               l1(xpind+1:ipoln) =  ( l1(xpind+1:ipoln) * (ll - length_xp) ) + length_xp
+           end IF
+
+           ! Compute the actual position of the grid points
+           do ipol=ipol1,ipoln
+             CALL COORD(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv),&
+                  & l1(ipol),mailx(ipol,ir),maily(ipol,ir))
+           enddo
            mailx(nppol,ir)=xn(nn(inouv),inouv)
            maily(nppol,ir)=yn(nn(inouv),inouv)
-!
+
+
            if(nrelax.gt.0) then
 !
 !  2.   on initialise la fonction qui doit s'annuler pour une
@@ -471,9 +514,15 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                      else
                              l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol-1)
                      endif
+
+                     ! keep the outer x-point fixed if required
+                     IF ((ir .EQ. nprad) .AND. nuldec .and. (ipol == xpind)) THEN              
+                         l2(ipol) = length_xp
+                     end IF
+
                      call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol), & 
-                          & mailx(ipol,ir),maily(ipol,ir))
-                     
+                          & mailx(ipol,ir),maily(ipol,ir))                     
+
                      diag%somort(ir,ireg)= diag%somort(ir,ireg)+(ort1(ipol)/nppol)
                      diag%somortpur(ir,ireg)= diag%somortpur(ir,ireg)+(ortpur(ipol)/nppol)
                      diag%sompropo(ir,ireg)= diag%sompropo(ir,ireg)+(propo(ipol)/nppol)
@@ -510,6 +559,10 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                                              ort1(ipol)=ort2(ipol)
                                              l2(ipol)=l1(ipol)+del
                                      endif
+                                     ! keep the outer x-point fixed if required
+                                     IF ((ir .EQ. nprad) .AND. nuldec .and. (ipol == xpind)) THEN              
+                                         l2(ipol) = length_xp
+                                     end IF                                     
                                      call coord(xn(1,inouv),yn(1,inouv),nn(inouv), & 
                                           & l2(ipol),mailx(ipol,ir),maily(ipol,ir))
                              endif

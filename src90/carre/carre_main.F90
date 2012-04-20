@@ -72,7 +72,7 @@ contains
          & equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg,&
          & par)
 
-    ! When using virtual targets, needs two passes through the analysis steps that 
+    ! When asked to create virtual targets, needs two passes through the analysis steps that 
     ! find and arrange the separatrix pieces and targets
     ! First pass - with real structures: identify target plates, limiting level lines, create virtual structures (if required)
     ! Second pass pass - with virtual structures: identify target plates, limiting level lines

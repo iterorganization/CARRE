@@ -38,7 +38,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       !  variables locales
       INTEGER isep,ipas,ireg,ipx,sens,nn,idef, & 
      &  ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
-     &  ,ptxext,i,j,nbcl(2),nnlast,npr1,nmail,imail
+     &  ,ptxext,i,j,nbcl(2),nnlast,npr1,nmail,imail, xpind
       REAL*8 dist,x2,y2,lg(10), & 
      &  xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
      &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, & 
@@ -328,7 +328,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
      &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
      &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &              ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
+     &              ynlast,nnlast,nuldec,&
+     &              xpind,xptxex,yptxex,&
+     &              .true.,diag,ireg, struct)
 
 !
 !  1.3.2  region 2
@@ -409,7 +411,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &              ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
+              &              ynlast,nnlast,nuldec,&
+              &              xpind,xptxex,yptxex,&
+              &.false.,diag,ireg, struct)
 !
 !  1.3.3  region 3
 
@@ -724,7 +728,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
      &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
      &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-     &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
+     &               ynlast,nnlast,nuldec,&
+     &               xpind,xptxex,yptxex,&
+     &               .true.,diag,ireg, struct)
 
 !
 !..2.3.2 Region 2: top PFR
@@ -804,7 +810,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
+              &               ynlast,nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&
+              &.false.,diag,ireg, struct)
 
 !
 !..2.3.3 Region 3: left
@@ -899,7 +907,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
+              &               ynlast,nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&
+              &.true.,diag,ireg, struct)
 
 
 !..2.3.4 Region 4: bottom PFR
@@ -980,7 +990,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
+              &               ynlast,nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&
+              &.false.,diag,ireg, struct)
 
 !
 !..2.3.5  Region 5: central region
@@ -1610,31 +1622,30 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          nuldec = .TRUE.
 
+! figure out index of x-point on outer separatrix
+
+         IF (equ%ptxint .EQ. 1) THEN
+            xpind = par%nptseg(1)+par%nptseg(3)-1
+         ELSE IF (equ%ptxint .EQ. 2) THEN
+            xpind = par%nptseg(5)+par%nptseg(3)-1
+         ENDIF
+
 !..Call the routine which grids this region
 
-!---
          print*, 'ireg=', ireg
-!---
          CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
               &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast(1:nnlast), & 
-              &               ynlast(1:nnlast),nnlast,nuldec,.true.,diag,ireg, struct)
+              &               ynlast(1:nnlast),nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&
+              &               .true.,diag,ireg,struct)
 
 !..Arangement of the mesh point which must coinside with outer X-point
-
-         IF (equ%ptxint .EQ. 1) THEN
-
-            grid%xmail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = xptxex
-            grid%ymail(par%nptseg(1)+par%nptseg(3)-1,par%npr(1),1) = yptxex
-
-         ELSE IF (equ%ptxint .EQ. 2) THEN
-
-            grid%xmail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = xptxex
-            grid%ymail(par%nptseg(5)+par%nptseg(3)-1,par%npr(1),1) = yptxex
-
-         ENDIF
+         
+         grid%xmail(xpind,par%npr(1),1) = xptxex
+         grid%ymail(xpind,par%npr(1),1) = yptxex
 
          nuldec = .FALSE.
 
@@ -1753,7 +1764,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
+              &               ynlast,nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&     
+              &.true.,diag,ireg, struct)
 
 !..3.3.3 Region 3: top PFR
 
@@ -1833,7 +1846,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
+              &               ynlast,nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&
+              &.false.,diag,ireg, struct)
 
 
 !..3.3.4 Region 4: left
@@ -1940,7 +1955,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.true.,diag,ireg, struct)
+              &               ynlast,nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&
+              &.true.,diag,ireg, struct)
 
 !..3.3.5 Region 5: bottom PFR
 
@@ -2019,7 +2036,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &               ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
+              &               ynlast,nnlast,nuldec,&
+              &               xpind,xptxex,yptxex,&
+              &.false.,diag,ireg, struct)
 
 !..3.3.6  Region 6: central region
 
@@ -2275,7 +2294,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
               &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
-              &              ynlast,nnlast,nuldec,.false.,diag,ireg, struct)
+              &              ynlast,nnlast,nuldec,&
+              &              xpind,xptxex,yptxex,&
+              &.false.,diag,ireg, struct)
 
 !..4.3.2  Region 2
 
