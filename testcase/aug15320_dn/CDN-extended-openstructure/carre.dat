@@ -54,7 +54,7 @@ psimin = -0.06
 psimin = -99999.9
 loglevel = 3
 loglevel = 6
-targetResolution = 0.08
+targetResolution = 0.04
 maxResJump = 4.0
 cleanupPasmin = 2.0e-3
 
