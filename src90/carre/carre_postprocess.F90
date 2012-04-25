@@ -48,11 +48,11 @@ contains
     type(CarreParameters), intent(in) :: par
     type(CarreEquilibrium), intent(inout) :: equ
     type(CarreGrid), intent(inout) :: grid
-    type(CarreStructures), intent(in) :: struct
+    type(CarreStructures), intent(inout) :: struct
 
     ! internal
     integer :: iReg, iPostProcess, nCellsToRefine, nCellsToRefineFix, nCellsToCoarsen
-    integer :: iBnd, iRad, iPol
+    integer :: iBnd, iRad, iPol, iStruc
     logical :: doesIntersect
     integer :: npReg(nregmx), npDiff, action
     integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
@@ -82,6 +82,11 @@ contains
                     call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
                 end do
             end do
+        end do
+
+        ! Mark structures on which the grid is to be refined
+        do iStruc = 1, par%nRefineAtStructs
+            struct%refineAtStructure(par%refineAtStructs(iStruc)) = .true.            
         end do
 
         ! Main iteration sequence
@@ -408,9 +413,12 @@ contains
                   if (.not. (grid%hx(iPol, iRad, iReg) > par%targetRes)) cycle
 
                   do iFace = 1, 4
-                      if (.not. structIsTarget(struct, grid%cellFaceIStruct(iFace, iPol, iRad, iReg)) ) cycle
-                      grid%cellflag(iPol, iRad, iReg) = GRID_BOUNDARY_REFINE
-                      exit
+                      !if (.not. structIsTarget(struct, grid%cellFaceIStruct(iFace, iPol, iRad, iReg)) ) cycle
+                      if (grid%cellFaceIStruct(iFace, iPol, iRad, iReg) == GRID_UNDEFINED) cycle 
+                      if (struct%refineAtStructure(grid%cellFaceIStruct(iFace, iPol, iRad, iReg))) then
+                          grid%cellflag(iPol, iRad, iReg) = GRID_BOUNDARY_REFINE
+                          exit
+                      end if
                   end do
 
               end do
@@ -629,24 +637,57 @@ contains
     logical, intent(in) :: finalized
 
     ! internal
-    integer :: iReg, xip, xir, iPol, nBndPoints
+    integer :: iReg, xip, xir, iPol, nBndPoints, ip, ir, ipMin, irMin, iRegMin
     logical :: setBoundary 
+    double precision :: dmin, d
+
+    external :: dist
+    double precision :: dist
+
 
     grid%pointFlag = GRID_UNDEFINED
 
     if (finalized) call markBoundaryPointsFinal(grid%pointFlag)
 
+    ! This approach breaks if one of the x-points is outside the vessel (in complex DN cases)    
+!!$    do iReg = 1, grid%nreg
+!!$        ! For region, find an x-point (which is declared to be on the inside)
+!!$        ! TODO: for limiter, just take any point on the core boundary.
+!!$        call findXPointInRegion(equ, grid, iReg, xip, xir)
+!!$
+!!$        ! Walk away from there (recursively) until all points are marked.
+!!$        ! (this recursion will do transitions between the regions)
+!!$        call markInternalPoints(xip, xir, iReg, grid%pointFlag, finalized)
+!!$
+!!$        if (.not. finalized) call markBoundaryPointsIteration(iReg, grid%pointFlag)
+!!$    end do
+
+    ! Find internal point: point closest to o-point    
+    iRegMin = GRID_UNDEFINED
+    dmin = huge(0.0d0)
     do iReg = 1, grid%nreg
-        ! For region, find an x-point (which is declared to be on the inside)
-        ! TODO: for limiter, just take any point on the core boundary.
-        call findXPointInRegion(equ, grid, iReg, xip, xir)
-
-        ! Walk away from there (recursively) until all points are marked.
-        ! (this recursion will do transitions between the regions)
-        call markInternalPoints(xip, xir, iReg, grid%pointFlag, finalized)
-
-        if (.not. finalized) call markBoundaryPointsIteration(iReg, grid%pointFlag)
+        do ip = 1, grid%np1(iReg)
+            do ir = 1, grid%nr(iReg)
+                d = dist(grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), equ%xpto, equ%ypto)
+                if (d < dmin) then
+                    iRegMin = iReg
+                    ipMin = ip
+                    irMin = ir
+                end if
+            end do
+        end do
     end do
+
+    call logmsg(LOGDEBUG,  'labelPointsInsideOutside: internal point closest to o-point is region '//&
+         & int2str(iRegMin)//', ip '//int2str(ipMin)//', ir '//int2str(irMin))
+    
+    call markInternalPoints(ipMin, irMin, iRegMin, grid%pointFlag, finalized)
+
+    if (.not. finalized) then
+        do iReg = 1, grid%nreg
+            call markBoundaryPointsIteration(iReg, grid%pointFlag)
+        end do
+    end if
 
     ! all points that are still undefined are external
     where (grid%pointFlag == GRID_UNDEFINED) grid%pointFlag = GRID_EXTERNAL
@@ -750,10 +791,9 @@ contains
               ipFace = ip - 1
               ipNext = ip - 1
           case(FACE_BOTTOM)
-              cycle
               if (ir == 1) cycle
               iAlign = FACE_RADIAL
-              !irFace = ir - 1
+              irFace = ir - 1
               irNext = ir - 1
           case(FACE_RIGHT)
               if (ip == grid%np1(ireg)) cycle

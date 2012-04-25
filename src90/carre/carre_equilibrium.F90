@@ -2,7 +2,6 @@ module carre_equilibrium
 
   use carre_types
   use itm_assert
-  use carre_postprocess
   use carre_intersect
   use Logging
   use Helper

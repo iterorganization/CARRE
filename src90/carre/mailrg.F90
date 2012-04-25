@@ -440,24 +440,21 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
            l0(1)=zero
            if(ir.eq.2) l0(nppol)=ll1
            do ipol=ipol1,ipoln
-             ! FIXME: the safeguard minimum distance mechanism is broken (17151 DDN case, set to zero as a temporary fix)
              if(ir.eq.2) then
                  d1=ruban(xn(1:nn(ianc),ianc),yn(1:nn(ianc),ianc),nn(ianc),&
                       & mailx(ipol,ir-1), maily(ipol,ir-1),l0(ipol-1))
                  l0(ipol)=d1
              end if
-!            l1(ipol)=(d1/ll1)*ll
              l1(ipol)=(l0(ipol)/l0(nppol))*ll
              if (l1(ipol) > ll) then
                  write (*,*) "mailrg: exceeding length of niveau line", l1(ipol)
-                 l1(ipol)=ll                 
+                 stop
+                 !l1(ipol)=ll                 
              end if
 
              CALL COORD(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv),&
                   & l1(ipol),mailx(ipol,ir),maily(ipol,ir))
            enddo
-!
- 
 
            ! In case of the inner sol region, we have the outer x-point given
            ! on the last radial flux surface. The position of this point is, obviously, fixed.
@@ -471,12 +468,12 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                
                ! scale points to the left and right of the x-point 
                ! left side
-               l1(1:xpind-1) = ( l1(1:xpind-1) / l1(xpind-1) ) * 0.9d0 * length_xp
+               l1(1:xpind-1) = ( l1(1:xpind-1) / l1(xpind-1) ) * 0.95d0 * length_xp
                ! xpoint itself
                l1(xpind) = length_xp
                ! right side
                l1(xpind+1:ipoln) =  l1(xpind+1:ipoln) - l1(xpind+1)
-               l1(xpind+1:ipoln) =  ( l1(xpind+1:ipoln) / l1(ipoln) ) * 0.9d0 + 0.1d0
+               l1(xpind+1:ipoln) =  ( l1(xpind+1:ipoln) / l1(ipoln) ) * 0.95d0 + 0.05d0
                l1(xpind+1:ipoln) =  ( l1(xpind+1:ipoln) * (ll - length_xp) ) + length_xp
            end IF
 
@@ -488,9 +485,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
            mailx(nppol,ir)=xn(nn(inouv),inouv)
            maily(nppol,ir)=yn(nn(inouv),inouv)
 
-
-           if(nrelax.gt.0) then
-!
+           if(nrelax.gt.0) then!
 !  2.   on initialise la fonction qui doit s'annuler pour une
 !       distribution orthogonale
              call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 

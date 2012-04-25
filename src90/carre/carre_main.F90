@@ -44,7 +44,7 @@ contains
     type(CarreDiag), intent(out) :: diag
 
     ! internal
-    integer :: i, j, itmp
+    integer :: i, j, itmp, iTarget
     integer :: iSetupStruct, nEquSteps, iEquStep
 
 
@@ -71,6 +71,26 @@ contains
     CALL SELPTX(equ%npxtot,equ%npx,equ%pointx,equ%pointy,equ%ii,equ%jj,equ%ptx, & 
          & equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg,&
          & par)
+
+    ! Short sanity check: virtual structures supplied by user only make sense in CARRE_EXTENDED mode
+    if (par%nVirtualStructs > 0 .and. par%carreMode /= CARRE_EXTENDED) then
+        stop "carre_main: you cannot submit virtual structures when not doing extended grid"
+    end if
+
+    ! In CARRE_STANDARD mode, we use the real structures and do one pass - no special setup required
+    ! In CARRE_STANDARD_VIRTUALSTRUCT mode, we use the real structures and do two passes - no special setup required
+    ! In CARRE_EXTENDED mode
+    ! -if virtual structures supplied, use these and only do one pass
+    ! -if no virtual structures supplied, use real structure and do two passes
+
+    if (par%nVirtualStructs > 0 .and. par%carreMode == CARRE_EXTENDED) then
+        ! set up virtual structures for first pass
+        struct%nstruc = struct%vnstruc 
+        struct%npstru(1:struct%vnstruc) = struct%vnpstru(1:struct%vnstruc)
+        struct%xstruc(:,1:struct%vnstruc) = struct%vxstruc(:,1:struct%vnstruc)
+        struct%ystruc(:,1:struct%vnstruc) = struct%vystruc(:,1:struct%vnstruc)    
+        struct%closed(1:struct%vnstruc) = struct%vclosed(1:struct%vnstruc)
+    end if
 
     ! When asked to create virtual targets, needs two passes through the analysis steps that 
     ! find and arrange the separatrix pieces and targets
@@ -191,6 +211,9 @@ contains
        if ( par%carreMode == CARRE_STANDARD ) then
            ! If no virtual targets are to be created, exit loop and go directly to grid generation                 
            exit
+       elseif ( par%nVirtualStructs > 0 ) then
+           ! virtual structures were supplied (only possible in CARRE_EXTENDED mode, don't create them
+           exit
        else
            ! Otherwise, if we have a case with x-points, set up virtual geometry
            if (equ%npx.gt.0)then
@@ -210,6 +233,11 @@ contains
                    struct%ystruc = struct%vystruc
                    struct%closed = struct%vclosed
                end if
+
+               ! mark the real target structures as to be defined
+               do iTarget = 1, struct%nbdef
+                   struct%refineAtStructure(struct%inddef(iTarget)) = .true.
+               end do
 
                call writeVirtualStructuresToFile( struct )
            end if                     ! npx.gt.0

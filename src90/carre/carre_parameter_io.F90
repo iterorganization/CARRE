@@ -430,6 +430,19 @@ CONTAINS
          call rdfrre(11,vari(ieg+1:80),par%cleanupPasmin,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:len('nVirtualStructs')) .EQ. 'nVirtualStructs') THEN
+         call rdfrin(11,vari(ieg+1:80),par%nVirtualStructs,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
+      ELSE IF (vari(1:len('nRefineAtStructs')) .EQ. 'nRefineAtStructs') THEN
+         call rdfrin(11,vari(ieg+1:80),par%nRefineAtStructs,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
+      ELSE IF (vari(1:len('refineAtStructs')) .EQ. 'refineAtStructs') THEN
+         call rdfrinarray(11,vari(ieg+1:80),par%refineAtStructs(1:par%nRefineAtStructs),&
+              &par%nRefineAtStructs,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('loglevel')) .EQ. 'loglevel') THEN
          call rdfrin(11,vari(ieg+1:80),par%logLevel,ierror)
          if(ierror.eq.1) go to 98
@@ -473,5 +486,39 @@ CONTAINS
       RETURN
 
     END SUBROUTINE CHANGE
+
+
+    subroutine rdfrinarray(iunit,vari,ii,nii,ierror)
+      !  version : 03.07.2000 22:59
+      implicit none
+      !  read an array of integer numbers from a chain of characters vari
+      !
+      !  arguments
+      integer iunit,ii(nii),nii,ierror
+      character vari*(*)
+      !  iunit: unit of temporary file
+      !  vari: chain of characters from which to read
+      !  ii: integer read from vari (output)
+      !  ierror: error flag: 0 for no error, 1 when there is an error.
+      !
+      !  calculations
+      !      rewind iunit
+      !      write(iunit,100)vari
+      !100   format(a)
+      !      rewind iunit
+      !      read(iunit,*,err=99)ii
+      !      write (*,*) 'rdrfin: vari', vari
+#ifdef READOPT
+      read(vari,err=99)ii
+#else
+      read(vari,*,err=99)ii
+#endif
+      ierror=0
+      return
+99    ierror=1
+      return
+    end subroutine rdfrinarray
+
+
 
 end module carre_parameter_io

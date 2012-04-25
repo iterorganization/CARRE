@@ -26,7 +26,11 @@ contains
     ! internal
     double precision :: limpoint_min(2), limpoint_max(2)
 
-    if (par%gridExtensionMode == GRID_EXTENSION_OFF) return
+    if (par%gridExtensionMode == GRID_EXTENSION_OFF) then
+        call logmsg( LOGINFO, "setupVirtualStructures: you want to create virtual structures, &
+             &but did not specify an extension mode (gridExtensionMode parameter)" )        
+        return        
+    end if
 
     select case(par%gridExtensionMode)
     case(GRID_EXTENSION_MODE_TARGET)

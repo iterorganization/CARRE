@@ -403,9 +403,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Call the routine which grids this region
 
-!---
          print*, 'ireg=', ireg
-!---
          CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
               &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
               &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 

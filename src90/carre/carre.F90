@@ -198,12 +198,9 @@ contains
     close(unit=7)
 
     !
-    !..3.1  Read the structures.
+    !..3.1  Read the structures into the standard struct%xstruc,... arrays
     !
-    call listru(8,struct)!,nstruc,npstru,nomstr,xstruc,ystruc,npstmx,strumx)
-
-    call csioGetStructureSegments( struct%nstruc, struct%npstru, &
-         & struct%xstruc, struct%ystruc, csioStrucNSeg, csioStrucSegments )
+    call listru(8,struct)
 
     ! Read carre.dat input file the first time to get basic setup parameters
     call read_code_parameters_noninteractive(par)
@@ -212,6 +209,34 @@ contains
 
     ! Set loglevel as given in parameters
     call setLogLevel(par%logLevel)
+
+    ! Split structures by type
+
+    ! If virtual structures are given, copy them to the struct%v*stru* arrays
+    if (par%nVirtualStructs > 0) then
+        struct%vnstruc = par%nVirtualStructs
+        struct%vnpstru(1:struct%vnstruc) = struct%npstru(1:struct%vnstruc)
+        struct%vxstruc(:,1:struct%vnstruc) = struct%xstruc(:,1:struct%vnstruc)
+        struct%vystruc(:,1:struct%vnstruc) = struct%ystruc(:,1:struct%vnstruc)
+        struct%vclosed(1:struct%vnstruc) = struct%closed(1:struct%vnstruc)
+    end if
+
+    !  Copy real structures to separate arrays
+    struct%rnstruc = struct%nstruc - par%nVirtualStructs
+    struct%rnpstru(1:struct%rnstruc) = struct%npstru(par%nVirtualStructs+1:struct%nstruc)
+    struct%rxstruc(:,1:struct%rnstruc) = struct%xstruc(:,par%nVirtualStructs+1:struct%nstruc)
+    struct%rystruc(:,1:struct%rnstruc) = struct%ystruc(:,par%nVirtualStructs+1:struct%nstruc)    
+    struct%rclosed(1:struct%rnstruc) = struct%closed(par%nVirtualStructs+1:struct%nstruc)
+
+    ! All structure (virtual + real) are now still in the standard struct%xstru,... arrays
+
+    call csioGetStructureSegments( struct%rnstruc, struct%rnpstru, &
+         & struct%rxstruc, struct%rystruc, csioStrucNSeg, csioStrucSegments )
+
+    if ( struct%vnstruc > 0 ) then
+        call csioGetStructureSegments( struct%vnstruc, struct%vnpstru, &
+             & struct%vxstruc, struct%vystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
+    end if
 
   end subroutine carre_init
 

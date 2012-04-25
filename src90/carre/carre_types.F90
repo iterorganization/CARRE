@@ -108,6 +108,9 @@ module carre_types
       double precision :: xPointX(gradmx), xPointY(gradmx) ! x-point positions
       double precision :: oPointX, oPointY ! o-point positions
 
+      ! Number of virtual structures provided in input
+      integer :: nVirtualStructs = 0
+
       ! Control flag for equilibrium data extension
       integer :: carreMode = CARRE_STANDARD
 
@@ -126,13 +129,16 @@ module carre_types
       ! Desired maximal poloidal cell size at targets in extended grid mode
       ! Default value is chosen to cause no refinement at targets.
       double precision :: targetRes = huge(0.0d0)
+      double precision :: maxResJump = huge(0.0d0)
 
-      double precision :: maxResJump = 4.0d0
-
-      double precision :: cleanupPasmin = huge(0.0d0)
+      ! Default value is chosen to cause no cleanup
+      double precision :: cleanupPasmin = 0.0d0
 
       ! Extended grid mode
       integer :: gridExtensionMode = GRID_EXTENSION_OFF
+
+      integer :: nRefineAtStructs = 0
+      integer :: refineAtStructs(strumx) = 0
 
       ! Log level (see Logging.f90)
       integer :: logLevel = LOGWARNING
@@ -291,20 +297,21 @@ module carre_types
       !.. closed: indicates whether the structure is closed or not
       integer ::  nstruc = 0, npstru(strumx), & 
            &    indplq(4,npxmx),inddef(nbdmx), & 
-           &   nbdef, nivtot(nivmx), nbniv      
+           &   nbdef, nivtot(nivmx), nbniv
       REAL*8  & 
            &   xstruc(npstmx,strumx), ystruc(npstmx,strumx), & 
            &   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx)
       logical :: closed(strumx)
 
-      ! arrays to hold copies of structures 
-      ! r for "real", i.e. the original input structures
+      ! arrays to hold specific subsets of structures 
+
+      ! r for "real", i.e. the actual device geometry structures
       integer :: rnstruc = 0, rnpstru(strumx)
       REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
       logical :: rclosed(strumx)
 
-      ! arrays to hold copies of structures 
-      ! v for "virtual", i.e. the structures created by setupVirtualStructures
+      ! v for "virtual", i.e. the virtual structures (either automatically generated or given
+      ! as part of the structure.dat input file
       integer :: vnstruc = 0, vnpstru(strumx)
       REAL*8 :: vxstruc(npstmx,strumx), vystruc(npstmx,strumx)
       logical :: vclosed(strumx)
@@ -316,6 +323,9 @@ module carre_types
       ! Generally it is only known for the target plates (computed in sptris).
       integer :: internalSide(strumx) = GRID_UNDEFINED
 
+      ! Flags whether the grid should be refined at this real structure (think: refined at targets)
+      ! Note: this refers to the real structures defined in the r*struc arrays.
+      logical :: refineAtStructure(strumx) = .false.
 
       character nomstr(strumx)*80
   end type CarreStructures
