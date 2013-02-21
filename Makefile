@@ -33,7 +33,7 @@ $(OBJECTCODE)/%.o : %.F
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
-all: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+all: TAGS ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 
 standalone: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
 
@@ -63,8 +63,10 @@ local:
 	-rm rzpsi.mtv rzpsi.ps map loadmap gnuplot.data gnuplot.cmd
 	-gtfl btor.dat structure.dat rzpsi.dat ncar.cfg gmeta fort.11 carre.out carre.log carre.dat warnings.dat traduit.log selptx.inf traduit.out 
 
+TAGS:	tags
+
 tags:
-	rm TAGS ; etags src/*/*.F
+	rm -f TAGS ; etags src/*/*.F
 
 depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	makedepend -f	${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
@@ -88,8 +90,9 @@ listobj:
 LISTOBJ: listobj
 
 ${OBJECTCODE}/dependencies.${OBJECTCODE}:
-	-mkdir ${OBJECTCODE}
+	-mkdir -p ${OBJECTCODE}
 	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}
+	${MAKE} listobj
 	${MAKE} depend
 
 include ${OBJECTCODE}/dependencies.${OBJECTCODE}
