@@ -228,13 +228,15 @@ do {
             /bin/echo -e "Input the list of grid numbers to be REMOVED:"; read u
             [ -n "$u" ] && {
                 uu=
+                vv=
                 for n in $u; do
                   uu="$uu $griddir/$grid_stem.v$n.geo"
+                  vv="$vv $dgdir/$grid_stem.v$n.sno"
                 done
-                ls -l $uu
+                ls -l $uu $vv
                 /bin/echo -e "Do you wish to remove this grid(s)? (y/n): \c"; read u
                 case "$u" in
-                  ( y|Y ) rm -f $uu
+                  ( y|Y ) rm -f $uu $vv
                           for f in $uu; do {
                             n=${f#$griddir/$grid_stem.v}
                             n=${n%.geo}
