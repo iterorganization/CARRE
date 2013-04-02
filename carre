@@ -229,14 +229,16 @@ do {
             [ -n "$u" ] && {
                 uu=
                 vv=
+                ww=
                 for n in $u; do
                   uu="$uu $griddir/$grid_stem.v$n.geo"
-                  vv="$vv $dgdir/$grid_stem.v$n.sno"
+                  vv="$vv $griddir/$grid_stem.v$n.ps"
+                  ww="$ww $dgdir/$grid_stem.v$n.sno"
                 done
-                ls -l $uu $vv
+                ls -l $uu $vv $ww
                 /bin/echo -e "Do you wish to remove this grid(s)? (y/n): \c"; read u
                 case "$u" in
-                  ( y|Y ) rm -f $uu $vv
+                  ( y|Y ) rm -f $uu $vv $ww
                           for f in $uu; do {
                             n=${f#$griddir/$grid_stem.v}
                             n=${n%.geo}
