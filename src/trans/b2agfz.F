@@ -209,13 +209,14 @@ c-ank19990108: done. To be honest, ssn-up and ssn-down are treated equally...
 
 c*** Now compare the vertical position of the x-point with that of the mid-SOL
 c      if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.zero) then
-      if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.z(nptseg(3)/2,1,3)) then
+      if(nreg.eq.2) then
+        equtype='limiter'
+      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.z(nptseg(3)/2,1,3)) 
+     . then
         equtype='sn-up'
 c      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).lt.zero) then
       else if(nreg.eq.3) then
         equtype='sn-down'
-      else if(nreg.eq.2) then
-        equtype='limiter'
       else if(nreg.eq.5) then
         equtype='cdn-full'
       else if(nreg.eq.6 .and. r(1,1,1).eq.r(1,1,3) .and.
@@ -1189,6 +1190,7 @@ c  construct the mesh for a limiter geometry
         ny=nprad(1)+nprad(2)-2
         npol1=nppol(1)-1
         npol2=npol1
+        npol2g=0
 c***
 c       print*,'npol2g=',npol2g
 c       print*,'npol2d=',npol2d
