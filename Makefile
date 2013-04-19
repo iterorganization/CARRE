@@ -33,7 +33,7 @@ $(OBJECTCODE)/%.o : %.F
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
 
-all: TAGS ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+all: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
 
 standalone: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
 
