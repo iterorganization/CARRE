@@ -237,6 +237,14 @@ contains
              & struct%rystruc(1:np, is) )
     end do
 
+    do is = 1, struct%vnstruc        
+        np = abs(struct%vnpstru(is))
+        call siloWriteLineSegmentGridFromPoints( csioDbfile, &
+             & "vstructure_"//int2str(is), &
+             & struct%vxstruc(1:np, is), &
+             & struct%vystruc(1:np, is) )
+    end do
+
     if (present(grid)) then
 
         ! write region grids

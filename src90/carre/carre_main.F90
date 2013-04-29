@@ -160,7 +160,7 @@ contains
                   & equ%npx,equ%ptx,equ%pty,equ%fctpx, & 
                   & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
                   & struct%indplq,struct%inddef,struct%nbdef, & 
-                  & equ%a00,equ%a10,equ%a01,equ%a11)
+                  & equ%a00,equ%a10,equ%a01,equ%a11,struct)
 
              do itmp=1,4
                 equ%ptsep(itmp,1) = 0
@@ -215,33 +215,36 @@ contains
            ! virtual structures were supplied (only possible in CARRE_EXTENDED mode, don't create them
            exit
        else
-           ! Otherwise, if we have a case with x-points, set up virtual geometry
-           if (equ%npx.gt.0)then
+          ! If we arrive here the second time, the virtual targets have been created and the
+          ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
+          if ( iSetupStruct == VIRTUAL_STRUCT_STEP ) exit
 
-               ! If we arrive here the second time, the virtual targets have been created and the
-               ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
-               if ( iSetupStruct == VIRTUAL_STRUCT_STEP ) exit
+          if (equ%limcfg /= 0) then 
+             call setupVirtualLimiterGeometry(par, equ, struct)           
+          else if (equ%npx > .0) then
+             ! if we have a case with x-points, set up virtual geometry
+             !..   10.1  Set up virtual targets/structures
+             call setupVirtualStructures(par, equ, struct)
 
-               !..   10.1  Set up virtual targets/structures
-               call setupVirtualStructures(par, equ, struct)
+             ! mark the real target structures as to be defined
+             do iTarget = 1, struct%nbdef
+                struct%refineAtStructure(struct%inddef(iTarget)) = .true.
+             end do
+          end if
 
-               ! They are only actually used in extended grid mode
-               if ( par%carreMode == CARRE_EXTENDED ) then              
-                   struct%nstruc = struct%vnstruc
-                   struct%npstru = struct%vnpstru
-                   struct%xstruc = struct%vxstruc
-                   struct%ystruc = struct%vystruc
-                   struct%closed = struct%vclosed
-               end if
+          ! They are only actually used in extended grid mode
+          if ( par%carreMode == CARRE_EXTENDED ) then              
+             struct%nstruc = struct%vnstruc
+             struct%npstru = struct%vnpstru
+             struct%xstruc = struct%vxstruc
+             struct%ystruc = struct%vystruc
+             struct%closed = struct%vclosed
+          end if
 
-               ! mark the real target structures as to be defined
-               do iTarget = 1, struct%nbdef
-                   struct%refineAtStructure(struct%inddef(iTarget)) = .true.
-               end do
-
-               call writeVirtualStructuresToFile( struct )
-           end if                     ! npx.gt.0
+          call writeVirtualStructuresToFile( struct )
        end if
+
+       call writeGridStateToSiloFile('carreVirtua0000', equ, struct)
 
     end do                     ! end setup loop
 

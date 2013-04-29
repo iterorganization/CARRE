@@ -78,6 +78,10 @@ contains
        ! smart equilibrium cutoff: cut off points outside of vessel
        call logmsg(LOGINFO, "carre_equilibrium: vessel/smart equilibrium extension enabled")
 
+       ! FIXME: this does not work for limiter configurations,
+       ! because the data for the "fake" x-point on the limiter structure
+       ! as defined in selptx is incomplete
+
        call equilibrium_vessel_cutoff(equ, struct, newPsi)
     end if
 
@@ -238,18 +242,18 @@ contains
        select case (iPass)
        case(1)
           ! bottom-left to top-right
-          xfrom = 2
+          xfrom = 1
           xto = equ%nx
           dx = 1
-          yfrom = 2
+          yfrom = 1
           yto = equ%ny
           dy = 1
        case(2)
           ! top-right-right to bottom-left
-          xfrom = equ%nx - 1
+          xfrom = equ%nx 
           xto = 1
           dx = -1
-          yfrom = equ%ny - 1
+          yfrom = equ%ny
           yto = 1
           dy = -1
        end select

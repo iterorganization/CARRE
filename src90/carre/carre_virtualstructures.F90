@@ -14,9 +14,152 @@ module carre_virtualstructures
 #include <CARREDIM.F>
 
   private
-  public :: setupVirtualStructures, writeVirtualStructuresToFile
+  public :: setupVirtualStructures, writeVirtualStructuresToFile, setupVirtualLimiterGeometry
 
 contains
+
+  ! Sets up a virtual limiter for creating an extended limiter grid.
+  ! -set up an infinitely thin radial limiter line going from the x-point
+  !  (point where the separatrix touches the wall) away from the plasma
+  ! -set up 
+
+  subroutine setupVirtualLimiterGeometry(par, equ, struct)
+    type(CarreParameters), intent(in) :: par
+    type(CarreEquilibrium), intent(in) :: equ
+    type(CarreStructures), intent(inout) :: struct
+
+    ! internal
+    integer :: istru, ip, np
+    double precision :: tx, ty, seppx, seppy, limpoint_min_psi, limpoint_max_psi
+    double precision :: ppsi(npstmx,struct%rnstruc)
+    double precision :: limpoint_min(2), limpoint_max(2)
+    double precision :: minpsi(struct%rnstruc), maxpsi(struct%rnstruc)
+    double precision :: x, y, psi, psi0
+
+    double precision feval2d
+    external feval2d
+
+    ! First figure out min/max psi range to be covered by the grid
+    
+    seppx = huge(seppx)
+    seppy = huge(seppy)
+
+    ! also find structure points covered by the grid with minimal and maximal psi value
+    limpoint_min_psi = huge(limpoint_min_psi)
+    limpoint_max_psi = -huge(limpoint_max_psi)
+
+    do istru = 1, struct%rnstruc
+
+       ! if in target mode, only consider points of the limiter structure
+       if ( par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET ) then
+          if ( .not. any( struct%inddef(1:struct%nbdef) == istru ) ) cycle
+       endif
+
+       ! track psi range of points for every structure
+       minpsi(istru) = huge(minpsi)
+       maxpsi(istru) = -huge(minpsi)
+       
+       write (0,*) 'virtualtargets: Structure ', istru, & 
+            &        ': ', struct%rnpstru(istru), ' points'
+       ! loop over all points in structure
+       do ip = 1, abs(struct%rnpstru(istru))
+
+          tx = struct%rxstruc( ip, istru )
+          ty = struct%rystruc( ip, istru )
+
+          ! compute psi at point
+          ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+               &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+               &           tx, ty )
+
+          ! update min/max psi values
+          minpsi(istru) = min( minpsi(istru), ppsi(ip,istru) )
+          maxpsi(istru) = max( maxpsi(istru), ppsi(ip,istru) )
+
+          ! bookkeeping to find points with min/max psi
+          if ( ppsi(ip,istru) < limpoint_min_psi ) then
+              limpoint_min_psi = ppsi(ip,istru)
+              limpoint_min(1) = tx
+              limpoint_min(2) = ty
+          end if
+          if ( ppsi(ip,istru) > limpoint_max_psi ) then
+              limpoint_max_psi = ppsi(ip,istru)
+              limpoint_max(1) = tx
+              limpoint_max(2) = ty
+          end if
+
+          ! find projection on separatrix for this point
+
+       enddo ! structure point loop
+
+       write(0,*) 'virtualtargets Structure:', istru, ', psi range:', & 
+            &        minpsi(istru),  maxpsi(istru)
+
+    enddo ! structure loop
+
+    ! create limiter structure starting at the x-point (innermost wall contact point)        
+
+    ! Structure number 1
+    struct%vnstruc = 1
+
+    x = equ%ptx(1)
+    y = equ%pty(1)
+    np = 1
+    struct%vxstruc(np, 1) = x
+    struct%vystruc(np, 1) = y
+    psi0 = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+         & x, y )
+    
+    write (*,*) limpoint_min_psi, limpoint_max_psi
+    write (*,*) np, x, y, psi0
+
+    limpoint_max_psi = limpoint_max_psi + abs(limpoint_max_psi * 0.1)
+    limpoint_min_psi = limpoint_min_psi - abs(limpoint_min_psi * 0.1)
+
+    do
+       call movePointAwayFromXOPoint( x, y, equ, onlyOPoint = .true. )
+
+       np = np + 1
+       struct%vxstruc(np, 1) = x
+       struct%vystruc(np, 1) = y       
+
+       psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+            & x, y )
+
+       write (*,*) np, x, y, psi
+
+       if ( psi > psi0 .and. psi > limpoint_max_psi  ) then
+          exit
+       end if
+
+       if ( psi < psi0 .and. psi < limpoint_min_psi ) then
+          exit
+       end if
+
+    end do
+
+    struct%vnpstru(1) = np
+    struct%vclosed(1) = .false.
+
+    return
+
+    if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
+       call virtualLimiters_targetMode(equ, struct)
+    else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
+       ! move the limiter points a bit further to the outside to make sure we really cover the vessel
+       ! (especially when using only a single vessel countour / open targets)
+       
+       call movePointAwayFromXOPoint( limpoint_min(1), limpoint_min(2), equ )
+       call movePointAwayFromXOPoint( limpoint_max(1), limpoint_max(2), equ )
+       
+       call add_virtual_limiter(equ, struct, limpoint_min(1), limpoint_min(2))
+       call add_virtual_limiter(equ, struct, limpoint_max(1), limpoint_max(2))
+    end if
+    
+  end subroutine setupVirtualLimiterGeometry
+
 
   subroutine setupVirtualStructures(par, equ, struct)
     type(CarreParameters), intent(in) :: par
@@ -50,8 +193,8 @@ contains
         ! move the limiter points a bit further to the outside to make sure we really cover the vessel
         ! (especially when using only a single vessel countour / open targets)
                 
-        call movePointAwayFromOPoint( limpoint_min(1), limpoint_min(2) )
-        call movePointAwayFromOPoint( limpoint_max(1), limpoint_max(2) )
+        call movePointAwayFromXOPoint( limpoint_min(1), limpoint_min(2), equ )
+        call movePointAwayFromXOPoint( limpoint_max(1), limpoint_max(2), equ )
         
         call add_virtual_limiter(equ, struct, limpoint_min(1), limpoint_min(2))
         call add_virtual_limiter(equ, struct, limpoint_max(1), limpoint_max(2))
@@ -67,58 +210,77 @@ contains
     call csioCloseFile()                         
 #endif
     
-  contains
-
-    subroutine movePointAwayFromOPoint( x, y )
-      double precision, intent(inout) :: x, y
-
-      ! internal
-      double precision :: psi, psix, gx, gy, gsign, dpsiToX, delta
-      integer :: ix, ixclosest
-
-      real*8 feval2d, norm
-      external feval2d, norm
-
-      ! compute psi at point
-      psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-           & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
-           & x, y )
-      
-      ! compute grad psi at point
-      gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-           & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
-           & x, y )
-      gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-           & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
-           & x, y )
-
-      ! find closest x-point in psi
-      dPsiToX = huge(dPsiToX)
-      do ix = 1, equ%npx
-          if ( abs(equ%fctpx(ix) - psi) < dpsiToX ) then
-              ixClosest = ix
-              dPsiToX = abs(equ%fctpx(ix) - psi)
-          end if
-      end do
-           
-      ! move in direction of grad psi away from o-point
-      if ( equ%fctpx(ixClosest) < psi ) then
-          gsign = +1
-      else
-          gsign = -1
-      end if
-
-      !delta = abs(equ%fctpx(ixClosest) - psi) * 0.1
-      !delta = 1.0 / norm(gx, gy) * (equ%x(2) - equ%x(1)) 
-      !delta = 1.0 / norm(gx, gy) * norm( equ%ptx(ixClosest) - x, equ%pty(ixClosest) - y ) * 0.1
-      delta = 1.0 / norm(gx, gy) * norm( equ%xpto - x, equ%ypto - y ) * 0.05
-
-      x = x + gx * gsign * delta
-      y = y + gy * gsign * delta
-
-    end subroutine movePointAwayFromOPoint
-
   end subroutine setupVirtualStructures
+
+
+  subroutine movePointAwayFromXOPoint( x, y, equ, onlyOPoint )
+    double precision, intent(inout) :: x, y
+    type(CarreEquilibrium), intent(in) :: equ
+    logical, intent(in), optional :: onlyOPoint
+
+    ! internal
+    double precision :: psi, psix, gx, gy, gsign, dpsiToX, delta, psio
+    integer :: ix, ixclosest
+    logical :: onlyO
+
+    real*8 feval2d, norm
+    external feval2d, norm
+
+    onlyO = .false.
+    if (present(onlyOPoint)) onlyO = onlyOPoint
+
+    ! compute psi at point
+    psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+         & x, y )
+
+    ! compute grad psi at point
+    gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+         & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
+         & x, y )
+    gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+         & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
+         & x, y )
+
+    ! find closest x- or o-point in psi
+    if (.not. onlyO) then
+       dPsiToX = huge(dPsiToX)
+       do ix = 1, equ%npx
+          if ( abs(equ%fctpx(ix) - psi) < dpsiToX ) then
+             ixClosest = ix
+             dPsiToX = abs(equ%fctpx(ix) - psi)
+          end if
+       end do
+       ! move in direction of grad psi away from o-point
+       if ( equ%fctpx(ixClosest) < psi ) then
+          gsign = +1
+       else
+          gsign = -1
+       end if       
+    else
+       psio = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
+            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+            & equ%xpto, equ%ypto )
+       !write (*,*) "O-point psi", psio
+
+       if ( psio < psi ) then
+          gsign = +1
+       else
+          gsign = -1
+       end if       
+    end if
+
+
+    !delta = abs(equ%fctpx(ixClosest) - psi) * 0.1
+    !delta = 1.0 / norm(gx, gy) * (equ%x(2) - equ%x(1)) 
+    !delta = 1.0 / norm(gx, gy) * norm( equ%ptx(ixClosest) - x, equ%pty(ixClosest) - y ) * 0.1
+    delta = 1.0 / norm(gx, gy) * norm( equ%xpto - x, equ%ypto - y ) * 0.05
+
+    x = x + gx * gsign * delta
+    y = y + gy * gsign * delta
+
+  end subroutine movePointAwayFromXOPoint
+
 
 
   !> This routine creates virtual target plates

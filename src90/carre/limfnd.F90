@@ -1,7 +1,7 @@
       subroutine limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot, & 
      &    nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx, & 
      &    nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
-     &    a00,a10,a01,a11)
+     &    a00,a10,a01,a11,struct)
 !
 !  version : 07.07.97 20:10
 !
@@ -30,14 +30,16 @@
      &  a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
      &  x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx), & 
      &  fctpx(npxmx),xstruc(npstmx,strumx),ystruc(npstmx,strumx)
+      type(CarreStructures), intent(inout) :: struct
+
 !
 !  local variables
       real*8 zero
       parameter(zero=0.)
       integer dir,sens,nt(2),nbcrb,ind0,i,ii,jj,k,plaque,nstrp1, & 
      &  idef,idniv,indlim,ipx
-      real*8 xt(npnimx,2),yt(npnimx,2), & 
-     &                                       x0,y0,psi0,x2,y2,psi2,norm
+      real*8 xt(npnimx,2),yt(npnimx,2),x0,y0,psi0,x2,y2,psi2,norm,&
+           & xin, yin
 !
 !  ind0: indice du point du limiteur qui est le plus rapproche de la
 !        separatrice
@@ -91,6 +93,13 @@
      &      nx,ny,x,y,psi,nstrp1,npstru,xstruc, & 
      &      ystruc,a00,a10,a01,a11,indlim)
       plaque=indlim
+
+      ! mark internal side of limiter structure
+      if (indlim /= 0) then
+         xin = nivx(nivtot(idniv)-1, idniv)
+         yin = nivy(nivtot(idniv)-1, idniv)
+         struct%internalSide(indlim) = onWhichSideOfStructure(xin, yin, struct, indlim)
+      end if
 !
 !  2.1  definition des indices de plaque pour usage dans maille
       indplq(1,1)=plaque

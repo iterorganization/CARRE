@@ -228,7 +228,7 @@ contains
     struct%rystruc(:,1:struct%rnstruc) = struct%ystruc(:,par%nVirtualStructs+1:struct%nstruc)    
     struct%rclosed(1:struct%rnstruc) = struct%closed(par%nVirtualStructs+1:struct%nstruc)
 
-    ! All structure (virtual + real) are now still in the standard struct%xstru,... arrays
+    ! All structures (virtual + real) are now still in the standard struct%xstru,... arrays
 
     call csioGetStructureSegments( struct%rnstruc, struct%rnpstru, &
          & struct%rxstruc, struct%rystruc, csioStrucNSeg, csioStrucSegments )
