@@ -374,6 +374,10 @@ CONTAINS
          call rdfrin(11,vari(ieg+1:80),par%equExtensionMode,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:len('equDistanceFun')) .EQ. 'equDistanceFun') THEN
+         call rdfrin(11,vari(ieg+1:80),par%equDistanceFunction,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('psimin')) .EQ. 'psimin') THEN
          call rdfrre(11,vari(ieg+1:80),par%psimin,ierror)
          if(ierror.eq.1) go to 98

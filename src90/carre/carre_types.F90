@@ -81,6 +81,10 @@ module carre_types
   integer, parameter, public :: EQU_EXTENSION_MODE_SIMPLE = 1
   integer, parameter, public :: EQU_EXTENSION_MODE_VESSEL = 2
 
+  ! Equilibrium distance function
+  integer, parameter, public :: EQU_DIST_FUN_FAST = 1
+  integer, parameter, public :: EQU_DIST_FUN_EXACT = 2
+
   type CarreParameters
       !.. nptseg: number of points along differents segments of separatrix (as given
       !..         in input file carre.dat. See also CarreGrid%nptseg)
@@ -116,6 +120,7 @@ module carre_types
 
       ! Control flag for equilibrium data extension
       integer :: equExtensionMode = EQU_EXTENSION_OFF
+      integer :: equDistanceFunction = EQU_DIST_FUN_EXACT
 
       ! psi cutoff parameters
       double precision :: psimin = -huge(0.0d0), psimax = huge(0.0d0)

@@ -131,8 +131,14 @@ contains
     distFactor = (psiPtX - psiPtO) / dist(equ%xpto, equ%ypto, equ%ptx(1), equ%pty(1))
 
     ! Run extension algorithm
-    call compute_distance_fast(equ, distFactor)
-    !call compute_distance_exact(equ, distFactor)
+    
+    if ( par%equDistanceFunction == EQU_DIST_FUN_FAST ) then
+       call compute_distance_fast(equ, distFactor)
+    elseif ( par%equDistanceFunction == EQU_DIST_FUN_EXACT ) then
+       call compute_distance_exact(equ, distFactor)
+    else
+       stop "extend_equilibrium: unknown choice for equDistanceFun"
+    endif
 
     ! Re-compute some data...
     ! Calculate the first partial derivatives in x and y and store
