@@ -44,19 +44,19 @@ nrelax        relax          pasmin         rlcept
     2.95424328E+00      3.14123078E-01     -1.01996500E+00
  $parameters
 carreMode = 2
-gridExtensionMode = 2
+gridExtensionMode = 1
 loglevel = 6
-equExtensionMode = 0
+equExtensionMode = 1
 psimin = -1.0e9
 psimax = +1.0e9
 rmin   = -1.0e9
 rmax   = +1.0e9
 zmin   = -1.0e9
 zmax   = 1e10
-addLeft   = 0
-addRight  = 0
-addBottom = 0
-addTop    = 0
+addLeft   = 10
+addRight  = 10
+addBottom = 10
+addTop    = 10
 repart = 2
 distxo = 0.97654325
 pntrat = 0.20000000
@@ -75,6 +75,10 @@ nrelax=  500
 relax= 1.0000E-01
 pasmin= 1.0000E-02
 rlcept= 1.0000E-06
+#nRefineAtStructs = 1
+#refineAtStructs = 4
+#targetResolution = 0.1
+#maxResJump = 10.0
 $end
  x(m)            y(m)            psi(SI)         dpsi/dx         dpsi/dy
  $maille
