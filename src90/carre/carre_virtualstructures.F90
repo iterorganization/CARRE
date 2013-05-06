@@ -34,10 +34,10 @@ contains
     double precision :: ppsi(npstmx,struct%rnstruc)
     double precision :: limpoint_min(2), limpoint_max(2)
     double precision :: minpsi(struct%rnstruc), maxpsi(struct%rnstruc)
-    double precision :: x, y, psi, psi0
+    double precision :: x, y, psi, psi0, l
 
-    double precision feval2d
-    external feval2d
+    double precision feval2d, long
+    external feval2d, long
 
     ! First figure out min/max psi range to be covered by the grid
     
@@ -140,22 +140,17 @@ contains
 
     end do
 
+
     struct%vnpstru(1) = np
     struct%vclosed(1) = .false.
 
-    return
-
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
-       call virtualLimiters_targetMode(equ, struct)
-    else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
-       ! move the limiter points a bit further to the outside to make sure we really cover the vessel
-       ! (especially when using only a single vessel countour / open targets)
+       ! limiting surface: only external one relevant (no. 2)
+       l = long( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2) )
+       call coord( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2), &
+            & l/2.0, x, y )
        
-       call movePointAwayFromXOPoint( limpoint_min(1), limpoint_min(2), equ )
-       call movePointAwayFromXOPoint( limpoint_max(1), limpoint_max(2), equ )
-       
-       call add_virtual_limiter(equ, struct, limpoint_min(1), limpoint_min(2))
-       call add_virtual_limiter(equ, struct, limpoint_max(1), limpoint_max(2))
+       call add_virtual_limiter(equ, struct, x, y)       
     end if
     
   end subroutine setupVirtualLimiterGeometry

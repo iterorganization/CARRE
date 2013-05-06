@@ -106,6 +106,7 @@
       indplq(2,1)=plaque
       inddef(1)=plaque
       inddef(2)=plaque
+      nbdef = 2
 
 !
 !  3.   On trouve le point du limiteur qui est le plus rapproche de la
@@ -127,7 +128,7 @@
       ipx = 1
       dir = 0
       k = 1
-      nbdef=0
+      !nbdef=0
 
       nivx(k,idniv)=x0
       nivy(k,idniv)=y0

@@ -5,7 +5,7 @@
       implicit none
 !  Determination des coordonnees (x0,y0) et de l'indice de segment ind0
 !  du point de la structure parametrisee par [tx1, ty1, n1], qui est
-!  le plus rapproche de la courbe parametrisee par [tx2, ty2,n2].
+!  le plus rapproche de la courbe parametrisee par [tx2, ty2, n2].
 !  N.B.: On suppose qu'il n'y a pas intersection entre les deux courbes.
 !
 !  arguments

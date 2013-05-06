@@ -4,6 +4,7 @@ module itmcarre
   use itm_assert
   use Logging
   use Helper
+  use itm_types
 
   use carre_main
   use carre_types
@@ -18,7 +19,7 @@ module itmcarre
   
 contains
 
-  Subroutine itmcarre_main(equcpo, limcpo, edgecpo)
+  subroutine itmcarre_main(equcpo, limcpo, edgecpo)
         
     type(type_equilibrium), intent(in), pointer :: equcpo(:)
     type(type_limiter), intent(in) :: limcpo
@@ -76,22 +77,22 @@ contains
     type(CarreEquilibrium), intent(out) :: equ
     type(CarreParameters), intent(inout) :: par
 
-    call assert( equcpo % profiles_2d % grid_type(1) == '1', &
+    call assert( equcpo % profiles_2d(1) % grid_type(1) == '1', &
         & "read_equilibrium: Equ. CPO not in right format: no rect. grid" )
-    equ%nx = size( equcpo % profiles_2d % grid % dim1 )
-    equ%ny = size( equcpo % profiles_2d % grid % dim2 )
+    equ%nx = size( equcpo % profiles_2d(1) % grid % dim1 )
+    equ%ny = size( equcpo % profiles_2d(1) % grid % dim2 )
 
     call assert( (equ%nx <= nxmax) .and. (equ%ny <= nymax), &
         & "read_equilibrium: equilibrium grid too large" )
 
-    equ%x(1:equ%nx) = equcpo % profiles_2d % grid % dim1
-    equ%y(1:equ%ny) = equcpo % profiles_2d % grid % dim2
-    equ%psi(1:equ%nx, 1:equ%ny) = equcpo % profiles_2d % psi
+    equ%x(1:equ%nx) = equcpo % profiles_2d(1) % grid % dim1
+    equ%y(1:equ%ny) = equcpo % profiles_2d(1) % grid % dim2
+    equ%psi(1:equ%nx, 1:equ%ny) = equcpo % profiles_2d(1) % psi
 
     ! X-points
-    par%xPointNum = size(equcpo % eqgeometry % xpts % r)
-    par%xPointX(1:par%xPointNum) = equcpo % eqgeometry % xpts % r(1:par%xPointNum)
-    par%xPointY(1:par%xPointNum) = equcpo % eqgeometry % xpts % z(1:par%xPointNum)
+    par%xPointNum = size(equcpo % eqgeometry % xpts(1) % r)
+    par%xPointX(1:par%xPointNum) = equcpo % eqgeometry % xpts(1) % r(1:par%xPointNum)
+    par%xPointY(1:par%xPointNum) = equcpo % eqgeometry % xpts(1) % z(1:par%xPointNum)
 
     ! O-Point
     par%oPointX = equcpo % global_param % mag_axis % position % r
@@ -173,9 +174,9 @@ contains
 
     ! arrays for cell flags (currently not used in ITM Carre)
     integer :: b2cflag(-1:nxmax,-1:nymax,CARREOUT_NCELLFLAGS)
-    integer :: cflag(npmamx,nrmamx,nreg,CARREOUT_NCELLFLAGS)
+    integer :: cflag(npmamx,nrmamx,grid%nreg,CARREOUT_NCELLFLAGS)
 
-    real*8 crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), & 
+    double precision :: crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), & 
         &  bb(-1:nxmx,-1:nymx,0:3),b0r0, & 
         &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), & 
         &  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3)    
@@ -190,10 +191,10 @@ contains
     b2cflag = 0
 
     ! assemble the crx, cry arrays
-    call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-        &    grid%xmail,grid%ymail,grid%nreg,grid%np1,par%npr,npmamx,nrmamx, & 
-        &    par%nptseg,psidx,psidy,grid%psim,grid%psidxm,grid%psidym,cflag,b0r0, & 
-        &    ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
+     call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+         &    grid%xmail,grid%ymail,grid%nreg,nregmx,grid%np1,par%npr,npmamx,nrmamx, & 
+         &    par%nptseg,psidx,psidy,grid%psim,grid%psidxm,grid%psidym,cflag,b0r0, & 
+         &    ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
 
     ! allocate connectivity arrays 
     allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),&
@@ -202,7 +203,8 @@ contains
         & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
 
     ! assemble the connectivity arrays
-    call init_connectivity (nx,ny,crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),b2cflag(-1:nx,-1:ny,:), &
+    call init_connectivity (nx,ny,crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),&
+        & b2cflag(-1:nx,-1:ny,:), &
         & leftix,leftiy,rightix,rightiy, &
         & topix,topiy,bottomix,bottomiy, &
         & leftcut,rightcut,bottomcut,topcut, &
@@ -214,9 +216,9 @@ contains
     allocate( resignore(-1:nx, -1:ny, 1:2) )
     call init_region(nx,ny,nncut,ncutmx, &
         & leftcut,rightcut,topcut,bottomcut, &
-        & leftix,rightix,rightiy,topix,topiy,bottomiy, &
+        & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
         & region,nnreg,resignore, &
-        & crx,cry,PERIODIC_BC)
+        & crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),PERIODIC_BC,b2cflag(-1:nx,-1:ny,:))
 
     ! set up the B2<->CPO mappings
     call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),b2cflag(-1:nx,-1:ny,:),&

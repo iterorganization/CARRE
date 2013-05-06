@@ -21,6 +21,7 @@ program tradui
   use carre_parameter_io
   use tradui_constants
   use carre_b2ag
+  use b2mod_silo
 
   implicit none
 
@@ -42,7 +43,11 @@ program tradui
   real*8 crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), & 
       &  bb(-1:nxmx,-1:nymx,0:3),b0r0, & 
       &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), & 
-      &  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3)
+      &  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3),&
+      &  psi_tmp(-1:nxmx,-1:nymx,0:4,0:2),&
+      &  crx_tmp(-1:nxmx,-1:nymx,0:4),cry_tmp(-1:nxmx,-1:nymx,0:4), &
+      &  silo_tmp(-1:nxmx,-1:nymx)
+  
   character nom*80
 
   ! connectivity and cut arrays
@@ -67,7 +72,7 @@ program tradui
   ! variables for UAL I/O
 #ifdef USE_ITMCARRE
   type (type_edge),pointer :: cpoedge(:) => null()
-  integer :: idx, shot, run
+  integer :: idx, shot, run, ix, iy
   double precision :: time
 #endif
 
@@ -131,6 +136,7 @@ program tradui
   write(6,*) '5: revised DIVIMP with grid parameters and PSI values'
 #ifdef USE_ITMCARRE
   write(6,*) '6: Write ITM CPO' 
+  write(6,*) '7: Write SILO file' 
 #endif
   read(5,*) isel
   write(6,*) 'The format chosen is :',isel
@@ -206,19 +212,18 @@ program tradui
       ! jdemod - added fpsi to call to ecrim5
       call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
 #ifdef USE_ITMCARRE
-  elseif(isel.eq.6) then
-      !
-      ! CPO Output
-      !
+  elseif(isel >= 6 .and. isel <= 7) then
 
       ! assemble the crx, cry arrays
-      ! the same applies here as in case 2 w.r.t. grid extent: no ghost cells
+      ! the same applies here as in case 2 w.r.t. grid extent: no ghost cells, 
+      ! storage is in 0:nx-1, 0:ny-1
       call b2agfz(nnx,nny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
           & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, & 
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,&
-          & ITM_DO_CLASSICAL_GHOSTCELLS )
+          & ITM_DO_CLASSICAL_GHOSTCELLS)
+      ! This gives crx, cry, fpsi, ffbz, psidx, psidy, b2cflag
 
       ! nnx, nny is the size of the region actually filled with data
 
@@ -228,9 +233,49 @@ program tradui
       else
           ! Figure out real grid dimension nx, ny
           call computeGridSizeWithGhostCells(nnx, nny, niso, nx, ny)
+
+          ! Compute magnetic field with the same recipe as carre...
+          call carre_b2agbb(nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),&
+               & bb(-1:nx,-1:ny,0:3), &
+               & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),&
+               & psidx(-1:nx,-1:ny,0:3), psidy(-1:nx,-1:ny,0:3) )
+
           ! add the ghost cells
+          psi_tmp(-1:nx,-1:ny,0:3,0) = fpsi(-1:nx,-1:ny,:)
+          psi_tmp(-1:nx,-1:ny,0:3,1) = psidx(-1:nx,-1:ny,:)
+          psi_tmp(-1:nx,-1:ny,0:3,2) = psidy(-1:nx,-1:ny,:)
+          crx_tmp(-1:nx,-1:ny,1:4) = crx(-1:nx,-1:ny,:)
+          cry_tmp(-1:nx,-1:ny,1:4) = cry(-1:nx,-1:ny,:)
+
           call create_guard_cells(nnx, nny, nx, ny, niso, nxiso, &
-              & crx(-1:nx,-1:ny,:), cry(-1:nx,-1:ny,:), b2cflag(-1:nx,-1:ny,:))
+              & crx_tmp(-1:nx,-1:ny,:), cry_tmp(-1:nx,-1:ny,:), &
+              & psi_tmp(-1:nx,-1:ny,:,:), &
+              & bb(-1:nx,-1:ny,0), bb(-1:nx,-1:ny,2),&
+              & ffbz(-1:nx,-1:ny,:), &
+              & b2cflag(-1:nx,-1:ny,:), withSourceOffset=.true.)
+
+          fpsi(-1:nx,-1:ny,0:3) = psi_tmp(-1:nx,-1:ny,0:3,0)
+          psidx(-1:nx,-1:ny,0:3) = psi_tmp(-1:nx,-1:ny,0:3,1)
+          psidy(-1:nx,-1:ny,0:3) = psi_tmp(-1:nx,-1:ny,0:3,2)
+          crx(-1:nx,-1:ny,:) = crx_tmp(-1:nx,-1:ny,1:4)
+          cry(-1:nx,-1:ny,:) = cry_tmp(-1:nx,-1:ny,1:4)
+
+!!$          !     ...and transfer it to ghost cells, with sanity checks
+!!$          do iy=0,ny+1
+!!$             do ix=0,nx+1
+!!$                select case( b2cflag(ix,iy,CELLFLAG_TYPE) )
+!!$                case(GRID_GUARD)
+!!$                   bb(ix,iy,0) = bb_tmp(ix,iy,0)
+!!$                   bb(ix,iy,2) = bb_tmp(ix,iy,2)
+!!$                case(GRID_INTERNAL, GRID_BOUNDARY)
+!!$                   if (abs(bp(ix,iy) - bb_tmp(ix,iy,0)) > 1e-7 .or. &
+!!$                        & abs(bt(ix,iy) - bb_tmp(ix,iy,2)) > 1e-7) then
+!!$                      write (*,*) "b2agfs: not matching carre bb at", ix, iy
+!!$                   endif
+!!$                end select
+!!$             enddo
+!!$          enddo
+
       end if
 
       ! allocate connectivity arrays 
@@ -250,11 +295,15 @@ program tradui
       ! compute the region arrays
       allocate( region(-1:nx, -1:ny, 0:2) )
       allocate( resignore(-1:nx, -1:ny, 1:2) )
+
       call init_region(nx,ny,nncut,ncutmx, &
           & leftcut,rightcut,topcut,bottomcut, &
-          & leftix,rightix,rightiy,topix,topiy,bottomiy, &
+          & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
           & region,nnreg,resignore, &
-          & crx,cry,PERIODIC_BC)
+          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),PERIODIC_BC, &
+          & b2cflag(-1:nx,-1:ny,:) )
+
+!      region(:,:,0)=1
 
       ! set up the B2<->CPO mappings
       call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
@@ -262,32 +311,60 @@ program tradui
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, ITM_OUTPUT_GHOSTCELLS, b2gd)
 
-      call b2ITMFillGridDescription( b2gd, itmgrid, &
-          & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
-          & leftix,leftiy,rightix,rightiy, &
-          & topix,topiy,bottomix,bottomiy, &
-          & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:), ITM_OUTPUT_GHOSTCELLS )
 
-      allocate(cpoedge(1))
-      allocate(cpoedge(1)%datainfo%dataprovider(1))
-      cpoedge(1)%datainfo%dataprovider="IPP"
-      allocate(cpoedge(1)%codeparam%codename(1))
-      cpoedge(1)%codeparam%codename(1)="ITMCARRE"
-      cpoedge(1)%time= 0.0D0
+      if (isel == 6) then
 
-      cpoedge(1)%grid = itmgrid
+         !
+         ! CPO Output
+         !
 
-      shot = 1
-      run = 1
-      time = 0.0
+         call b2ITMFillGridDescription( b2gd, itmgrid, &
+              & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
+              & leftix,leftiy,rightix,rightiy, &
+              & topix,topiy,bottomix,bottomiy, &
+              & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:), ITM_OUTPUT_GHOSTCELLS )
 
-      call open_ual(idx, shot, run, time, &
-          & nmlFile = 'ual.namelist.edge.out', doCreate = .true.)
+         allocate(cpoedge(1))
+         allocate(cpoedge(1)%datainfo%dataprovider(1))
+         cpoedge(1)%datainfo%dataprovider="IPP"
+         allocate(cpoedge(1)%codeparam%codename(1))
+         cpoedge(1)%codeparam%codename(1)="ITMCARRE"
+         cpoedge(1)%time= 0.0D0
 
-      call euitm_put(idx,"edge",cpoedge)
-      call euitm_deallocate(cpoedge)
+         cpoedge(1)%grid = itmgrid
 
-      call close_ual(idx)
+         shot = 1
+         run = 1
+         time = 0.0
+
+         call open_ual(idx, shot, run, time, &
+              & nmlFile = 'ual.namelist.edge.out', doCreate = .true.)
+
+         call euitm_put(idx,"edge",cpoedge)
+         call euitm_deallocate(cpoedge)
+
+         call close_ual(idx)
+
+      else if (isel == 7) then 
+
+         call b2silo_open("traduitAAA")
+         call b2silo_writeGrid( "grid", b2gd, nx, ny, &
+              & b2cflag(-1:nx,-1:ny,:), &
+              & crx(-1:nx,-1:ny,:), cry (-1:nx,-1:ny,:))
+         silo_tmp(-1:nx,-1:ny) = b2cflag(-1:nx,-1:ny,1)
+         call b2silo_writeCvScalarReal( "grid", b2gd, "cflag1", nx, ny, silo_tmp(-1:nx,-1:ny) )
+         silo_tmp(-1:nx,-1:ny) = b2cflag(-1:nx,-1:ny,2)
+         call b2silo_writeCvScalarReal( "grid", b2gd, "cflag2", nx, ny, silo_tmp(-1:nx,-1:ny) )
+         silo_tmp(-1:nx,-1:ny) = b2cflag(-1:nx,-1:ny,3)
+         call b2silo_writeCvScalarReal( "grid", b2gd, "cflag3", nx, ny, silo_tmp(-1:nx,-1:ny) )
+         silo_tmp(-1:nx,-1:ny) = b2cflag(-1:nx,-1:ny,4)
+         call b2silo_writeCvScalarReal( "grid", b2gd, "cflag4", nx, ny, silo_tmp(-1:nx,-1:ny) )
+         silo_tmp(-1:nx,-1:ny) = b2cflag(-1:nx,-1:ny,5)
+         call b2silo_writeCvScalarReal( "grid", b2gd, "cflag5", nx, ny, silo_tmp(-1:nx,-1:ny) )
+         call b2silo_close()
+
+      end if
+
 #endif      
 
 

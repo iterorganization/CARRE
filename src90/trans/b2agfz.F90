@@ -33,7 +33,7 @@
      &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx),&
      &  cflag(npolmx,nradmx,nregmx,CARREOUT_NCELLFLAGS)
       integer b2cflag(-1:nxmax,-1:nymax,CARREOUT_NCELLFLAGS)
-      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
+      double precision :: crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
      &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), & 
      &  r(npolmx,nradmx,nregmx),z(npolmx,nradmx,nregmx), & 
      &  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3), & 
@@ -227,13 +227,14 @@
 
 !*** Now compare the vertical position of the x-point with that of the mid-SOL
 !      if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.zero) then
-      if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.z(nptseg(3)/2,1,3)) then
+      if(nreg.eq.2) then
+         equtype='limiter'
+      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.z(nptseg(3)/2,1,3)) then
+      !    if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.z(nptseg(3)/2,1,3)) then
         equtype='sn-up'
 !      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).lt.zero) then
       else if(nreg.eq.3) then
         equtype='sn-down'
-      else if(nreg.eq.2) then
-        equtype='limiter'
       else if(nreg.eq.5) then
         equtype='cdn-full'
       else if(nreg.eq.6 .and. r(1,1,1).eq.r(1,1,3) .and. & 
@@ -1273,6 +1274,7 @@
         ny=nprad(1)+nprad(2)-2
         npol1=nppol(1)-1
         npol2=npol1
+        npol2g=0
 !***
 !       print*,'npol2g=',npol2g
 !       print*,'npol2d=',npol2d
