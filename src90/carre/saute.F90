@@ -107,7 +107,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
                   if (ind2 == 0) ind2 = npst - 1
                   if (ind2 == npst) ind2 = 1
               else
-                  ! We fell off the structure. Return last point of structure.
+                  ! We fell off the structure. Return the last point of the structure.
                   if (ind2 == 0) then
                       x2 = xst(1)
                       y2 = yst(1)

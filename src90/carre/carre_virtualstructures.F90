@@ -117,7 +117,7 @@ contains
     limpoint_max_psi = limpoint_max_psi + abs(limpoint_max_psi * 0.1)
     limpoint_min_psi = limpoint_min_psi - abs(limpoint_min_psi * 0.1)
 
-    do
+   do
        call movePointAwayFromXOPoint( x, y, equ, onlyOPoint = .true. )
 
        np = np + 1
@@ -143,6 +143,8 @@ contains
 
     struct%vnpstru(1) = np
     struct%vclosed(1) = .false.
+
+    FIXME: also set up limiter in vessel case to avoid falling of the structure
 
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
        ! limiting surface: only external one relevant (no. 2)

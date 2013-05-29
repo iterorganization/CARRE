@@ -285,6 +285,8 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
       ypto=pointy(ipo)
       ptx(npx+1)=xpto
       pty(npx+1)=ypto
+      iptx(npx+1)=ii(ipo)
+      jptx(npx+1)=jj(ipo)
   end if
 
 20 continue

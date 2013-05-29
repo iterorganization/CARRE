@@ -1,7 +1,7 @@
       subroutine limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot, & 
      &    nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx, & 
      &    nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
-     &    a00,a10,a01,a11,struct)
+     &    a00,a10,a01,a11,struct,equ)
 !
 !  version : 07.07.97 20:10
 !
@@ -31,6 +31,7 @@
      &  x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx), & 
      &  fctpx(npxmx),xstruc(npstmx,strumx),ystruc(npstmx,strumx)
       type(CarreStructures), intent(inout) :: struct
+      type(CarreEquilibrium), intent(inout) :: equ
 
 !
 !  local variables
@@ -114,13 +115,24 @@
       call plurap(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
      &  nivx(1,idniv),nivy(1,idniv),nivtot(idniv),x0,y0,ind0)
 !
-!  4.   parametrisation de la separatrice.
+!  4.   parametrisation de la separatrice.      
+
+      ! Fill x-point arrays as done in selptx
+      ! "x-point" (limiter point)
       ptx(1)=x0
       pty(1)=y0
-      nbcrb=1
-      nt(1)=0
       ii = ifind(x0,x,nx,1)
       jj = ifind(y0,y,ny,1)
+      equ%iptx(1) = ii
+      equ%jptx(1) = jj
+      ! o-point
+      ptx(2)=x0
+      pty(2)=y0
+      equ%iptx(2) = ifind(xpto,x,nx,1)
+      equ%jptx(2) = ifind(ypto,y,ny,1)
+
+      nbcrb=1
+      nt(1)=0
 
       psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
      &       a11(ii,jj,1)*x0*y0

@@ -192,8 +192,8 @@ contains
           call logmsg(LOGWARNING, "crbniv: too many points in level line, returning incomplete line.")
 #ifdef USE_SILO
              if (DEBUGFILES_CRBNIV) then
-                !call csioOpenFile('carreCrbnivEndP')
-                call csioOpenFile()
+                call csioOpenFile('carreCrbnivEndP')
+                !call csioOpenFile()
                 call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
                      & crbx(1:k), crby(1:k) )    
                 call csioCloseFile()
@@ -214,8 +214,8 @@ contains
              foundEndPoint = .true.
 #ifdef USE_SILO
              if (DEBUGFILES_CRBNIV) then
-                !call csioOpenFile('carreCrbnivEndP')
-                call csioOpenFile()
+                call csioOpenFile('carreCrbnivEndP')
+                !call csioOpenFile()
                 call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
                      & crbx(1:k), crby(1:k) )    
                 call csioCloseFile()
@@ -369,7 +369,14 @@ contains
 #ifdef USE_SILO
           if (DEBUGFILES_CRBNIV) then
              call csioOpenFile('carreCrbnivStop')
-             call csioOpenFile()
+             write (*,*) "k=", k
+             if ( k == 1 ) then
+                ! Add second point to broken line to make I/O work.
+                k = 2
+                crbx(2) = 0.0
+                crby(2) = 0.0
+             end if
+
              call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
                   & crbx(1:k), crby(1:k) )    
              call csioCloseFile()

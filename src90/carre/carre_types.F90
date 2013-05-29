@@ -163,10 +163,14 @@ module carre_types
       !.. pointx,pointy: coordinates of the points where the gradient
       !                  vanishes
       !.. ii,jj : x and y indices of the cells where the gradient vanishes
+      ! Note on the following arrays: the convention is 
+      !  -npx is number of x-points. In limiter configuration npx=1, the single
+      !   x point being the limiter contact point.
+      !  -data for the o-point is stored in the same arrays at index npx+1
       !.. npx   : number of the X-points
       !.. ptx,pty: X-point co-ordinates
       !.. iptx,jptx: x and y indices of the cells containing the X-points
-      !.. xpto,ypto: coordinates of the O-point
+      !.. xpto,ypto: coordinates of the O-point      
       !.. racord: determines whether the X-points are connected
       !.. fctpx: the psi values at each X- or O-point
       !.. separx,separy: coordinates of the points of the parametrised

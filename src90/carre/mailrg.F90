@@ -273,7 +273,13 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
          valfct=a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
      &          a11(ii,jj,1)*x2*y2
 
+! Before creating a new grid line by distributing points on a poloidal grid line 
+! (which is a niveau line in psi), the code sets up two curves that are not be 
+! crossed (basically to restrict the region in which the poloidal grid line can
+! exist).
+
 !..Definition de la pemiere courbe a ne pas traverser.
+!..Define the first limiting line
 
          DO 14 i=1, nn(ianc)
             xcrb(i,1)=xn(i,ianc)
@@ -295,6 +301,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
      &            plaque,x2,y2)
 !***
 !        print*,'apres crbniv:'
+
 !        print*,'x/y inouv=',xn(1,inouv),yn(1,inouv)
 !        print*,'          ',xn(2,inouv),yn(2,inouv)
 !        print*,'x/y ianc =',xn(1,ianc),yn(1,ianc)
@@ -307,6 +314,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 !  in the right direction
 !  From the first computation of the level line, now figure out
 !  what the proper direction is.
+
          ecart1=SQRT((x2 - xstruc(ind,plaque))**2 + & 
      &               (y2 - ystruc(ind,plaque))**2)
          ecart2=SQRT((x2 - xstruc(ind+1,plaque))**2 + & 
@@ -330,8 +338,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
          ELSE IF ((ecart1 .LT. epsiln) .OR. (ecart2 .LT. epsiln)) THEN
 
-            IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) & 
-     &                                                          THEN
+            IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) THEN
 
                nn(inouv)=1
                dir=MOD(dir+1,4) + 1
@@ -342,46 +349,74 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
          ELSE
 
-            IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) & 
-     &                                                           THEN
+            if ( .true. ) then 
 
-               IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
-                    &   ystruc(1,plaque),npstru(plaque))) & 
-                    & .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
-                    &   xstruc(1,plaque),ystruc(1,plaque), npstru(plaque)))&
-                    & .or. &
-                    & .not. onInternalSideOfStructure( xn(2,inouv), yn(2,inouv), struct, plaque )&
-                    &) THEN
+               IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) then
                   nn(inouv)=1
                   dir=MOD(dir+1,4) + 1
                   ii=ii - MOD(dir-2,2)
                   jj=jj - MOD(dir-3,2)
+               end IF
+
+            else
+
+               IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) THEN
+
+                  IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+                       &   ystruc(1,plaque),npstru(plaque))) & 
+                       & .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
+                       &   xstruc(1,plaque),ystruc(1,plaque), npstru(plaque)))&
+                       & .or. &
+                       & .not. onInternalSideOfStructure( xn(2,inouv), yn(2,inouv), struct, plaque )) THEN
+
+                     nn(inouv)=1
+                     dir=MOD(dir+1,4) + 1
+                     ii=ii - MOD(dir-2,2)
+                     jj=jj - MOD(dir-3,2)
+
+                  ELSE
+
+                     ! We end up 
+
+                     PRINT *,'probleme de marche 1 dans mailrg'
+                     write (*,*) "Starting point for search: ", xn(1,inouv), yn(1,inouv)
+                     call pltend
+                     STOP
+
+                  ENDIF
 
                ELSE
 
-                  PRINT *,'probleme de marche 1 dans mailrg'
-                  call pltend
-                  STOP
+                  IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+                       & ystruc(1,plaque),npstru(plaque))) & 
+                       & .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
+                       & xstruc(1,plaque),ystruc(1,plaque), & 
+                       & npstru(plaque))) &
+                       & .or. &
+                       & .not. onInternalSideOfStructure( xn(2,inouv), yn(2,inouv), struct, plaque )&
+                       &) THEN
 
+                     PRINT *,'probleme de marche 2 dans mailrg'
+                     write (*,*) "Specific reason(2): "
+
+                     if ( inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), ystruc(1,plaque),npstru(plaque)) ) then
+                        write (*,*) "inStruct"
+                     end if
+                     if ( cross(ind,xn(1,inouv),yn(1,inouv), xstruc(1,plaque),ystruc(1,plaque), npstru(plaque)) ) then
+                        write (*,*) "cross"
+                     end if
+                     if ( .not. onInternalSideOfStructure( xn(2,inouv), yn(2,inouv), struct, plaque ) ) then
+                        write (*,*) "not onInternalSideOfStructure"
+                     end if
+
+                     call pltend
+                     STOP
+
+                  ENDIF
                ENDIF
 
-            ELSE
+            end if
 
-               IF ((inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
-                    & ystruc(1,plaque),npstru(plaque))) & 
-                    & .OR. (cross(ind,xn(1,inouv),yn(1,inouv), & 
-                    & xstruc(1,plaque),ystruc(1,plaque), & 
-                    & npstru(plaque))) &
-                    & .or. &
-                    & .not. onInternalSideOfStructure( xn(2,inouv), yn(2,inouv), struct, plaque )&
-                    &) THEN
-
-                  PRINT *,'probleme de marche 2 dans mailrg'
-                  call pltend
-                  STOP
-
-               ENDIF
-            ENDIF
          ENDIF
 
 !..Pour les points successifs, on poursuit jusqu'a ce qu'on frappe une

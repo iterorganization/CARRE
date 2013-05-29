@@ -133,8 +133,10 @@ contains
     ! Run extension algorithm
     
     if ( par%equDistanceFunction == EQU_DIST_FUN_FAST ) then
+       write (*,*) "extend_equilibrium: fast"
        call compute_distance_fast(equ, distFactor)
     elseif ( par%equDistanceFunction == EQU_DIST_FUN_EXACT ) then
+       write (*,*) "extend_equilibrium: exact"
        call compute_distance_exact(equ, distFactor)
     else
        stop "extend_equilibrium: unknown choice for equDistanceFun"
@@ -306,9 +308,11 @@ contains
     ! First compute intersection of all faces in the psi grid with the structures
     call compute_intersections()    
    
-    ! Mark cells internal, starting from an internal cell. Use the first x-point for that.
+    ! Mark cells internal, starting from an internal cell. 
+    ! Use the O-point for this.
     equ%pointFlag = GRID_UNDEFINED
-    call markInternalPoint( equ%iptx(1), equ%jptx(1) )
+    !call markInternalPoint( equ%iptx(1), equ%jptx(1) )
+    call markInternalPoint( equ%iptx(equ%npx+1), equ%jptx(equ%npx+1) )
 
     ! Mark all other points as external
     where ( equ%pointFlag == GRID_UNDEFINED ) equ%pointFlag = GRID_EXTERNAL
@@ -408,7 +412,7 @@ contains
   subroutine equilibrium_vessel_cutoff(equ, struct, psi)
     type(CarreEquilibrium), intent(inout) :: equ
     type(CarreStructures), intent(in) :: struct
-    double precision :: psi(nxmax, nymax)
+    double precision, intent(inout) :: psi(nxmax, nymax)
     
     ! internal
     ! How many points to grow the vessel region
@@ -426,7 +430,7 @@ contains
     end do
 
     ! Set original equilibrium value on internal points
-    where ( pointFlag == GRID_INTERNAL ) psi = equ%psi    
+    where ( pointFlag /= GRID_INTERNAL ) psi = huge(psi)
 
   contains
 

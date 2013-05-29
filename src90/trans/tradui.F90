@@ -65,7 +65,7 @@ program tradui
   integer, allocatable :: region(:,:,:), resignore(:,:,:)
   integer, parameter :: istyle = -1 ! hard-wired to DG format
   
-  logical, parameter :: ITM_OUTPUT_GHOSTCELLS = .true.
+  logical, parameter :: ITM_OUTPUT_GHOSTCELLS = .false.
 
 #endif
 
