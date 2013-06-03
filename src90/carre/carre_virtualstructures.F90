@@ -128,7 +128,7 @@ contains
             & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
             & x, y )
 
-       write (*,*) np, x, y, psi
+       !write (*,*) np, x, y, psi
 
        if ( psi > psi0 .and. psi > limpoint_max_psi  ) then
           exit
@@ -144,15 +144,23 @@ contains
     struct%vnpstru(1) = np
     struct%vclosed(1) = .false.
 
-    FIXME: also set up limiter in vessel case to avoid falling of the structure
-
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
-       ! limiting surface: only external one relevant (no. 2)
+       ! Place limiter triangle at middle of external limiting surface.
+       ! Limiting surface: only external one relevant (no. 2)
        l = long( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2) )
        call coord( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2), &
             & l/2.0, x, y )
        
        call add_virtual_limiter(equ, struct, x, y)       
+    else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
+       ! Place limiter triangle at outside end of the virtual limiter structure
+       
+       x = struct%vxstruc(np, 1) - &
+            & ( struct%vxstruc(np, 1) - struct%vxstruc(np-1, 1) ) * 0.95
+       y = struct%vystruc(np, 1) - &
+            & ( struct%vystruc(np, 1) - struct%vystruc(np-1, 1) ) * 0.95
+
+       call add_virtual_limiter(equ, struct, x, y)              
     end if
     
   end subroutine setupVirtualLimiterGeometry

@@ -228,6 +228,7 @@ contains
     integer :: NB_DX(N_PASS, N_NB)
     integer :: NB_DY(N_PASS, N_NB)
     double precision :: NB_D(N_PASS, N_NB)
+    double precision :: newpsi(1:equ%nx, 1:equ%ny)
 
     double precision :: D_DIAG, D_DX, D_DY
 
@@ -244,6 +245,8 @@ contains
     NB_DX(2, :) = (/  1, -1,  0,  1 /)
     NB_DY(2, :) = (/  0, +1, +1, +1 /)
     NB_D(2, :) = (/ D_DX, D_DIAG, D_DY, D_DIAG /)
+
+    newpsi = equ%psi(1:equ%nx, 1:equ%ny)
 
     do iPass = 1, N_PASS
        
@@ -275,15 +278,15 @@ contains
                 if ( ( ix+NB_DX(iPass, iNb) < 1 ) .or. ( ix+NB_DX(iPass, iNb) > equ%nx ) ) cycle
                 if ( ( iy+NB_DY(iPass, iNb) < 1 ) .or. ( iy+NB_DY(iPass, iNb) > equ%ny ) ) cycle
 
-                if ( equ%psi(ix + NB_DX(iPass, iNb), iy + NB_DY(iPass, iNb)) == huge(equ%psi)) cycle
+                if ( newpsi(ix + NB_DX(iPass, iNb), iy + NB_DY(iPass, iNb)) == huge(newpsi)) cycle
 
                 if ( factor > 0 ) then
-                   equ%psi(ix, iy) = min( equ%psi(ix, iy), &
-                        & equ%psi(ix + NB_DX(iPass, iNb), iy + NB_DY(iPass, iNb)) + NB_D(iPass, iNb) * factor )
+                   newpsi(ix, iy) = min( newpsi(ix, iy), &
+                        & newpsi(ix + NB_DX(iPass, iNb), iy + NB_DY(iPass, iNb)) + NB_D(iPass, iNb) * factor )
                 else
-                   if (equ%psi(ix, iy) == huge(equ%psi)) equ%psi(ix, iy) = -huge(equ%psi)
-                   equ%psi(ix, iy) = max( equ%psi(ix, iy), &
-                        & equ%psi(ix + NB_DX(iPass, iNb), iy + NB_DY(iPass, iNb)) + NB_D(iPass, iNb) * factor )
+                   if (newpsi(ix, iy) == huge(newpsi)) newpsi(ix, iy) = -huge(newpsi)
+                   newpsi(ix, iy) = max( newpsi(ix, iy), &
+                        & newpsi(ix + NB_DX(iPass, iNb), iy + NB_DY(iPass, iNb)) + NB_D(iPass, iNb) * factor )
                 end if
              end do
 
@@ -291,6 +294,8 @@ contains
        end do
 
     end do
+
+    equ%psi(1:equ%nx, 1:equ%ny) = newpsi
 
   end subroutine compute_distance_fast
 
