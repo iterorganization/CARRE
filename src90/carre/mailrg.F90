@@ -5,7 +5,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
      & xnlast,ynlast,nnlast,nuldec,&
      & xpind,xpx,xpy,&
      & solregion,diag,ireg,&
-     & struct)
+     & struct, extended_grid_limiter)
 !
 !  version : 07.07.97 19:11
 !
@@ -47,7 +47,8 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
      &     xpx, xpy
       REAL*8 :: xpto, ypto
 
-      LOGICAL nuldec
+      ! FIXME: find a better solution for avoiding the explicit extended_grid_limiter flag.
+      LOGICAL nuldec, extended_grid_limiter
       logical solregion ! is region part of SOL?
 
       type(CarreDiag), intent(inout) :: diag
@@ -349,7 +350,11 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
          ELSE
 
-            if ( .true. ) then 
+            if ( extended_grid_limiter ) then 
+
+               ! Special treatment for limiter cases with extended grids. The limiter structure is just a line
+               ! (i.e. infinitesimal thin). Don't do any of the tests to check whether we are on the "inside" of it,
+               ! but just turn around.
 
                IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) then
                   nn(inouv)=1
@@ -359,6 +364,12 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                end IF
 
             else
+
+               ! Check whether we are going in the same direction as the previous poloidal grid line.
+               ! If not, check whether we are inside a closed structure, or on the internal side
+               ! of an open structure, or whether we just crossed a structure element of the target plate.
+               ! If any of these is the case, reverse the direction an try again.
+               ! Otherwise, there's a serious problem.
 
                IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) THEN
 

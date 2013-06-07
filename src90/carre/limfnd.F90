@@ -1,7 +1,7 @@
       subroutine limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot, & 
      &    nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx, & 
      &    nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
-     &    a00,a10,a01,a11,struct,equ)
+     &    a00,a10,a01,a11,struct,equ,virtualGeometry)
 !
 !  version : 07.07.97 20:10
 !
@@ -32,6 +32,7 @@
      &  fctpx(npxmx),xstruc(npstmx,strumx),ystruc(npstmx,strumx)
       type(CarreStructures), intent(inout) :: struct
       type(CarreEquilibrium), intent(inout) :: equ
+      logical, intent(in) :: virtualGeometry
 
 !
 !  local variables
@@ -52,149 +53,169 @@
       real*8 aire
       external aire,horair,ifind
       intrinsic sqrt
-!
-!  calculation
-!
-!  1.   definition of a line from the magnetic axis to a point outside
-!       the separatrix
-      if(nstruc.lt.strumx) then
-        nstrp1=nstruc+1
-        npstru(nstrp1)=3
-        xstruc(1,nstrp1)=xpto
-        ystruc(1,nstrp1)=ypto
-        xstruc(2,nstrp1)=xpto
-        ystruc(2,nstrp1)=max(y(1),y(ny))
-        xstruc(3,nstrp1)=xpto
-        ystruc(3,nstrp1)=1.e20
+
+      if ( virtualGeometry ) then
+         
+         nivx(:, 1:2) = 0
+
+         call findClosedLevelLine( equ, &
+              & xstruc(1,1), ystruc(1,1), &
+              & nivx(:, 1), nivy(:, 1), nivtot(1) )
+
+         call findClosedLevelLine( equ, &
+              & xstruc(1,2), ystruc(1,2), &
+              & nivx(:, 2), nivy(:, 2), nivtot(2) )
+         
+         nbcrb = 2
+
       else
-        write(6,*)'Dimension of structures (strumx) must be increased.'
-        write(6,*)'strumx, nstruc=',strumx,nstruc
-        stop
+
+         !
+         !  calculation
+         !
+         !  1.   definition of a line from the magnetic axis to a point outside
+         !       the separatrix
+         if(nstruc.lt.strumx) then
+            nstrp1=nstruc+1
+            npstru(nstrp1)=3
+            xstruc(1,nstrp1)=xpto
+            ystruc(1,nstrp1)=ypto
+            xstruc(2,nstrp1)=xpto
+            ystruc(2,nstrp1)=max(y(1),y(ny))
+            xstruc(3,nstrp1)=xpto
+            ystruc(3,nstrp1)=1.e20
+         else
+            write(6,*)'Dimension of structures (strumx) must be increased.'
+            write(6,*)'strumx, nstruc=',strumx,nstruc
+            stop
+         endif
+         !
+         !  2.   walk from point 1 towards point 2 until a structure is reached
+         sens=1
+         idniv=1
+         !       courbe a ne pas traverser
+         nbcrb=1
+         nt(1)=2
+         nt(2)=0
+         xt(1,nbcrb)=xpto
+         yt(1,nbcrb)=ypto
+         norm=sqrt((xstruc(2,nstrp1)-xstruc(1,nstrp1))**2+ & 
+              &  (ystruc(2,nstrp1)-ystruc(1,nstrp1))**2)
+         xt(2,nbcrb)=xpto-1.e-2*stpmin*(ystruc(2,nstrp1)-ystruc(1,nstrp1)) & 
+              &  /norm
+         yt(2,nbcrb)=ypto+1.e-2*stpmin*(xstruc(2,nstrp1)-xstruc(1,nstrp1)) & 
+              &  /norm
+
+         CALL MARCHE(xpto,ypto,nstrp1,nstrp1,sens,nivx(1,idniv), & 
+              &      nivy(1,idniv), & 
+              &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
+              &      nx,ny,x,y,psi,nstrp1,npstru,xstruc, & 
+              &      ystruc,a00,a10,a01,a11,indlim)
+         plaque=indlim
+
+         ! mark internal side of limiter structure
+         if (indlim /= 0) then
+            xin = nivx(nivtot(idniv)-1, idniv)
+            yin = nivy(nivtot(idniv)-1, idniv)
+            struct%internalSide(indlim) = onWhichSideOfStructure(xin, yin, struct, indlim)
+         end if
+         !
+         !  2.1  definition des indices de plaque pour usage dans maille
+         indplq(1,1)=plaque
+         indplq(2,1)=plaque
+         inddef(1)=plaque
+         inddef(2)=plaque
+         nbdef = 2
+
+         !
+         !  3.   On trouve le point du limiteur qui est le plus rapproche de la
+         !       derniere surface de flux parametrisee.
+         call plurap(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
+              &  nivx(1,idniv),nivy(1,idniv),nivtot(idniv),x0,y0,ind0)
+         !
+         !  4.   parametrisation de la separatrice.      
+
+         ! Fill x-point arrays as done in selptx
+         ! "x-point" (limiter point)
+         ptx(1)=x0
+         pty(1)=y0
+         ii = ifind(x0,x,nx,1)
+         jj = ifind(y0,y,ny,1)
+         equ%iptx(1) = ii
+         equ%jptx(1) = jj
+         ! o-point
+         ptx(2)=x0
+         pty(2)=y0
+         equ%iptx(2) = ifind(xpto,x,nx,1)
+         equ%jptx(2) = ifind(ypto,y,ny,1)
+
+         nbcrb=1
+         nt(1)=0
+
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+              &       a11(ii,jj,1)*x0*y0
+
+         ipx = 1
+         dir = 0
+         k = 1
+         !nbdef=0
+
+         nivx(k,idniv)=x0
+         nivy(k,idniv)=y0
+         CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
+              &  nivx(1,idniv),nivy(1,idniv), & 
+              &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
+         call insert(indlim,inddef,nbdef,ipx)
+         indplq(idniv,ipx) = indlim
+         CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
+              &  nivx(1,idniv),nivy(1,idniv), & 
+              &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
+         nivtot(idniv)=k
+         call insert(indlim,inddef,nbdef,ipx)
+         indplq(idniv,ipx) = indlim
+
+         if((nivx(1,idniv)-nivx(nivtot(idniv),idniv))**2 & 
+              &  +(nivy(1,idniv)-nivy(nivtot(idniv),idniv))**2 .gt. & 
+              &  2.*(x(2)-x(1))**2) then
+            write(6,*)'attention: la courbe parametrisee est mal fermee.'
+            print*,'nivtot=',nivtot(idniv)
+            print*,'nivx/y(1)=',nivx(1,idniv),nivy(1,idniv)
+            print*,'nivx/y(f)=',nivx(nivtot(idniv),idniv), & 
+                 &    nivy(nivtot(idniv),idniv)
+         endif
+         nivx(nivtot(idniv),idniv)=nivx(1,idniv)
+         nivy(nivtot(idniv),idniv)=nivy(1,idniv)
+         if(aire(nivx,nivy,nivtot(idniv)).lt.zero) then
+            do i=1,nivtot(idniv)/2
+               ii=nivtot(idniv)-i+1
+               psi2=nivx(i,idniv)
+               nivx(i,idniv)=nivx(ii,idniv)
+               nivx(ii,idniv)=psi2
+               psi2=nivy(i,idniv)
+               nivy(i,idniv)=nivy(ii,idniv)
+               nivy(ii,idniv)=psi2
+            enddo
+         endif
+         !
+         !  5.   Recherche de la frontiere exterieure
+         idniv=2
+         sens=1
+         sens=horair(xpto,ypto,x0,y0,xstruc(1,plaque),ystruc(1,plaque), & 
+              &  npstru(plaque),sens)
+         nbcrb=2
+         nt(nbcrb)=nivtot(1)
+         do i=1,nt(nbcrb)
+            xt(i,nbcrb)=nivx(i,1)
+            yt(i,nbcrb)=nivy(i,1)
+         enddo
+         CALL MARCHE(nivx(1,1),nivy(1,1),plaque,plaque,sens,nivx(1,idniv), & 
+              &      nivy(1,idniv), & 
+              &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
+              &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+              &      ystruc,a00,a10,a01,a11,indlim)
+
+
       endif
-!
-!  2.   walk from point 1 towards point 2 until a structure is reached
-      sens=1
-      idniv=1
-!       courbe a ne pas traverser
-      nbcrb=1
-      nt(1)=2
-      nt(2)=0
-      xt(1,nbcrb)=xpto
-      yt(1,nbcrb)=ypto
-      norm=sqrt((xstruc(2,nstrp1)-xstruc(1,nstrp1))**2+ & 
-     &  (ystruc(2,nstrp1)-ystruc(1,nstrp1))**2)
-      xt(2,nbcrb)=xpto-1.e-2*stpmin*(ystruc(2,nstrp1)-ystruc(1,nstrp1)) & 
-     &  /norm
-      yt(2,nbcrb)=ypto+1.e-2*stpmin*(xstruc(2,nstrp1)-xstruc(1,nstrp1)) & 
-     &  /norm
-
-      CALL MARCHE(xpto,ypto,nstrp1,nstrp1,sens,nivx(1,idniv), & 
-     &      nivy(1,idniv), & 
-     &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstrp1,npstru,xstruc, & 
-     &      ystruc,a00,a10,a01,a11,indlim)
-      plaque=indlim
-
-      ! mark internal side of limiter structure
-      if (indlim /= 0) then
-         xin = nivx(nivtot(idniv)-1, idniv)
-         yin = nivy(nivtot(idniv)-1, idniv)
-         struct%internalSide(indlim) = onWhichSideOfStructure(xin, yin, struct, indlim)
-      end if
-!
-!  2.1  definition des indices de plaque pour usage dans maille
-      indplq(1,1)=plaque
-      indplq(2,1)=plaque
-      inddef(1)=plaque
-      inddef(2)=plaque
-      nbdef = 2
-
-!
-!  3.   On trouve le point du limiteur qui est le plus rapproche de la
-!       derniere surface de flux parametrisee.
-      call plurap(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
-     &  nivx(1,idniv),nivy(1,idniv),nivtot(idniv),x0,y0,ind0)
-!
-!  4.   parametrisation de la separatrice.      
-
-      ! Fill x-point arrays as done in selptx
-      ! "x-point" (limiter point)
-      ptx(1)=x0
-      pty(1)=y0
-      ii = ifind(x0,x,nx,1)
-      jj = ifind(y0,y,ny,1)
-      equ%iptx(1) = ii
-      equ%jptx(1) = jj
-      ! o-point
-      ptx(2)=x0
-      pty(2)=y0
-      equ%iptx(2) = ifind(xpto,x,nx,1)
-      equ%jptx(2) = ifind(ypto,y,ny,1)
-
-      nbcrb=1
-      nt(1)=0
-
-      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
-     &       a11(ii,jj,1)*x0*y0
-
-      ipx = 1
-      dir = 0
-      k = 1
-      !nbdef=0
-
-      nivx(k,idniv)=x0
-      nivy(k,idniv)=y0
-      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-     &  nivx(1,idniv),nivy(1,idniv), & 
-     &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
-      call insert(indlim,inddef,nbdef,ipx)
-      indplq(idniv,ipx) = indlim
-      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-     &  nivx(1,idniv),nivy(1,idniv), & 
-     &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
-      nivtot(idniv)=k
-      call insert(indlim,inddef,nbdef,ipx)
-      indplq(idniv,ipx) = indlim
-
-      if((nivx(1,idniv)-nivx(nivtot(idniv),idniv))**2 & 
-     &  +(nivy(1,idniv)-nivy(nivtot(idniv),idniv))**2 .gt. & 
-     &  2.*(x(2)-x(1))**2) then
-        write(6,*)'attention: la courbe parametrisee est mal fermee.'
-        print*,'nivtot=',nivtot(idniv)
-        print*,'nivx/y(1)=',nivx(1,idniv),nivy(1,idniv)
-        print*,'nivx/y(f)=',nivx(nivtot(idniv),idniv), & 
-     &    nivy(nivtot(idniv),idniv)
-      endif
-      nivx(nivtot(idniv),idniv)=nivx(1,idniv)
-      nivy(nivtot(idniv),idniv)=nivy(1,idniv)
-      if(aire(nivx,nivy,nivtot(idniv)).lt.zero) then
-        do i=1,nivtot(idniv)/2
-          ii=nivtot(idniv)-i+1
-          psi2=nivx(i,idniv)
-          nivx(i,idniv)=nivx(ii,idniv)
-          nivx(ii,idniv)=psi2
-          psi2=nivy(i,idniv)
-          nivy(i,idniv)=nivy(ii,idniv)
-          nivy(ii,idniv)=psi2
-        enddo
-      endif
-!
-!  5.   Recherche de la frontiere exterieure
-      idniv=2
-      sens=1
-      sens=horair(xpto,ypto,x0,y0,xstruc(1,plaque),ystruc(1,plaque), & 
-     &  npstru(plaque),sens)
-      nbcrb=1
-      nt(nbcrb)=nivtot(1)
-      do i=1,nt(nbcrb)
-        xt(i,nbcrb)=nivx(i,1)
-        yt(i,nbcrb)=nivy(i,1)
-      enddo
-      CALL MARCHE(nivx(1,1),nivy(1,1),plaque,plaque,sens,nivx(1,idniv), & 
-     &      nivy(1,idniv), & 
-     &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
-     &      ystruc,a00,a10,a01,a11,indlim)
 
 !
 !  5.1  Calcul de la distance entre le point de contact et la derniere

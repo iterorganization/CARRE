@@ -49,7 +49,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx), & 
      &  ynlast(npnimx)
       CHARACTER*3 rep
-      LOGICAL nuldec, correct
+      LOGICAL nuldec, correct, extended_grid
       integer :: nn1
 
       !  procedures
@@ -105,6 +105,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       lg = 0.0d0
 
       grid%radLineSepSeg = 0
+
+      extended_grid = ( par%carreMode == CARRE_EXTENDED )
 
 !..On procede au cas par cas selon la configuration des separatrices.
 
@@ -330,7 +332,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
      &              ynlast,nnlast,nuldec,&
      &              xpind,xptxex,yptxex,&
-     &              .true.,diag,ireg, struct)
+     &              .true.,diag,ireg, struct, .false.)
 
 !
 !  1.3.2  region 2
@@ -411,7 +413,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &              ynlast,nnlast,nuldec,&
               &              xpind,xptxex,yptxex,&
-              &.false.,diag,ireg, struct)
+              &.false.,diag,ireg, struct, .false.)
 !
 !  1.3.3  region 3
 
@@ -728,7 +730,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
      &               ynlast,nnlast,nuldec,&
      &               xpind,xptxex,yptxex,&
-     &               .true.,diag,ireg, struct)
+     &               .true.,diag,ireg, struct, .false.)
 
 !
 !..2.3.2 Region 2: top PFR
@@ -810,7 +812,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
-              &.false.,diag,ireg, struct)
+              &.false.,diag,ireg, struct, .false.)
 
 !
 !..2.3.3 Region 3: left
@@ -907,7 +909,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
-              &.true.,diag,ireg, struct)
+              &.true.,diag,ireg, struct, .false.)
 
 
 !..2.3.4 Region 4: bottom PFR
@@ -990,7 +992,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
-              &.false.,diag,ireg, struct)
+              &.false.,diag,ireg, struct, .false.)
 
 !
 !..2.3.5  Region 5: central region
@@ -1638,7 +1640,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast(1:nnlast), & 
               &               ynlast(1:nnlast),nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
-              &               .true.,diag,ireg,struct)
+              &               .true.,diag,ireg,struct, .false.)
 
 !..Arangement of the mesh point which must coinside with outer X-point
          
@@ -1764,7 +1766,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&     
-              &.true.,diag,ireg, struct)
+              &.true.,diag,ireg, struct, .false.)
 
 !..3.3.3 Region 3: top PFR
 
@@ -1846,7 +1848,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
-              &.false.,diag,ireg, struct)
+              &.false.,diag,ireg, struct, .false.)
 
 
 !..3.3.4 Region 4: left
@@ -1955,7 +1957,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
-              &.true.,diag,ireg, struct)
+              &.true.,diag,ireg, struct, .false.)
 
 !..3.3.5 Region 5: bottom PFR
 
@@ -2036,7 +2038,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
-              &.false.,diag,ireg, struct)
+              &.false.,diag,ireg, struct, .false.)
 
 !..3.3.6  Region 6: central region
 
@@ -2294,7 +2296,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
               &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
               &              ynlast,nnlast,nuldec,&
               &              xpind,xptxex,yptxex,&
-              &.false.,diag,ireg, struct)
+              &.false.,diag,ireg, struct, extended_grid)
 
 !..4.3.2  Region 2
 

@@ -14,7 +14,7 @@ module carre_niveau
 
   private
 
-  public crbniv, findLevelLineForPoints
+  public crbniv, findLevelLineForPoints, findClosedLevelLine
 
   logical, parameter :: DEBUGFILES_CRBNIV = .false.
 
@@ -554,7 +554,6 @@ contains
 
   END subroutine crbniv
 
-
   !> High-level routine to fine a level line connecting two points.
   !> (xFrom, yFrom)->(xTo, yTo). It is assumed that both points
   !> do lie on the same level line. If there are multiple possible 
@@ -650,5 +649,51 @@ contains
    end if
 
   end subroutine findLevelLineForPoints
+
+
+  !> High-level routine to fine a level line connecting two points.
+  !> (xFrom, yFrom)->(xTo, yTo). It is assumed that both points
+  !> do lie on the same level line. If there are multiple possible 
+  !> connection lines between the points, the shortest one is returned.
+  subroutine findClosedLevelLine( equ, &
+       & xFrom, yFrom, &
+       & nivx, nivy, npNiv )
+    type(CarreEquilibrium), intent(in) :: equ
+    double precision, intent(in) :: xFrom, yFrom
+    double precision, intent(out) :: nivx(npnimx), nivy(npnimx)
+    integer, intent(out) :: npNiv
+
+    ! internal
+    integer :: ii, jj, npNivTmp, iDir, iDirStart
+    double precision :: valNiv, length, maxLength, lengthFace
+    double precision :: nivxTmp(npnimx), nivyTmp(npnimx)
+    logical :: foundEndPoint
+
+    ! external
+    integer :: ifind
+    double precision :: long
+    external :: ifind, long
+    logical :: foundLevelLine
+
+    ! Find the cell of the starting point    
+    ii = ifind(xFrom, equ%x(1:equ%nx), equ%nx, 1)
+    jj = ifind(yFrom, equ%y(1:equ%ny), equ%ny, 1)
+
+    ! Compute psi value at this point
+    valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + & 
+         & equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom   
+
+    iDir = 1 ! need to do this because iDir can be changed in crbniv...
+
+    npNiv = 1
+    nivx(1) = xFrom
+    nivy(1) = yFrom
+
+    CALL CRBNIV(ii,jj,npNiv,iDir,&
+         & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
+         & valNiv,nivx,nivy)     
+   
+  end subroutine findClosedLevelLine
+
 
 end module carre_niveau

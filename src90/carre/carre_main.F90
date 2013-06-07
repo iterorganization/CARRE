@@ -160,7 +160,7 @@ contains
                   & equ%npx,equ%ptx,equ%pty,equ%fctpx, & 
                   & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
                   & struct%indplq,struct%inddef,struct%nbdef, & 
-                  & equ%a00,equ%a10,equ%a01,equ%a11,struct,equ)
+                  & equ%a00,equ%a10,equ%a01,equ%a11,struct,equ, iSetupStruct==VIRTUAL_STRUCT_STEP)
 
              do itmp=1,4
                 equ%ptsep(itmp,1) = 0
