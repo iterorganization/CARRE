@@ -418,6 +418,10 @@ CONTAINS
          call rdfrin(11,vari(ieg+1:80),par%addTop,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:len('equExpansionFactor')) .EQ. 'equExpansionFactor') THEN
+         call rdfrre(11,vari(ieg+1:80),par%equExpansionFactor,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('gridExtensionMode')) .EQ. 'gridExtensionMode') THEN
          call rdfrin(11,vari(ieg+1:80),par%gridExtensionMode,ierror)
          if(ierror.eq.1) go to 98

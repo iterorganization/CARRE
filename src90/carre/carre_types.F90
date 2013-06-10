@@ -131,6 +131,9 @@ module carre_types
       ! extension size for equilibrium grid at the boundaries
       integer :: addLeft = 0, addRight = 0, addTop = 0, addBottom = 0
 
+      ! equilibrium expansion factor
+      double precision :: equExpansionFactor = 1.0
+
       ! Desired maximal poloidal cell size at targets in extended grid mode
       ! Default value is chosen to cause no refinement at targets.
       double precision :: targetRes = huge(0.0d0)

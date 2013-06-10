@@ -128,7 +128,7 @@ contains
          & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
          & equ%ptx(1), equ%pty(1) )
 
-    distFactor = (psiPtX - psiPtO) / dist(equ%xpto, equ%ypto, equ%ptx(1), equ%pty(1))
+    distFactor = ( (psiPtX - psiPtO) / dist(equ%xpto, equ%ypto, equ%ptx(1), equ%pty(1)) ) * par%equExpansionFactor
 
     ! Run extension algorithm
     
