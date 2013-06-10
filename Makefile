@@ -6,7 +6,9 @@ CPP	= /usr/lib/cpp
 # Source form: src is old fixed form source (no longer maintained), src90 is current free form source
 SRCDIR = src90
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_types:${SRCDIR}/itm_assert:${SRCDIR}/b2_shared
+SVN_B2SRC_PATH = https://solps-mdsplus.aug.ipp.mpg.de/repos/SOLPS/branches/ITM/4.10a/solps5.0/src/Braams/b2/src_xpb
+
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/b2_shared
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
@@ -23,9 +25,11 @@ include LISTOBJ
 # But we want the UAL library
 ifdef USE_ITMCARRE 
 
+ITM_SRC_PREREQS=src90/b2_shared 
+
 EXCLUDELIST +=
 ALLTARGETS += ${OBJECTCODE}/itmcarre_wrapper
-VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itmcarre:${SRCDIR}/itm_types:${SRCDIR}/itm_grid:${SRCDIR}/itm_assert:${SRCDIR}/b2_shared:${SRCDIR}/itm_constants:${SRCDIR}/itm_b2_shared:${SRCDIR}/itm_grid_external/orderpack
+VPATH = ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itmcarre:${SRCDIR}/b2_shared
 
 # Some variables are expected to be set up properly by the ITMv1 script
 # -${UAL} is the path to the UAL library files
@@ -141,6 +145,9 @@ local:
 tags:
 	rm TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
+echo:
+	echo INCLUDE ${INCLUDE}
+
 olddepend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} 
 	makedepend -f ${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJECTCODE}/dependencies.${OBJECTCODE} ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak
@@ -173,7 +180,7 @@ simpledepend:
 
 depend:
 # 	First do preprocessor #includes dependencies (-u disables USE dependency output)	
-	bin/sfmakedepend -d -u -p '$${OBJECTCODE}/' ${INCLUDE} \
+	bin/sfmakedepend -d -u -p '$${OBJECTCODE}/' -I ${SRCDIR}/include \
 	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE}.include src90/*/*.[fF] src90/*/*.[fF]90 
 #	Now preprocess all files and do dependencies of preprocessed files to get correct USE dependencies
 	-rm ${OBJECTCODE}/*.f90 ${OBJECTCODE}/*.f
@@ -185,12 +192,19 @@ depend:
 				${CPP} ${DEFINES} -P -C ${INCLUDE} $$d/$$f ${OBJECTCODE}/$$basename.f90; \
 			done \
 		fi ; \
+		dirfiles=`find -L $$d/ -name '*.F'` ; \
+		if [ -n "$$dirfiles" ] ; then \
+			for f in `find -L $$d -name '*.F' -printf "%f "`; do \
+				basename=`basename $$f .F`; \
+				${CPP} ${DEFINES} -P -C ${INCLUDE} $$d/$$f ${OBJECTCODE}/$$basename.f90; \
+			done \
+		fi ; \
 		dirfiles=`find -L $$d/ -name '*.f90'` ; \
 		if [ -n "$$dirfiles" ] ; then \
 			cp $$dirfiles ${OBJECTCODE} ; \
 		fi ; \
 	done ; \
-	bin/sfmakedepend -d -p '$${OBJECTCODE}/' ${INCLUDE} \
+	bin/sfmakedepend -d -p '$${OBJECTCODE}/' \
 	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE}.use ${OBJECTCODE}/*.[fF] ${OBJECTCODE}/*.[fF]90 
 
 
@@ -220,7 +234,7 @@ listobj:
 	echo "$$ll90" | eval sed "$$EL90" >> LISTOBJ ; \
 	echo "$$lu90" | eval sed "$$EU90" >> LISTOBJ
 
-LISTOBJ: listobj
+LISTOBJ: listobj ${ITM_SRC_PREREQS}
 
 ${OBJECTCODE}/dependencies.${OBJECTCODE}.include:
 	-mkdir -p ${OBJECTCODE}
@@ -229,6 +243,19 @@ ${OBJECTCODE}/dependencies.${OBJECTCODE}.include:
 	${MAKE} listobj
 	${MAKE} depend
 ${OBJECTCODE}/dependencies.${OBJECTCODE}.use: ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
+
+src90/b2_shared:
+	mkdir src90/b2_shared
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2ag_ghostcells.F90 src90/b2_shared/b2ag_ghostcells.F90
+	svn export ${SVN_B2SRC_PATH}/modules/b2mod_constants.F src90/b2_shared/b2mod_constants.F
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2ITMMapping.f90 src90/b2_shared/b2ITMMapping.f90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_cellhelper.f90 src90/b2_shared/b2mod_cellhelper.f90 
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F src90/b2_shared/b2mod_indirect.F
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_types.F src90/b2_shared/b2mod_types.F
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_connectivity.F90 src90/b2_shared/b2mod_connectivity.F90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F src90/b2_shared/b2mod_indirect.F
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_ual.F90 src90/b2_shared/b2mod_ual.F90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_silo.F90 src90/b2_shared/b2mod_silo.F90
 
 include ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
 include ${OBJECTCODE}/dependencies.${OBJECTCODE}.use
