@@ -8,7 +8,7 @@ FFLAGS 		= -g -warn all -check all -check noarg_temp_created  -warn notruncated_
 FFLAGS	       += -module ${OBJECTCODE}/
 LDFLAGS		= -check all -warn all -debug all  # -gen-interfaces -warn interfaces
 else
-FFLAGS		= -O -vec_report0
+FFLAGS		= -O3 -vec_report0
 FFLAGS	       += -module ${OBJECTCODE}/
 endif
 
@@ -21,12 +21,12 @@ LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
 LDFLAGS 	+= ${NCARG}
 endif
 
-ifndef NOUSE_MSCL
-LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
-endif
+#ifndef NOUSE_MSCL
+#LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
+#endif
 
 ifdef USE_SILO
-# # SILO
+ # SILO
 # INCLUDE += -I ${SILO_HOME}/include
 # LDLIBS += -L${SILO_HOME}/amd64_sles11/lib -lsilo
 
@@ -38,8 +38,18 @@ ifdef USE_SILO
 INCLUDE += -I lib/${OBJECTCODE}/silo/include
 LDLIBS += -Llib/${OBJECTCODE}/silo/lib -lsiloh5
 
-INCLUDE += -I lib/${OBJECTCODE}/hdf5/include
-LDLIBS += -Llib/${OBJECTCODE}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
-
+#INCLUDE += -I lib/${OBJECTCODE}/hdf5/include
+#LDLIBS += -Llib/${OBJECTCODE}/hdf5/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5_hl -lhdf5 -lz -lstdc++
 
 endif
+
+GATEWAY_LIBS=ual-${ITM_INTEL_OBJECTCODE} amns-ifort xmllib-${ITM_INTEL_OBJECTCODE} itmtypes-${ITM_INTEL_OBJECTCODE} itmconstants-${ITM_INTEL_OBJECTCODE} itmassert-${ITM_INTEL_OBJECTCODE}
+
+ifdef SOLPS_DEBUG
+GATEWAY_LIBS+=itmggd-debug-${ITM_INTEL_OBJECTCODE}
+else
+GATEWAY_LIBS+=itmggd-${ITM_INTEL_OBJECTCODE}
+endif
+
+INCLUDE += $(shell eval-pkg-config --cflags ${GATEWAY_LIBS} ) 
+LDLIBS += $(shell eval-pkg-config --libs ${GATEWAY_LIBS} ) 
