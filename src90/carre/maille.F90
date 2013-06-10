@@ -2266,9 +2266,13 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !!!!
 !        sens =-drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)),
 !    .                 struct%npstru(struct%inddef(idef)),x2,y2,'droite')
+
          sens=1
-         sens=horair(equ%xpto,equ%ypto,x2,y2,struct%xstruc(1,struct%inddef(idef)), & 
-     &     struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),sens)
+         if (.not. extended_grid ) then
+            sens=horair(equ%xpto,equ%ypto,x2,y2,struct%xstruc(1,struct%inddef(idef)), & 
+                 &     struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),sens)            
+         end if
+
 !***
 !        print*,'dans maille: sens=',sens
 !***

@@ -255,6 +255,7 @@ contains
 
        call writeGridStateToSiloFile('carreMaille0000', equ, struct)
        call maille(equ,struct,grid,diag,par)
+       call writeGridStateToSiloFile('carreMailleF000', equ, struct, grid)
 
     end if
 
