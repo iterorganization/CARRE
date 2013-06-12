@@ -1,0 +1,8 @@
+#!/bin/sh
+
+rm structure.dat rzpsi.dat carre.dat btor.dat 
+rm carreFinal00000.silo carre.out 
+rm virtualstructure.out
+rm traduitAAA00000 traduit.out
+rm selptx.inf 
+rm *.silo
