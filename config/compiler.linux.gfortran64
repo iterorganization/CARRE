@@ -27,6 +27,9 @@ ifdef USE_ITMCARRE
 endif
 
 ifdef USE_SILO
-  INCLUDE += -I lib/${OBJECTCODE}/silo/include
-  LDLIBS += -Llib/${OBJECTCODE}/silo/lib -lsiloh5
+INCLUDE += -I lib/${OBJECTCODE}/silo/include
+LDLIBS += -Llib/${OBJECTCODE}/silo/lib64 -lsiloh5
+
+INCLUDE += -I lib/${OBJECTCODE}/hdf5/include
+LDLIBS += -Llib/${OBJECTCODE}/hdf5/lib64  -lhdf5_hl -lhdf5 -lz -lstdc++
 endif

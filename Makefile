@@ -172,6 +172,41 @@ tags:
 echo:
 	echo INCLUDE ${INCLUDE}
 
+HDF5_VERSION=1.8.10
+HDF5_INSTALL_DIR=${PWD}/lib/${OBJECTCODE}/hdf5
+
+hdf5-${HDF5_VERSION}.tar.gz:
+	wget http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${HDF5_VERSION}/src/hdf5-${HDF5_VERSION}.tar.gz      
+
+hdf5-${HDF5_VERSION}: hdf5-${HDF5_VERSION}.tar.gz
+	tar xvfz hdf5-${HDF5_VERSION}.tar.gz
+
+lib/${OBJECTCODE}/hdf5:  hdf5-${HDF5_VERSION}
+	cd hdf5-${HDF5_VERSION}; \
+	./configure --enable-cxx --with-pic  --prefix=${HDF5_INSTALL_DIR} && \
+	make -j4 && \
+	make install
+
+hdf5: lib/${OBJECTCODE}/hdf5
+
+SILO_VERSION=4.9.1
+SILO_INSTALL_DIR=${PWD}/lib/${OBJECTCODE}/silo
+
+silo: lib/${OBJECTCODE}/silo
+
+lib/${OBJECTCODE}/silo: hdf5 silo-${SILO_VERSION} 
+	cd silo-${SILO_VERSION}; \
+	./configure --with-hdf5=${HDF5_INSTALL_DIR}/lib64,${HDF5_INSTALL_DIR}/include --prefix=${SILO_INSTALL_DIR} --disable-browser --disable-silex --enable-fortran FC=${FC} ; \
+	make -j4; \
+	make install
+
+silo-${SILO_VERSION}: silo-${SILO_VERSION}.tar.gz
+	tar xvfz silo-${SILO_VERSION}.tar.gz
+
+silo-${SILO_VERSION}.tar.gz:
+	wget https://wci.llnl.gov/codes/silo/silo-4.9.1/silo-4.9.1.tar.gz
+
+
 olddepend: ${OBJS:.o=.F} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} 
 	makedepend -f ${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJECTCODE}/dependencies.${OBJECTCODE} ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak
