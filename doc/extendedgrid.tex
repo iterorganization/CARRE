@@ -1,0 +1,119 @@
+\documentclass[10pt,a4paper]{report}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\author{Hajo Klingshirn}
+\title{Extended grids in SOLPS 5.0}
+\begin{document}
+
+\chapter{Carre 2}
+
+\section{Carre modes}
+
+\begin{itemize}
+\item
+\verb+carreMode = CARRE_STANDARD (0)+ Normal operation
+\item
+\verb+carreMode = CARRE_STANDARDVIRTUAL_STRUCTS (1)+ Normal operation, also create and output virtual structures
+\item
+\verb+carreMode = CARRE_EXTENDED (2)+ Extended grid generation
+
+If \verb+nvirtstruct == 0+, virtual structures are generated automatically.
+
+If \verb+nvirtstruct > 0+, the first \verb+nvirtualstruct+ structures are assumed to be the virtual structures and used
+for the extended grid generation (i.e. the virtual structure are not generated automatically). 
+The remaining structures are assumed to be real structures. 
+\end{itemize}
+
+
+
+
+
+\chapter{Extended grid handling in SOLPS 5.0}
+
+\section{Modification to the grid generation chain}
+
+\subsection{Carre}
+See separate report on Carre 2.
+
+The carre.out file now has an update version string on the first line 
+
+ output format:carre71 
+
+If this string is present, the Carre output file is in the new format.
+
+The region blocks were extended by additional field cellflags (1:nppol-1, 1:nprad-1, 1:GRID\_N\_CELLFLAGS).
+Constants to work with the cellflags array are defined in tradui\_constants.F and carre\_constants.F (part of Carre, svn:exported to B2).
+
+Note that the number of poloidal grid points is dynamically determined by Carre, i.e. it is only known after Carre finished and then has to be propagated down the grid tool chain. The carre output grid size is \verb+(c_nx,c_ny)+.
+
+\subsection{Traduit}
+When selecting conversion type 2 (format B2.5), traduit will now \emph{not} add ghost cells to the grid. 
+
+The traduit.out output file now has a version string
+
+VERSION01.001.028
+
+on the first line. It holds $c_nx \times c_ny$ cells, none of which are ghost cells. Their arrangement is as before for all topologies, simply with the rows/columns of ghost cells omitted.
+
+Every line still holds information for a single grid cell. It now includes additional variables and object categorization flags.
+Included are: cell corner positions, value of psi and it's derivatives at these corners, ffbz at the corners, 
+the magnetic field vector at the cell center (only poloidal and toroidal components,
+(the radial component is omitted, it's assumed to bezero) and a set of integer cell flags.
+The output is written by (see carre/src90/trans/ecrim2.F90)
+
+\begin{verbatim}
+          write (nfin,117) &
+               & ix+1,iy+1,&
+               & x0,y0,fpsi0, &  ! cell center quantities
+               & (crx(ix,iy,i),cry(ix,iy,i),&
+               &  fpsi(ix,iy,i),psidx(ix,iy,i),psidy(ix,iy,i),ffbz(ix,iy,i),i=0,3), & ! corner quantities
+               & bb(ix,iy,0),bb(ix,iy,2), & ! cell center mag. field
+               & b2cflag(ix,iy,1:GRID_N_CELLFLAGS) ! cell flags
+          
+     117   FORMAT(I4,1X,I4,1X,29(F12.8,1X),5(I4,1X))
+\end{verbatim}
+
+\verb+GRID_N_CELLFLAGS+ is the number of integer flags per cell (defined in the module \verb+traduit_constants+).
+
+\subsubsection{The cell flag array}
+
+The cell flags contain categorization information for the cell and it's faces.
+Related constants are defined in \verb-carre_constants.f90-.
+
+\verb+b2cflag(1)+: cell type (internal, external, boundary, ...). 
+\verb+b2cflag(2:4)+: structure index for all four faces of the cell. Order is left-bottom-right-top (in the computational domain).
+
+\subsection{b2ag}
+
+The routine that reads in the input file in traduit.out format (\verb+b2gxdr_dummy()+ in file \verb+b2agfs.F+) now checks for the input file version and, if required, adds the ghost cells. The routine doing the actual work is \verb+create_guard_cells()+ in \verb+b2ag_ghostcells.F+. The magnetic field is computed for all cells using the same code as traduit. The computed values
+are set for the ghost cells and used as sanity check for the internal cells.
+
+\section{Changes concerning the B2.5 data structure and variables}
+
+\subsection{Object categorization/cell flags}
+
+\subsection{Connectivity}
+
+\subsection{Geometric quantities}
+
+B2 uses the following geometric quantities for cells
+
+
+
+\section{b2ag}
+
+Geometry tests: there is now a separate routine (\verb+b2mod_tests/b2_test_geometry+) to test the validity of geometric quantities.
+
+
+\section{b2mn}
+
+Connectivity tests:
+
+b2sral: extrapolation to faces becomes more complex due to ghost cells neither left nor right (or top/bottom) neighbour. 
+See the FIXMEs there.
+
+
+
+\end{document}
