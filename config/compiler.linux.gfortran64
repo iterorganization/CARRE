@@ -1,31 +1,32 @@
-
-
 FC		= gfortran
 CPP		= /lib/cpp -C -traditional
 
+FFLAGS	        = -J${OBJECTCODE}
 ifdef CARRE_DEBUG
-FFLAGS 		= -g -C -ffree-line-length-none -Wall -fbounds-check -fno-second-underscore
-FFLAGS	       += -J${OBJECTCODE}
-LDFLAGS		= -Wall
+  FFLAGS 		+= -g -C -ffree-line-length-none -Wall -fbounds-check -fno-second-underscore
+  LDFLAGS		= -Wall
 else
-FFLAGS		= -O -ffree-line-length-none -fno-second-underscore
-FFLAGS	       += -J${OBJECTCODE}
+  FFLAGS		+= -O -ffree-line-length-none -fno-second-underscore
 endif
-
-DBLPAD		=
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
 ifdef USE_NCARG
-LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
-LDFLAGS 	+= ${NCARG}
+  LDLIBS	+= -L${SOLPS_LIB} -L/usr/X11R6/lib64
+  LDFLAGS 	+= ${NCARG}
 endif
 
 ifndef NOUSE_MSCL
-LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
+  LDFLAGS 	+= -L${SOLPS_LIB} -lmscl
 endif
 
 ifdef USE_ITMCARRE
+  #FIXME: use pkg-config
   INCLUDE+= -I ${UAL}/include/amd64_g95
   LDLIBS += -L${UAL}/lib -lUALFORTRANInterface_g95
+endif
+
+ifdef USE_SILO
+  INCLUDE += -I lib/${OBJECTCODE}/silo/include
+  LDLIBS += -Llib/${OBJECTCODE}/silo/lib -lsiloh5
 endif

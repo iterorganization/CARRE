@@ -74,9 +74,9 @@ contains
     if ( loglvl( level ) ) then
             if ( present( ia ) ) then
                     if ( present( ib ) ) then
-                            write (*,'(a,i,i)') msg, ia, ib
+                            write (*,'(a,i10,i10)') msg, ia, ib
                     else
-                            write (*,'(a,i)') msg, ia
+                            write (*,'(a,i10)') msg, ia
                     end if
             else 
                     write (*,'(a)') msg

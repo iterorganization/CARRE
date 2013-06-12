@@ -120,7 +120,7 @@ module carre_types
 
       ! Control flag for equilibrium data extension
       integer :: equExtensionMode = EQU_EXTENSION_OFF
-      integer :: equDistanceFunction = EQU_DIST_FUN_EXACT
+      integer :: equDistanceFunction = EQU_DIST_FUN_FAST
 
       ! psi cutoff parameters
       double precision :: psimin = -huge(0.0d0), psimax = huge(0.0d0)

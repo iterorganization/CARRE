@@ -38,7 +38,7 @@ setenv USE_UAL -DUSE_UAL
 unsetenv USE_ITMCARRE
 unsetenv USE_UAL
 
-#setenv NOUSE_MSCL True
+setenv NOUSE_MSCL True
 
 
 # Interactive Carre

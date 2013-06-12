@@ -1,5 +1,25 @@
 # VERSION : --> see SVN
 
+# Compile-time switches
+
+# FIXME: explicitly test for OBJECTCODE
+
+CARRE_DEBUG = yes
+
+USE_SILO = '-DUSE_SILO'
+
+CARRE_NONINTERACTIVE = "-DCARRE_NONINTERACTIVE"
+
+#USE_ITMCARRE = "-DUSE_ITMCARRE -DEUITM"
+#USE_UAL = "-DUSE_UAL"
+
+#USE_NCARG = '-DUSE_NCARG'
+#NOUSE_MSCL = "True"
+
+
+#SOLPSTOP = '/scratch/hmk/svn/solps5.0/'
+#SOLPS_LIB = "$SOLPSTOP/src/lib/$OBJECTCODE"
+
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
 
@@ -8,7 +28,7 @@ SRCDIR = src90
 
 SVN_B2SRC_PATH = https://solps-mdsplus.aug.ipp.mpg.de/repos/SOLPS/branches/ITM/4.10a/solps5.0/src/Braams/b2/src_xpb
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/b2_shared
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/b2_shared ${SRCDIR}/itm_shared
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
@@ -256,6 +276,8 @@ src90/b2_shared:
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F src90/b2_shared/b2mod_indirect.F
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_ual.F90 src90/b2_shared/b2mod_ual.F90
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_silo.F90 src90/b2_shared/b2mod_silo.F90
+
+#TODO: export target for b2_shared_itm
 
 include ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
 include ${OBJECTCODE}/dependencies.${OBJECTCODE}.use

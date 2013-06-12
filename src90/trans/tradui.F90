@@ -9,13 +9,14 @@ program tradui
   !*** grid formats
   !======================================================================
 #ifdef USE_ITMCARRE
-  use b2mod_connectivity
-  use b2ITMMapping
+  use b2itm_grid_io
   use b2mod_ual
   use euITM_schemas  
   use euITM_routines
-  use b2ag_ghostcells
 #endif
+  use b2mod_connectivity
+  use b2ITMMapping
+  use b2ag_ghostcells
   use carre_types
   use carre_constants
   use carre_parameter_io
@@ -58,19 +59,17 @@ program tradui
 
   type(CarreParameters) :: par
 
-#ifdef USE_ITMCARRE      
   type(B2ITMGridMap) :: b2gd
-  type(type_complexgrid) :: itmgrid
   integer :: inseltop, inselbot, nnreg(0:2)
   integer, allocatable :: region(:,:,:), resignore(:,:,:)
   integer, parameter :: istyle = -1 ! hard-wired to DG format
   
   logical, parameter :: ITM_OUTPUT_GHOSTCELLS = .false.
 
-#endif
 
   ! variables for UAL I/O
 #ifdef USE_ITMCARRE
+  type(type_complexgrid) :: itmgrid
   type (type_edge),pointer :: cpoedge(:) => null()
   integer :: idx, shot, run, ix, iy
   double precision :: time
@@ -136,6 +135,8 @@ program tradui
   write(6,*) '5: revised DIVIMP with grid parameters and PSI values'
 #ifdef USE_ITMCARRE
   write(6,*) '6: Write ITM CPO' 
+#endif
+#ifdef USE_SILO
   write(6,*) '7: Write SILO file' 
 #endif
   read(5,*) isel
@@ -211,7 +212,6 @@ program tradui
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! jdemod - added fpsi to call to ecrim5
       call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
-#ifdef USE_ITMCARRE
   elseif(isel >= 6 .and. isel <= 7) then
 
       ! assemble the crx, cry arrays
@@ -313,6 +313,7 @@ program tradui
 
 
       if (isel == 6) then
+#ifdef USE_ITMCARRE
 
          !
          ! CPO Output
@@ -344,9 +345,9 @@ program tradui
          call euitm_deallocate(cpoedge)
 
          call close_ual(idx)
-
+#endif
       else if (isel == 7) then 
-
+#ifdef USE_SILO
          call b2silo_open("traduitAAA")
          call b2silo_writeGrid( "grid", b2gd, nx, ny, &
               & b2cflag(-1:nx,-1:ny,:), &
@@ -362,11 +363,8 @@ program tradui
          silo_tmp(-1:nx,-1:ny) = b2cflag(-1:nx,-1:ny,5)
          call b2silo_writeCvScalarReal( "grid", b2gd, "cflag5", nx, ny, silo_tmp(-1:nx,-1:ny) )
          call b2silo_close()
-
+#endif
       end if
-
-#endif      
-
 
   else
       write(6,*) 'Wrong value (must be 1 to 5): isel=',isel

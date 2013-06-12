@@ -468,13 +468,9 @@ contains
        if(nncut.gt.nncutmax) then
           write(*,*) ' Increase nncutmax in b2mod_geo!'
           write(*,*) ' nncut = ',nncut,' nncutmax = ',nncutmax
-#ifdef USE_ITMCARRE
           if (.not.(nncut.le.nncutmax)) then
              stop 'faulty parameter nncutmax'
           end if
-#else
-          call xertst (nncut.le.nncutmax,'faulty parameter nncutmax')
-#endif
           
        end if
     end do
@@ -858,13 +854,12 @@ contains
     match(ix1,iy1,ix2,iy2)= & 
         & (dist(ix1,iy1,1,ix2,iy2,0)+dist(ix1,iy1,3,ix2,iy2,2)).lt. & 
         & geom_match_dist
-    intrinsic min, max
-    !
-#ifndef USE_ITMCARRE
-    call ipgetr ('b2agfs_geom_match_dist', geom_match_dist)
-    call xertst (geom_match_dist.gt.0.0_R8, & 
-        &  'faulty argument geom_match_dist')
-#endif
+    intrinsic min, max   
+    ! FIXME: make this conditional
+    !call ipgetr ('b2agfs_geom_match_dist', geom_match_dist)
+    if ( .not. geom_match_dist.gt.0.0_R8 ) then
+       stop "faulty argument geom_match_dist"
+     end if
     ! if stellarator island or limiter case, find periodicity domain coordinate
     if(periodic_bc.eq.1) then
         if (nncut.eq.1) then    ! stellarator island is on North side
@@ -892,11 +887,7 @@ contains
                 enddo
             enddo
         else
-#ifdef USE_ITMCARRE
-            stop 'Unexpected geometry!'
-#else
-            call xerrab ('Unexpected geometry!')
-#endif
+           stop 'Unexpected geometry!'
         endif
     endif
     !
@@ -1508,10 +1499,9 @@ contains
                 ! A vanishing face has no ghost cell -> no neighbour on that side
                 if (.not. isInDomain(nx, ny, gix, giy)) cycle
 
-#ifndef USE_ITMCARRE
-                call xertst( isGhostCell(cflags(gix, giy, CELLFLAG_TYPE)), &
-                     & "Broken cell type: expected ghost cell" )
-#endif
+                if ( .not. isGhostCell(cflags(gix, giy, CELLFLAG_TYPE)) ) then
+                   stop "Broken cell type: expected ghost cell"
+                end if
                 listLen = listLen + 1
                 x(listLen) = gix
                 y(listLen) = giy
