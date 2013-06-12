@@ -1,0 +1,27 @@
+Building
+--------
+
+The environment variable OBJECTCODE has to be set to one of the 
+compiler choices given in config/. When using CARRE2 in the SOLPS environment, 
+the OBJECTCODE variable is usually set by the SOLPS setup scripts.
+
+Examples: 
+
+For tcsh:
+ 
+ setenv OBJECTCODE amd64_gfortran_4.6.debug
+
+For bash:
+
+ export OBJECTCODE=amd64_gfortran_4.6.debug
+
+Alternatively, one can inject it in the Makefile by
+
+ make OBJECTCODE=amd64_gfortran_4.6.debug <target>
+
+
+To build, execute the following commands:
+
+ make depend
+ make 
+

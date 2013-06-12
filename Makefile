@@ -16,7 +16,6 @@ CARRE_NONINTERACTIVE = "-DCARRE_NONINTERACTIVE"
 #USE_NCARG = '-DUSE_NCARG'
 #NOUSE_MSCL = "True"
 
-
 #SOLPSTOP = '/scratch/hmk/svn/solps5.0/'
 #SOLPS_LIB = "$SOLPSTOP/src/lib/$OBJECTCODE"
 
@@ -31,7 +30,12 @@ SVN_B2SRC_PATH = https://solps-mdsplus.aug.ipp.mpg.de/repos/SOLPS/branches/ITM/4
 VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/b2_shared ${SRCDIR}/itm_shared
 INCLUDE = -I ${SRCDIR}/include
 
-ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
+# We can only build the dg-to-Carre converter fcrr when we have the SOLPS environment available
+ifdef SOLPSTOP
+ALLTARGETS +=  ${OBJECTCODE}/fcrr
+endif
+
 EXCLUDELIST = carre.o fcrr.o tradui.o euitm_routines.o itmcarre_wrapper.o
 
 DEFINES = ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL} ${CARRE_NONINTERACTIVE}
