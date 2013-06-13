@@ -79,7 +79,8 @@ module carre_types
   ! Equilibrium extension modes
   integer, parameter, public :: EQU_EXTENSION_OFF = 0
   integer, parameter, public :: EQU_EXTENSION_MODE_SIMPLE = 1
-  integer, parameter, public :: EQU_EXTENSION_MODE_VESSEL = 2
+  integer, parameter, public :: EQU_EXTENSION_MODE_VESSEL_CUTOFF = 2
+  integer, parameter, public :: EQU_EXTENSION_MODE_VESSEL_RESTORE = 3
 
   ! Equilibrium distance function
   integer, parameter, public :: EQU_DIST_FUN_FAST = 1

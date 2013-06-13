@@ -629,6 +629,7 @@ contains
        ! take a step along the separatrix away from the x-point
        ! to gain some distance between virtual and real structures
 
+       write (*,*) "tx, ty", tx, ty
        ! choose a stepsize
        dx = 1 / norm( gx, gy ) * & 
             &        norm( equ%ptx( vtargetipx( itarget ) ) - tx, & 

@@ -18,6 +18,9 @@ module carre_equilibrium
   private
   public extend_equilibrium, insideEquGrid, compute_psi_on_grid
 
+  integer, parameter :: EQU_VESSEL_CUTOFF = 1
+  integer, parameter :: EQU_VESSEL_RESTORE = 2
+
 contains
 
   !> Extend a given equilibrium by throwing away data outside a given psi value and extending
@@ -74,15 +77,20 @@ contains
 
     end if
 
-    if (par%equExtensionMode == EQU_EXTENSION_MODE_VESSEL) then
+    if (par%equExtensionMode == EQU_EXTENSION_MODE_VESSEL_CUTOFF) then
        ! smart equilibrium cutoff: cut off points outside of vessel
-       call logmsg(LOGINFO, "carre_equilibrium: vessel/smart equilibrium extension enabled")
-
+       call logmsg(LOGINFO, "carre_equilibrium: vessel/smart equilibrium extension enabled, cutoff mode")
        ! FIXME: this does not work for limiter configurations,
        ! because the data for the "fake" x-point on the limiter structure
        ! as defined in selptx is incomplete
 
-       call equilibrium_vessel_cutoff(equ, struct, newPsi)
+       call equilibrium_vessel_set(equ, struct, newPsi, EQU_VESSEL_CUTOFF)
+    end if
+
+    if (par%equExtensionMode == EQU_EXTENSION_MODE_VESSEL_RESTORE) then
+       ! smart equilibrium cutoff: restore points outside vessel
+       call logmsg(LOGINFO, "carre_equilibrium: vessel/smart equilibrium extension enabled, restore mode")
+       call equilibrium_vessel_set(equ, struct, newPsi, EQU_VESSEL_RESTORE)
     end if
 
     ! Extend equilibrium grid towards left, right, bottom, top
@@ -407,17 +415,21 @@ contains
 
   end subroutine categorize_equilibrium_grid
 
-
   !> Cut off psi data outside of plasma vessel. The idea is to keep the 
   !> original psi data in the domain where we want to compute the plasma solution,
   !> and replace it with fake data for the purpose of gridding outside of the vessel.
   !>
+  !> There are two modes:
+  !> -EQU_VESSEL_CUTOFF: remove all equilibrium data outside the vessel
+  !> -EQU_VESSEL_RESTORE: restore all equilibrium data inside the vessel
+  !>
   !> To find the points inside the vessel we need some information from the geometry
   !> and topology analysis, which is why this routine must be called after this happened.
-  subroutine equilibrium_vessel_cutoff(equ, struct, psi)
+  subroutine equilibrium_vessel_set(equ, struct, psi, mode)
     type(CarreEquilibrium), intent(inout) :: equ
     type(CarreStructures), intent(in) :: struct
     double precision, intent(inout) :: psi(nxmax, nymax)
+    integer, intent(in) :: mode
     
     ! internal
     ! How many points to grow the vessel region
@@ -434,8 +446,14 @@ contains
        call growInternalRegion(pointFlag(1:equ%nx, 1:equ%ny))
     end do
 
-    ! Set original equilibrium value on internal points
-    where ( pointFlag /= GRID_INTERNAL ) psi = huge(psi)
+    select case (mode)
+    case (EQU_VESSEL_CUTOFF)
+       ! delete data on external points
+       where ( pointFlag /= GRID_INTERNAL ) psi = huge(psi)
+    case  (EQU_VESSEL_RESTORE)
+       ! Set original equilibrium value on internal points
+       where ( pointFlag == GRID_INTERNAL ) psi = equ%psi
+    end select
 
   contains
 
@@ -468,7 +486,7 @@ contains
 
     end subroutine growInternalRegion
 
-  end subroutine equilibrium_vessel_cutoff
+  end subroutine equilibrium_vessel_set
 
 
   !> Check whether the given position (x,y) is
