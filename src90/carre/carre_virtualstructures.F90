@@ -433,7 +433,9 @@ contains
                   &              equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
                   &              tx, ty )
              ! take a step, including a security factor
-             dx = 0.02 * (tpsi - equ%fctpx(ipx)) & 
+             ! FIXME: choose step size in a better way
+             ! was: 0.02, did not get to separatrix within 1000 steps in this case
+             dx = 0.1 * (tpsi - equ%fctpx(ipx)) & 
                   &              / sqrt( gx**2 + gy**2 );
              tx = tx - dx * gx
              ty = ty - dx * gy
@@ -441,6 +443,8 @@ contains
              tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
                   &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
                   &              tx, ty )
+             write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of x-point", equ%fctpx(ipx)
+
              ! TODO: if psi not moving in the right direction,
              ! decrease step size and try again
              istep = istep + 1
