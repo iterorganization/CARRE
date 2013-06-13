@@ -31,5 +31,5 @@ equDistanceFun=1
 equExpansionFactor=0.8
 loglevel=2
 carreMode=2
-gridExtensionMode=1
+gridExtensionMode=2
 $end
