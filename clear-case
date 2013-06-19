@@ -1,8 +1,21 @@
 #!/bin/sh
 
-rm structure.dat rzpsi.dat carre.dat btor.dat 
-rm carreFinal00000.silo carre.out 
-rm virtualstructure.out
-rm traduitAAA00000 traduit.out
-rm selptx.inf 
-rm *.silo
+clear_input=1
+if [ "$1" = output ]; then
+    echo "Only clearing output"
+    clear_input=0
+fi 
+
+# Input files
+
+if [ "$clear_input" = 1 ]; then
+    rm -f structure.dat rzpsi.dat carre.dat btor.dat 
+    rm -f selptx.inf 
+fi
+
+# Output files
+
+rm -f carreFinal00000.silo carre.out 
+rm -f virtualstructure.out
+rm -f traduitAAA00000 traduit.out
+rm -f *.silo
