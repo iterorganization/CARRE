@@ -443,7 +443,7 @@ contains
              tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
                   &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
                   &              tx, ty )
-             write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of x-point", equ%fctpx(ipx)
+             !write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of x-point", equ%fctpx(ipx)
 
              ! TODO: if psi not moving in the right direction,
              ! decrease step size and try again

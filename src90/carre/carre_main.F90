@@ -114,7 +114,7 @@ contains
        ! Only do two passes when currently working with original structures
        if (iSetupStruct /= ORIGINAL_STRUCT_STEP) nEquSteps = GIVEN_EQU_STEP
 
-       ! Equilibrium setup loop
+       ! Equilibrium setup loopu
        do iEquStep = GIVEN_EQU_STEP, nEquSteps
 
           ! We do the equilibrium extension on the beginning of the second
