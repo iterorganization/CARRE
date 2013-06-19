@@ -5,6 +5,11 @@ if [ -z $1 ]; then
     exit 1
 fi
 
+if [ ! -d $1 ]; then
+    echo "Creating directory $1"
+    mkdir -p $1
+fi
+
 cp structure.dat rzpsi.dat carre.dat btor.dat $1
 cp virtualstructure.out $1
 cp carreFinal00000.silo carre.out $1

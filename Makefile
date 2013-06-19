@@ -196,7 +196,7 @@ silo: lib/${OBJECTCODE}/silo
 
 lib/${OBJECTCODE}/silo: hdf5 silo-${SILO_VERSION} 
 	cd silo-${SILO_VERSION}; \
-	./configure --with-hdf5=${HDF5_INSTALL_DIR}/include,${HDF5_INSTALL_DIR}/lib64 --prefix=${SILO_INSTALL_DIR} --disable-browser --disable-silex --enable-fortran FC=${FC} ; \
+	./configure --with-hdf5=${HDF5_INSTALL_DIR}/include,${HDF5_INSTALL_DIR}/lib --prefix=${SILO_INSTALL_DIR} --disable-browser --disable-silex --enable-fortran FC=${FC} ; \
 	make -j4; \
 	make install
 

@@ -27,10 +27,10 @@ endif
 
 ifdef USE_SILO
 INCLUDE += -I lib/${OBJECTCODE}/silo/include
-LDLIBS += -Llib/${OBJECTCODE}/silo/lib64 -lsiloh5
+LDLIBS += -Llib/${OBJECTCODE}/silo/lib -lsiloh5
 
 INCLUDE += -I lib/${OBJECTCODE}/hdf5/include
-LDLIBS += -Llib/${OBJECTCODE}/hdf5/lib64  -lhdf5_hl -lhdf5 -lz -lstdc++
+LDLIBS += -Llib/${OBJECTCODE}/hdf5/lib  -lhdf5_hl -lhdf5 -lz -lstdc++
 endif
 
 GATEWAY_LIBS=ual-${ITM_INTEL_OBJECTCODE} amns-ifort xmllib-${ITM_INTEL_OBJECTCODE} itmtypes-${ITM_INTEL_OBJECTCODE} itmconstants-${ITM_INTEL_OBJECTCODE} itmassert-${ITM_INTEL_OBJECTCODE}
