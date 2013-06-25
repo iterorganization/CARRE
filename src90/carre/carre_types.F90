@@ -274,7 +274,12 @@ module carre_types
       ! If GRID_UNDEFINED, it's not on a structure
       integer :: cellFaceIStruct(1:4,npmamx-1,nrmamx-1,nregmx)
 
-      integer, dimension(npmamx,nrmamx,nregmx) :: pointFlag, pointStructIndex
+      ! Point flags and point structure indices.
+      ! pointFlagFinalCheck is for a sanity check to test the explicit knowledge 
+      ! about the boundary points at the finalization step 
+      ! against the implicit knowledge gained by the object categorization.
+      integer, dimension(npmamx,nrmamx,nregmx) :: pointFlag, pointStructIndex, &
+           & pointFlagFinalCheck
 
       ! logical flags marking radial grid lines as required
       integer :: lineFlagRad(npmamx, nregmx)

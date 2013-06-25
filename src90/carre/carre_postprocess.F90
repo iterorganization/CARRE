@@ -228,6 +228,10 @@ contains
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
         ! Recompute the object categorization
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)
+        ! Forced coarsening of finalized grid 
+        call forcedCoarsening(grid, par)       
+        ! Sanity check whether categorization agrees with knowledge from finalization
+        !call boundaryPointSanityCheck()
         ! Recompute psi on grid
         call compute_psi_on_grid( equ, grid )
         ! write final postprocessing result
@@ -246,32 +250,6 @@ contains
         ! Mark points to be inside/outside of vessel (this identifies the boundary points)
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
 
-!!$        ! Mark faces boundary faces not on a target, using the region connection information
-!!$        ! This currently only treats poloidally-aligned faces
-!!$        do iReg = 1, grid%nreg
-!!$            do iPol = 1, grid%np1(iReg)-1
-!!$                do iBnd = 1, 2
-!!$                    select case (iBnd)
-!!$                    case(1)
-!!$                        ! Top boundary faces of region
-!!$                        iRad = grid%nr(iReg)
-!!$                    case(2)
-!!$                        ! Bottom boundary faces of region
-!!$                        iRad = 1
-!!$                    end select
-!!$
-!!$                    if (grid%nbFaceIPol(iReg, iPol, iBnd) == GRID_UNDEFINED) then
-!!$                        ! No neighbour on this face
-!!$                        ! Set points to be boundary points
-!!$                        grid%pointFlag(iPol:iPol+1, iRad, iReg) = GRID_BOUNDARY
-!!$                        ! Where no structure set yet, set generic structure number
-!!$                        where (grid%pointStructIndex(iPol:iPol+1, iRad, iReg) == GRID_UNDEFINED) &
-!!$                             & grid%pointStructIndex(iPol:iPol+1, iRad, iReg) = BOUNDARY_NOSTRUCTURE
-!!$                    end if
-!!$                end do
-!!$            end do
-!!$        end do
-
         ! Recompute the object categorization 
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
 
@@ -282,6 +260,53 @@ contains
 
 
   contains
+
+!!$    subroutine boundaryPointSanityCheck()
+!!$
+!!$      integer :: iPol, iRad, iReg
+!!$      integer :: nError
+!!$
+!!$      nError = 0
+!!$
+!!$      call logmsg(LOGDEBUG,  'boundaryPointSanityCheck: # of set bnd. points is        '&
+!!$           &//int2str(count(grid%pointFlagFinalCheck == GRID_BOUNDARY))  )
+!!$      call logmsg(LOGDEBUG,  'boundaryPointSanityCheck: # of identified bnd. points is '&
+!!$           &//int2str(count(grid%pointFlag == GRID_BOUNDARY))  )
+!!$
+!!$      do iReg = 1, grid%nreg
+!!$         do iPol = 1, grid%np1(iReg) - 1
+!!$            do iRad = 1, grid%nr(iReg) - 1
+!!$
+!!$               if ( grid%pointFlag(iPol, iRad, iReg) /= GRID_BOUNDARY .and. &
+!!$                    &  grid%pointFlagFinalCheck(iPol, iRad, iReg) == GRID_BOUNDARY ) then
+!!$
+!!$                  write (*,*) "Wrong categorization of boundary point iReg=", iReg, &
+!!$                       & ", iPol=", iPol, ", iRad=", iRad, &
+!!$                       & " at position (", grid%xmail(iPol, iRad, iReg),&
+!!$                       & ", ", grid%ymail(iPol, iRad, iReg) 
+!!$                  nError = nError + 1
+!!$               end if
+!!$
+!!$            end do
+!!$         end do
+!!$      end do
+!!$
+!!$      if (nError > 0) then
+!!$         !stop "boundaryPointSanityCheck: broken boundary point categorization"
+!!$      end if
+!!$
+!!$    end subroutine boundaryPointSanityCheck
+
+    subroutine forcedCoarsening(grid, par)
+      type(CarreParameters), intent(in) :: par
+      type(CarreGrid), intent(inout) :: grid
+
+      !call computeHxHy(grid)   
+      
+      
+      
+
+    end subroutine forcedCoarsening
 
     subroutine categorizeCellsAndFaces(pasmin, finalized)
       double precision, intent(in) :: pasmin
@@ -649,19 +674,6 @@ contains
 
     if (finalized) call markBoundaryPointsFinal(grid%pointFlag)
 
-    ! This approach breaks if one of the x-points is outside the vessel (in complex DN cases)    
-!!$    do iReg = 1, grid%nreg
-!!$        ! For region, find an x-point (which is declared to be on the inside)
-!!$        ! TODO: for limiter, just take any point on the core boundary.
-!!$        call findXPointInRegion(equ, grid, iReg, xip, xir)
-!!$
-!!$        ! Walk away from there (recursively) until all points are marked.
-!!$        ! (this recursion will do transitions between the regions)
-!!$        call markInternalPoints(xip, xir, iReg, grid%pointFlag, finalized)
-!!$
-!!$        if (.not. finalized) call markBoundaryPointsIteration(iReg, grid%pointFlag)
-!!$    end do
-
     ! Find internal point: point closest to o-point    
     iRegMin = GRID_UNDEFINED
     dmin = huge(0.0d0)
@@ -887,6 +899,7 @@ contains
       ! internal
       integer :: iReg, iPol, iRad, iStruct
       logical :: onStructure
+      integer :: nError
             
       grid%pointStructIndex = GRID_UNDEFINED
 
@@ -905,6 +918,38 @@ contains
 
               end do
           end do
+      end do
+
+      ! Second step: check against list of points explicitly identified as boundary
+      ! points during finalization step
+
+      nError = 0
+
+      call logmsg(LOGDEBUG,  'markBoundaryPointsFinal: # of identified bnd. points is '&
+           &//int2str(count(points == GRID_BOUNDARY))  )
+      call logmsg(LOGDEBUG,  'markBoundaryPointsFinal: # of set bnd. points is        '&
+           &//int2str(count(grid%pointFlagFinalCheck == GRID_BOUNDARY))  )
+
+      do iReg = 1, grid%nreg
+         do iPol = 1, grid%np1(iReg) - 1
+            do iRad = 1, grid%nr(iReg) - 1
+
+               if ( points(iPol, iRad, iReg) /= GRID_BOUNDARY .and. &
+                    &  grid%pointFlagFinalCheck(iPol, iRad, iReg) == GRID_BOUNDARY ) then
+
+                  call logmsg(LOGWARNING, "Wrong categorization of boundary point iReg="&
+                       & //int2str(iReg)//", iPol="//int2str(iPol)//", iRad="//int2str(iRad)&
+                       & //" at position ("//real2str(grid%xmail(iPol, iRad, iReg))&
+                       & //", "//real2str(grid%ymail(iPol, iRad, iReg)) )
+
+                  points(iPol, iRad, iReg) = GRID_BOUNDARY
+                  grid%pointStructIndex(iPol, iRad, iReg) = -99
+                  
+                  nError = nError + 1
+               end if
+
+            end do
+         end do
       end do
 
     end subroutine markBoundaryPointsFinal
@@ -1805,6 +1850,7 @@ contains
     double precision :: dist
 
     pointWasMoved = .false.
+    grid%pointFlagFinalCheck = GRID_UNDEFINED
 
     ! First fix cells with broken geometry (can happen at this stage due to 
     ! forced coarsening)
@@ -1921,7 +1967,7 @@ contains
 
                             ! make sure neighbour point is in region
                             if ( (ip2 < 1) .or. (ip2 > grid%np1(iReg)) ) cycle
-                            if ( (ir2 < 1) .or. (ir2 > grid%nr(iReg)) ) cycle
+                            if ( (ir2 < 1) .or. (ir2 > grid%nr(iReg)) ) cycle 
 
                             ! figure out indices and type of face this point is on
                             ipFace = ip + min(dx, 0)
@@ -1937,6 +1983,7 @@ contains
                                      & grid%faceISecPy(iFace,ipFace,irFace,iReg), &
                                      & markFixed = .false. )
                                 pointMoved = .true.
+                                grid%pointFlagFinalCheck(ip, ir, iReg) = GRID_BOUNDARY
                                 exit
                             end if
 
@@ -1949,6 +1996,8 @@ contains
                                 call movePoint( grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
                                      & grid%xmail(ip2,ir2,iReg), grid%ymail(ip2,ir2,iReg), &
                                      & markFixed = .false. )
+                                grid%pointFlagFinalCheck(ip, ir, iReg) = GRID_BOUNDARY
+                                grid%pointFlagFinalCheck(ip2, ir2, iReg) = GRID_BOUNDARY
                                 pointMoved = .true.
                                 exit
                             end if
@@ -1981,6 +2030,7 @@ contains
                 nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
                 if (.not. ((nInt == 1) .and. (nExt == 3)) ) cycle
 
+
                 call logmsg(LOGDEBUG,  'finalizeCells: candidate cell '//int2str(ip)&
                      &//', '//int2str(ir)//', '//int2str(iReg) )
 
@@ -2000,17 +2050,25 @@ contains
                 ipNb = ipFix + 1
                 irNb = irFix
                 if (ipNb > ip+1) ipNb = ip
-                pointOk = pointOk .or. pointsIdentical( &
+                if ( pointsIdentical( &
                      & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
-                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) )
+                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
+                   pointOk = .true.             
+                   grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                   grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
+                end if
 
                 ! compare with neighbour in radial direction
                 ipNb = ipFix
                 irNb = irFix + 1
                 if (irNb > ir+1) irNb = ir
-                pointOk = pointOk .or. pointsIdentical( &
+                if ( pointsIdentical( &
                      & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
-                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) )
+                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
+                   pointOk = .true.             
+                   grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                   grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
+                end if
 
                 ! if not ok, set it to neighbour in radial direction
                 if (.not. pointOk) then
@@ -2020,6 +2078,8 @@ contains
                     call movePoint( grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
                          & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg), &
                          & markFixed = .false. )
+                    ! The point that was moved is marked as a boundary point in movePoint.
+                    ! We also have to mark the point it was moved on as a boundary point.
                 end if
 
             end do
@@ -2069,10 +2129,11 @@ contains
               grid%xmail(ip(1), ir(1), iReg) = xTo
               grid%ymail(ip(1), ir(1), iReg) = yTo
               pointWasMoved(ip(1), ir(1), iReg) = .true.
+              grid%pointFlagFinalCheck(ip(1), ir(1), iReg) = GRID_BOUNDARY                  
 
               if (markFixed) then                
                   ! Mark as boundary point
-                  grid%pointflag(ip(1), ir(1), iReg) = GRID_BOUNDARY
+                  grid%pointFlag(ip(1), ir(1), iReg) = GRID_BOUNDARY
                   
                   ! Mark all faces connected to this point as not intersected
                   grid%faceISec(FACE_RADIAL,ip(1),ir(1),iReg) = .false.

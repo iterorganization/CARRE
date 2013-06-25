@@ -338,6 +338,28 @@ contains
                & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
        end if
 
+       ! boundary points sanity check
+       nIntPoints = 0
+
+       do iReg = 1, grid%nreg
+          do ip = 1, grid%np1(iReg)
+             do ir = 1, grid%nr(iReg)
+                if ( grid%pointFlagFinalCheck(ip, ir, iReg) /= GRID_BOUNDARY) cycle
+
+                nIntPoints = nIntPoints + 1
+
+                tmpX(nIntPoints) = grid%xmail(ip, ir, iReg)
+                tmpY(nIntPoints) = grid%ymail(ip, ir, iReg)                
+             end do
+          end do
+       end do
+
+       !call logmsg(LOGDEBUG,  'carre_postprocess: '//int2str(nIntPoints)//' boundary points')
+       if (nIntPoints > 0) then
+          call siloWritePointGrid( csioDbfile, 'boundaryPointsFinalCheck', &
+               & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
+       end if
+
        ! radial intersected faces
        nIntPoints = 0
 
