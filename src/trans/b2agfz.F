@@ -37,7 +37,7 @@ c======================================================================
 c======================================================================
 c*** Input:
 c***  nxmax,nymax: array dimensions for B2 grid (poloidal & radial)
-c***  r,z   : co-ordinates of the carre grid points
+c***  r,z   : coordinates of the carre grid points
 c***  nreg  : actual number of regions in the carre grid
 c***  nppol,nprad : number of poloidal and radial grid points in each
 c***                region
@@ -204,7 +204,7 @@ c>>>
 c======================================================================
 c*** Define the equilibrium type
 
-c!!! Change the criteria (O-point is not necessarily around z=0 !!!   	
+c!!! Change the criteria (O-point is not necessarily around z=0) !!!   	
 c-ank19990108: done. To be honest, ssn-up and ssn-down are treated equally...
 
 c*** Now compare the vertical position of the x-point with that of the mid-SOL
@@ -226,7 +226,7 @@ c      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).lt.zero) then
      .                                      z(1,1,1).eq.z(1,1,5) ) then
         equtype='ddn-down'
       else
-        write(6,*) 'b2agfz: the equilibrium of a non-forseen type.  ',
+        write(6,*) 'b2agfz: the equilibrium is of an unforeseen type. ',
      ,                                                   'nreg = ',nreg
         stop
       end if
