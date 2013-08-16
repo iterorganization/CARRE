@@ -17,7 +17,7 @@ CARRE_NONINTERACTIVE = "-DCARRE_NONINTERACTIVE"
 #NOUSE_MSCL = "True"
 
 #SOLPSTOP = '/scratch/hmk/svn/solps5.0/'
-#SOLPS_LIB = "$SOLPSTOP/src/lib/$OBJECTCODE"
+SOLPS_LIB = ${SOLPSTOP}/src/lib/${OBJECTCODE}
 
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
@@ -143,7 +143,7 @@ ${OBJECTCODE}/traduit: ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a
 
 ${OBJECTCODE}/fcrr: ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a Makefile
 	rm -f ${OBJECTCODE}/fcrr 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
+	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
 
 ${OBJECTCODE}/itmcarre_wrapper: ${OBJECTCODE}/itmcarre_wrapper.o ${OBJECTCODE}/libcarre.a Makefile
 	rm -f ${OBJECTCODE}/itmcarre_wrapper 2>/dev/null; \
