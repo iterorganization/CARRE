@@ -1,0 +1,43 @@
+SUMMARY OF THE Silo with HDF5 CONFIGURATION
+=================================
+
+Silo Version:           4.9.1
+Configured on:          Thu Jun 13 13:41:44 CEST 2013
+Configured by:          hmk@g02
+Configure command:      ./configure '--with-hdf5=/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/hdf5/include,/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/hdf5/lib' '--prefix=/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/silo' '--disable-browser' '--disable-silex' '--enable-fortran' 'FC=ifort'
+Host system:            x86_64-unknown-linux-gnu
+Build system:           x86_64-unknown-linux-gnu
+Installation point:     /pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/silo
+Source directory:       @UsingSrcDir@
+Archiver:               ar
+Ranlib:                 ranlib
+
+Configure Summary
+Compiling Options:
+                     C Compiler /afs/@cell/.cs/gcc/4.7.2/@sys/bin/gcc
+                       CPPFLAGS -I/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/hdf5/include 
+                         CFLAGS -fPIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -Wdeclaration-after-statement
+                        LDFLAGS -L/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/hdf5/lib 
+                           LIBS -lhdf5 -lz  -lm
+Languages:
+                   C++ Compiler /afs/@cell/.cs/gcc/4.7.2/@sys/bin/g++
+                       CXXFLAGS -fPIC
+               Fortran Compiler /afs/@cell/common/soft/intel/ics/2011.0.013/12.1/bin/intel64/bin/ifort
+                        FCFLAGS -g
+                         FCLIBS  -L/afs/ipp-garching.mpg.de/common/soft/intel/ics/2011.0.013/composer_xe_2011_sp1.13.367/compiler/lib/intel64 -L/afs/ipp-garching.mpg.de/common/soft/gcc/4.7.2/@sys/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.7.2 -L/afs/ipp-garching.mpg.de/common/soft/gcc/4.7.2/@sys/bin/../lib/gcc -L/afs/ipp-garching.mpg.de/common/soft/gcc/4.7.2/@sys/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/afs/ipp-garching.mpg.de/common/soft/gcc/4.7.2/@sys/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../.. -L/lib64 -L/lib -L/usr/lib64 -L/usr/lib -lifport -lifcore -limf -lsvml -lm -lipgo -lirc -lpthread -lirc_s -ldl
+Features:
+                        Browser @UsingBrowser@
+                       Readline @UsingReadline@
+                           HDF5 @UsingHDF5@
+                          Silex @UsingSilex@
+                             Qt @UsingQt@
+                Qt moc Compiler 
+                    Qt CXXFLAGS 
+                        Qt LIBS 
+                         Python @UsingPython@
+                Python Compiler 
+                Python CPPFLAGS 
+Makefile Summary
+Compile command:         gcc -DHAVE_CONFIG_H -I. -I..   -I/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/hdf5/include   -fPIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -Wdeclaration-after-statement 
+Libtool command:         /bin/sh ../libtool --tag=CC   --mode=compile gcc -DHAVE_CONFIG_H -I. -I..   -I/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/hdf5/include   -fPIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -Wdeclaration-after-statement 
+Link command:            /bin/sh ../libtool --tag=CC   --mode=link gcc  -fPIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -Wdeclaration-after-statement  -L/pfs/work/hmk/svn/CARRE/branches/CARRE2/lib/amd64_intel_12/hdf5/lib  -o make.settings -lhdf5 -lz  -lm 
