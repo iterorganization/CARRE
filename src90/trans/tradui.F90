@@ -139,6 +139,7 @@ program tradui
 #ifdef USE_SILO
   write(6,*) '7: Write SILO file' 
 #endif
+  write(6,*) '8: format B2.5 (old style)'
   read(5,*) isel
   write(6,*) 'The format chosen is :',isel
 
@@ -149,7 +150,19 @@ program tradui
       !
       call ecrim1(nout,nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, & 
           &  nrmamx)
-  elseif(isel.eq.2) then
+   elseif(isel.eq.8) then
+      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
+           r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
+           par%nptseg,psidx,psidy,psi,psidxm,psidym,cflag,b0r0, &
+           ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+!!$        call b2agbb (nx,ny,fpsi,ffbz,bb, &
+!!$          crx,cry,psidx,psidy,nxmx,nymx)
+      call ecrim2_oldformat(nfin,nx,ny,&
+           & crx(-1:nxmx,-1:nymx,0:3),&
+           & cry(-1:nxmx,-1:nymx,0:3),bb(-1:nxmx,-1:nymx,0:3),nxmx,nymx)
+   elseif(isel.eq.2) then
       !
       ! B2.5 Format (Carre script default)
       !
@@ -365,7 +378,6 @@ program tradui
          call b2silo_close()
 #endif
       end if
-
   else
       write(6,*) 'Wrong value (must be 1 to 5): isel=',isel
       stop
