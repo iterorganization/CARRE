@@ -142,8 +142,8 @@ contains
             select case (action)
             case(ACTION_REFINE_FIX)
                 action = ACTION_COARSEN
-            case(ACTION_COARSEN_FORCE)
-                action = ACTION_COARSEN_FORCE
+            !case(ACTION_COARSEN_FORCE)
+            !    action = ACTION_COARSEN_FORCE
             case default
                 if (nCellsToRefineFix > 0) then
                     action = ACTION_REFINE_FIX
@@ -152,12 +152,12 @@ contains
                         action = ACTION_REFINE
                     else
                         action = ACTION_COARSEN_FORCE
-                        ! switch to cleanup resolution for coarsening
-                        lPasMin = par%cleanupPasmin
-                        ! recompute object categorization with cleanup minimum cell length
-                        call categorizeCellsAndFaces(lPasmin, finalized = .false.)
-                        nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
-                            & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
+!!$                        ! switch to cleanup resolution for coarsening
+!!$                        lPasMin = par%cleanupPasmin
+!!$                        ! recompute object categorization with cleanup minimum cell length
+!!$                        call categorizeCellsAndFaces(lPasmin, finalized = .false.)
+!!$                        nCellsToCoarsen = count( grid%cellflag == GRID_INTERNAL_COARSEN ) &
+!!$                            & + count( grid%cellflag == GRID_BOUNDARY_COARSEN )
                     end if
                 end if
             end select
@@ -186,9 +186,9 @@ contains
                 ! Refine cells
                 call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)            
             case (ACTION_COARSEN_FORCE)            
-                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN_FORCE. "&
-                    &//int2str(nCellsToCoarsen)//' cells to coarsen')
-                call coarsenCells(grid, force = .true.)
+!!$                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN_FORCE. "&
+!!$                    &//int2str(nCellsToCoarsen)//' cells to coarsen')
+!!$                call coarsenCells(grid, force = .true.)
             end select
 
             npDiff = sum(grid%np1(1:grid%nReg)-npReg(1:grid%nReg))
@@ -228,14 +228,18 @@ contains
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
         ! Recompute the object categorization
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)
+        ! write cell finalization result
+        call writeGridStateToSiloFile('carrePostProcE0', equ, struct, grid)
         ! Forced coarsening of finalized grid 
         call forcedCoarsening(grid, par)       
+        ! write forced coarsening result
+        call writeGridStateToSiloFile('carrePostProcE1', equ, struct, grid)
         ! Sanity check whether categorization agrees with knowledge from finalization
         !call boundaryPointSanityCheck()
         ! Recompute psi on grid
         call compute_psi_on_grid( equ, grid )
         ! write final postprocessing result
-        call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
+        call writeGridStateToSiloFile('carrePostProcF0', equ, struct, grid)
 
     else
         call logmsg( LOGINFO, "carre_postprocess_computation: doing standard grid" )
@@ -252,6 +256,9 @@ contains
 
         ! Recompute the object categorization 
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
+
+        ! Recompute psi on grid
+        call compute_psi_on_grid( equ, grid )
 
         ! write final postprocessing result
         call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
@@ -301,10 +308,73 @@ contains
       type(CarreParameters), intent(in) :: par
       type(CarreGrid), intent(inout) :: grid
 
-      !call computeHxHy(grid)   
+      integer :: iPol, iRad, iReg
+
+      call coarsenCells(grid, force = .true.)
+
+      return
+
+      ! Using this approach we might have damaged cells.
+      ! Look for cells that have an external node. Move that node in the radial
+      ! direction onto the neighbour internal or boundary node and declare it a boundary node.
+
+      do iReg = 1, grid%nreg
+         do iPol = 1, grid%np1(iReg) - 1
+            do iRad = 1, grid%nr(iReg) - 1
+
+               ! Only interested in cells in the domain
+               if ( count(grid%pointFlag(iPol:iPol+1, iRad:iRad+1, iReg) &
+                    & == GRID_INTERNAL ) == 0 )  cycle
+
+               if ( grid%pointFlag(iPol, iRad, iReg) == GRID_EXTERNAL ) then
+                  if ( grid%pointFlag(iPol, iRad + 1, iReg) == GRID_EXTERNAL ) then
+                     stop "1"
+                  end if
+                  grid%xmail(iPol, iRad, iReg) = grid%xmail(iPol, iRad + 1, iReg)
+                  grid%ymail(iPol, iRad, iReg) = grid%ymail(iPol, iRad + 1, iReg)
+                  grid%pointFlag(iPol, iRad, iReg) = GRID_BOUNDARY
+                  grid%pointStructIndex(iPol, iRad, iReg) &
+                       & = grid%pointStructIndex(iPol, iRad + 1, iReg)                  
+               end if
+               if ( grid%pointFlag(iPol, iRad+1, iReg) == GRID_EXTERNAL ) then
+                  if ( grid%pointFlag(iPol, iRad, iReg) == GRID_EXTERNAL ) then
+                     stop "2"
+                  end if
+                  grid%xmail(iPol, iRad + 1, iReg) = grid%xmail(iPol, iRad, iReg)
+                  grid%ymail(iPol, iRad + 1, iReg) = grid%ymail(iPol, iRad, iReg)
+                  grid%pointFlag(iPol, iRad + 1, iReg) = GRID_BOUNDARY
+                  grid%pointStructIndex(iPol, iRad + 1, iReg) &
+                       & = grid%pointStructIndex(iPol, iRad, iReg)                  
+               end if
+               if ( grid%pointFlag(iPol + 1, iRad, iReg) == GRID_EXTERNAL ) then
+                  if ( grid%pointFlag(iPol + 1, iRad + 1, iReg) == GRID_EXTERNAL ) then
+                     stop "3"
+                  end if
+                  grid%xmail(iPol + 1, iRad, iReg) = grid%xmail(iPol + 1, iRad + 1, iReg)
+                  grid%ymail(iPol + 1, iRad, iReg) = grid%ymail(iPol + 1, iRad + 1, iReg)
+                  grid%pointFlag(iPol + 1, iRad, iReg) = GRID_BOUNDARY
+                  grid%pointStructIndex(iPol + 1, iRad, iReg) &
+                       & = grid%pointStructIndex(iPol + 1, iRad + 1, iReg)                  
+               end if
+               if ( grid%pointFlag(iPol + 1, iRad + 1, iReg) == GRID_EXTERNAL ) then
+                  if ( grid%pointFlag(iPol + 1, iRad, iReg) == GRID_EXTERNAL ) then
+                     stop "4"
+                  end if
+                  grid%xmail(iPol + 1, iRad + 1, iReg) = grid%xmail(iPol + 1, iRad, iReg)
+                  grid%ymail(iPol + 1, iRad + 1, iReg) = grid%ymail(iPol + 1, iRad, iReg)
+                  grid%pointFlag(iPol + 1, iRad + 1, iReg) = GRID_BOUNDARY
+                  grid%pointStructIndex(iPol + 1, iRad + 1, iReg) &
+                       & = grid%pointStructIndex(iPol + 1, iRad, iReg)                  
+               end if
+               
+            end do
+         end do
+      end do
       
-      
-      
+      call categorizeCellsAndFaces(lPasmin, finalized = .true.)
+
+      where (grid%cellflag == GRID_BOUNDARY_COARSEN) grid%cellflag = GRID_BOUNDARY
+      where (grid%cellflag == GRID_INTERNAL_COARSEN) grid%cellflag = GRID_INTERNAL
 
     end subroutine forcedCoarsening
 
@@ -413,20 +483,20 @@ contains
       ! First: all internal cells with an intersected face are boundary cells and are assumed to be unproblematic
       where ( (cellBndFaceCount > 0) .and. (grid%cellFlag == GRID_INTERNAL) ) grid%cellflag = GRID_BOUNDARY
 
-      ! If grid is finalized we are done now
-      if (finalized) return
-
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
       ! -cells with three internal points and one external point
       where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE_FIX
 
-      ! Figure out which must be coarsened due to too high resolution
+      ! Find cells with too high resolution
       call computeHxHy(grid)
       where ( (grid%cellflag == GRID_BOUNDARY) &
            & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_BOUNDARY_COARSEN
       where ( (grid%cellflag == GRID_INTERNAL) &
            & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
+
+      ! If grid is finalized we are done now
+      if (finalized) return
 
       ! Figure out which must be refined due to too low resolution 
 
@@ -985,6 +1055,7 @@ contains
 
     ! flags marking strips of cells in the radial direction as refined
     logical :: cellsRefinedFlag(nregmx, npmamx-1)
+    logical :: lineAdded
 
     ! Storage for level lines
     double precision :: llx(npnimx), lly(npnimx)
@@ -1137,9 +1208,9 @@ contains
                          & refineFacePy(FACE_POLOIDAL, ip, ir, iReg), &
                          & isRequired = isRequired, &
                          & recomputeIntersection = recomputeIntersection, &
-                         & iFcR = irMap(ir, iReg) )
+                         & iFcR = irMap(ir, iReg), lineAdded = lineAdded )
 
-                    call markRefined(iReg, ip)
+                    if (lineAdded) call markRefined(iReg, ip)
 
                     ! update grid index map to account for radial line
                     ! We added a radial grid line between poloidal points ip and ip + 1
@@ -1190,7 +1261,7 @@ contains
        & iReg, sepSegUpdated, &
        & px, py, isRequired, &
        & recomputeIntersection, &
-       & iFcR, iRegOrigin )
+       & iFcR, iRegOrigin, lineAdded )
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
@@ -1200,6 +1271,7 @@ contains
     logical, intent(in) :: isRequired
     logical, intent(in), optional :: recomputeIntersection
     integer, intent(in), optional :: iFcR, iRegOrigin
+    logical, intent(out), optional :: lineAdded
 
     ! internal
     integer :: ir
@@ -1241,6 +1313,7 @@ contains
             ! and the geometry changed such that the intersection vanishes.
             call logmsg(LOGDEBUG,  'addRadialLine: did not find intersection of face with a structure!&
                  & Skipping this radial line.')
+            if (present(lineAdded)) lineAdded = .false.
             return
         end if
         call logmsg(LOGDEBUGBULK,  'addRadialLine: old intersection '//real2str(px)//', '//real2str(py)//&
@@ -1418,6 +1491,8 @@ contains
     else
         grid%lineFlagRad(liFcP + 1, iReg) = GRIDLINE_REFINED
     end if
+
+    if (present(lineAdded)) lineAdded = .true.
 
   end subroutine addRadialLine
 
@@ -1631,6 +1706,9 @@ contains
     logical :: removeRadialLine(npmamx,nregmx), removeable
     integer :: sepSegsDelta(nsepsegmx)    
 
+    ! FIXME: cannot remove radial lines that are part of the wall, i.e. radial lines
+    ! with two consecutive boundary points
+
     ! Figure out what radial grid lines have to be removed
     ! to remove excessively fine cells
     ! Also compute how many points are removed from every separatrix segment by this
@@ -1667,6 +1745,9 @@ contains
                 grid%ymail(np, :, iReg) = grid%ymail(ip, :, iReg)
                 grid%lineFlagRad(np, iReg) = grid%lineFlagRad(ip, iReg)
                 grid%radLineSepSeg(np, iReg) = grid%radLineSepSeg(ip, iReg)
+                grid%pointFlag(np, :, iReg) = grid%pointFlag(ip, :, iReg)
+                grid%pointFlagFinalCheck(np, :, iReg) = grid%pointFlagFinalCheck(ip, :, iReg)
+                grid%pointStructIndex(np, :, iReg) = grid%pointStructIndex(ip, :, iReg)
             end if
         end do
         grid%np1(iReg) = np
