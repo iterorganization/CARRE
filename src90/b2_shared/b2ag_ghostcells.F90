@@ -21,7 +21,8 @@ contains
     integer, intent(out) :: nx, ny
 
     nx = nnx + 2 * niso
-    ny = nny
+	# FIXME: make + 4 configurable
+    ny = nny + 4
   end subroutine computeGridSizeWithGhostCells
 
 
@@ -507,6 +508,7 @@ contains
               do ystep =  1, ny + 2
                   giy = giy + dy
                   if (giy < -1) giy = ny
+                  if (giy > ny) giy = -1
                   cellFound = slotAvailable(gix, giy)
                   if (cellFound) exit
               end do

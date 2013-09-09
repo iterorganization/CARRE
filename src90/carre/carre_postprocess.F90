@@ -1707,7 +1707,7 @@ contains
     integer :: sepSegsDelta(nsepsegmx)    
 
     ! FIXME: cannot remove radial lines that are part of the wall, i.e. radial lines
-    ! with two consecutive boundary points
+    ! with two consecutive boundary points.
 
     ! Figure out what radial grid lines have to be removed
     ! to remove excessively fine cells

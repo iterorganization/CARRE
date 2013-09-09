@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Object name="VisIt">
-    <Field name="Version" type="string">2.5.0</Field>
+    <Field name="Version" type="string">2.5.2</Field>
     <Object name="VIEWER">
         <Object name="DEFAULT_VALUES">
             <Object name="GlobalAttributes">
@@ -1151,42 +1151,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/ConnectedComponents/rstructure_10</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_10, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">ConnectedComponents</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/ConnectedComponents/rstructure_11</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_11, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">ConnectedComponents</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/ConnectedComponents/rstructure_12</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_12, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">ConnectedComponents</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/ConnectedComponents/rstructure_2</Field>
                     <Field name="definition" type="string">"cell_constant(rstructure_2, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -1247,42 +1211,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/ConnectedComponents/rstructure_7</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_7, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">ConnectedComponents</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/ConnectedComponents/rstructure_8</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_8, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">ConnectedComponents</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/ConnectedComponents/rstructure_9</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_9, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">ConnectedComponents</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/ConnectedComponents/separatrix_xpoint1_branch1</Field>
                     <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -1295,8 +1223,8 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/ConnectedComponents/separatrix_xpoint1_branch2</Field>
-                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0.)"</Field>
+                    <Field name="name" type="string">operators/ConnectedComponents/separatrix_xpoint1_branch3</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch3, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -1441,6 +1369,18 @@
                 <Object name="Expression">
                     <Field name="name" type="string">operators/ConnectedComponents/boundaryPoints</Field>
                     <Field name="definition" type="string">"cell_constant(boundaryPoints, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">ConnectedComponents</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/ConnectedComponents/boundaryPointsFinalCheck</Field>
+                    <Field name="definition" type="string">"cell_constant(boundaryPointsFinalCheck, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -1907,114 +1847,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/1D/rstructure_10</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_10, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">CurveMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/2D/rstructure_10</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_10, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/3D/rstructure_10</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_10, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/1D/rstructure_11</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_11, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">CurveMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/2D/rstructure_11</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_11, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/3D/rstructure_11</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_11, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/1D/rstructure_12</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_12, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">CurveMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/2D/rstructure_12</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_12, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/3D/rstructure_12</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_12, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/DataBinning/1D/rstructure_2</Field>
                     <Field name="definition" type="string">"cell_constant(rstructure_2, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -2195,114 +2027,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/1D/rstructure_7</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_7, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">CurveMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/2D/rstructure_7</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_7, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/3D/rstructure_7</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_7, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/1D/rstructure_8</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_8, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">CurveMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/2D/rstructure_8</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_8, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/3D/rstructure_8</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_8, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/1D/rstructure_9</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_9, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">CurveMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/2D/rstructure_9</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_9, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/3D/rstructure_9</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_9, 0)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">DataBinning</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/DataBinning/1D/separatrix_xpoint1_branch1</Field>
                     <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -2339,8 +2063,8 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/1D/separatrix_xpoint1_branch2</Field>
-                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0)"</Field>
+                    <Field name="name" type="string">operators/DataBinning/1D/separatrix_xpoint1_branch3</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch3, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">CurveMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -2351,8 +2075,8 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/2D/separatrix_xpoint1_branch2</Field>
-                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0)"</Field>
+                    <Field name="name" type="string">operators/DataBinning/2D/separatrix_xpoint1_branch3</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch3, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -2363,8 +2087,8 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/DataBinning/3D/separatrix_xpoint1_branch2</Field>
-                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0)"</Field>
+                    <Field name="name" type="string">operators/DataBinning/3D/separatrix_xpoint1_branch3</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch3, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -2807,6 +2531,42 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/1D/boundaryPointsFinalCheck</Field>
+                    <Field name="definition" type="string">"cell_constant(boundaryPointsFinalCheck, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">CurveMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/2D/boundaryPointsFinalCheck</Field>
+                    <Field name="definition" type="string">"cell_constant(boundaryPointsFinalCheck, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/DataBinning/3D/boundaryPointsFinalCheck</Field>
+                    <Field name="definition" type="string">"cell_constant(boundaryPointsFinalCheck, 0)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">DataBinning</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
                     <Field name="name" type="string">operators/DataBinning/1D/externalPoints</Field>
                     <Field name="definition" type="string">"cell_constant(externalPoints, 0)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -3119,42 +2879,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/Flux/rstructure_10</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_10, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">Flux</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/Flux/rstructure_11</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_11, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">Flux</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/Flux/rstructure_12</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_12, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">Flux</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/Flux/rstructure_2</Field>
                     <Field name="definition" type="string">"cell_constant(rstructure_2, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -3215,42 +2939,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/Flux/rstructure_7</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_7, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">Flux</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/Flux/rstructure_8</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_8, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">Flux</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/Flux/rstructure_9</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_9, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">ScalarMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">Flux</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/Flux/separatrix_xpoint1_branch1</Field>
                     <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -3263,8 +2951,8 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/Flux/separatrix_xpoint1_branch2</Field>
-                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0.)"</Field>
+                    <Field name="name" type="string">operators/Flux/separatrix_xpoint1_branch3</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch3, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -3409,6 +3097,18 @@
                 <Object name="Expression">
                     <Field name="name" type="string">operators/Flux/boundaryPoints</Field>
                     <Field name="definition" type="string">"cell_constant(boundaryPoints, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">ScalarMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">Flux</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/Flux/boundaryPointsFinalCheck</Field>
+                    <Field name="definition" type="string">"cell_constant(boundaryPointsFinalCheck, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">ScalarMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -5879,42 +5579,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/SurfaceNormal/rstructure_10</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_10, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">VectorMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">SurfaceNormal</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/SurfaceNormal/rstructure_11</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_11, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">VectorMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">SurfaceNormal</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/SurfaceNormal/rstructure_12</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_12, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">VectorMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">SurfaceNormal</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/SurfaceNormal/rstructure_2</Field>
                     <Field name="definition" type="string">"cell_constant(rstructure_2, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -5975,42 +5639,6 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/SurfaceNormal/rstructure_7</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_7, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">VectorMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">SurfaceNormal</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/SurfaceNormal/rstructure_8</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_8, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">VectorMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">SurfaceNormal</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
-                    <Field name="name" type="string">operators/SurfaceNormal/rstructure_9</Field>
-                    <Field name="definition" type="string">"cell_constant(rstructure_9, 0.)"</Field>
-                    <Field name="hidden" type="bool">false</Field>
-                    <Field name="type" type="string">VectorMeshVar</Field>
-                    <Field name="fromDB" type="bool">false</Field>
-                    <Field name="fromOperator" type="bool">true</Field>
-                    <Field name="operatorName" type="string">SurfaceNormal</Field>
-                    <Field name="meshName" type="string"></Field>
-                    <Field name="dbName" type="string">__none__</Field>
-                    <Field name="autoExpression" type="bool">false</Field>
-                </Object>
-                <Object name="Expression">
                     <Field name="name" type="string">operators/SurfaceNormal/separatrix_xpoint1_branch1</Field>
                     <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch1, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
@@ -6023,8 +5651,8 @@
                     <Field name="autoExpression" type="bool">false</Field>
                 </Object>
                 <Object name="Expression">
-                    <Field name="name" type="string">operators/SurfaceNormal/separatrix_xpoint1_branch2</Field>
-                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch2, 0.)"</Field>
+                    <Field name="name" type="string">operators/SurfaceNormal/separatrix_xpoint1_branch3</Field>
+                    <Field name="definition" type="string">"cell_constant(separatrix_xpoint1_branch3, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">VectorMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -6169,6 +5797,18 @@
                 <Object name="Expression">
                     <Field name="name" type="string">operators/SurfaceNormal/boundaryPoints</Field>
                     <Field name="definition" type="string">"cell_constant(boundaryPoints, 0.)"</Field>
+                    <Field name="hidden" type="bool">false</Field>
+                    <Field name="type" type="string">VectorMeshVar</Field>
+                    <Field name="fromDB" type="bool">false</Field>
+                    <Field name="fromOperator" type="bool">true</Field>
+                    <Field name="operatorName" type="string">SurfaceNormal</Field>
+                    <Field name="meshName" type="string"></Field>
+                    <Field name="dbName" type="string">__none__</Field>
+                    <Field name="autoExpression" type="bool">false</Field>
+                </Object>
+                <Object name="Expression">
+                    <Field name="name" type="string">operators/SurfaceNormal/boundaryPointsFinalCheck</Field>
+                    <Field name="definition" type="string">"cell_constant(boundaryPointsFinalCheck, 0.)"</Field>
                     <Field name="hidden" type="bool">false</Field>
                     <Field name="type" type="string">VectorMeshVar</Field>
                     <Field name="fromDB" type="bool">false</Field>
@@ -6691,7 +6331,7 @@
                 <Field name="rangeScale" type="int">0</Field>
             </Object>
             <Object name="View2DAttributes">
-                <Field name="windowCoords" type="doubleArray" length="4">1.04334 2.20498 -1.23349 1.20834 </Field>
+                <Field name="windowCoords" type="doubleArray" length="4">3.9697 8.4968 -4.58517 4.74735 </Field>
                 <Field name="viewportCoords" type="doubleArray" length="4">0.2 0.95 0.15 0.95 </Field>
                 <Field name="fullFrameActivationMode" type="string">Auto</Field>
                 <Field name="fullFrameAutoThreshold" type="double">100</Field>
@@ -7016,8 +6656,8 @@
                 <Field name="stride" type="int">1</Field>
             </Object>
             <Object name="FileOpenOptions">
-                <Field name="typeNames" type="stringVector">"AMR" "ANALYZE" "ANSYS" "AUXFile" "Adventure" "AugDecomp" "BOV" "Boxlib2D" "Boxlib3D" "CCM" "CEAucd" "CGNS" "CMAT" "CTRL" "Cale" "CaleHDF5" "CarpetHDF5" "Chombo" "Claw" "Cosmos" "CosmosPP" "Cube" "Curve2D" "DDCMD" "Dyna3D" "EnSight" "Enzo" "Exodus" "ExtrudedVol" "FITS" "FLASH" "Fluent" "GGCM" "GMV" "GTC" "GULP" "Gadget" "Geqdsk" "H5Nimrod" "H5Part" "Image" "KullLite" "LAMMPS" "Lines" "M3DC1" "M3D" "MFIXCDF" "MFIX" "MM5" "Miranda" "NASTRAN" "NETCDF" "Nek5000" "OVERFLOW" "OpenFOAM" "PATRAN" "PDB" "PFLOTRAN" "PLOT2D" "PLOT3D" "Pixie" "PlainText" "Point3D" "ProteinDataBank" "PuReMD" "RAW" "S3D" "SAMI" "SAMRAI" "SAR" "SAS" "STAR" "STL" "Shapefile" "Silo" "SimV1" "SimV1Writer" "SimV2" "Spheral" "TFT" "TSurf" "Tecplot" "Tetrad" "TimeVaryingExodus" "UNIC" "VASP" "VCellMTMD" "VTK" "Velodyne" "Vis5D" "Vista" "Vs" "WavefrontOBJ" "XSF" "XYZ" "Xdmf" "Xmdv" "ZeusMP" "ZipWrapper" "lata" "paraDIS" "paraDIS_tecplot" "volimage" </Field>
-                <Field name="typeIDs" type="stringVector">"AMR_1.0" "ANALYZE_1.0" "ANSYS_1.0" "AUXFile_1.0" "Adventure_1.0" "AugDecomp_1.0" "BOV_1.0" "Boxlib2D_1.0" "Boxlib3D_1.0" "CCM_1.0" "CEAucd_1.0" "CGNS_1.0" "CMAT_1.0" "CTRL_1.0" "Cale_1.1" "CaleHDF5_1.1" "CarpetHDF5_2.0" "Chombo_1.0" "Claw_1.0" "Cosmos_1.0" "CosmosPP_1.0" "Cube_1.0" "Curve2D_1.0" "DDCMD_1.0" "Dyna3D_1.0" "EnSight_1.0" "Enzo_1.0" "Exodus_1.0" "ExtrudedVol_1.0" "FITS_1.0" "FLASH_1.0" "Fluent_1.0" "GGCM_1.0" "GMV_1.0" "GTC_1.0" "GULP_1.0" "Gadget_2.0a" "Geqdsk_1.0" "H5Nimrod_1.0" "H5Part_1.0" "Image_1.0" "KullLite_1.0" "LAMMPS_1.0" "Lines_1.0" "M3DC1_1.0" "M3D_1.0" "MFIXCDF_1.0" "MFIX_1.0" "MM5_1.0" "Miranda_1.0" "NASTRAN_1.0" "NETCDF_1.0" "Nek5000_1.0" "OVERFLOW_1.0" "OpenFOAM_1.0" "PATRAN_1.0" "PDB_1.1" "PFLOTRAN_1.0" "PLOT2D_1.0" "PLOT3D_1.0" "Pixie_1.0" "PlainText_1.0" "Point3D_1.0" "ProteinDataBank_1.0" "PuReMD_1.0" "RAW_1.0" "S3D_1.0" "SAMI_1.0" "SAMRAI_1.0" "SAR_1.0" "SAS_1.0" "STAR_1.0" "STL_1.0" "Shapefile_1.0" "Silo_1.0" "SimV1_1.0" "SimV1Writer_1.0" "SimV2_1.0" "Spheral_1.0" "TFT_1.0" "TSurf_1.0" "Tecplot_1.0" "Tetrad_1.0" "TimeVaryingExodus_1.0" "UNIC_1.0" "VASP_1.0" "VCellMTMD_1.0" "VTK_1.0" "Velodyne_1.0" "Vis5D_1.0" "Vista_1.0" "Vs_3.0.0" "WavefrontOBJ_1.0" "XSF_1.0" "XYZ_1.0" "Xdmf_1.0" "Xmdv_1.0" "ZeusMP_1.0" "ZipWrapper_1.0" "lata_1.0" "paraDIS_2.0" "paraDIS_tecplot_1.0a1" "volimage_1.0" </Field>
+                <Field name="typeNames" type="stringVector">"AMR" "ANALYZE" "ANSYS" "AUXFile" "Adventure" "AugDecomp" "BOV" "Boxlib2D" "Boxlib3D" "CCM" "CEAucd" "CGNS" "CMAT" "CTRL" "Cale" "CaleHDF5" "CarpetHDF5" "Chombo" "Claw" "Cosmos" "CosmosPP" "Cube" "Curve2D" "DDCMD" "Dyna3D" "EnSight" "Enzo" "Exodus" "ExtrudedVol" "FITS" "FLASH" "Fluent" "GGCM" "GMV" "GTC" "GULP" "Gadget" "Geqdsk" "H5Nimrod" "H5Part" "Image" "KullLite" "LAMMPS" "Lines" "M3DC1" "M3D" "MFIXCDF" "MFIX" "MM5" "Miranda" "NASTRAN" "NETCDF" "Nek5000" "OVERFLOW" "OpenFOAM" "PATRAN" "PDB" "PFLOTRAN" "PLOT2D" "PLOT3D" "Pixie" "PlainText" "Point3D" "ProteinDataBank" "PuReMD" "RAW" "S3D" "SAMI" "SAMRAI" "SAR" "SAS" "STAR" "STL" "Shapefile" "Silo" "SimV1" "SimV1Writer" "SimV2" "Spheral" "TFT" "TSurf" "Tecplot" "Tetrad" "TimeVaryingExodus" "UNIC" "VASP" "VCellMTMD" "VTK" "Velodyne" "Vis5D" "Vista" "Vs" "WavefrontOBJ" "XSF" "XYZ" "Xdmf" "Xmdv" "ZeusMP" "ZipWrapper" "lata" "paraDIS" "paraDIS_tecplot" "volimage" "BATL" "MatrixMarket" </Field>
+                <Field name="typeIDs" type="stringVector">"AMR_1.0" "ANALYZE_1.0" "ANSYS_1.0" "AUXFile_1.0" "Adventure_1.0" "AugDecomp_1.0" "BOV_1.0" "Boxlib2D_1.0" "Boxlib3D_1.0" "CCM_1.0" "CEAucd_1.0" "CGNS_1.0" "CMAT_1.0" "CTRL_1.0" "Cale_1.1" "CaleHDF5_1.1" "CarpetHDF5_2.0" "Chombo_1.0" "Claw_1.0" "Cosmos_1.0" "CosmosPP_1.0" "Cube_1.0" "Curve2D_1.0" "DDCMD_1.0" "Dyna3D_1.0" "EnSight_1.0" "Enzo_1.0" "Exodus_1.0" "ExtrudedVol_1.0" "FITS_1.0" "FLASH_1.0" "Fluent_1.0" "GGCM_1.0" "GMV_1.0" "GTC_1.0" "GULP_1.0" "Gadget_2.0a" "Geqdsk_1.0" "H5Nimrod_1.0" "H5Part_1.0" "Image_1.0" "KullLite_1.0" "LAMMPS_1.0" "Lines_1.0" "M3DC1_1.0" "M3D_1.0" "MFIXCDF_1.0" "MFIX_1.0" "MM5_1.0" "Miranda_1.0" "NASTRAN_1.0" "NETCDF_1.0" "Nek5000_1.0" "OVERFLOW_1.0" "OpenFOAM_1.0" "PATRAN_1.0" "PDB_1.1" "PFLOTRAN_1.0" "PLOT2D_1.0" "PLOT3D_1.0" "Pixie_1.0" "PlainText_1.0" "Point3D_1.0" "ProteinDataBank_1.0" "PuReMD_1.0" "RAW_1.0" "S3D_1.0" "SAMI_1.0" "SAMRAI_1.0" "SAR_1.0" "SAS_1.0" "STAR_1.0" "STL_1.0" "Shapefile_1.0" "Silo_1.0" "SimV1_1.0" "SimV1Writer_1.0" "SimV2_1.0" "Spheral_1.0" "TFT_1.0" "TSurf_1.0" "Tecplot_1.0" "Tetrad_1.0" "TimeVaryingExodus_1.0" "UNIC_1.0" "VASP_1.0" "VCellMTMD_1.0" "VTK_1.0" "Velodyne_1.0" "Vis5D_1.0" "Vista_1.0" "Vs_3.0.0" "WavefrontOBJ_1.0" "XSF_1.0" "XYZ_1.0" "Xdmf_1.0" "Xmdv_1.0" "ZeusMP_1.0" "ZipWrapper_1.0" "lata_1.0" "paraDIS_2.0" "paraDIS_tecplot_1.0a1" "volimage_1.0" "BATL_1.0" "MatrixMarket_1.0" </Field>
                 <Object name="DBOptionsAttributes">
                     <Field name="types" type="intVector"></Field>
                     <Field name="names" type="stringVector"></Field>
@@ -8357,7 +7997,33 @@
                     <Field name="enumStringsSizes" type="intVector"></Field>
                     <Field name="obsoleteNames" type="stringVector"></Field>
                 </Object>
-                <Field name="Enabled" type="intVector">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </Field>
+                <Object name="DBOptionsAttributes">
+                    <Field name="types" type="intVector">0 0 0 </Field>
+                    <Field name="names" type="stringVector">"Show generating processor instead of refinement level" "Use new style curve generation" "Set up patch abutment information" </Field>
+                    <Field name="optBools" type="intVector">0 1 1 </Field>
+                    <Field name="optFloats" type="doubleVector"></Field>
+                    <Field name="optDoubles" type="doubleVector"></Field>
+                    <Field name="optInts" type="intVector"></Field>
+                    <Field name="optStrings" type="stringVector"></Field>
+                    <Field name="optEnums" type="intVector"></Field>
+                    <Field name="enumStrings" type="stringVector"></Field>
+                    <Field name="enumStringsSizes" type="intVector"></Field>
+                    <Field name="obsoleteNames" type="stringVector"></Field>
+                </Object>
+                <Object name="DBOptionsAttributes">
+                    <Field name="types" type="intVector"></Field>
+                    <Field name="names" type="stringVector"></Field>
+                    <Field name="optBools" type="intVector"></Field>
+                    <Field name="optFloats" type="doubleVector"></Field>
+                    <Field name="optDoubles" type="doubleVector"></Field>
+                    <Field name="optInts" type="intVector"></Field>
+                    <Field name="optStrings" type="stringVector"></Field>
+                    <Field name="optEnums" type="intVector"></Field>
+                    <Field name="enumStrings" type="stringVector"></Field>
+                    <Field name="enumStringsSizes" type="intVector"></Field>
+                    <Field name="obsoleteNames" type="stringVector"></Field>
+                </Object>
+                <Field name="Enabled" type="intVector">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </Field>
                 <Field name="preferredIDs" type="stringVector">"Silo_1.0" </Field>
             </Object>
             <Object name="BoundaryAttributes">
@@ -9657,12 +9323,14 @@
         </Object>
         <Object name="ViewerSubject">
             <Object name="SourceMap">
-                <Field name="SOURCE00" type="string">localhost:/home/hmk/svn/CARRE/branches/CARRE2/traduitAAA00000</Field>
-                <Field name="SOURCE01" type="string">localhost:/home/hmk/svn/CARRE/branches/CARRE2/carreFinal00000.silo</Field>
+                <Field name="SOURCE00" type="string">localhost:/pfs/work/hmk/svn/CARRE/branches/CARRE2/traduitAAA00000</Field>
+                <Field name="SOURCE01" type="string">localhost:/pfs/work/hmk/svn/CARRE/branches/CARRE2/carreFinal00000.silo</Field>
             </Object>
             <Object name="SourcePlugins">
                 <Field name="localhost:/home/hmk/svn/CARRE/branches/CARRE2/carreFinal00000.silo" type="string">Silo_1.0</Field>
                 <Field name="localhost:/home/hmk/svn/CARRE/branches/CARRE2/traduitAAA00000" type="string">Silo_1.0</Field>
+                <Field name="localhost:/pfs/work/hmk/svn/CARRE/branches/CARRE2/carreFinal00000.silo" type="string">Silo_1.0</Field>
+                <Field name="localhost:/pfs/work/hmk/svn/CARRE/branches/CARRE2/traduitAAA00000" type="string">Silo_1.0</Field>
             </Object>
             <Object name="DatabaseCorrelationList">
                 <Field name="needPermission" type="bool">true</Field>
@@ -10277,7 +9945,7 @@
                             <Field name="rangeScale" type="int">0</Field>
                         </Object>
                         <Object name="View2DAttributes">
-                            <Field name="windowCoords" type="doubleArray" length="4">0.82081 2.38039 -1.32606 1.27527 </Field>
+                            <Field name="windowCoords" type="doubleArray" length="4">3.00849 8.53325 -4.70616 5.44851 </Field>
                             <Field name="viewportCoords" type="doubleArray" length="4">0.2 0.95 0.15 0.95 </Field>
                             <Field name="fullFrameActivationMode" type="string">Auto</Field>
                             <Field name="fullFrameAutoThreshold" type="double">100</Field>
@@ -11332,7 +11000,7 @@
                             <Field name="rangeScale" type="int">0</Field>
                         </Object>
                         <Object name="View2DAttributes">
-                            <Field name="windowCoords" type="doubleArray" length="4">1.04334 2.20498 -1.23349 1.20834 </Field>
+                            <Field name="windowCoords" type="doubleArray" length="4">3.9697 8.4968 -4.58517 4.74735 </Field>
                             <Field name="viewportCoords" type="doubleArray" length="4">0.2 0.95 0.15 0.95 </Field>
                             <Field name="fullFrameActivationMode" type="string">Auto</Field>
                             <Field name="fullFrameAutoThreshold" type="double">100</Field>
@@ -11689,7 +11357,7 @@
                 <Object name="RunningEngines">
                     <Object name="MachineProfile">
                         <Field name="hostNickname" type="string"></Field>
-                        <Field name="host" type="string">motoko</Field>
+                        <Field name="host" type="string">g02.itm.rzg.mpg.de</Field>
                         <Field name="userName" type="string">hmk</Field>
                         <Field name="hostAliases" type="string"></Field>
                         <Field name="directory" type="string"></Field>
