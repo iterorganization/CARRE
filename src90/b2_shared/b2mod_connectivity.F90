@@ -19,7 +19,7 @@ module b2mod_connectivity
   integer, parameter :: GEOMETRY_LINEAR = 1
   integer, parameter :: GEOMETRY_LIMITER = 2
   integer, parameter :: GEOMETRY_SN = 3
-  integer, parameter :: GEOMETRY_STELLERATORISLAND = 4
+  integer, parameter :: GEOMETRY_STELLARATORISLAND = 4
   integer, parameter :: GEOMETRY_CDN = 5
   integer, parameter :: GEOMETRY_DDN_BOTTOM = 6
   integer, parameter :: GEOMETRY_DDN_TOP = 7
@@ -50,7 +50,7 @@ module b2mod_connectivity
       &   1,  2,  2, & ! GEOMETRY_LINEAR
       &   2,  3,  3, & ! GEOMETRY_LIMITER
       &   4,  6,  7, & ! GEOMETRY_SN
-      &   5,  7,  8, & ! GEOMETRY_STELLERATORISLAND
+      &   5,  7,  8, & ! GEOMETRY_STELLARATORISLAND
       &   8, 12, 14, & ! GEOMETRY_CDN
       &   8, 13, 14, & ! GEOMETRY_DDN_BOTTOM
       &   8, 13, 14  & ! GEOMETRY_DDN_TOP
@@ -98,7 +98,7 @@ module b2mod_connectivity
       &   'Inner PFR wall                  ', 'Core boundary                   ', 'Outer PFR wall                  ', &
       &   'Separatrix                      ', 'Inner baffle                    ',&
       &   'Main chamber wall               ', 'Outer baffle                    ', UU, UU, UU, UU, UU, UU, UU, &
-      & & ! GEOMETRY_STELLERATORISLAND - not fully done yet
+      & & ! GEOMETRY_STELLARATORISLAND - not fully done yet
       &   'Core                            ', 'SOL                             ', 'Inner divertor                  ', &
       &   'Outer divertor                  ', 'Island                          ', UU, UU, UU, UU, UU, UU, UU, UU, UU, &
       & &
@@ -188,13 +188,13 @@ contains
   !> A note on the cut arrays:
   !> leftcut(i) holds the left boundary index of a region which is cut
   !> rightcut(i) holds the right boundary index + 1 of a region which is cut
-  !> This means the region range in the x direction is (leftcut(i):rightcut(i)
+  !> This means the region range in the x direction is (leftcut(i):rightcut(i))
 
   subroutine init_connectivity(nx1,ny1,crx1,cry1,cflag,& 
       & leftix1,leftiy1,rightix1,rightiy1, & 
       & topix1,topiy1,bottomix1,bottomiy1, & 
       & leftcut1,rightcut1,bottomcut1,topcut1, & 
-      & periodic_bc,nncut,nncutmax,inseltop, inselbot, & 
+      & periodic_bc,nncut,nncutmax,inseltop,inselbot, & 
       & geom_match_dist,istyle)
 
     use b2mod_types
@@ -255,7 +255,8 @@ contains
     topiy1 = NO_CONNECTIVITY
     bottomix1 = NO_CONNECTIVITY
     bottomiy1 = NO_CONNECTIVITY
-
+    inseltop = NO_CONNECTIVITY
+    inselbot = NO_CONNECTIVITY
 
     ! First step: find cell connectivity
 
@@ -406,7 +407,106 @@ contains
 
           end do
        end do
-          
+    
+    else
+
+    ! second step (for "extended" grids with no cell face information): 
+    ! make sure ghost cells are not connected across different walls
+    
+      do ix = -1, nx1
+        do iy = -1, ny1
+          if(.not. isGhostCell(cflag(ix, iy, CELLFLAG_TYPE))) cycle
+          if(cflag(ix,iy,CELLFLAG_LEFTFACE) /= GRID_UNDEFINED) then
+            if(isInDomain(nx1,ny1,topix1(ix,iy),topiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_LEFTFACE).ne.cflag(topix1(ix,iy),topiy1(ix,iy),CELLFLAG_LEFTFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_LEFTFACE).gt.0 .or. &
+               &   cflag(topix1(ix,iy),topiy1(ix,iy),CELLFLAG_LEFTFACE).gt.0 )) then
+                bottomix1(topix1(ix,iy),topiy1(ix,iy)) = ix
+                bottomiy1(topix1(ix,iy),topiy1(ix,iy)) = -2
+                topix1(ix,iy) = ix
+                topiy1(ix,iy) = ny1+1
+              end if
+            end if
+            if(isInDomain(nx1,ny1,bottomix1(ix,iy),bottomiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_LEFTFACE).ne.cflag(bottomix1(ix,iy),bottomiy1(ix,iy),CELLFLAG_LEFTFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_LEFTFACE).gt.0 .or. &
+               &   cflag(bottomix1(ix,iy),bottomiy1(ix,iy),CELLFLAG_LEFTFACE).gt.0 )) then
+                topix1(bottomix1(ix,iy),bottomiy1(ix,iy)) = ix
+                topiy1(bottomix1(ix,iy),bottomiy1(ix,iy)) = ny1+1
+                bottomix1(ix,iy) = ix
+                bottomiy1(ix,iy) = -2
+              end if
+            end if
+          end if
+          if(cflag(ix,iy,CELLFLAG_BOTTOMFACE) /= GRID_UNDEFINED) then
+            if(isInDomain(nx1,ny1,leftix1(ix,iy),leftiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_BOTTOMFACE).ne.cflag(leftix1(ix,iy),leftiy1(ix,iy),CELLFLAG_BOTTOMFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_BOTTOMFACE).gt.0 .or. &
+               &   cflag(leftix1(ix,iy),leftiy1(ix,iy),CELLFLAG_BOTTOMFACE).gt.0 )) then
+                rightix1(leftix1(ix,iy),leftiy1(ix,iy)) = nx1+1
+                rightiy1(leftix1(ix,iy),leftiy1(ix,iy)) = iy
+                leftix1(ix,iy) = -2
+                leftiy1(ix,iy) = iy
+              end if
+            end if
+            if(isInDomain(nx1,ny1,rightix1(ix,iy),rightiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_BOTTOMFACE).ne.cflag(rightix1(ix,iy),rightiy1(ix,iy),CELLFLAG_BOTTOMFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_BOTTOMFACE).gt.0 .or. &
+               &   cflag(rightix1(ix,iy),rightiy1(ix,iy),CELLFLAG_BOTTOMFACE).gt.0 )) then
+                leftix1(rightix1(ix,iy),rightiy1(ix,iy)) = -2
+                leftiy1(rightix1(ix,iy),rightiy1(ix,iy)) = iy
+                rightix1(ix,iy) = nx1+1
+                rightiy1(ix,iy) = -2
+              end if
+            end if
+          end if
+          if(cflag(ix,iy,CELLFLAG_RIGHTFACE) /= GRID_UNDEFINED) then
+            if(isInDomain(nx1,ny1,topix1(ix,iy),topiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_RIGHTFACE).ne.cflag(topix1(ix,iy),topiy1(ix,iy),CELLFLAG_RIGHTFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_RIGHTFACE).gt.0 .or. &
+               &   cflag(topix1(ix,iy),topiy1(ix,iy),CELLFLAG_RIGHTFACE).gt.0 )) then
+                bottomix1(topix1(ix,iy),topiy1(ix,iy)) = ix
+                bottomiy1(topix1(ix,iy),topiy1(ix,iy)) = -2
+                topix1(ix,iy) = ix
+                topiy1(ix,iy) = ny1+1
+              end if
+            end if
+            if(isInDomain(nx1,ny1,bottomix1(ix,iy),bottomiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_RIGHTFACE).ne.cflag(bottomix1(ix,iy),bottomiy1(ix,iy),CELLFLAG_RIGHTFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_RIGHTFACE).gt.0 .or. &
+               &   cflag(bottomix1(ix,iy),bottomiy1(ix,iy),CELLFLAG_RIGHTFACE).gt.0 )) then
+                topix1(bottomix1(ix,iy),bottomiy1(ix,iy)) = ix
+                topiy1(bottomix1(ix,iy),bottomiy1(ix,iy)) = ny1+1
+                bottomix1(ix,iy) = ix
+                bottomiy1(ix,iy) = -2
+              end if
+            end if
+          end if
+          if(cflag(ix,iy,CELLFLAG_TOPFACE) /= GRID_UNDEFINED) then
+            if(isInDomain(nx1,ny1,leftix1(ix,iy),leftiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_TOPFACE).ne.cflag(leftix1(ix,iy),leftiy1(ix,iy),CELLFLAG_TOPFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_TOPFACE).gt.0 .or. &
+               &   cflag(leftix1(ix,iy),leftiy1(ix,iy),CELLFLAG_TOPFACE).gt.0 )) then
+                rightix1(leftix1(ix,iy),leftiy1(ix,iy)) = nx1+1
+                rightiy1(leftix1(ix,iy),leftiy1(ix,iy)) = iy
+                leftix1(ix,iy) = -2
+                leftiy1(ix,iy) = iy
+              end if
+            end if
+            if(isInDomain(nx1,ny1,rightix1(ix,iy),rightiy1(ix,iy))) then
+              if(cflag(ix,iy,CELLFLAG_TOPFACE).ne.cflag(rightix1(ix,iy),rightiy1(ix,iy),CELLFLAG_TOPFACE) .and. &
+               & ( cflag(ix,iy,CELLFLAG_TOPFACE).gt.0 .or. &
+               &   cflag(rightix1(ix,iy),rightiy1(ix,iy),CELLFLAG_TOPFACE).gt.0 )) then
+                leftix1(rightix1(ix,iy),rightiy1(ix,iy)) = -2
+                leftiy1(rightix1(ix,iy),rightiy1(ix,iy)) = iy
+                rightix1(ix,iy) = nx1+1
+                rightiy1(ix,iy) = -2
+              end if
+            end if
+          end if
+        end do
+      end do
+     
     end if
 
 
@@ -477,10 +577,10 @@ contains
 
     write(*,*) 'istyle',istyle,'nncut',nncut
     if(nncut.eq.0) write(*,*) 'No cuts found'
-    if(nncut.ge.1) write(*,*) & 
+    if(nncut.ge.1) write(*,'(1x,a,4i5)') & 
         & 'Calculated leftcut1, rightcut1, topcut1, bottomcut1 = ', & 
         & leftcut1(1), rightcut1(1), topcut1(1), bottomcut1(1)
-    if(nncut.ge.2) write(*,*) & 
+    if(nncut.ge.2) write(*,'(1x,a,4i5)') & 
         & 'Calculated leftcut2, rightcut2, topcut2, bottomcut2 = ', & 
         & leftcut1(2), rightcut1(2), topcut1(2), bottomcut1(2)
 
@@ -779,7 +879,7 @@ contains
     !    +---1---+-------2-------+---3---++---8---+-------9-------+--10---+
     !
     !
-    ! For reference: CARRE region numbering  referring to Fig. 3b in the CARRE96 paper:
+    ! For reference: CARRE region numbering referring to Fig. 3b in the CARRE96 paper:
     !
     !    +-------+---------------+-------++-------+---------------+-------+
     !    |4444444:444444444444444:4444444||2222222:222222222222222:2222222|
@@ -839,7 +939,7 @@ contains
     ! region 8 === right outboard divertor
     !
 
-    integer ix,iy,inseliy,inselix,iyt,geoType, iFace, offset
+    integer ix,iy,inseliy,inselix1,inselix2,iyt,geoType, iFace, offset
     real (kind=R8) :: & 
         & geom_match_dist
     data geom_match_dist/1.0e-6_R8/
@@ -864,11 +964,13 @@ contains
     if(periodic_bc.eq.1) then
         if (nncut.eq.1) then    ! stellarator island is on North side
             inseliy=ny+1
-            inselix=-2
+            inselix1=-2
+            inselix2=-2
             do iy=ny,-1,-1
                 do ix=2,0,-1
                     if(match(nx-ix,iy,ix-1,iy)) then
-                        inselix=ix-1
+                        inselix1=ix-1
+                        inselix2=nx-ix
                         inseliy=iy
                         exit
                     endif
@@ -876,15 +978,33 @@ contains
             enddo
         else if (nncut.eq.0) then   ! limited region is on South side
             inseliy=-2
-            inselix=-2
-            do iy=-1,ny
-                do ix=2,0,-1
-                    if(match(nx-ix,iy,ix-1,iy)) then
-                        inselix=ix-1
-                        inseliy=iy
-                        exit
-                    endif
-                enddo
+            inselix1=-2
+            inselix2=-2
+            do iy = ny-1, 0, -1
+              if (inseliy.gt.-2) cycle
+              ix = -1
+              ix1 = -2
+              do while (ix1.eq.-2 .and. ix.lt.nx)
+                if (.not.cflag(ix,iy,CELLFLAG_TYPE)==GRID_INTERNAL) then
+                  ix = ix + 1
+                else
+                  ix1 = ix
+                endif
+              end do
+              ix = nx
+              ix2 = -2    
+              do while (ix2.eq.-2 .and. ix.gt.-2)
+                if (.not.cflag(ix,iy,CELLFLAG_TYPE)==GRID_INTERNAL) then
+                  ix = ix - 1
+                else
+                  ix2 = ix
+                endif
+              end do
+              if(ix1.ne.ix2 .and. match(ix2,iy,ix1,iy)) then
+                 inselix1=ix1
+                 inselix2=ix2
+                 inseliy=iy
+              endif
             enddo
         else
            stop 'Unexpected geometry!'
@@ -909,13 +1029,13 @@ contains
         nnreg(0)=1
     else if (nncut.eq.0 .and. periodic_bc.eq.1) then   ! limiter case
         do iy = -1, inseliy
-            do ix = inselix, nx-1-inselix
-                region(ix,iy,0) = 1
+            do ix = inselix1, inselix2
+              if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) region(ix,iy,0) = 1
             enddo
         enddo
         do iy = inseliy+1, ny
             do ix = -1, nx
-                region(ix,iy,0) = 2
+              if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) region(ix,iy,0) = 2
             enddo
         enddo
         nnreg(0) = 2
@@ -931,42 +1051,45 @@ contains
             if(nncut.eq.1) then
                 do ix=-1,leftcut(1)-1
                     do iy=-1,ny
+                        if (isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) cycle
                         if (periodic_bc.ne.1.or.iy.lt.topcut(1)) & 
                             &           region(ix,iy,0)=3
                         if(periodic_bc.eq.1.and. & 
                             &           iy.ge.topcut(1).and.iy.lt.inseliy) & 
                             &           region(ix,iy,0)=2
-                        if(periodic_bc.eq.1.and. & 
-                            &           iy.ge.inseliy.and.ix.ge.inselix) & 
+                        if(periodic_bc.eq.1.and.iy.ge.inseliy.and. & 
+                            &           ix.ge.inselix1.and.ix.le.inselix2) & 
                             &           region(ix,iy,0)=5
                     enddo
                 enddo
                 do ix=leftcut(1),rightcut(1)-1
                     do iy=bottomcut(1),topcut(1)-1
-                        region(ix,iy,0)=1
+                      if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) region(ix,iy,0)=1
                     enddo
                     if(periodic_bc.eq.0) then
                         do iy=topcut(1),ny
-                            region(ix,iy,0)=2
+                          if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) region(ix,iy,0)=2
                         enddo
                     elseif(periodic_bc.eq.1) then
                         do iy=topcut(1),inseliy-1
-                            region(ix,iy,0)=2
+                          if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) region(ix,iy,0)=2
                         enddo
                         do iy=inseliy,ny
-                            region(ix,iy,0)=5
+                          if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE)) .and. &
+                          &   ix.ge.inselix1.and.ix.le.inselix2) region(ix,iy,0)=5
                         enddo
                     endif
                 enddo
                 do ix=rightcut(1),nx
                     do iy=-1,ny
+                        if (isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) cycle
                         if (periodic_bc.eq.0.or.iy.lt.topcut(1)) & 
                             &           region(ix,iy,0)=4
                         if(periodic_bc.eq.1.and. & 
                             &           iy.ge.topcut(1).and.iy.lt.inseliy) & 
                             &           region(ix,iy,0)=2
-                        if(periodic_bc.eq.1.and. & 
-                            &           iy.ge.inseliy.and.ix.le.nx-1-inselix) & 
+                        if(periodic_bc.eq.1.and.iy.ge.inseliy.and. & 
+                            &           ix.ge.inselix1.and.ix.le.inselix2) & 
                             &           region(ix,iy,0)=5
                     enddo
                 enddo
@@ -978,11 +1101,12 @@ contains
             elseif(nncut.eq.2) then
                 do ix = -1, leftcut(1)-1
                     do iy = -1, ny
-                        region(ix,iy,0)=3
+                      if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) region(ix,iy,0)=3
                     enddo
                 enddo
                 do ix = leftcut(1), leftcut(2)-1
                     do iy = max(bottomcut(1),bottomcut(2)), ny
+                        if (isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) cycle
                         if (iy.lt.min(topcut(1),topcut(2))) then
                             region(ix,iy,0)=1
                         else
@@ -992,18 +1116,21 @@ contains
                 enddo
                 do iy = -1, ny
                     ix = leftcut(2)
-                    do while (leftix(ix,iy).ne.-2)
+                    do while (leftix(ix,iy).ne.-2 .and. &
+                           &  .not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE)))
                         region(ix,iy,0)=4
                         ix=ix+1
                     enddo
                     ix = rightcut(2)-1
-                    do while (rightix(ix,iy).ne.nx+1)
+                    do while (rightix(ix,iy).ne.nx+1 .and. &
+                           &  .not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE)))
                         region(ix,iy,0)=7
                         ix=ix-1
                     enddo
                 enddo
                 do ix = rightcut(2), rightcut(1)-1
                     do iy = max(bottomcut(1),bottomcut(2)), ny
+                        if (isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) cycle
                         if (iy.lt.min(topcut(1),topcut(2))) then
                             region(ix,iy,0)=5
                         else
@@ -1013,7 +1140,7 @@ contains
                 enddo
                 do ix = rightcut(1), nx
                     do iy = -1, ny
-                        region(ix,iy,0)=8
+                      if (.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) region(ix,iy,0)=8
                     enddo
                 enddo
                 nnreg(0)=8
@@ -1021,33 +1148,40 @@ contains
         endif
     endif
 
-
-    ! ghost cells inherit region number from internal neighbour cell
+    ! Ghost cells inherit region number from internal neighbour cell
     do ix=-1,nx
         do iy=-1,ny
             if ( cflag(ix, iy, CELLFLAG_TYPE) /= GRID_BOUNDARY ) cycle
             geoType = cellGeoType(crx(ix,iy,:), cry(ix,iy,:))
             
-            if ( cflag(ix, iy, CELLFLAG_LEFTFACE) /= GRID_UNDEFINED&
-                 & .and. geoType /= CGEO_TRIA_NOLEFT )&
+            if ( cflag(ix, iy, CELLFLAG_LEFTFACE) /= GRID_UNDEFINED &
+                 & .and. geoType /= CGEO_TRIA_NOLEFT ) &
                  & region(leftix(ix,iy), leftiy(ix,iy), 0) = region(ix,iy,0)
-            if ( cflag(ix, iy, CELLFLAG_BOTTOMFACE) /= GRID_UNDEFINED&
-                 & .and. geoType /= CGEO_TRIA_NOBOT )&
+            if ( cflag(ix, iy, CELLFLAG_BOTTOMFACE) /= GRID_UNDEFINED &
+                 & .and. geoType /= CGEO_TRIA_NOBOT ) &
                  & region(bottomix(ix,iy), bottomiy(ix,iy), 0) = region(ix,iy,0)
-            if ( cflag(ix, iy, CELLFLAG_RIGHTFACE) /= GRID_UNDEFINED&
-                 & .and. geoType /= CGEO_TRIA_NORIGHT )&
+            if ( cflag(ix, iy, CELLFLAG_RIGHTFACE) /= GRID_UNDEFINED &
+                 & .and. geoType /= CGEO_TRIA_NORIGHT ) &
                  & region(rightix(ix,iy), rightiy(ix,iy), 0) = region(ix,iy,0)
-            if ( cflag(ix, iy, CELLFLAG_TOPFACE) /= GRID_UNDEFINED&
-                 & .and. geoType /= CGEO_TRIA_NOTOP )&
+            if ( cflag(ix, iy, CELLFLAG_TOPFACE) /= GRID_UNDEFINED &
+                 & .and. geoType /= CGEO_TRIA_NOTOP ) &
                  & region(topix(ix,iy), topiy(ix,iy), 0) = region(ix,iy,0)
         end do
     end do
 
+    ! Set unused cells to region 0
+    do iy=-1,ny
+        do ix=-1,nx
+            if (isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) &
+                 & region(ix,iy,0) = 0
+        end do
+    end do
+
+    ! Check all valid cells have a non-zero region number
     do ix=-1,nx
         do iy=-1,ny
-            if(region(ix,iy,0).eq.0) then
-                write(*,*) 'REGION not set for ',ix,iy,0
-            endif
+            if(.not.isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE)) .and. &
+             & region(ix,iy,0).eq.0) write(*,*) 'REGION not set for ',ix,iy,0
         enddo
     enddo
 
@@ -1213,13 +1347,40 @@ contains
 !!$        nnreg(2)=2
 !!$    endif
 
-    ! Set unused cells to region 0
+    ! After we know the volumetric region numbers, we fix the boundary indices for 
+    ! non-structure boundaries. CARRE2 sets them to -1 for all boundary faces not 
+    ! on a structure. Here they are set to -REGION.
+    ! The corresponding face of the guard cell receives the same number.
+
     do iy=-1,ny
         do ix=-1,nx
-            if (isUnusedCell(cflag(ix,iy,CELLFLAG_TYPE))) &
-                 & region(ix,iy,0) = 0
-        end do
-    end do
+            if (cflag(ix, iy, CELLFLAG_TYPE) /= GRID_BOUNDARY) cycle
+            do iFace = CELLFLAG_LEFTFACE, CELLFLAG_TOPFACE
+                if (cflag(ix, iy, iFace) == BOUNDARY_NOSTRUCTURE) then
+                    offset = (iFace - CELLFLAG_LEFTFACE + 1) * -10
+                    cflag(ix, iy, iFace) = offset - region(ix, iy, 0)
+                    geoType = cellGeoType(crx(ix,iy,:), cry(ix,iy,:))
+                    if (iFace == CELLFLAG_LEFTFACE .and. &
+                      & geoType /= CGEO_TRIA_NOLEFT) then
+                      cflag(leftix(ix,iy),leftiy(ix,iy),CELLFLAG_RIGHTFACE) =  &
+                       & cflag(ix, iy, iFace)
+                    else if (iFace == CELLFLAG_RIGHTFACE .and. &
+                      & geoType /= CGEO_TRIA_NORIGHT) then
+                      cflag(rightix(ix,iy),rightiy(ix,iy),CELLFLAG_LEFTFACE) =  &
+                       & cflag(ix, iy, iFace)
+                    else if (iFace == CELLFLAG_TOPFACE .and. &
+                      & geoType /= CGEO_TRIA_NOTOP) then
+                      cflag(topix(ix,iy),topiy(ix,iy),CELLFLAG_BOTTOMFACE) =  &
+                       & cflag(ix, iy, iFace)
+                    else if (iFace == CELLFLAG_BOTTOMFACE .and. &
+                      & geoType /= CGEO_TRIA_NOBOT) then
+                      cflag(bottomix(ix,iy),bottomiy(ix,iy),CELLFLAG_TOPFACE) =  &
+                       & cflag(ix, iy, iFace)
+                    endif
+                end if
+            end do
+        enddo
+    enddo
 
     ! set up region where the residuals should be ignored (none yet)
     do iy=-1,ny
@@ -1233,24 +1394,6 @@ contains
                 resignore(ix,iy,1)=1
                 resignore(ix,iy,2)=1
             endif
-        enddo
-    enddo
-
-    ! After we know the region numbers, we fix the boundary indices for non-structure
-    ! boundaries. CARRE2 sets them to -1 for all boundary faces not on a structure.
-    ! Here they are set to -REGION.
-
-    ! FIXME: what about CELLFLAG_*FACE of guard cells?
-
-    do iy=-1,ny
-        do ix=-1,nx
-            if (cflag(ix, iy, CELLFLAG_TYPE) /= GRID_BOUNDARY) cycle
-            do iFace = CELLFLAG_LEFTFACE, CELLFLAG_TOPFACE
-                if (cflag(ix, iy, iFace) == BOUNDARY_NOSTRUCTURE) then
-                    offset = (iFace - CELLFLAG_LEFTFACE + 1) * -10
-                    cflag(ix, iy, iFace) = offset - region(ix, iy, 0)
-                end if
-            end do
         enddo
     enddo
 
@@ -1282,8 +1425,8 @@ contains
     end if
 
     if (nnreg(0) == 5) then
-        geometryId = GEOMETRY_STELLERATORISLAND
-        call logmsg( LOGDEBUG, "b2mod_connectivity.geometryId(): identified GEOMETRY_STELLERATORISLAND")
+        geometryId = GEOMETRY_STELLARATORISLAND
+        call logmsg( LOGDEBUG, "b2mod_connectivity.geometryId(): identified GEOMETRY_STELLARATORISLAND")
         return
     end if
 
@@ -1383,7 +1526,7 @@ contains
   end function isRealCell
 
   ! For the ghost cell at position (ix,iy), get the face index
-  ! on which the neighobur internal cell is connected
+  ! on which the neighbour internal cell is connected
   integer function ghostGetBndFace(nx, ny, ix, iy)
     use b2mod_indirect
 
@@ -1438,7 +1581,7 @@ contains
     integer, intent(in) :: nx, ny, ix, iy
 
     isInDomain = (ix >= -1 .and. ix <= nx &
-         & .and. iy >= -1 .and. iy <= ny)
+          & .and. iy >= -1 .and. iy <= ny)
 
   end function isInDomain
 

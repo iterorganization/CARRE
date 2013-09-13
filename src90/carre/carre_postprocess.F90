@@ -39,6 +39,10 @@ module carre_postprocess
   integer, parameter :: ACTION_REFINE = 3
   integer, parameter :: ACTION_COARSEN_FORCE = 4
 
+  ! shared
+  integer :: cellBndFaceCount(npmamx-1,nrmamx-1,nregmx)
+  logical :: finalized
+
 contains
 
   !> Perform postprocessing on the grid as generated in carre_main.
@@ -385,7 +389,6 @@ contains
       ! internal
       integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
       integer :: iReg, iPol, iRad, iFace, i, j, iStructStart, iStructEnd
-      integer :: cellBndFaceCount(npmamx-1,nrmamx-1,nregmx)
 
       ! Cell flag
       ! First mark cells internal/external
@@ -448,8 +451,6 @@ contains
             end do
          end do
       end if
-
-   end if
 
       ! Translate the face/structure intersections into cell flags
       ! First: all internal cells with an intersected face are boundary cells and are assumed to be unproblematic
@@ -526,6 +527,9 @@ contains
     ! 
     ! This routine is only to be called when the grid has been finalized.
     subroutine categorizeFaceStructureIndices()
+
+      ! internal
+      integer :: iFace, iStructStart, iStructEnd
 
       if (.not. finalized) stop "categorizeFaceStructureIndices: grid not finalized"
 

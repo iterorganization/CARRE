@@ -23,10 +23,14 @@
 !
 !  version : 25.02.98 20:54
 !
+      integer, intent(in) :: lun, ngpr, ngpz
+      integer, intent(out) :: iret, nr, nz
       real*8 rgr(*), zgr(*), pfm(ngpr, *)
 !... toroidal field in tesla, radius in m
       real*8 btf, rtf
       real ubtf, urtf
+!... internal
+      integer i, j
 !-----------------------------------------------------
 !
 !*** Read the plasma equilibrium ...

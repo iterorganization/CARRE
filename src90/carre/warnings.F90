@@ -8,9 +8,10 @@
 ! for the use in the automatic grid generator AGG
 !****************************************************************
 #include <CARREDIM.F>
-      REAL*8 nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo
+      INTEGER i, j
+      REAL*8 nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo,rn
       REAL*8 separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto, & 
-     & distnv
+     & distnv,sxu,syu,sxo,syo,z,dz,adz,adzu,adzo,bdzu,bdzo,rs,distsn
 
       open (33,file='warnings.dat')
       rewind 33

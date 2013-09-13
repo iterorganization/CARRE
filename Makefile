@@ -167,7 +167,7 @@ local:
 	-gtfl btor.dat structure.dat rzpsi.dat ncar.cfg gmeta fort.11 carre.out carre.log carre.dat warnings.dat traduit.log selptx.inf traduit.out 
 
 tags:
-	rm TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
+	rm -f TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
 echo:
 	echo INCLUDE ${INCLUDE}
@@ -239,10 +239,10 @@ simpledepend:
 
 depend:
 # 	First do preprocessor #includes dependencies (-u disables USE dependency output)	
-	bin/sfmakedepend -d -u -p '$${OBJECTCODE}/' -I ${SRCDIR}/include \
+	bin/sfmakedepend -d -u -p '$${OBJECTCODE}/' ${INCLUDE} \
 	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE}.include src90/*/*.[fF] src90/*/*.[fF]90 
 #	Now preprocess all files and do dependencies of preprocessed files to get correct USE dependencies
-	-rm ${OBJECTCODE}/*.f90 ${OBJECTCODE}/*.f
+	-rm -f ${OBJECTCODE}/*.f90 ${OBJECTCODE}/*.f
 	@for d in `echo "${VPATH}" | tr : \ `; do \
 		dirfiles=`find -L $$d/ -name '*.F90'` ; \
 		if [ -n "$$dirfiles" ] ; then \
@@ -263,7 +263,7 @@ depend:
 			cp $$dirfiles ${OBJECTCODE} ; \
 		fi ; \
 	done ; \
-	bin/sfmakedepend -d -p '$${OBJECTCODE}/' \
+	bin/sfmakedepend -d -p '$${OBJECTCODE}/' ${INCLUDE} \
 	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE}.use ${OBJECTCODE}/*.[fF] ${OBJECTCODE}/*.[fF]90 
 
 

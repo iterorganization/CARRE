@@ -21,7 +21,7 @@ contains
     integer, intent(out) :: nx, ny
 
     nx = nnx + 2 * niso
-	# FIXME: make + 4 configurable
+	! FIXME: make + 4 configurable
     ny = nny + 4
   end subroutine computeGridSizeWithGhostCells
 
