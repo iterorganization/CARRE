@@ -152,15 +152,29 @@ contains
     gd%b2ny = ny
 
     allocate( gd%mapCvI(-1:nx+1, -1:ny+1) )
+    gd%mapCvI = GRID_UNDEFINED
     allocate( gd%mapFcI(-1:nx+1, -1:ny+1, 0:3) )
+    gd%mapFcI = GRID_UNDEFINED
     allocate( gd%mapVxI(-1:nx+1, -1:ny+1, 0:3) )
+    gd%mapVxI = GRID_UNDEFINED
 
     allocate( gd%mapCvix(ncv), gd%mapCviy(ncv) )
+    gd%mapCvix = GRID_UNDEFINED
+    gd%mapCviy = GRID_UNDEFINED
     allocate( gd%mapFcix(nfcx+nfcy), gd%mapFciy(nfcx+nfcy), gd%mapFcIFace(nfcx+nfcy) )
+    gd%mapFcix = GRID_UNDEFINED
+    gd%mapFciy = GRID_UNDEFINED
+    gd%mapFcIFace = GRID_UNDEFINED
     allocate( gd%mapVxix(nvx), gd%mapVxiy(nvx), gd%mapVxIVx(nvx) )
+    gd%mapVxix = GRID_UNDEFINED
+    gd%mapVxiy = GRID_UNDEFINED
+    gd%mapVxIVx = GRID_UNDEFINED
 
     gd%nsv = 0
     allocate( gd%svix(MAX_SPECIAL_VERTICES), gd%sviy(MAX_SPECIAL_VERTICES), gd%svi(MAX_SPECIAL_VERTICES) )
+    gd%svix = GRID_UNDEFINED
+    gd%sviy = GRID_UNDEFINED
+    gd%svi = GRID_UNDEFINED
 
   end subroutine allocateB2ITMGridMap
 
@@ -786,8 +800,13 @@ contains
         end do
     end do
 
-    call logmsg( LOGDEBUG, "b2ITMCreateMap: found "//int2str(svc-svcDuplicates)//" special vertices (x-points),&
+    if (svc-svcDuplicates.eq.1) then
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: found "//int2str(svc-svcDuplicates)//" special vertex (x-point),&
         & "//int2str(svc)//" including duplicates.")
+    else
+      call logmsg( LOGDEBUG, "b2ITMCreateMap: found "//int2str(svc-svcDuplicates)//" special vertices (x-points),&
+        & "//int2str(svc)//" including duplicates.")
+    end if
 
     ! number of unique cells 
     !ncv = ( nx + 2 ) * ( ny + 2 ) - count( .not. isNeeded( cvi ) )
@@ -964,8 +983,6 @@ contains
     end do
 
     ! After completing the vertex map, we can complete the special vertex (x-point) map
-
-
 
     ! The special vertex with index i1 is unique and needed. Copy it to the map structure
     ! identify duplicate special vertices
@@ -1262,11 +1279,11 @@ contains
 
     select case(dir)
     case(LEFT)
-        nbix = leftix(ix, iy)
-        nbiy = leftiy(ix, iy)
+       nbix = leftix(ix, iy)
+       nbiy = leftiy(ix, iy)
     case(BOTTOM)
-        nbix = bottomix(ix, iy)
-        nbiy = bottomiy(ix, iy)
+       nbix = bottomix(ix, iy)
+       nbiy = bottomiy(ix, iy)
     case(RIGHT)
 !!$        if (ix == nx) then
 !!$            nbix = ix + 1
