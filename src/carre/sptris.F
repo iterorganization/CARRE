@@ -66,8 +66,9 @@ c>>>
 c<<<
         write(0,*) 
         write(0,*) 'ipx,ix,jx,ptx,pty =',ipx,ix,jx,ptx(ipx),pty(ipx)
-        write(0,*) 'psi(ix,jx),CCW =',psi(ix,jx),psi(ix+1,jx),
-     ,                                psi(ix+1,jx+1),psi(ix,jx+1)
+        write(0,'(a,1p,4(1x,1e12.5))') 
+     ,   'psi(ix,jx),CCW =',psi(ix,jx),psi(ix+1,jx),
+     ,                      psi(ix+1,jx+1),psi(ix,jx+1)
 c>>>
 
 *..Calculate the flux at the x-point
@@ -117,9 +118,11 @@ c>>>
             iref = i2+incrir(idir)
             jref = j2+incrjr(idir)
 c<<<
-            write(0,*) 'i1,i2,j1,j2,iref,jref =',i1,i2,j1,j2,iref,jref
-            write(0,*) 'psi(i1,j1),psi(i2,j2),fctpx(ipx)=',
-     ,                                  psi(i1,j1),psi(i2,j2),fctpx(ipx)
+            write(0,'(a,6i4)') 'i1,i2,j1,j2,iref,jref =',
+     .                          i1,i2,j1,j2,iref,jref
+            write(0,'(a,1p,3(1x,1e12.5))') 
+     ,                         'psi(i1,j1),psi(i2,j2),fctpx(ipx)=',
+     ,                          psi(i1,j1),psi(i2,j2),fctpx(ipx)
 c>>>
 
 *..Check for crossing the segment
@@ -137,7 +140,8 @@ c>>>
               endif !}
             
 c<<<
-      write(0,*) 'Cell crossing: k,isep,ipx,separx,separy =',
+      write(0,'(a,1p,3i4,2(1x,1e12.5))') 
+     ,  'Cell crossing: k,isep,ipx,separx,separy =',
      ,                  k,isep,ipx,separx(k,isep,ipx),separy(k,isep,ipx)
 c>>>
 
@@ -162,13 +166,13 @@ c>>>
           end do !}
         end do !}
         write(0,*) 
-        write(0,*) 'After idir loop: isep,ipx,nbdef,nbdfav = ',
+        write(0,'(a,4i4)') 'After idir loop: isep,ipx,nbdef,nbdfav = ',
      ,                                        isep,ipx,nbdef,nbdfav !###
 cank}
       end do !}
 c<<<
       write(0,*) 
-      write(0,*) 'After X-point loop: isep,npx,nbdef,nbdfav = ',
+      write(0,'(a,4i4)') 'After X-point loop: isep,npx,nbdef,nbdfav = ',
      ,                                        isep,npx,nbdef,nbdfav !###
       if(nbdef.gt.0) then !{
         write(0,*) 'ixp_hlp :',(ixp_hlp(i),i=1,nbdef)

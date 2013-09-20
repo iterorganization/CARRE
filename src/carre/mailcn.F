@@ -121,8 +121,8 @@ c***
 
          xt(1)=xn(1,1)
          yt(1)=yn(1,1)
-         xt(2)=xfin
-         yt(2)=yfin
+         xt(2)=xpto
+         yt(2)=ypto
          xt(3)=xt(1)
          yt(3)=yt(1)
          nt=3
@@ -136,9 +136,9 @@ c***
       xtt(1)= xpto-0.1
       ytt(1)= ypto
       xtt(2)= x(nx)
-      ytt(2)=ypto
-      xtt(3)=xtt(1)
-      ytt(3)=ytt(1)
+      ytt(2)= ypto
+      xtt(3)= xtt(1)
+      ytt(3)= ytt(1)
       ntt=3
       sens=1
       CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sens,
