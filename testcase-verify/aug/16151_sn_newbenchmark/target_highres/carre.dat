@@ -1,0 +1,33 @@
+$parameters
+repart   =     2
+nrelax   =  5000
+relax    =   9.9999998E-03
+pasmin   =   1.0E-03
+rlcept   =   1.0000000E-06
+pntrat   =   1.9927342E-01
+nptseg(1) =    25
+deltp1(1) =   5.0-03
+deltpn(1) =   1.0-03
+nptseg(2) =    25
+deltp1(2) =   5.0-03
+deltpn(2) =   1.0-03
+nptseg(3) =    49
+deltp1(3) =   2.2724472E-02
+deltpn(3) =   2.2724472E-02
+npr(1) =    19
+deltr1(1) =  -3.7110333E-03
+deltrn(1) =  -7.7110333E-03
+npr(2) =    19
+deltr1(2) =   6.8144349E-04
+deltrn(2) =   1.3557688E-03
+npr(3) =    19
+deltr1(3) =   2.2269997E-03
+deltrn(3) =   7.5923689E-03
+tgarde(1) =   0.2000001E-01
+tgarde(2) =   0.2000001E-01
+carreMode = 2
+gridExtensionMode = 1
+targetResolution = 0.005
+maxResJump = 8.0
+loglevel=6
+$end
