@@ -13,5 +13,8 @@ fi
 cp structure.dat rzpsi.dat carre.dat btor.dat $1
 cp virtualstructure.out $1
 cp carreFinal00000.silo carre.out $1
-cp traduitAAA00000 traduit.out $1
+cp traduit.out $1
+cp traduitAAA00000 $1
+cp traduit.out.b2 $1
+cp traduit.out.sonnet $1
 cp selptx.inf $1
