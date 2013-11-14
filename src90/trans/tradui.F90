@@ -15,7 +15,7 @@ program tradui
   use euITM_routines
 #endif
   use b2mod_connectivity
-  use b2ITMMapping
+  use b2mod_grid_mapping
   use b2ag_ghostcells
   use carre_types
   use carre_constants
@@ -55,7 +55,7 @@ program tradui
   integer :: nncut
   integer :: leftcut(ncutmx),rightcut(ncutmx),bottomcut(ncutmx),topcut(ncutmx)
   integer, allocatable, dimension(:,:) :: leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy
-  integer, parameter :: PERIODIC_BC = 0
+  integer, parameter :: PERIODIC_BC = 1
 
   type(CarreParameters) :: par
 
@@ -140,6 +140,7 @@ program tradui
   write(6,*) '7: Write SILO file' 
 #endif
   write(6,*) '8: format B2.5 (old style)'
+  write(6,*) '9: format SONNET-DIVIMP, only internal cells'
   read(5,*) isel
   write(6,*) 'The format chosen is :',isel
 
@@ -199,6 +200,19 @@ program tradui
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
+      call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
+  elseif(isel.eq.9) then
+      !
+      ! Original SONNET/DIVIMP format, only internal cells
+      !
+      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
+          & par%nptseg,psidx,psidy,&
+          & psi,psidxm,psidym,cflag,b0r0, & 
+          & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+      call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
   elseif(isel.eq.4) then
       !
       !*** B2-Sonnet-DG format
@@ -308,6 +322,8 @@ program tradui
       ! compute the region arrays
       allocate( region(-1:nx, -1:ny, 0:2) )
       allocate( resignore(-1:nx, -1:ny, 1:2) )
+      
+      nncut = 0
 
       call init_region(nx,ny,nncut,ncutmx, &
           & leftcut,rightcut,topcut,bottomcut, &
@@ -379,7 +395,7 @@ program tradui
 #endif
       end if
   else
-      write(6,*) 'Wrong value (must be 1 to 5): isel=',isel
+      write(6,*) 'Wrong value (must be 1 to 9): isel=',isel
       stop
   endif
   !======================================================================

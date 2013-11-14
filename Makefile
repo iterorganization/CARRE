@@ -4,13 +4,15 @@
 
 # FIXME: explicitly test for OBJECTCODE
 
+OBJECTCODE=amd64_intel_12
+
 CARRE_DEBUG = yes
 
 USE_SILO = '-DUSE_SILO'
 
 CARRE_NONINTERACTIVE = "-DCARRE_NONINTERACTIVE"
 
-#USE_ITMCARRE = "-DUSE_ITMCARRE -DEUITM"
+#USE_ITMCARRE = "-DUSE_ITMCARRE"
 #USE_UAL = "-DUSE_UAL"
 
 #USE_NCARG = '-DUSE_NCARG'
@@ -27,7 +29,8 @@ SRCDIR = src90
 
 SVN_B2SRC_PATH = https://solps-mdsplus.aug.ipp.mpg.de/repos/SOLPS/branches/ITM/4.10a/solps5.0/src/Braams/b2/src_xpb
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/b2_shared ${SRCDIR}/itm_shared
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_shared:${SRCDIR}/b2_export/utility ${SRCDIR}/b2_export/modules ${SRCDIR}/b2_export/b2_shared
+
 INCLUDE = -I ${SRCDIR}/include
 
 ALLTARGETS = ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
@@ -38,7 +41,7 @@ endif
 
 EXCLUDELIST = carre.o fcrr.o tradui.o euitm_routines.o itmcarre_wrapper.o
 
-DEFINES = ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL} ${CARRE_NONINTERACTIVE}
+DEFINES = "-DBUILDING_CARRE" ${USE_ITMCARRE} ${USE_NCARG} ${USE_SILO} ${USE_UAL} ${CARRE_NONINTERACTIVE}
 
 # Include object lists
 include LISTOBJ
@@ -171,6 +174,9 @@ tags:
 
 echo:
 	echo INCLUDE ${INCLUDE}
+	echo DEST ${DEST}
+	echo DEFINES ${DEFINES}
+	echo VPATH ${VPATH}
 
 HDF5_VERSION=1.8.10
 HDF5_INSTALL_DIR=${PWD}/lib/${OBJECTCODE}/hdf5
@@ -304,17 +310,57 @@ ${OBJECTCODE}/dependencies.${OBJECTCODE}.include:
 ${OBJECTCODE}/dependencies.${OBJECTCODE}.use: ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
 
 src90/b2_shared:
-	mkdir src90/b2_shared
+	mkdir -p src90/b2_shared
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2ag_ghostcells.F90 src90/b2_shared/b2ag_ghostcells.F90
-	svn export ${SVN_B2SRC_PATH}/modules/b2mod_constants.F src90/b2_shared/b2mod_constants.F
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2ITMMapping.f90 src90/b2_shared/b2ITMMapping.f90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_grid_mapping.f90 src90/b2_shared/b2mod_grid_mapping.f90
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_cellhelper.f90 src90/b2_shared/b2mod_cellhelper.f90 
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F src90/b2_shared/b2mod_indirect.F
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_types.F src90/b2_shared/b2mod_types.F
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_connectivity.F90 src90/b2_shared/b2mod_connectivity.F90
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F src90/b2_shared/b2mod_indirect.F
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_ual.F90 src90/b2_shared/b2mod_ual.F90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_ual.F90 src90/b2_shared_itm/b2mod_ual.F90
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_silo.F90 src90/b2_shared/b2mod_silo.F90
+	svn export ${SVN_B2SRC_PATH}/modules/b2mod_constants.F src90/b2_shared/b2mod_constants.F
+	svn export ${SVN_B2SRC_PATH}/utility/chcase.F src90/b2_shared/chcase.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipmain.F src90/b2_shared/ipmain.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipos.F src90/b2_shared/ipos.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipseti.F src90/b2_shared/ipseti.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipsetr.F src90/b2_shared/ipsetr.F
+	svn export ${SVN_B2SRC_PATH}/utility/streql.F src90/b2_shared/streql.F
+	svn export ${SVN_B2SRC_PATH}/utility/xerset.F src90/b2_shared/xerset.F
+	svn export ${SVN_B2SRC_PATH}/utility/xertst.F src90/b2_shared/xertst.F
+
+src90/b2_export:
+	mkdir -p src90/b2_export/b2_shared
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2ag_ghostcells.F90 	src90/b2_export/b2_shared/b2ag_ghostcells.F90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_grid_mapping.f90 	src90/b2_export/b2_shared/b2mod_grid_mapping.f90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_cellhelper.f90 	src90/b2_export/b2_shared/b2mod_cellhelper.f90 
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F 	src90/b2_export/b2_shared/b2mod_indirect.F
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_types.F 		src90/b2_export/b2_shared/b2mod_types.F
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_connectivity.F90 	src90/b2_export/b2_shared/b2mod_connectivity.F90
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F 	src90/b2_export/b2_shared/b2mod_indirect.F
+ifdef USE_ITMCARRE 
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_ual.F90 		src90/b2_export/b2_shared/b2mod_ual.F90
+endif
+	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_silo.F90 		src90/b2_export/b2_shared/b2mod_silo.F90
+	mkdir -p src90/b2_export/modules
+	svn export ${SVN_B2SRC_PATH}/modules/b2mod_constants.F 		src90/b2_export/modules/b2mod_constants.F
+	mkdir -p src90/b2_export/utility
+	svn export ${SVN_B2SRC_PATH}/utility/chcase.F 			src90/b2_export/utility/chcase.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipmain.F 			src90/b2_export/utility/ipmain.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipos.F 			src90/b2_export/utility/ipos.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipseti.F 			src90/b2_export/utility/ipseti.F
+	svn export ${SVN_B2SRC_PATH}/utility/ipsetr.F 			src90/b2_export/utility/ipsetr.F
+	svn export ${SVN_B2SRC_PATH}/utility/streql.F 			src90/b2_export/utility/streql.F
+	svn export ${SVN_B2SRC_PATH}/utility/xerset.F 			src90/b2_export/utility/xerset.F
+	svn export ${SVN_B2SRC_PATH}/utility/xertst.F 			src90/b2_export/utility/xertst.F
+
+
+# 	svn export ${SVN_B2SRC_PATH}/utility/subsys.F src90/b2_shared/subsys.F
+# 	svn export ${SVN_B2SRC_PATH}/utility/ipgeti.F src90/b2_shared/ipgeti.F
+# 	svn export ${SVN_B2SRC_PATH}/utility/ipgetr.F src90/b2_shared/ipgetr.F
+# 	svn export ${SVN_B2SRC_PATH}/utility/lwimai.F src90/b2_shared/lwimai.F
+# 	svn export ${SVN_B2SRC_PATH}/utility/lwmain.F src90/b2_shared/lwmain.F
 
 #TODO: export target for b2_shared_itm
 

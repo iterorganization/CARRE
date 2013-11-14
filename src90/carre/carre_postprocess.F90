@@ -39,10 +39,6 @@ module carre_postprocess
   integer, parameter :: ACTION_REFINE = 3
   integer, parameter :: ACTION_COARSEN_FORCE = 4
 
-  ! shared
-  integer :: cellBndFaceCount(npmamx-1,nrmamx-1,nregmx)
-  logical :: finalized
-
 contains
 
   !> Perform postprocessing on the grid as generated in carre_main.
@@ -235,7 +231,7 @@ contains
         ! write cell finalization result
         call writeGridStateToSiloFile('carrePostProcE0', equ, struct, grid)
         ! Forced coarsening of finalized grid 
-        call forcedCoarsening(grid, par)       
+        !call forcedCoarsening(grid, par)       
         ! write forced coarsening result
         call writeGridStateToSiloFile('carrePostProcE1', equ, struct, grid)
         ! Sanity check whether categorization agrees with knowledge from finalization
@@ -389,6 +385,7 @@ contains
       ! internal
       integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
       integer :: iReg, iPol, iRad, iFace, i, j, iStructStart, iStructEnd
+      integer :: cellBndFaceCount(npmamx-1,nrmamx-1,nregmx)
 
       ! Cell flag
       ! First mark cells internal/external
@@ -427,34 +424,69 @@ contains
       cellBndFaceCount = 0
       grid%cellFaceIStruct = GRID_UNDEFINED
 
-      if (finalized) then 
-         call categorizeFaceStructureIndices()
+      do iReg = 1, grid%nreg
 
-      else
-         do iReg = 1, grid%nreg
-            do iPol = 1, grid%np1(iReg) - 1
-               do iRad = 1, grid%nr(iReg) - 1
+          do iPol = 1, grid%np1(iReg) - 1
+              do iRad = 1, grid%nr(iReg) - 1
 
-                  ! During iteration: transfer intersection information from faces to cells
-                  do iFace = 1, 4 ! left, bottom, right, top
-                     doesIntersect = grid%faceISec(CELL_FACE_ALIGN(iFace), &
-                          & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+                  if (finalized) then 
+                      ! Finalized grid: derive boundary cells from boundary nodes
 
-                     grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
-                          & grid%faceISecIStruct(CELL_FACE_ALIGN(iFace), &
-                          & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+                      ! Only for internal cells
+                      if (grid%cellflag(iPol, iRad, iReg) /= GRID_INTERNAL) cycle
 
-                     if (doesIntersect) cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
-                  end do
+                      ! Figure out boundary face structure indices
+                      do iFace = 1, 4
+                          iStructStart = grid%pointStructIndex( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg )
+                          iStructEnd = grid%pointStructIndex( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg )
 
-               end do
-            end do
-         end do
-      end if
+                          if ((iStructStart /= GRID_UNDEFINED) .and. (iStructEnd /= GRID_UNDEFINED)) then
+                              grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructStart
+                              if (iStructStart /= iStructEnd) then
+                                  call logmsg(LOGDEBUG, "categorizeCellsAndFaces: ambiguous face/structure association")
+                              end if
+                              cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
+                          else
+                              call assert( grid%pointflag( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg ) /= GRID_BOUNDARY &
+                               & .or. &
+                               &  grid%pointflag( &
+                               & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg ) /= GRID_BOUNDARY )                              
+                          end if
+                      end do
+
+                  else
+                      ! During iteration: transfer intersection information from faces to cells
+                      do iFace = 1, 4 ! left, bottom, right, top
+                          doesIntersect = grid%faceISec(CELL_FACE_ALIGN(iFace), &
+                               & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+
+                          grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
+                               & grid%faceISecIStruct(CELL_FACE_ALIGN(iFace), &
+                               & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+
+                          if (doesIntersect) cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
+                      end do
+                  end if 
+
+              end do
+          end do
+      end do
 
       ! Translate the face/structure intersections into cell flags
       ! First: all internal cells with an intersected face are boundary cells and are assumed to be unproblematic
       where ( (cellBndFaceCount > 0) .and. (grid%cellFlag == GRID_INTERNAL) ) grid%cellflag = GRID_BOUNDARY
+
+      ! If grid is finalized we are done now
+      if (finalized) return
+
+      ! FIXME: need to return later in case coarsening cat. is still required
 
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
@@ -467,9 +499,6 @@ contains
            & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_BOUNDARY_COARSEN
       where ( (grid%cellflag == GRID_INTERNAL) &
            & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
-
-      ! If grid is finalized we are done now
-      if (finalized) return
 
       ! Figure out which must be refined due to too low resolution 
 
@@ -519,61 +548,6 @@ contains
       end do
 
     end subroutine categorizeCellsAndFaces
-
-
-    ! For every boundary face, derive the structure index for this face 
-    ! (the strucure number on which the face lies) from the structure indices
-    ! of the nodes defining the face.
-    ! 
-    ! This routine is only to be called when the grid has been finalized.
-    subroutine categorizeFaceStructureIndices()
-
-      ! internal
-      integer :: iFace, iStructStart, iStructEnd
-
-      if (.not. finalized) stop "categorizeFaceStructureIndices: grid not finalized"
-
-      do iReg = 1, grid%nreg
-
-         do iPol = 1, grid%np1(iReg) - 1
-            do iRad = 1, grid%nr(iReg) - 1
-
-               ! Finalized grid: derive boundary cells from boundary nodes
-
-               ! Only for internal cells
-               if (grid%cellflag(iPol, iRad, iReg) /= GRID_INTERNAL) cycle
-
-               ! Figure out boundary face structure indices
-               do iFace = 1, 4
-                  iStructStart = grid%pointStructIndex( &
-                       & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
-                       & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg )
-                  iStructEnd = grid%pointStructIndex( &
-                       & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
-                       & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg )
-
-                  if ((iStructStart /= GRID_UNDEFINED) .and. (iStructEnd /= GRID_UNDEFINED)) then
-                     grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructStart
-                     if (iStructStart /= iStructEnd) then
-                        call logmsg(LOGDEBUG, "categorizeCellsAndFaces: ambiguous face/structure association")
-                     end if
-                     cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
-                  else
-                     call assert( grid%pointflag( &
-                          & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
-                          & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg ) /= GRID_BOUNDARY &
-                          & .or. &
-                          &  grid%pointflag( &
-                          & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
-                          & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg ) /= GRID_BOUNDARY )                              
-                  end if
-               end do
-
-            end do
-         end do
-      end do
-
-    end subroutine categorizeFaceStructureIndices
 
 
     ! For use in categorizeCellsAndFaces

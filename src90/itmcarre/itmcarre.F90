@@ -10,7 +10,7 @@ module itmcarre
   use carre_types
   use carre_constants
   use CarreDiagnostics
-  use b2ITMMapping
+  use b2mod_grid_mapping
   use carre_parameter_io
 
   implicit none

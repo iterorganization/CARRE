@@ -41,7 +41,8 @@ contains
 
     logical :: namelistExists, openEnv = .false.
 
-    namelist /ual_namelist/ lTreename, lShot, lRun, lTime, lRefshot, lRefrun, lUser, lTokamak, lDataversion, openEnv, lDoCreate, lUseHdf5
+    namelist /ual_namelist/ lTreename, lShot, lRun, lTime, lRefshot, lRefrun, lUser, lTokamak, lDataversion, &
+         & openEnv, lDoCreate, lUseHdf5
 
     if (present(shot)) lShot = shot
     if (present(run)) lRun = run
