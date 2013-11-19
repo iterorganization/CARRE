@@ -4,7 +4,7 @@
 
 # FIXME: explicitly test for OBJECTCODE
 
-OBJECTCODE=amd64_intel_12
+#OBJECTCODE=amd64_intel_12
 
 CARRE_DEBUG = yes
 
@@ -29,7 +29,7 @@ SRCDIR = src90
 
 SVN_B2SRC_PATH = https://solps-mdsplus.aug.ipp.mpg.de/repos/SOLPS/branches/ITM/4.10a/solps5.0/src/Braams/b2/src_xpb
 
-VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_shared:${SRCDIR}/b2_export/utility ${SRCDIR}/b2_export/modules ${SRCDIR}/b2_export/b2_shared
+VPATH	= ${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_shared:${SRCDIR}/b2_export/utility:${SRCDIR}/b2_export/modules:${SRCDIR}/b2_export/b2_shared
 
 INCLUDE = -I ${SRCDIR}/include
 
@@ -52,7 +52,7 @@ include LISTOBJ
 # But we want the UAL library
 ifdef USE_ITMCARRE 
 
-ITM_SRC_PREREQS=src90/b2_shared 
+ITM_SRC_PREREQS=src90/b2_shared src90/b2_export
 
 EXCLUDELIST +=
 ALLTARGETS += ${OBJECTCODE}/itmcarre_wrapper
@@ -173,10 +173,11 @@ tags:
 	rm -f TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
 echo:
-	echo INCLUDE ${INCLUDE}
-	echo DEST ${DEST}
-	echo DEFINES ${DEFINES}
-	echo VPATH ${VPATH}
+	@echo INCLUDE ${INCLUDE}
+	@echo DEST ${DEST}
+	@echo DEFINES ${DEFINES}
+	@echo VPATH ${VPATH}
+	@echo SOLPS_LIB ${SOLPS_LIB}
 
 HDF5_VERSION=1.8.10
 HDF5_INSTALL_DIR=${PWD}/lib/${OBJECTCODE}/hdf5
@@ -243,7 +244,7 @@ simpledepend:
 	bin/sfmakedepend -d -p '$${OBJECTCODE}/' ${INCLUDE} \
 	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE} src90/*/*.[fF] src90/*/*.[fF]90 
 
-depend:
+depend: ${ITM_SRC_PREREQS}
 # 	First do preprocessor #includes dependencies (-u disables USE dependency output)	
 	bin/sfmakedepend -d -u -p '$${OBJECTCODE}/' ${INCLUDE} \
 	    -f ${OBJECTCODE}/dependencies.${OBJECTCODE}.include src90/*/*.[fF] src90/*/*.[fF]90 
