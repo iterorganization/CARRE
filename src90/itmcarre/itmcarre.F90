@@ -168,7 +168,7 @@ contains
     integer :: inseltop, inselbot, nnreg(0:2)
     integer, allocatable :: region(:,:,:), resignore(:,:,:)
 
-    integer, parameter :: PERIODIC_BC = 0
+    integer :: periodic_bc
     integer, parameter :: istyle = -1 ! hard-wired to DG format
     
 
@@ -208,8 +208,8 @@ contains
         & leftix,leftiy,rightix,rightiy, &
         & topix,topiy,bottomix,bottomiy, &
         & leftcut,rightcut,bottomcut,topcut, &
-        & PERIODIC_BC,nncut,ncutmx,inseltop, inselbot, & 
-        & geom_match_dist, istyle )
+        & periodic_bc,nncut,ncutmx,inseltop,inselbot, & 
+        & geom_match_dist,istyle )
 
     ! compute the region arrays
     allocate( region(-1:nx, -1:ny, 0:2) )
@@ -218,7 +218,7 @@ contains
         & leftcut,rightcut,topcut,bottomcut, &
         & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
         & region,nnreg,resignore, &
-        & crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),PERIODIC_BC,b2cflag(-1:nx,-1:ny,:))
+        & crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),periodic_bc,b2cflag(-1:nx,-1:ny,:))
 
     ! set up the B2<->CPO mappings
     call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),b2cflag(-1:nx,-1:ny,:),&

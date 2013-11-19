@@ -55,7 +55,7 @@ program tradui
   integer :: nncut
   integer :: leftcut(ncutmx),rightcut(ncutmx),bottomcut(ncutmx),topcut(ncutmx)
   integer, allocatable, dimension(:,:) :: leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy
-  integer, parameter :: PERIODIC_BC = 1
+  integer :: periodic_bc
 
   type(CarreParameters) :: par
 
@@ -124,6 +124,11 @@ program tradui
 
   call limail(nin,nreg,nppol,nprad,r,z,psi,psidxm,psidym, & 
       &  cflag,npmamx,nrmamx,nregmx,par%carre_format)
+  if(nreg.eq.2) then
+    periodic_bc = 1
+  else
+    periodic_bc=0
+  endif
 
   !* 4.   Select the output format
 
@@ -316,7 +321,7 @@ program tradui
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, &
           & leftcut,rightcut,bottomcut,topcut, &
-          & PERIODIC_BC,nncut,ncutmx,inseltop, inselbot, & 
+          & periodic_bc,nncut,ncutmx,inseltop, inselbot, & 
           & geom_match_dist,istyle)
 
       ! compute the region arrays
@@ -329,7 +334,7 @@ program tradui
           & leftcut,rightcut,topcut,bottomcut, &
           & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
           & region,nnreg,resignore, &
-          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),PERIODIC_BC, &
+          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),periodic_bc, &
           & b2cflag(-1:nx,-1:ny,:) )
 
 !      region(:,:,0)=1

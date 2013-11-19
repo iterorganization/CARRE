@@ -6,7 +6,9 @@
 
 #OBJECTCODE=amd64_intel_12
 
+ifdef SOLPS_DEBUG
 CARRE_DEBUG = yes
+endif
 
 USE_SILO = '-DUSE_SILO'
 
@@ -52,7 +54,7 @@ include LISTOBJ
 # But we want the UAL library
 ifdef USE_ITMCARRE 
 
-ITM_SRC_PREREQS=src90/b2_shared src90/b2_export
+ITM_SRC_PREREQS=src90/b2_export
 
 EXCLUDELIST +=
 ALLTARGETS += ${OBJECTCODE}/itmcarre_wrapper
@@ -310,27 +312,6 @@ ${OBJECTCODE}/dependencies.${OBJECTCODE}.include:
 	${MAKE} depend
 ${OBJECTCODE}/dependencies.${OBJECTCODE}.use: ${OBJECTCODE}/dependencies.${OBJECTCODE}.include
 
-src90/b2_shared:
-	mkdir -p src90/b2_shared
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2ag_ghostcells.F90 src90/b2_shared/b2ag_ghostcells.F90
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_grid_mapping.f90 src90/b2_shared/b2mod_grid_mapping.f90
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_cellhelper.f90 src90/b2_shared/b2mod_cellhelper.f90 
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F src90/b2_shared/b2mod_indirect.F
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_types.F src90/b2_shared/b2mod_types.F
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_connectivity.F90 src90/b2_shared/b2mod_connectivity.F90
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_indirect.F src90/b2_shared/b2mod_indirect.F
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_ual.F90 src90/b2_shared_itm/b2mod_ual.F90
-	svn export ${SVN_B2SRC_PATH}/b2_shared/b2mod_silo.F90 src90/b2_shared/b2mod_silo.F90
-	svn export ${SVN_B2SRC_PATH}/modules/b2mod_constants.F src90/b2_shared/b2mod_constants.F
-	svn export ${SVN_B2SRC_PATH}/utility/chcase.F src90/b2_shared/chcase.F
-	svn export ${SVN_B2SRC_PATH}/utility/ipmain.F src90/b2_shared/ipmain.F
-	svn export ${SVN_B2SRC_PATH}/utility/ipos.F src90/b2_shared/ipos.F
-	svn export ${SVN_B2SRC_PATH}/utility/ipseti.F src90/b2_shared/ipseti.F
-	svn export ${SVN_B2SRC_PATH}/utility/ipsetr.F src90/b2_shared/ipsetr.F
-	svn export ${SVN_B2SRC_PATH}/utility/streql.F src90/b2_shared/streql.F
-	svn export ${SVN_B2SRC_PATH}/utility/xerset.F src90/b2_shared/xerset.F
-	svn export ${SVN_B2SRC_PATH}/utility/xertst.F src90/b2_shared/xertst.F
-
 src90/b2_export:
 	mkdir -p src90/b2_export/b2_shared
 	svn export ${SVN_B2SRC_PATH}/b2_shared/b2ag_ghostcells.F90 	src90/b2_export/b2_shared/b2ag_ghostcells.F90
@@ -355,13 +336,6 @@ endif
 	svn export ${SVN_B2SRC_PATH}/utility/streql.F 			src90/b2_export/utility/streql.F
 	svn export ${SVN_B2SRC_PATH}/utility/xerset.F 			src90/b2_export/utility/xerset.F
 	svn export ${SVN_B2SRC_PATH}/utility/xertst.F 			src90/b2_export/utility/xertst.F
-
-
-# 	svn export ${SVN_B2SRC_PATH}/utility/subsys.F src90/b2_shared/subsys.F
-# 	svn export ${SVN_B2SRC_PATH}/utility/ipgeti.F src90/b2_shared/ipgeti.F
-# 	svn export ${SVN_B2SRC_PATH}/utility/ipgetr.F src90/b2_shared/ipgetr.F
-# 	svn export ${SVN_B2SRC_PATH}/utility/lwimai.F src90/b2_shared/lwimai.F
-# 	svn export ${SVN_B2SRC_PATH}/utility/lwmain.F src90/b2_shared/lwmain.F
 
 #TODO: export target for b2_shared_itm
 

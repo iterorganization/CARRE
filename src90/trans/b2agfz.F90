@@ -115,6 +115,12 @@
 !======================================================================
 !*** The computational grid looks then like the following:
 !***
+!*** In CARRE2 vessel mode, only the separatrices and core-interface
+!*** boundaries need to be straight lines in computational space. The
+!*** other edges may have arbitrary shapes.
+!*** In particular, regions not physically connected to each other no
+!*** longer need to have the same radial extent in computational space.
+!***
 !***      *******************|*******************
 !***      * c4 :  f4   : i4 *|* c2 :  f2   : i2 *
 !***      *....:............*|*....:............*
@@ -244,7 +250,7 @@
      &                                      z(1,1,1).eq.z(1,1,5) ) then
         equtype='ddn-down'
       else
-        write(6,*) 'b2agfz: the equilibrium of a non-forseen type.  ', & 
+        write(6,*) 'b2agfz: the equilibrium is of an unforeseen type.  ', & 
      &                                                   'nreg = ',nreg
         stop
       end if
@@ -277,18 +283,19 @@
 !*** Check some grid dimensions for consistency
 
             errenc=.false.
-            if(nprad(5).ne.nprad(6)) then
-              write(0,*) 'nprad(5) .ne. nprad(6)'
-              errenc=.true.
-            end if
-            if(nprad(2).ne.nprad(4)) then
-              write(0,*) 'nprad(2) .ne. nprad(4)'
-              errenc=.true.
-            end if
-            if(nprad(5)+nprad(1)-1.ne.nprad(3)) then
-              write(0,*) 'nprad(5)+nprad(1)-1 .ne. nprad(3)'
-              errenc=.true.
-            end if
+!xpb In Carre2 vessel mode, these conditions are no longer necessary
+!!$            if(nprad(5).ne.nprad(6)) then
+!!$              write(0,*) 'nprad(5) .ne. nprad(6)'
+!!$              errenc=.true.
+!!$            end if
+!!$            if(nprad(2).ne.nprad(4)) then
+!!$              write(0,*) 'nprad(2) .ne. nprad(4)'
+!!$              errenc=.true.
+!!$            end if
+!!$            if(nprad(5)+nprad(1)-1.ne.nprad(3)) then
+!!$              write(0,*) 'nprad(5)+nprad(1)-1 .ne. nprad(3)'
+!!$              errenc=.true.
+!!$            end if
 
             if(errenc) then
               write(0,*) 'nprad: ',nprad
@@ -422,18 +429,19 @@
 !*** Check some grid dimensions for consistency
 
             errenc=.false.
-            if(nprad(3).ne.nprad(6)) then
-              write(0,*) 'nprad(3) .ne. nprad(6)'
-              errenc=.true.
-            end if
-            if(nprad(2).ne.nprad(4)) then
-              write(0,*) 'nprad(2) .ne. nprad(4)'
-              errenc=.true.
-            end if
-            if(nprad(3)+nprad(1)-1.ne.nprad(5)) then
-              write(0,*) 'nprad(3)+nprad(1)-1 .ne. nprad(5)'
-              errenc=.true.
-            end if
+!xpb In Carre2 vessel mode, these conditions are no longer necessary
+!!$            if(nprad(3).ne.nprad(6)) then
+!!$              write(0,*) 'nprad(3) .ne. nprad(6)'
+!!$              errenc=.true.
+!!$            end if
+!!$            if(nprad(2).ne.nprad(4)) then
+!!$              write(0,*) 'nprad(2) .ne. nprad(4)'
+!!$              errenc=.true.
+!!$            end if
+!!$            if(nprad(3)+nprad(1)-1.ne.nprad(5)) then
+!!$              write(0,*) 'nprad(3)+nprad(1)-1 .ne. nprad(5)'
+!!$              errenc=.true.
+!!$            end if
 
             if(errenc) then
               write(0,*) 'nprad: ',nprad
@@ -558,7 +566,7 @@
           else     ! {
 
             write(*,*) 'Non-recognisable option for disconnected ', & 
-     &              'double null -- internal error in b2agfz: ',equtype
+     &              'double-null -- internal error in b2agfz: ',equtype
             stop
         ! }
           end if
@@ -615,27 +623,29 @@
               stop
             end if
 
-            do k=1,3     ! {
-              if(nqr(i,1,k).ne.nqr(i,2,k) .or. & 
-     &           nqr(i,1,k).ne.nqr(i,3,k)) then ! {
-                write(0,*) 'Inconsistent radidal grid dimensions. ', & 
-     &                                   'Region: ',znrtxt(k),znstxt(i)
-                write(*,*) '==> Check the npr specification in carre. '
-                errenc=.true.    ! }
-              end if     ! }
-            end do      ! }
+!xpb In Carre2 vessel mode, no longer need to ensure same radial width of
+!xpb computational contiguous but physically disjoint regions
+!!$            do k=1,3     ! {
+!!$              if(nqr(i,1,k).ne.nqr(i,2,k) .or. & 
+!!$     &           nqr(i,1,k).ne.nqr(i,3,k)) then ! {
+!!$                write(0,*) 'Inconsistent radial grid dimensions. ', & 
+!!$     &                                   'Region: ',znrtxt(k),znstxt(i)
+!!$                write(*,*) '==> Check the npr specification in carre. '
+!!$                errenc=.true.    ! }
+!!$              end if     ! }
+!!$            end do      ! }
           end do
-          do k=1,3      ! {
-            if(nqr(1,1,k).ne.nqr(2,1,k)) then
-              write(0,*) 'Inconsistent radidal grid dimensions, ', & 
-     &                            'right and left.  Region: ',znrtxt(k)
-              write(*,*) '==> Check the npr specification in carre. '
-              errenc=.true.
-            end if      ! }
-          end do
+!!$          do k=1,3      ! {
+!!$            if(nqr(1,1,k).ne.nqr(2,1,k)) then
+!!$              write(0,*) 'Inconsistent radial grid dimensions, ', & 
+!!$     &                            'right and left.  Region: ',znrtxt(k)
+!!$              write(*,*) '==> Check the npr specification in carre. '
+!!$              errenc=.true.
+!!$            end if      ! }
+!!$          end do
 
           if(errenc) then
-            write(*,*) 'Inconsistent radidal grid dimensions, '
+            write(*,*) 'Inconsistent radial grid dimensions, '
             write(*,*) '==> Check the npr specification in carre. '
             stop
           end if
@@ -650,18 +660,19 @@
 !*** Check some grid dimensions for consistency
 
             errenc=.false.
-            if(nprad(1).ne.nprad(3)) then
-              write(0,*) 'nprad(1) .ne. nprad(3)'
-              errenc=.true.
-            end if
-            if(nprad(2).ne.nprad(4)) then
-              write(0,*) 'nprad(2) .ne. nprad(4)'
-              errenc=.true.
-            end if
-            if(nprad(5).ne.nprad(4)) then
-              write(0,*) 'nprad(5) .ne. nprad(4)'
-              errenc=.true.
-            end if
+!xpb In Carre2 vessel mode, these conditions are no longer necessary
+!!$            if(nprad(1).ne.nprad(3)) then
+!!$              write(0,*) 'nprad(1) .ne. nprad(3)'
+!!$              errenc=.true.
+!!$            end if
+!!$            if(nprad(2).ne.nprad(4)) then
+!!$              write(0,*) 'nprad(2) .ne. nprad(4)'
+!!$              errenc=.true.
+!!$            end if
+!!$            if(nprad(5).ne.nprad(4)) then
+!!$              write(0,*) 'nprad(5) .ne. nprad(4)'
+!!$              errenc=.true.
+!!$            end if
 
             if(errenc) then
               write(0,*) 'nprad: ',nprad
@@ -834,27 +845,29 @@
               stop
             end if
 
-            do k=1,3     ! {
-              if(nqr(i,1,k).ne.nqr(i,2,k) .or. & 
-     &           nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
-                write(0,*) 'Inconsistent radidal grid dimensions. ', & 
-     &                                   'Region: ',znrtxt(k),znstxt(i)
-                write(*,*) '==> Check the npr specification in carre. '
-                errenc=.true.    ! }
-              end if     ! }
-            end do      ! }
+!xpb In Carre2 vessel mode, no longer need to ensure same radial width of
+!xpb computational contiguous but physically disjoint regions
+!!$            do k=1,3     ! {
+!!$              if(nqr(i,1,k).ne.nqr(i,2,k) .or. & 
+!!$     &           nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
+!!$                write(0,*) 'Inconsistent radial grid dimensions. ', & 
+!!$     &                                   'Region: ',znrtxt(k),znstxt(i)
+!!$                write(*,*) '==> Check the npr specification in carre. '
+!!$                errenc=.true.    ! }
+!!$              end if     ! }
+!!$            end do      ! }
           end do
-          do k=1,3      ! {
-            if(nqr(1,1,k).ne.nqr(2,1,k)) then
-              write(0,*) 'Inconsistent radidal grid dimensions, ', & 
-     &                            'right and left.  Region: ',znrtxt(k)
-              write(*,*) '==> Check the npr specification in carre. '
-              errenc=.true.
-            end if      ! }
-          end do
+!!$          do k=1,3      ! {
+!!$            if(nqr(1,1,k).ne.nqr(2,1,k)) then
+!!$              write(0,*) 'Inconsistent radial grid dimensions, ', & 
+!!$     &                            'right and left.  Region: ',znrtxt(k)
+!!$              write(*,*) '==> Check the npr specification in carre. '
+!!$              errenc=.true.
+!!$            end if      ! }
+!!$          end do
 
           if(errenc) then
-            write(*,*) 'Inconsistent radidal grid dimensions, '
+            write(*,*) 'Inconsistent radial grid dimensions, '
             write(*,*) '==> Check the npr specification in carre. '
             stop
           end if
@@ -959,7 +972,7 @@
                   if (iir == -1) ciy = ciy - 1
 
                   b2cflag(ix,iy,:)=cflag(cix,ciy,irg,:)                                  
-                  ! If cells are inverted in poloidal or radial direction, also invert the
+! If cells are inverted in poloidal or radial direction, also invert the
                   ! flags / indices stored for the faces
                   if (iip == -1) then
                       b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(cix,ciy,irg,CELLFLAG_RIGHTFACE) 
@@ -1033,7 +1046,7 @@
       nxiso(1)=nxx(1)+1
 
 !<<<
-        write(0,*) 'nx, ncut, niso = ',nx, ncut, niso
+        write(0,*) 'nx, ny, ncut, niso = ',nx, ny, ncut, niso
         write(0,*) 'nxcut :  ',(nxcut(i),i=1,ncut)
         write(0,*) 'nycut :  ',(nycut(i),i=1,ncut)
         write(0,*) 'nxiso :  ',(nxiso(i),i=1,niso)
@@ -1042,7 +1055,7 @@
       else if(index(equtype,'sn-down').gt.0 .or. & 
      &        index(equtype,'sn-up').gt.0) then ! {
 !----------------------------------------------------------------------
-!  construct the mesh for the bottom single null geometry
+!  construct the mesh for the bottom single-null geometry
 
         nx=nptseg(1)+nptseg(2)+nptseg(3)-3
         ny=nprad(1)+nprad(2)-2
@@ -1061,10 +1074,10 @@
         if(npol1.ne.nx) then   ! {
           write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
           stop     ! }
-        else if(nprad(2).ne.nprad(3)) then     ! {
-          write(6,*)'error in b2agfz: nprad(2)=',nprad(2), & 
-     &      ' .ne. nprad(3)=',nprad(3)
-          stop     ! }
+!!$        else if(nprad(2).ne.nprad(3)) then     ! {
+!!$          write(6,*)'error in b2agfz: nprad(2)=',nprad(2), & 
+!!$     &      ' .ne. nprad(3)=',nprad(3)
+!!$          stop     ! }
         end if
 
 !  edge region

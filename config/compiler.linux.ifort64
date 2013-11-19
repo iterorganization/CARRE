@@ -4,7 +4,7 @@ FC		= ifort
 CPP		= /lib/cpp -C -traditional
 
 ifdef CARRE_DEBUG
-FFLAGS 		= -g -warn all -check all -check noarg_temp_created  -warn notruncated_source -warn nounused  -debug all -p -C -gen-interfaces -warn interfaces 
+FFLAGS 		= -g -warn all -check all -check noarg_temp_created  -warn notruncated_source -warn nounused  -debug all -p -C -gen-interfaces -warn interfaces -traceback
 FFLAGS	       += -module ${OBJECTCODE}/
 LDFLAGS		= -check all -warn all -debug all  # -gen-interfaces -warn interfaces
 else
