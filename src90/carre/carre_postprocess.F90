@@ -169,20 +169,41 @@ contains
             case (ACTION_REFINE_FIX)
                 ! Cells need refinement because of broken geometry                
                 ! Fix cells by modifying the grid accordingly
-                call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
-                    & //int2str(nCellsToRefineFix)//' cells with critical geometry')
+                if ( nCellsToRefineFix == 0 ) then
+                  call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                    & //'no cells with critical geometry')
+                elseif ( nCellsToRefineFix == 1 ) then
+                  call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                    & //int2str(nCellsToRefineFix)//' cell with critical geometry')
+                else
+                  call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                    & //int2str(nCellsToRefineFix)//' cell with critical geometry')
+                endif
                 call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
             case (ACTION_COARSEN)
                 if ( nCellsToCoarsen > 0 ) then
-                    call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
+                    if (nCellsToCoarsen == 1) then
+                      call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
+                        &//int2str(nCellsToCoarsen)//' cell to coarsen')
+                    else
+                      call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
                         &//int2str(nCellsToCoarsen)//' cells to coarsen')
+                    endif
                     call coarsenCells(grid, force = .false.)
                 else
                     call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. No cells to coarsen")
                 end if
             case (ACTION_REFINE)
-                call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                if ( nCellsToRefine == 0 ) then
+                  call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                    &'no cells with too low resolution')
+                elseif ( nCellsToRefine == 1 ) then
+                  call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                    &int2str(nCellsToRefine)//' cell with too low resolution')
+                else
+                  call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
                     &int2str(nCellsToRefine)//' cells with too low resolution')
+                endif
                 ! Refine cells
                 call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)            
             case (ACTION_COARSEN_FORCE)            
@@ -1733,8 +1754,16 @@ contains
 
             end do
         end do
-        call logmsg(LOGDEBUG, "coarsenCells: region "//int2str(iReg)//": can remove " &
+        if (count(removeRadialLine(:, iReg)) >= 2) then
+          call logmsg(LOGDEBUG, "coarsenCells: region "//int2str(iReg)//": can remove " &
              & //int2str(count(removeRadialLine(:, iReg)))//" lines.")
+        elseif (count(removeRadialLine(:, iReg)) == 1) then
+          call logmsg(LOGDEBUG, "coarsenCells: region "//int2str(iReg)//": can remove " &
+             & //int2str(count(removeRadialLine(:, iReg)))//" line.")
+        elseif (count(removeRadialLine(:, iReg)) == 0) then
+          call logmsg(LOGDEBUG, "coarsenCells: region "//int2str(iReg)//": cannot remove " &
+             & //"any lines.")
+        endif
     end do
 
     ! Remove lines region by region
