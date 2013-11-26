@@ -48,7 +48,7 @@
        write(0,'(6h pty: ,1p,10e10.2/(6x,10e10.2))') (pty(i),i=1,npx)
       end if !}
 !>>>
-!*** Order the x-points from top to bottom if necessary
+!*** Order the X-points from top to bottom if necessary
 
       if(npx.eq.2) then !{
         if(pty(1).gt.pty(2)) then !{

@@ -107,11 +107,11 @@ module carre_types
       !           the X-points. Set to 0 for connected double-nulls
       real*8 :: cstlin = 0.00
 
-      ! Predefined x- and o-point locations
+      ! Predefined X- and O-point locations
       ! If xPointNum > 0, the values in xPointX/Y and oPointX/Y are assumed to be valid
-      integer :: xPointNum = 0 ! Number of predefined x-points
-      double precision :: xPointX(gradmx), xPointY(gradmx) ! x-point positions
-      double precision :: oPointX, oPointY ! o-point positions
+      integer :: xPointNum = 0 ! Number of predefined X-points
+      double precision :: xPointX(gradmx), xPointY(gradmx) ! X-point positions
+      double precision :: oPointX, oPointY ! O-point positions
 
       ! Number of virtual structures provided in input
       integer :: nVirtualStructs = 0
@@ -168,9 +168,9 @@ module carre_types
       !                  vanishes
       !.. ii,jj : x and y indices of the cells where the gradient vanishes
       ! Note on the following arrays: the convention is 
-      !  -npx is number of x-points. In limiter configuration npx=1, the single
-      !   x point being the limiter contact point.
-      !  -data for the o-point is stored in the same arrays at index npx+1
+      !  -npx is number of X-points. In limiter configuration npx=1, the single
+      !   X-point being the limiter contact point.
+      !  -data for the O-point is stored in the same arrays at index npx+1
       !.. npx   : number of the X-points
       !.. ptx,pty: X-point co-ordinates
       !.. iptx,jptx: x and y indices of the cells containing the X-points
@@ -191,7 +191,7 @@ module carre_types
       !     N.B.: When the limiter configuration is selected, npx is set equal
       !           to 1 and the coordinates of the X-point correspond to the
       !           innermost point of the limiter.
-      !.. eps_Xpt Threshold to decide when we are close to an x-point (is set
+      !.. eps_Xpt Threshold to decide when we are close to an X-point (is set
       !           depending on equilibrium resolution)
       !   distxo  The distance between the active X-point and the O-point
       !.. nsep  : number of the separatrices per the configuration
@@ -271,7 +271,7 @@ module carre_types
       ! See the GRID_* constants in carre_constants
       integer :: cellflag(npmamx-1,nrmamx-1,nregmx)
       ! Structure index indicating the structure on which this face lies.
-      ! If GRID_UNDEFINED, it's not on a structure
+      ! If GRID_UNDEFINED, it is not on a structure
       integer :: cellFaceIStruct(1:4,npmamx-1,nrmamx-1,nregmx)
 
       ! Point flags and point structure indices.

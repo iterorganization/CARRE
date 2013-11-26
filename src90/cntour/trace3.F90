@@ -84,16 +84,16 @@
 
 !     ON DESSINE LA SURFACE INTERIEURE
 
-      x1 = xn1(1)
-      y1 = yn1(1)
+         x1 = xn1(1)
+         y1 = yn1(1)
 !     On identifie le point de depart
 
          valfct=fctini
 !..Psi value at the X-point
-       x2=xfin
-       y2=yfin
+         x2=xfin
+         y2=yfin
 
-            sens=1
+         sens=1
 
 
 

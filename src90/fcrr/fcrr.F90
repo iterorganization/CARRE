@@ -172,13 +172,13 @@ contains
     cpo % profiles_2d % grid % dim2 = zgr(1:nz)
     cpo % profiles_2d % psi = pfm
 
-    ! x-points
+    ! X-points
     allocate(cpo % eqgeometry % xpts % r(nxpt))
     allocate(cpo % eqgeometry % xpts % z(nxpt))
     cpo % eqgeometry % xpts % r = xptcntr(1,1:nxpt)
     cpo % eqgeometry % xpts % z = xptcntr(2,1:nxpt)
 
-    ! o-point
+    ! O-point
     cpo % global_param % mag_axis % position % r = xlpcntr(1)
     cpo % global_param % mag_axis % position % z = xlpcntr(2)
 

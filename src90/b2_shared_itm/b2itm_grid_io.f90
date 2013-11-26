@@ -320,7 +320,7 @@ contains
 !!$              & itmgrid % spaces(SPACE_POLOIDALPLANE) % objects(3) % neighbour(icv,4,1) = gmap % mapCvI( nix, niy )
 !!$      end do
 
-!!$      ! Fill in x-point indices
+!!$      ! Fill in X-point indices
 !!$      allocate( itmgrid % spaces(SPACE_POLOIDALPLANE) % nodes % xpoints( gmap % nsv ) )
 !!$      itmgrid % spaces(SPACE_POLOIDALPLANE) % nodes % xpoints = gmap % svi(1:gmap % nsv)
 !!$
@@ -446,7 +446,7 @@ contains
               & = createIndexListForRange( 1, 1 )
       end if
 
-!!$      ! Subgrid of all x-points (in one poloidal plane at toroidal index 1)
+!!$      ! Subgrid of all X-points (in one poloidal plane at toroidal index 1)
 !!$      allocate( xpoints(gmap%nsv, SPACE_COUNT) )
 !!$      xpoints = 1
 !!$      xpoints(:, SPACE_POLOIDALPLANE) = gmap%svi(1:gmap%nsv)

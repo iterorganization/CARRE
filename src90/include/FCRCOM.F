@@ -31,7 +31,7 @@
 !*** ntrgx : maximum number of "targets" (Carre)
 !*** ngpr  : maximum number of rows in pfm matrix
 !*** ngpz  : maximum number of columns in pfm matrix
-!*** nxptm : maximum number of pre-defined x-points
+!*** nxptm : maximum number of pre-defined X-points
 !*** nsgm  : actual number of "segments of separatrices" (Carre)
 !*** nrgn  : actual number of "regions" (Carre)
 !*** nptseg: number of "grid points" on each "segment of separatrices"
@@ -57,8 +57,8 @@
 !*** pasmin,
 !*** rlcept,
 !*** pntrat : scalar parameters for Carre
-!*** nxpt   : actual number of pre-defined x-points
-!*** xptcntr: co-ordinates of the x-points
-!*** xlpcntr: co-ordinates of the o-point
-!*** xpttol : tolerance parameter for distinguishing the x-points
+!*** nxpt   : actual number of pre-defined X-points
+!*** xptcntr: co-ordinates of the X-points
+!*** xlpcntr: co-ordinates of the O-point
+!*** xpttol : tolerance parameter for distinguishing the X-points
 !*** ldgv2  : true if the input from DG v.2.0 or later

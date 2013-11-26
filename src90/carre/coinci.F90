@@ -70,8 +70,8 @@
       print *,'Are you sure the X-points should be connected? (y/n)'
 
 #ifdef CARRE_NONINTERACTIVE  
-        coinci = imn
-        return     
+      coinci = imn
+      return     
 #else
  10   read '(a1)',c
       if(c.eq.'y' .or. c.eq.'Y') then

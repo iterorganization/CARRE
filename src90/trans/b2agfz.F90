@@ -228,10 +228,10 @@
 !======================================================================
 !*** Define the equilibrium type
 
-!!!! Change the criteria (O-point is not necessarily around z=0 !!!   	
+!!!! Change the criteria (O-point is not necessarily around z=0) !!!   	
 !-ank19990108: done. To be honest, ssn-up and ssn-down are treated equally...
 
-!*** Now compare the vertical position of the x-point with that of the mid-SOL
+!*** Now compare the vertical position of the X-point with that of the mid-SOL
 !      if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.zero) then
       if(nreg.eq.2) then
          equtype='limiter'
@@ -265,7 +265,7 @@
        if(index(equtype,'ddn-').gt.0) then     !   {
 !----------------------------------------------------------------------
 !*** Construct the full mesh for the disconnected double-null geometry,
-!*** inner x-point either below (down) or above (up) the axis
+!*** inner X-point either below (down) or above (up) the axis
 !***
 !*** The grid is constructed of two adjacent parts corresponding to the
 !*** inner and outer halfs of the edge region.
@@ -906,14 +906,15 @@
           nxx(ihg)=nqp(ihg,1,1)+nqp(ihg,2,1)+nqp(ihg,3,1)
           nx=nx+nxx(ihg)
           if(nx.ge.nxmax) then
-            write(*,*) 'Grid is too large in poloial direction: nx=', & 
+            write(*,*) 'Grid is too large in poloidal direction: nx=', & 
      &                                           nx+1,' > nxmax=',nxmax
             write(*,*) '==> Increase npmamx in CARREDIM.F'
             stop
           end if
 !*** Three poloidal zones
           do ipz=1,3     ! {
-            iy=0
+! The following line is to ensure the SOL pieces are lined up
+            iy=nqr(ihg,2,1)+nqr(ihg,2,2)-nqr(ihg,ipz,1)-nqr(ihg,ipz,2) 
             ixx=ix
 !*** Three radial zones
             do irz=1,3     ! {
@@ -1016,7 +1017,6 @@
 !>>>
 	end if
 
-
 !*** Determine the cut positions and lengths
 
         ncut=4
@@ -1042,8 +1042,8 @@
           nycut(3)=nycut(2)
           nycut(4)=nycut(1)    ! }
         end if
-      niso=1
-      nxiso(1)=nxx(1)+1
+        niso=1
+        nxiso(1)=nxx(1)+1
 
 !<<<
         write(0,*) 'nx, ny, ncut, niso = ',nx, ny, ncut, niso
@@ -1051,6 +1051,9 @@
         write(0,*) 'nycut :  ',(nycut(i),i=1,ncut)
         write(0,*) 'nxiso :  ',(nxiso(i),i=1,niso)
 !>>>
+
+
+
 !---------------------------------------------------------------------- ! }
       else if(index(equtype,'sn-down').gt.0 .or. & 
      &        index(equtype,'sn-up').gt.0) then ! {

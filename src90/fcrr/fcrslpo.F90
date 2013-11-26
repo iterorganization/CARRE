@@ -3,7 +3,7 @@
 !  version : 08.02.99 13:23
 !
 !======================================================================
-!*** Write the co-ordinates of the x- and o-points for Carre
+!*** Write the co-ordinates of the X- and O-points for Carre
 !*** At present, always a single-null configuration
 !======================================================================
       implicit none
@@ -17,17 +17,17 @@
         rewind(2)
         write(2,*) xpttol
         write(2,*) nxpt
-      do i=1,nxpt
+        do i=1,nxpt
           write(2,*) xptcntr(1,i),xptcntr(2,i)
-      end do
+        end do
         write(2,*) xlpcntr(1),xlpcntr(2)
-      if(nxpt.eq.2) then
-        if(nrgn.eq.6) then
-          write(2,*) 0
-        else if(nrgn.eq.5) then
-          write(2,*) 1
+        if(nxpt.eq.2) then
+          if(nrgn.eq.6) then
+            write(2,*) 0
+          else if(nrgn.eq.5) then
+            write(2,*) 1
+          end if
         end if
-      end if
         close(2)
       end if
 !======================================================================

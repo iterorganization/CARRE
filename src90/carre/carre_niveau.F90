@@ -633,8 +633,8 @@ contains
 
     if (.not. foundLevelLine) then
        ! This happens if the equilibrium data has issues. 
-       ! Usually happens for faces going ino the x-point. Fortunately there the 
-       ! level lines are pretty straight anyway, so it's not a problem.
+       ! Usually happens for faces going ino the X-point. Fortunately there the 
+       ! level lines are pretty straight anyway, so it is not a problem.
        call logmsg( LOGDEBUGBULK, 'findLevelLineForPoints: WARNING: unable to find connecting level line.&
             & Substituting direct connection line' )
        npniv = 2

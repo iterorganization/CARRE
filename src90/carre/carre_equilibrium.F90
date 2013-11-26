@@ -81,7 +81,7 @@ contains
        ! smart equilibrium cutoff: cut off points outside of vessel
        call logmsg(LOGINFO, "carre_equilibrium: vessel/smart equilibrium extension enabled, cutoff mode")
        ! FIXME: this does not work for limiter configurations,
-       ! because the data for the "fake" x-point on the limiter structure
+       ! because the data for the "fake" X-point on the limiter structure
        ! as defined in selptx is incomplete
 
        call equilibrium_vessel_set(equ, struct, newPsi, EQU_VESSEL_CUTOFF)
@@ -125,7 +125,7 @@ contains
     call writeGridStateToSiloFile('carreEquCutoff0', equ, struct )
 
     ! Figure out distance factor for equilibrium extension
-    ! We compute the distance between o- and x-point both in space and psi, and derive 
+    ! We compute the distance between O- and X-point both in space and psi, and derive 
     ! the factor from that    
     ! TODO: limiter case has to be treated differently.
     psiPtO = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 

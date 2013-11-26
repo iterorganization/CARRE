@@ -19,7 +19,7 @@ module carre_virtualstructures
 contains
 
   ! Sets up a virtual limiter for creating an extended limiter grid.
-  ! -set up an infinitely thin radial limiter line going from the x-point
+  ! -set up an infinitely thin radial limiter line going from the X-point
   !  (point where the separatrix touches the wall) away from the plasma
   ! -set up 
 
@@ -97,7 +97,7 @@ contains
 
     enddo ! structure loop
 
-    ! create limiter structure starting at the x-point (innermost wall contact point)        
+    ! create limiter structure starting at the X-point (innermost wall contact point)        
 
     ! Structure number 1
     struct%vnstruc = 1
@@ -247,7 +247,7 @@ contains
          & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
          & x, y )
 
-    ! find closest x- or o-point in psi
+    ! find closest X- or O-point in psi
     if (.not. onlyO) then
        dPsiToX = huge(dPsiToX)
        do ix = 1, equ%npx
@@ -256,7 +256,7 @@ contains
              dPsiToX = abs(equ%fctpx(ix) - psi)
           end if
        end do
-       ! move in direction of grad psi away from o-point
+       ! move in direction of grad psi away from O-point
        if ( equ%fctpx(ixClosest) < psi ) then
           gsign = +1
        else
@@ -414,7 +414,7 @@ contains
           istep = 0
           do
              ! TODO: step towards psi value of closest separatrix,
-             ! i.e. the x-point psi value closest to the current psi value
+             ! i.e. the X-point psi value closest to the current psi value
              ipx = 1
              if ( abs( tpsi - equ%fctpx(ipx) ) & 
                   &              / abs( equ%fctpx(ipx) ) < tol ) then
@@ -443,7 +443,7 @@ contains
              tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
                   &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
                   &              tx, ty )
-             !write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of x-point", equ%fctpx(ipx)
+             !write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of X-point", equ%fctpx(ipx)
 
              ! TODO: if psi not moving in the right direction,
              ! decrease step size and try again
@@ -466,7 +466,7 @@ contains
     ! counter for number of targets to create
     nvtarget = 0
 
-    ! loop over x-points
+    ! loop over X-points
     do ipx = 1, equ%npx
 
        ! loop over separatrix segments
@@ -479,16 +479,16 @@ contains
 
 
           ! for complex cases (disconnected double null), some targets
-          ! will be listed for multiple x-points. We only want to treat every target once here.
-          ! Look at all other x-points, and only treat the target if it's not listed 
-          ! for another x-point that has a lower total number of associated targets.
+          ! will be listed for multiple X-points. We only want to treat every target once here.
+          ! Look at all other X-points, and only treat the target if it is not listed 
+          ! for another X-point that has a lower total number of associated targets.
           doTarget = .true.
           do ipxOther = 1, equ%npx
               if (ipxOther == ipx) cycle
 
               if ( any( struct%indplq(:, ipxOther) == itarget ) .and. &
                    & ( count( struct%indplq(:, ipxOther) /= 0 ) < count( struct%indplq(:, ipx) /= 0 )) ) then
-                  ! found another x-point associate with the same target but
+                  ! found another X-point associate with the same target but
                   ! lower number of associated targets. Give the target to the other x-point
                   doTarget = .false.
                   exit
@@ -496,13 +496,13 @@ contains
           end do         
           if (.not. doTarget) cycle
 
-          write (0,*) 'x-point : ', ipx, ', separatrix segment: ', & 
+          write (0,*) 'X-point : ', ipx, ', separatrix segment: ', & 
                &           isep, ', creating virtual structure taking the role of structure no. ', itarget
 
           nvtarget = nvtarget + 1
-          ! vtargetipx stores index of x-point associated with this target
+          ! vtargetipx stores index of X-point associated with this target
           vtargetipx(nvtarget) = ipx
-          ! vtistruc stores index of structure associated w.t. target
+          ! vtistruc stores index of structure associated with this target
           vtistruc(nvtarget) = itarget
           vtstartx(nvtarget) = equ%ptx(ipx)
           vtstarty(nvtarget) = equ%pty(ipx)
@@ -594,7 +594,7 @@ contains
                    cycle
                 endif
 
-                ! Point on correct sep. branch. Check distance to x-point
+                ! Point on correct sep. branch. Check distance to X-point
                 dx = dist( equ%ptx(ipx), equ%pty(ipx), tx, ty )
                 ! if further away than previous projections, keep
                 if (  dx > dxmax ) then
@@ -606,7 +606,7 @@ contains
 
           enddo ! structure loop
        enddo ! separatrix segment loop
-    enddo ! x-point loop
+    enddo ! X-point loop
 
     ! Diagnostic output: psi range of virtual targets vtminpsi
     call logmsg(LOGDEBUG, "virtualTargets: psi range "//real2str(vtminpsi)&
@@ -626,11 +626,11 @@ contains
        gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
             &        equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
             &        tx, ty )
-       ! check in which direction the associated x-point is
+       ! check in which direction the associated X-point is
        p = gx * ( equ%pty( vtargetipx( itarget ) ) - ty ) & 
             &        - gy * ( equ%ptx( vtargetipx( itarget ) ) - tx )
 
-       ! take a step along the separatrix away from the x-point
+       ! take a step along the separatrix away from the X-point
        ! to gain some distance between virtual and real structures
 
        write (*,*) "tx, ty", tx, ty
@@ -639,14 +639,14 @@ contains
             &        norm( equ%ptx( vtargetipx( itarget ) ) - tx, & 
             &              equ%pty( vtargetipx( itarget ) ) - ty ) * 0.3
 
-       if ( p == 0 ) stop 'Grad psi pointing towards x-point'
+       if ( p == 0 ) stop 'Grad psi pointing towards X-point'
        if ( p > 0 ) then
-          ! x-point to the left of grad psi
+          ! X-point to the left of grad psi
           ! step in clockwise right angle to grad psi
           vtstartx(itarget) = vtstartx(itarget) + dx * gy 
           vtstarty(itarget) = vtstarty(itarget) - dx * gx
        else
-          ! x-point to the right of grad psi
+          ! X-point to the right of grad psi
           ! step in anti-clockwise right angle to grad psi
           vtstartx(itarget) = vtstartx(itarget) - dx * gy
           vtstarty(itarget) = vtstarty(itarget) + dx * gx
@@ -710,13 +710,13 @@ contains
        tx = vtstartx(itarget)
        ty = vtstarty(itarget)
 
-       if ( p == 0 ) stop 'Grad psi pointing towards x-point'
+       if ( p == 0 ) stop 'Grad psi pointing towards X-point'
        if ( p > 0 ) then
-          ! x-point to the left of grad psi
+          ! X-point to the left of grad psi
           ! do the points in the direction of - grad psi first
           idir = 2
        else
-          ! x-point to the right of grad psi
+          ! X-point to the right of grad psi
           ! do the points in the direction of + grad psi first
           idir = 1
        endif

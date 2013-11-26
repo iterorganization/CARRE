@@ -18,7 +18,7 @@ contains
   subroutine open_ual(idx, shot, run, time, user, tokamak, dataversion, doCreate, useHdf5, nmlFile)
     integer, intent(out) :: idx
     integer, intent(in), optional :: shot, run
-    real(R8), intent(out), optional :: time  ! Time is special: it's not used here, but can be read from the namelist and returned
+    real(R8), intent(out), optional :: time  ! Time is special: it is not used here, but can be read from the namelist and returned
     character(*), intent(in), optional :: user
     character(*), intent(in), optional :: tokamak
     character(*), intent(in), optional :: dataversion

@@ -23,7 +23,7 @@
 !***  nxmax, nymax: max. grid dimensions for equilibrium data (psi)
 !***  npstmx      : max. number of points in a structure
 !***  strumx      : max. number of structures
-!***  npxmx       : max. number of the x-points to be treated
+!***  npxmx       : max. number of the X-points to be treated
 !***  nivmx       : max. number of the level lines
 !***  npmamx      : max. number of the poloidal mesh points
 !***  nrmamx      : max. number of the radial mesh points

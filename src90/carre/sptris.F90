@@ -62,7 +62,7 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
   nt(1)=0
   nt(2)=0
 
-  !..Loop over the x-points
+  !..Loop over the X-points
 
   do ipx=1,npx !{
       ix = iptx(ipx)
@@ -74,7 +74,7 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
            &                                psi(ix+1,jx+1),psi(ix,jx+1)
       !>>>
 
-      !..Calculate the flux at the x-point
+      !..Calculate the flux at the X-point
 
       fctpx(ipx) = a00(ix,jx,1) + a10(ix,jx,1)*ptx(ipx) & 
            &                            + a01(ix,jx,1)*pty(ipx) & 
@@ -167,7 +167,7 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
                   ! from separatrix incidence direction derive "internal" and "external" side of target
                   ! (used for gridding with open target structures)
                   
-                  ! compute an internal point by moving a small step from the strike point towards the x-point 
+                  ! compute an internal point by moving a small step from the strike point towards the X-point 
                   if (indStr /= 0) then
                       delta = (x(2) - x(1)) * 0.1
                       xin = separx(k, isep, ipx) + (separx(k-1, isep, ipx) - separx(k, isep, ipx)) * delta

@@ -73,12 +73,12 @@ contains
 
             ! first and last radial line is required
 
-            ! The grid lines going into the x-point are also required...
+            ! The grid lines going into the X-point are also required...
             do ipx = 1, equ%npx
                 call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), npoint, xipol, xirad, findAll = .true.)
                 do ipoint = 1, npoint
                     call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required &
-                        & due to x-point #'//int2str(ipx)//" in region "//int2str(iReg))
+                        & due to X-point #'//int2str(ipx)//" in region "//int2str(iReg))
                     call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
                 end do
             end do
@@ -177,7 +177,7 @@ contains
                     & //int2str(nCellsToRefineFix)//' cell with critical geometry')
                 else
                   call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
-                    & //int2str(nCellsToRefineFix)//' cell with critical geometry')
+                    & //int2str(nCellsToRefineFix)//' cells with critical geometry')
                 endif
                 call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
             case (ACTION_COARSEN)
@@ -767,7 +767,7 @@ contains
 
     if (finalized) call markBoundaryPointsFinal(grid%pointFlag)
 
-    ! Find internal point: point closest to o-point    
+    ! Find internal point: point closest to O-point    
     iRegMin = GRID_UNDEFINED
     dmin = huge(0.0d0)
     do iReg = 1, grid%nreg
@@ -783,7 +783,7 @@ contains
         end do
     end do
 
-    call logmsg(LOGDEBUG,  'labelPointsInsideOutside: internal point closest to o-point is region '//&
+    call logmsg(LOGDEBUG,  'labelPointsInsideOutside: internal point closest to O-point is region '//&
          & int2str(iRegMin)//', ip '//int2str(ipMin)//', ir '//int2str(irMin))
     
     call markInternalPoints(ipMin, irMin, iRegMin, grid%pointFlag, finalized)
@@ -806,7 +806,7 @@ contains
 
             ! For every cell at the top of the region
             do iPol = 1, grid%np1(iReg) - 1
-                ! If it's an internal cell, both top nodes have to be boundary nodes.
+                ! If it is an internal cell, both top nodes have to be boundary nodes.
                 
                 if ( count(grid%pointFlag(iPol:iPol+1, grid%nr(iReg)-1:grid%nr(iReg), iReg) == GRID_INTERNAL) > 0 ) then 
 
@@ -1620,7 +1620,7 @@ contains
     ! using the signed relaxation method 
 
     !nrelax = 0
-    ! nrelax is coming from COMRLX.F. It's not a constant, can be modified by user I/O.
+    ! nrelax is coming from COMRLX.F. It is not a constant, can be modified by user I/O.
     if(nrelax.gt.0) then
         ! 2.   on initialise la fonction qui doit s'annuler pour une
         !      distribution orthogonale

@@ -29,11 +29,11 @@
 
 !*** If the structure index is non-zero, it points to a structure
 !*** intersecting the separatrix branch. Store all such cases for a
-!*** while - we will select the primary strikepoints after all x-points
+!*** while - we will select the primary strikepoints after all X-points
 !*** have been treated.
 !ank-19990727: symptomatic treatment
 !*** ... However, multiple intersections of separatrix branches starting
-!*** at the same x-point with the same target should be screened
+!*** at the same X-point with the same target should be screened
 
       write(0,*) 'insert: indstr,nbdef,ipx',indstr,nbdef,ipx !###
       if (indstr .gt. 0)  then !{
@@ -51,17 +51,17 @@
       entry trgarng(inddef,indxpt,xst,yst,nbdef,npx)
 !=======================================================================
 !*** Here, we determine the "primary" strikepoints - i.e., those
-!*** connected to the innermost x-point for each target, and check for
+!*** connected to the innermost X-point for each target, and check for
 !*** the consistency of the strike-points and targets.
-!*** Each x-point must be connected to two "primary" strike-points.
+!*** Each X-point must be connected to two "primary" strike-points.
 !***
 !*** Input:
 !***  inddef  - list of targets (pieces of structure having at least one
 !***            intersection with a separatrix branch (strike-point)
-!***  indxpt  - list of x-points connected to the corresponding targets
+!***  indxpt  - list of X-points connected to the corresponding targets
 !***  xst,yst - strike-point co-ordinates
 !***  nbdef   - number of strike-points
-!***  npx     - number of x-points
+!***  npx     - number of X-points
 !***
 !*** Output:
 !***  the same arrays corrected so that only the "primary" strike-points
@@ -71,9 +71,9 @@
 !***  ii  - strike-point counters for each target
 !***  jj  - index of targets being "private" - i.e., having only one
 !***        strike-point
-!***  kk  - index of x-points connected to two "private" targets
-!***  ll  - index of x-points corresponding to the "private" targets
-!***  mm  - number of "private" targets for each x-point
+!***  kk  - index of X-points connected to two "private" targets
+!***  ll  - index of X-points corresponding to the "private" targets
+!***  mm  - number of "private" targets for each X-point
 !=======================================================================
 !<<<
       write(0,*) 'Entering trgarng: nbdef=',nbdef
@@ -84,7 +84,7 @@
         write(0,'(1x,a4,4x,1p,10e10.3)') 'yst:',(yst(i),i=1,nbdef)
       end if !}
 !>>>
-!*** Select the primary x-points and correct the number of targets
+!*** Select the primary X-points and correct the number of targets
 !*** First, check which targets are intersected only once
 
       do i=1,nbdmx !{
@@ -120,8 +120,8 @@
       end if !}
 !>>>
 
-!*** Check the count of private targets for each x-point
-!*** m is the number of x-points having two "private" targets
+!*** Check the count of private targets for each X-point
+!*** m is the number of X-points having two "private" targets
       m=0
       do j=1,npx !{
         if(mm(j).eq.2) then !{
@@ -129,12 +129,12 @@
           kk(m)=j
         else if(mm(j).gt.2) then !}{
           write(0,*) 'Error found in INSERT (entry TRGARNG): too many ', & 
-     &      '"private" targets for one x-point: ',j
-          stop '==> Check the targets related to the inner x-point'
+     &      '"private" targets for one X-point: ',j
+          stop '==> Check the targets related to the inner X-point'
         end if !}
       end do !}
 !<<<
-      write(0,*) 'Complete x-points: ',m
+      write(0,*) 'Complete X-points: ',m
       if(m.gt.0) then !{
         write(0,*) 'kk : ',(kk(i),i=1,m)
       end if !}

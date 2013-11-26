@@ -132,15 +132,15 @@
       !
       !  4.   parametrisation de la separatrice.      
 
-      ! Fill x-point arrays as done in selptx
-      ! "x-point" (limiter point)
+      ! Fill X-point arrays as done in selptx
+      ! "X-point" (limiter point)
       ptx(1)=x0
       pty(1)=y0
       ii = ifind(x0,x,nx,1)
       jj = ifind(y0,y,ny,1)
       equ%iptx(1) = ii
       equ%jptx(1) = jj
-      ! o-point
+      ! O-point
       ptx(2)=x0
       pty(2)=y0
       equ%iptx(2) = ifind(xpto,x,nx,1)

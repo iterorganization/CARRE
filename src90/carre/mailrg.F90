@@ -29,8 +29,8 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       ! 
       ! Parameters:
       ! nuldec: if .true., indicates we are gridding the inner SOL of a disconnected double null
-      ! xpind: poloidal grid point index of the outer x-point
-      ! xpx,ypx: coordinates of outer x-point
+      ! xpind: poloidal grid point index of the outer X-point
+      ! xpx,ypx: coordinates of outer X-point
 
 #include <CARREDIM.F>
 
@@ -159,7 +159,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 12    continue
 
         
-      ! compute psi at o-point
+      ! compute psi at O-point
       ii = ifind(xpto,x,nx,1)
       jj = ifind(ypto,y,ny,1)
       fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto + a11(ii,jj,1)*xpto*ypto
@@ -502,17 +502,17 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                   & l1(ipol),mailx(ipol,ir),maily(ipol,ir))
            enddo
 
-           ! In case of the inner sol region, we have the outer x-point given
+           ! In case of the inner sol region, we have the outer X-point given
            ! on the last radial flux surface. The position of this point is, obviously, fixed.
            ! We have to enforce this explicitly, of else bad things will happen 
-           ! (specifically, points can end up "on the wrong side" of the x-point, and the 
+           ! (specifically, points can end up "on the wrong side" of the X-point, and the 
            ! optimization algorithm cannot recover from this).
 
            IF ((ir .EQ. nprad) .AND. (nuldec)) THEN              
-               ! get length to x-point on the last surface
+               ! get length to X-point on the last surface
                length_xp=ruban(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv),xpx,xpy,0.0d0)
                
-               ! scale points to the left and right of the x-point 
+               ! scale points to the left and right of the X-point 
                ! left side
                l1(1:xpind-1) = ( l1(1:xpind-1) / l1(xpind-1) ) * 0.95d0 * length_xp
                ! xpoint itself
@@ -556,7 +556,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                              l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol-1)
                      endif
 
-                     ! keep the outer x-point fixed if required
+                     ! keep the outer X-point fixed if required
                      IF ((ir .EQ. nprad) .AND. nuldec .and. (ipol == xpind)) THEN              
                          l2(ipol) = length_xp
                      end IF
@@ -600,7 +600,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                                              ort1(ipol)=ort2(ipol)
                                              l2(ipol)=l1(ipol)+del
                                      endif
-                                     ! keep the outer x-point fixed if required
+                                     ! keep the outer X-point fixed if required
                                      IF ((ir .EQ. nprad) .AND. nuldec .and. (ipol == xpind)) THEN              
                                          l2(ipol) = length_xp
                                      end IF                                     

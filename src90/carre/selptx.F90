@@ -101,7 +101,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
 
   havePredefinedXPoints = .false.
 
-  ! If the code parameter structure contains x-points, we use them.
+  ! If the code parameter structure contains X-points, we use them.
   ! Otherwise, we look for the selptx.inf file, or ask the user.
   if (par % xPointNum > 0) then
       nptx = par%xPointNum
@@ -127,17 +127,17 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
 10        continue
           open(lun,file='selptx.inf',err=12)
           rewind(lun)
-          read(lun,*,err=14) xpttol ! x-point identification tolerance
-          read(lun,*,err=14) nptx   ! number of x-points specified in file
+          read(lun,*,err=14) xpttol ! X-point identification tolerance
+          read(lun,*,err=14) nptx   ! number of X-points specified in file
           ex=nptx.le.nptxm
-          if(ex) then               ! if at most nptxm x-points given in file continue, else error
+          if(ex) then               ! if at most nptxm X-points given in file continue, else error
               nptx=max0(nptx,0)
               do i=1,nptx
                   read(lun,*,err=14) xptxm(i),yptxm(i)
               end do
               read(lun,*,err=14) xptom,yptom
               havePredefinedXPoints = .true.
-              !*** lconn>0 means "connect x-points")
+              !*** lconn>0 means "connect X-points")
               read(lun,*,end=11, err=111) lconn
               go to 11
 111           lconn=-1
@@ -237,7 +237,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
           kptx(j)=k
       end do
       !
-      !*** Here the o-point and nptx x-points are identified.
+      !*** Here the O-point and nptx X-points are identified.
       !*** Ask for confirmation.
       !
       write(*,*) 'Pre-selected points are identified.'

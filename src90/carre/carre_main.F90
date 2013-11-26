@@ -132,7 +132,7 @@ contains
           !..8.0  Parametrise the separatrices
           IF (equ%npx.GT.0 .and. equ%limcfg.eq.0) THEN
 
-             ! Configuration with x-points
+             ! Configuration with X-points
 
              CALL SPTRIS(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
                   &      equ%iptx,equ%jptx,equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
@@ -222,7 +222,7 @@ contains
           if (equ%limcfg /= 0) then 
              call setupVirtualLimiterGeometry(par, equ, struct)           
           else if (equ%npx > .0) then
-             ! if we have a case with x-points, set up virtual geometry
+             ! if we have a case with X-points, set up virtual geometry
              !..   10.1  Set up virtual targets/structures
              call setupVirtualStructures(par, equ, struct)
 

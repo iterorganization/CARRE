@@ -222,8 +222,8 @@ contains
   end subroutine findPointInRegion
 
 
-  ! Find index of of an x-point in this region
-  ! Note it's possible an x-point occurs multiple time, or multiple x-points occur.
+  ! Find index of of an X-point in this region
+  ! Note it is possible an X-point occurs multiple times, or multiple X-points occur.
   ! The first one found will be returned.
   subroutine findXPointInRegion(equ, grid, iReg, xipol, xirad)
     type(CarreEquilibrium), intent(in) :: equ
@@ -238,13 +238,13 @@ contains
     real*8 :: dist
     external dist
 
-    ! check all x-points
+    ! check all X-points
     do ipx = 1, equ%npx
         call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), &
              & npoint, xipols, xirads )
 
         if (npoint > 0) then
-            call logmsg(LOGDEBUGBULK,  "findXPointInRegion: region "//int2str(iReg)//", found x-point&
+            call logmsg(LOGDEBUGBULK,  "findXPointInRegion: region "//int2str(iReg)//", found X-point&
                  & at "//int2str(xipols(1))//' '//int2str(xirads(1))//", position "//real2str(equ%ptx(ipx))//&
                  & ' '//real2str(equ%pty(ipx)) )
             xipol = xipols(1)
@@ -253,7 +253,7 @@ contains
         end if
     end do
 
-    ! if we arrive here, no cell next to an x-point was found
+    ! if we arrive here, no cell next to an X-point was found
     xipol = GRID_UNDEFINED
     xirad = GRID_UNDEFINED
 

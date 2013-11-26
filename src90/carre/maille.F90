@@ -1622,7 +1622,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          nuldec = .TRUE.
 
-! figure out index of x-point on outer separatrix
+! figure out index of X-point on outer separatrix
 
          IF (equ%ptxint .EQ. 1) THEN
             xpind = par%nptseg(1)+par%nptseg(3)-1
