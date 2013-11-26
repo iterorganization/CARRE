@@ -81,7 +81,8 @@
       character equtype*20
 
       logical errenc
-      integer j,k,kk,iip,iir,irg,irz,ipz,ihg,lp,lr,mp,mr,ixx,iyy,nxx(2)
+      integer j,k,kk,iip,iir,irg,irz,ipz,ihg,lp,lr,mp,mr,ixx,iyy
+      integer nxx(2),nyy
       character*8 znstxt(2)*5, znptxt(3), znrtxt(3)
       data znstxt / 'left', 'right' /
       data znptxt / 'bottom', 'center', 'top' /
@@ -902,6 +903,9 @@
 
         ix=0
         nx=0
+        nyy=max(nqr(1,1,1)+nqr(1,1,2), &
+              & nqr(1,2,1)+nqr(1,2,2), &
+              & nqr(1,3,1)+nqr(1,3,2))
         do ihg=1,2     ! {
           nxx(ihg)=nqp(ihg,1,1)+nqp(ihg,2,1)+nqp(ihg,3,1)
           nx=nx+nxx(ihg)
@@ -914,7 +918,7 @@
 !*** Three poloidal zones
           do ipz=1,3     ! {
 ! The following line is to ensure the SOL pieces are lined up
-            iy=nqr(ihg,2,1)+nqr(ihg,2,2)-nqr(ihg,ipz,1)-nqr(ihg,ipz,2) 
+            iy=nyy-nqr(ihg,ipz,1)-nqr(ihg,ipz,2) 
             ixx=ix
 !*** Three radial zones
             do irz=1,3     ! {
