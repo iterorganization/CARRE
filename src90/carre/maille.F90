@@ -2408,14 +2408,16 @@ contains
                  & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, & 
                  & par%deltrn,par%repart,par%pntrat,par%tgarde,&
                  & struct%distnv,xptxo,yptxo, & 
-                 & distxo,xx,yy,fctini,difpsi,equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
+                 & distxo,xx,yy,fctini,difpsi, &
+                 & equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
                  & equ%npx,equ%racord,equ%x,equ%y,equ%nx,equ%ny)
            elseif(sellan(1:7).eq.'english') then
              CALL LECCLE(par%nptseg,par%npr,lg,&
                  & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, & 
                  & par%deltrn,par%repart,par%pntrat,par%tgarde,&
                  & struct%distnv,xptxo,yptxo, & 
-                 & distxo,xx,yy,fctini,difpsi,equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
+                 & distxo,xx,yy,fctini,difpsi, &
+                 & equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
                  & equ%npx,equ%racord,equ%x,equ%y,equ%nx,equ%ny)
            endif
 

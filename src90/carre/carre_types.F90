@@ -199,7 +199,7 @@ module carre_types
            &   nptot(4,npxmx), ii(gradmx), jj(gradmx),ptxint, limcfg, nsep
 
       REAL*8 :: &
-           &  x(nxmax), y(nymax), psi(nxmax,nymax), &
+           & x(nxmax), y(nymax), psi(nxmax,nymax), &
            & psidx(nxmax,nymax), psidy(nxmax,nymax), &
            & a00(nxmax,nymax,3), a10(nxmax,nymax,3),&
            & a01(nxmax,nymax,3), a11(nxmax,nymax,3), &

@@ -110,6 +110,7 @@
    10 CONTINUE
 
       nn(1)=nn1
+
 !.. On prepare une structure artificielle pour trouver la distance
 !.. horizontale vers l'exterieur entre le point O et la separatrice
 !.. soit le petit rayon a du plasma
@@ -120,8 +121,8 @@
 
          xt(1)=xn(1,1)
          yt(1)=yn(1,1)
-         xt(2)=xfin
-         yt(2)=yfin
+         xt(2)=xpto
+         yt(2)=ypto
          xt(3)=xt(1)
          yt(3)=yt(1)
          nt=3
@@ -135,9 +136,9 @@
       xtt(1)= xpto-0.1
       ytt(1)= ypto
       xtt(2)= x(nx)
-      ytt(2)=ypto
-      xtt(3)=xtt(1)
-      ytt(3)=ytt(1)
+      ytt(2)= ypto
+      xtt(3)= xtt(1)
+      ytt(3)= ytt(1)
       ntt=3
       sens=1
       CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sens, & 
@@ -229,7 +230,7 @@
 
 !0195     IF (xn(2,inouv) .LT. xn(1,inouv)) THEN
           if((xn(2,inouv)-xn(1,inouv))*(xn(2,ianc)-xn(1,ianc))+ & 
-     &          (yn(2,inouv)-yn(1,inouv))*(yn(2,ianc)-yn(1,ianc)) & 
+     &       (yn(2,inouv)-yn(1,inouv))*(yn(2,ianc)-yn(1,ianc)) & 
      &          .lt.zero) then
             nn(inouv)=1
             dir=MOD(dir+1,4) + 1
@@ -252,8 +253,8 @@
           diag%gdpsi(ir,ireg)= (valfct-fctxo)/(fctini-fctxo)
           diag%racpsi(ir,ireg)= sqrt(diag%gdpsi(ir,ireg))
           sens=2
-        x1 = diag%gdr(ir-1,ireg)
-        y1=ypto
+          x1 = diag%gdr(ir-1,ireg)
+          y1 = ypto
           CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens, & 
      &               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
@@ -550,8 +551,8 @@
         nbniv=nbniv+1
         nivtot(nbniv)=nn(inouv)
         do 30 i=1,nn(inouv)
-        nivx(i,nbniv)=xn(i,inouv)
-        nivy(i,nbniv)=yn(i,inouv)
+          nivx(i,nbniv)=xn(i,inouv)
+          nivy(i,nbniv)=yn(i,inouv)
    30   continue
       endif
 
