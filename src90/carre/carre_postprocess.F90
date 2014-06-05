@@ -406,7 +406,9 @@ contains
       ! internal
       integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
       integer :: iReg, iPol, iRad, iFace, i, j, iStructStart, iStructEnd
+      integer :: ipx, isep, itarget
       integer :: cellBndFaceCount(npmamx-1,nrmamx-1,nregmx)
+      logical :: StructStartOnTarget
 
       ! Cell flag
       ! First mark cells internal/external
@@ -465,8 +467,23 @@ contains
                                & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
                                & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg )
 
+                          ! Check if the structure is a target
+                          StructStartOnTarget = .false.
+                          do ipx = 1, equ%npx
+                            do isep = 1, 4
+                              itarget = struct%indplq(isep,ipx)
+                              ! if separatrix segment does not intersect target, skip
+                              if ( itarget == 0 ) cycle
+                              if ( iStructStart == itarget ) StructStartOnTarget = .true.
+                            end do
+                          end do
+
                           if ((iStructStart /= GRID_UNDEFINED) .and. (iStructEnd /= GRID_UNDEFINED)) then
-                              grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructStart
+                              if ( StructStartOnTarget) then
+                                grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructEnd
+                              else
+                                grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructStart
+                              end if
                               if (iStructStart /= iStructEnd) then
                                   call logmsg(LOGDEBUG, "categorizeCellsAndFaces: ambiguous face/structure association")
                               end if
@@ -819,7 +836,7 @@ contains
             end do
         end do                
 
-!!$        ! Mark boundary  points at non-wall boundaries, which are currently marked as internal points
+!!$        ! Mark boundary points at non-wall boundaries, which are currently marked as internal points
 !!$        do iReg = 1, grid%nreg
 !!$            ! For every radial line...
 !!$            do iPol = 1, grid%np1(iReg)

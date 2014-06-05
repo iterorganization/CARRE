@@ -477,7 +477,6 @@ contains
           ! if separatrix segment does not intersect target, skip
           if ( itarget == 0 ) cycle
 
-
           ! for complex cases (disconnected double null), some targets
           ! will be listed for multiple X-points. We only want to treat every target once here.
           ! Look at all other X-points, and only treat the target if it is not listed 

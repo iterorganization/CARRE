@@ -175,11 +175,14 @@ tags:
 	rm -f TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` 
 
 echo:
-	@echo INCLUDE ${INCLUDE}
-	@echo DEST ${DEST}
-	@echo DEFINES ${DEFINES}
-	@echo VPATH ${VPATH}
-	@echo SOLPS_LIB ${SOLPS_LIB}
+	@echo INCLUDE=${INCLUDE}
+	@echo DEST=${DEST}
+	@echo DEFINES=${DEFINES}
+	@echo VPATH=${VPATH}
+	@echo SOLPS_LIB=${SOLPS_LIB}
+	@echo OBJS=$(OBJS)
+	@echo OBJSL90=$(OBJSL90)
+	@echo OBJSU90=$(OBJSU90)
 
 HDF5_VERSION=1.8.10
 HDF5_INSTALL_DIR=${PWD}/lib/${OBJECTCODE}/hdf5
