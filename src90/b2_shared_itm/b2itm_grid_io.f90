@@ -396,7 +396,7 @@ contains
       integer :: cls(SPACE_COUNT_MAX)
       integer, allocatable :: xpoints(:,:)
 
-      geoId = geometryId(nnreg, topcut)
+      geoId = geometryId(nnreg, periodic_bc, topcut)
     
       ! Figure out total number of subgrids
       ! Do generic subgrids + subgrids
