@@ -24,7 +24,7 @@
 !  local variables
       integer ix,iy,i
       real*8 x0,y0,fpsi0
-      character(len=24) :: hlp_format
+      character(len=35) :: hlp_format
 !
 !  procedures
 !======================================================================
@@ -40,6 +40,8 @@
           write(nfin,hlp_format) nx,"  ",ny,"  ",niso,"  ",nxiso(1:nisomx)
       end if
 
+      write(hlp_format,'(a,i1,a)') '(I4,1X,I4,1X,29(F12.8,1X),', &
+                                  &  CARREOUT_NCELLFLAGS,'(I4,1X))'
       do iy=0,ny-1
         do ix=0,nx-1
 
@@ -49,7 +51,7 @@
           y0=0.25*(cry(ix,iy,0)+cry(ix,iy,1)+cry(ix,iy,2)+cry(ix,iy,3))
           fpsi0=0.25*(fpsi(ix,iy,0)+fpsi(ix,iy,1)+fpsi(ix,iy,2)+fpsi(ix,iy,3))
 !* print B2.5
-          write (nfin,117) &
+          write (nfin,hlp_format) &
                & ix+1,iy+1,&
                & x0,y0,fpsi0, &  ! cell center quantities
                & (crx(ix,iy,i),cry(ix,iy,i),&
@@ -60,8 +62,6 @@
         enddo
       enddo
 
-      ! FIXME: this format has to be updated to match the size CARROUT_NCELLFLAG in the last entry
-117   FORMAT(I4,1X,I4,1X,29(F12.8,1X),5(I4,1X))
       return
 !======================================================================
       end
