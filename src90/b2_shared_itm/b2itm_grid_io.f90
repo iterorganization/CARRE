@@ -71,7 +71,7 @@ module b2itm_grid_io
   integer, parameter :: B2_GENERIC_SUBGRID_COUNT = 6
 
   ! Generic subgrids (all cells, all faces)
-  ! Note: special subgrids (given by region ids) don't have specific constants (see also b2mod_connectivity.f90)
+  ! Note: special subgrids (given by region ids) do not have specific constants (see also b2mod_connectivity.f90)
 
   !> Subgrid of all 2d cells
   integer, parameter :: B2_SUBGRID_CELLS = 1 
@@ -97,11 +97,11 @@ contains
 
   !> Routine that fills in a grid description which is part of a CPO
   !> using the given grid data and prepared mappings
-  subroutine b2ITMFillGridDescription( gmap, itmgrid, &
+  subroutine b2ITMFillGridDescription( gmap,itmgrid, &
       & nx,ny,crx,cry, &
       & leftix,leftiy,rightix,rightiy, &
       & topix,topiy,bottomix,bottomiy,&
-      & nnreg, topcut, region, cflag, includeGhostCells, vol, gs, qc )
+      & nnreg,topcut,region,cflag,includeGhostCells,vol,gs,qc )
 
     type(B2ITMGridMap), intent(in) :: gmap
     type(type_complexgrid), intent(out) :: itmgrid
@@ -209,9 +209,26 @@ contains
               end if
           end select
 
+          ! Neighbour faces of this face
+          ! Left neighbour: face continuing to the left of this face
+          nix = leftix( ix, iy )
+          niy = leftiy( ix, iy )
+          if ( .not. isUnneededCell( nx, ny, cflag, includeGhostCells, nix, niy ) ) then
+             itmgrid % spaces(SPACE_POLOIDALPLANE) % objects(2) % neighbour( ifc, 1, 1 ) = &
+                  & gmap % mapFcI( nix, niy, gmap % mapFcIFace( ifc ) )
+          end if
+          ! Right neighbour: face continuing to the right of this face 
+          nix = rightix( ix, iy )
+          niy = rightiy( ix, iy )
+          if ( .not. isUnneededCell( nx, ny, cflag, includeGhostCells, nix, niy ) ) then
+             itmgrid % spaces(SPACE_POLOIDALPLANE) % objects(2) % neighbour( ifc, 2, 1 ) = &
+                  & gmap % mapFcI( nix, niy, gmap % mapFcIFace( ifc ) )
+          end if
+
           ! measure: area
           if (present(gs)) itmgrid % spaces(SPACE_POLOIDALPLANE) % objects(2) % measure( ifc, 1 ) = gs(ix, iy, ALIGNX)
       end do
+
       ! y-aligned faces    
       do ifc = gmap % nfcx + 1, gmap % nfcx + gmap % nfcy    
           ! get position of this face in the b2 grid
@@ -249,6 +266,22 @@ contains
               end if
           end select
 
+
+          ! Neighbour faces of this face
+          ! Bottom neighbour: face continuing to the bottom of this face
+          nix = bottomix( ix, iy )
+          niy = bottomiy( ix, iy )
+          if ( .not. isUnneededCell( nx, ny, cflag, includeGhostCells, nix, niy ) ) then
+             itmgrid % spaces(SPACE_POLOIDALPLANE) % objects(2) % neighbour( ifc, 1, 1 ) = &
+                  & gmap % mapFcI( nix, niy, gmap % mapFcIFace( ifc ) )
+          end if
+          ! Top neighbour: face continuing to the top of this face 
+          nix = topix( ix, iy )
+          niy = topiy( ix, iy )
+          if ( .not. isUnneededCell( nx, ny, cflag, includeGhostCells, nix, niy ) ) then
+             itmgrid % spaces(SPACE_POLOIDALPLANE) % objects(2) % neighbour( ifc, 2, 1 ) = &
+                  & gmap % mapFcI( nix, niy, gmap % mapFcIFace( ifc ) )
+          end if
           ! measure: area
           if (present(gs)) itmgrid % spaces(SPACE_POLOIDALPLANE) % objects(2) % measure( ifc, 1 ) = gs(ix, iy, ALIGNY)*qc(ix, iy)
       end do
