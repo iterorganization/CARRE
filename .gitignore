@@ -1,0 +1,21 @@
+# files ignored in git repository
+
+# backup files
+*~
+
+# object, archive,... files
+*.[oa]
+*.mod
+
+# error messages from compiler etc.
+*.error
+
+
+LISTOBJ
+linux.*/
+g77*/
+IBMaix*/
+SGIirix*/
+sun*/
+T3E*/
+unicos*/
