@@ -5,6 +5,7 @@ c  version : 05.04.97 16:19
 c
 c======================================================================
       implicit none
+#include <COMLAN.F>
 c  read data concerning structures
 c
 c  arguments
@@ -39,7 +40,12 @@ c
       ifail=1
       call entete(iunit,'$structures',ifail)
       if(ifail.eq.1) then
-        write(6,*)'unable to find structure header in file: stop'
+        if(sellan(1:8).eq.'francais') then
+          write(6,*)'Incapable de trouver l''entete structure '//
+     &     'dans le fichier: stop'
+        elseif(sellan(1:7).eq.'english') then
+          write(6,*)'unable to find structure header in file: stop'
+        endif
         stop
       endif
  1    continue
@@ -50,7 +56,28 @@ c
         nomstr(nstr)=line
 c       call rdfrin(11,line,npstru(nstr),ifail)
         read(iunit,*)npstru(nstr)
-        if(abs(npstru(nstr)).le.1) then
+        if(abs(npstru(nstr)).gt.npstmx) then
+          if(sellan(1:8).eq.'francais') then
+            write(6,'(a,i2,a)') 
+     .       'Trop de points pour la structure ',nstr,' !'
+            write(6,'(a,i6)') 'Nombre de points declares : ',
+     .       abs(npstru(nstr))
+            write(6,'(a,i4)') 'Nombre maximum de points prevu : ',
+     .       npstmx
+            write(6,'(a)') 'Veuillez augmenter la valeur de npstmx '//
+     &       'dans CARREDIM.F et recompiler !'
+          elseif(sellan(1:7).eq.'english') then
+            write(6,'(a,i2,a)') 
+     .       'Too many points in structure ',nstr,' !'
+            write(6,'(a,i6)') 'Number of points declared : ',
+     .       abs(npstru(nstr))
+            write(6,'(a,i4)') 'Maximum number of points allowed : ',
+     .       npstmx
+            write(6,'(a)') 'Please increase the value of npstmx '//
+     &       'in CARREDIM.F and recompile !'
+          endif
+          stop
+        else if(abs(npstru(nstr)).le.1) then
           i=0
  3        continue
           i=i+1
@@ -81,6 +108,10 @@ c  close input unit
       return
 c
  98   continue
-      write(6,*)'error in structure file'
+      if(sellan(1:8).eq.'francais') then
+        write(6,*)'erreur dans le fichier structure'
+      elseif(sellan(1:7).eq.'english') then
+        write(6,*)'error in structure file'
+      endif
       stop
       end

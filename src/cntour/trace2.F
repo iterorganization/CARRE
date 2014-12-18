@@ -9,7 +9,7 @@ c
 
 cank-970707: dimensions from the file
 *  dimensions
-      include "../include/CARREDIM.F"
+#include <CARREDIM.F>
 
 c
 c  arguments
