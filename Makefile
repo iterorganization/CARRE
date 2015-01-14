@@ -1,5 +1,7 @@
 #  VERSION : 27.07.97 22:41
 
+OBJDIR = $(OBJECTCODE)
+
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
 
@@ -20,44 +22,44 @@ endif
 
 include LISTOBJ
 
-DEST = $(OBJS:%.o=$(OBJECTCODE)/%.o)
+DEST = $(OBJS:%.o=$(OBJDIR)/%.o)
 MAINLIST = $(EXCLUDELIS:.=\.)
 LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
-$(OBJECTCODE)/%.o : %.F
-	- /bin/rm -f ${OBJECTCODE}/$*.f
-	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJECTCODE}/$*.f; \
+$(OBJDIR)/%.o : %.F
+	- /bin/rm -f ${OBJDIR}/$*.f
+	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
-		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
-		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJECTCODE}/$*.o ${OBJECTCODE}/$*.f;; \
+		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 	esac; \
-	if [ -f $*.o ]; then /bin/mv $*.o ${OBJECTCODE}; fi
+	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
-all: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+all: ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
 
-standalone: ${OBJECTCODE}/carre ${OBJECTCODE}/traduit
+standalone: ${OBJDIR}/carre ${OBJDIR}/traduit
 
-${OBJECTCODE}/carre: ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a
-	rm -f ${OBJECTCODE}/carre 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/carre ${OBJECTCODE}/carre.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+${OBJDIR}/carre: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a
+	rm -f ${OBJDIR}/carre 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/carre ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJECTCODE}/traduit: ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a
-	rm -f ${OBJECTCODE}/traduit 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/traduit ${OBJECTCODE}/tradui.o ${OBJECTCODE}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+${OBJDIR}/traduit: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a
+	rm -f ${OBJDIR}/traduit 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/traduit ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJECTCODE}/fcrr: ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a Makefile
-	rm -f ${OBJECTCODE}/fcrr 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJECTCODE}/fcrr ${OBJECTCODE}/fcrr.o ${OBJECTCODE}/fcrblkd.o ${OBJECTCODE}/libcarre.a ${SOLPS_LIB}/libmscl.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+${OBJDIR}/fcrr: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLPS_LIB}/libmscl.a Makefile
+	rm -f ${OBJDIR}/fcrr 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/fcrr ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLPS_LIB}/libmscl.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJECTCODE}/libcarre.a: ${DEST}
+${OBJDIR}/libcarre.a: ${DEST}
 	ar r $@ $?
 	ranlib $@
 
 clean:
-	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f ${OBJECTCODE}/libcarre.a ${OBJECTCODE}/carre ${OBJECTCODE}/traduit ${OBJECTCODE}/fcrr
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
 
 neat:
-	rm -rf ${OBJECTCODE}/*.o ${OBJECTCODE}/*.f
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
 
 local:
 	-rm rzpsi.mtv rzpsi.ps map loadmap gnuplot.data gnuplot.cmd
@@ -69,13 +71,10 @@ tags:
 	rm -f TAGS ; etags src/*/*.F
 
 depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
-	makedepend -f	${OBJECTCODE}/dependencies.${OBJECTCODE} ${INCLUDE} $^
-	mv ${OBJECTCODE}/dependencies.${OBJECTCODE} ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak
-	sed -e '3,$$s/^\.\.\/src\/[^\/]*\///' ${OBJECTCODE}/dependencies.${OBJECTCODE}.bak | \
-	sed -e '3,$$s/^/${OBJECTCODE}\//' > ${OBJECTCODE}/dependencies.${OBJECTCODE}
-
-update:
-	cd $(SOLPSTOP); gmake update
+	makedepend -f	${OBJDIR}/dependencies.${OBJECTCODE} ${INCLUDE} $^
+	mv ${OBJDIR}/dependencies.${OBJECTCODE} ${OBJDIR}/dependencies.${OBJECTCODE}.bak
+	sed -e '3,$$s/^\.\.\/src\/[^\/]*\///' ${OBJDIR}/dependencies.${OBJECTCODE}.bak | \
+	sed -e '3,$$s|^|${OBJDIR}/|' > ${OBJDIR}/dependencies.${OBJECTCODE}
 
 listobj:
 	@rm -f LISTOBJ; touch LISTOBJ; l="OBJS ="; \
@@ -89,11 +88,11 @@ listobj:
 
 LISTOBJ: listobj
 
-${OBJECTCODE}/dependencies.${OBJECTCODE}:
-	-mkdir -p ${OBJECTCODE}
-	touch ${OBJECTCODE}/dependencies.${OBJECTCODE}
+${OBJDIR}/dependencies.${OBJECTCODE}:
+	-mkdir -p ${OBJDIR}
+	touch ${OBJDIR}/dependencies.${OBJECTCODE}
 	${MAKE} listobj
 	${MAKE} depend
 
-include ${OBJECTCODE}/dependencies.${OBJECTCODE}
+include ${OBJDIR}/dependencies.${OBJECTCODE}
 
