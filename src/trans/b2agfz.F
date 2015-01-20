@@ -261,19 +261,23 @@ c*** Check some grid dimensions for consistency
             errenc=.false.
             if(nprad(5).ne.nprad(6)) then
               write(0,*) 'nprad(5) .ne. nprad(6)'
+              write(*,*) 'nprad(5) .ne. nprad(6)'
               errenc=.true.     
             end if
             if(nprad(2).ne.nprad(4)) then
               write(0,*) 'nprad(2) .ne. nprad(4)'
+              write(*,*) 'nprad(2) .ne. nprad(4)'
               errenc=.true.
             end if
             if(nprad(5)+nprad(1)-1.ne.nprad(3)) then
               write(0,*) 'nprad(5)+nprad(1)-1 .ne. nprad(3)'
+              write(*,*) 'nprad(5)+nprad(1)-1 .ne. nprad(3)'
               errenc=.true.
             end if
   
             if(errenc) then
               write(0,*) 'nprad: ',nprad
+              write(*,*) 'nprad: ',nprad
               write(*,*) 'b2agfz: inconsistent grid dimensions.'
               write(*,*) '==> check the npr(i) values in carre'
               stop
@@ -406,19 +410,23 @@ c*** Check some grid dimensions for consistency
             errenc=.false.
             if(nprad(3).ne.nprad(6)) then
               write(0,*) 'nprad(3) .ne. nprad(6)'
+              write(*,*) 'nprad(3) .ne. nprad(6)'
               errenc=.true.
             end if
             if(nprad(2).ne.nprad(4)) then
               write(0,*) 'nprad(2) .ne. nprad(4)'
+              write(*,*) 'nprad(2) .ne. nprad(4)'
               errenc=.true.
             end if
             if(nprad(3)+nprad(1)-1.ne.nprad(5)) then
               write(0,*) 'nprad(3)+nprad(1)-1 .ne. nprad(5)'
+              write(*,*) 'nprad(3)+nprad(1)-1 .ne. nprad(5)'
               errenc=.true.
             end if
   
             if(errenc) then
               write(0,*) 'nprad: ',nprad
+              write(*,*) 'nprad: ',nprad
               write(*,*) 'b2agfz: inconsistent grid dimensions.'
               write(*,*) '==> check the npr(i) values in carre'
               stop
@@ -587,6 +595,8 @@ c*** Check them for consistency
                 if(i.eq.2 .and. kk.ne.2) kk=4-kk
                 write(0,*) 'Inconsistent poloidal grid dimensions. ',
      ,                                  'Region: ',znptxt(kk),znstxt(i)
+                write(*,*) 'Inconsistent poloidal grid dimensions. ',
+     ,                                  'Region: ',znptxt(kk),znstxt(i)
                 errenc=.true.   	! }
               end if    	! }
             end do
@@ -600,7 +610,9 @@ c*** Check them for consistency
             do k=1,3    	! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
      .           nqr(i,1,k).ne.nqr(i,3,k)) then ! {
-                write(0,*) 'Inconsistent radidal grid dimensions. ',
+                write(0,*) 'Inconsistent radial grid dimensions. ',
+     ,                                   'Region: ',znrtxt(k),znstxt(i)
+                write(*,*) 'Inconsistent radial grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
                 errenc=.true.   	! }
@@ -609,7 +621,9 @@ c*** Check them for consistency
           end do
           do k=1,3      ! {
             if(nqr(1,1,k).ne.nqr(2,1,k)) then
-              write(0,*) 'Inconsistent radidal grid dimensions, ',
+              write(0,*) 'Inconsistent radial grid dimensions, ',
+     ,                            'right and left.  Region: ',znrtxt(k)
+              write(*,*) 'Inconsistent radial grid dimensions, ',
      ,                            'right and left.  Region: ',znrtxt(k)
               write(*,*) '==> Check the npr specification in carre. '
               errenc=.true.
@@ -617,7 +631,7 @@ c*** Check them for consistency
           end do
   
           if(errenc) then
-            write(*,*) 'Inconsistent radidal grid dimensions, '
+            write(*,*) 'Inconsistent radial grid dimensions, '
             write(*,*) '==> Check the npr specification in carre. '
             stop
           end if
@@ -634,19 +648,23 @@ c*** Check some grid dimensions for consistency
             errenc=.false.
             if(nprad(1).ne.nprad(3)) then
               write(0,*) 'nprad(1) .ne. nprad(3)'
+              write(*,*) 'nprad(1) .ne. nprad(3)'
               errenc=.true.     
             end if
             if(nprad(2).ne.nprad(4)) then
               write(0,*) 'nprad(2) .ne. nprad(4)'
+              write(*,*) 'nprad(2) .ne. nprad(4)'
               errenc=.true.
             end if
             if(nprad(5).ne.nprad(4)) then
               write(0,*) 'nprad(5) .ne. nprad(4)'
+              write(*,*) 'nprad(5) .ne. nprad(4)'
               errenc=.true.
             end if
   
             if(errenc) then
               write(0,*) 'nprad: ',nprad
+              write(*,*) 'nprad: ',nprad
               write(*,*) 'b2agfz: inconsistent grid dimensions.'
               write(*,*) '==> check the npr(i) values in carre'
               stop
@@ -806,6 +824,8 @@ c*** Check them for consistency
                 if(i.eq.2 .and. kk.ne.2) kk=4-kk
                 write(0,*) 'Inconsistent poloidal grid dimensions. ',
      ,                                  'Region: ',znptxt(kk),znstxt(i)
+                write(*,*) 'Inconsistent poloidal grid dimensions. ',
+     ,                                  'Region: ',znptxt(kk),znstxt(i)
                 errenc=.true.   	! }
               end if    	! }
             end do
@@ -819,7 +839,9 @@ c*** Check them for consistency
             do k=1,3    	! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
      .           nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
-                write(0,*) 'Inconsistent radidal grid dimensions. ',
+                write(0,*) 'Inconsistent radial grid dimensions. ',
+     ,                                   'Region: ',znrtxt(k),znstxt(i)
+                write(*,*) 'Inconsistent radial grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
                 errenc=.true.   	! }
@@ -828,7 +850,9 @@ c*** Check them for consistency
           end do
           do k=1,3      ! {
             if(nqr(1,1,k).ne.nqr(2,1,k)) then
-              write(0,*) 'Inconsistent radidal grid dimensions, ',
+              write(0,*) 'Inconsistent radial grid dimensions, ',
+     ,                            'right and left.  Region: ',znrtxt(k)
+              write(*,*) 'Inconsistent radial grid dimensions, ',
      ,                            'right and left.  Region: ',znrtxt(k)
               write(*,*) '==> Check the npr specification in carre. '
               errenc=.true.
@@ -836,7 +860,7 @@ c*** Check them for consistency
           end do
   
           if(errenc) then
-            write(*,*) 'Inconsistent radidal grid dimensions, '
+            write(*,*) 'Inconsistent radial grid dimensions, '
             write(*,*) '==> Check the npr specification in carre. '
             stop
           end if
