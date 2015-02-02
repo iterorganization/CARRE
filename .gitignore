@@ -19,3 +19,7 @@ SGIirix*/
 sun*/
 T3E*/
 unicos*/
+
+# temporary link files set up by the scripts
+dg.*
+
