@@ -6,6 +6,8 @@
 # object, archive,... files
 *.[oa]
 *.mod
+TAGS
+LISTOBJ
 
 # error messages from compiler etc.
 *.error
