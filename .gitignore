@@ -1,27 +1,27 @@
-# files ignored in git repository
+# Temporary save files
 
-# backup files
 *~
 
-# object, archive,... files
-*.[oa]
-*.mod
+# Local compiler files
+
 TAGS
 LISTOBJ
+linux.ifort64/
+linux.ifort64.debug/
 
-# error messages from compiler etc.
-*.error
+# Carre temporary files
 
-
-LISTOBJ
-linux.*/
-g77*/
-IBMaix*/
-SGIirix*/
-sun*/
-T3E*/
-unicos*/
-
-# temporary link files set up by the scripts
+CARRE.HISTORY
+btor.dat
+carre.dat
+carre.log
+carre.out
+carre.ps
+fort.3
+ncar.cfg
+gmeta
+rzpsi.dat
+selptx.inf
+structure.dat
+traduit.log
 dg.*
-

@@ -152,7 +152,8 @@ do {
                   /bin/echo -e "The grid in DG format is stored as $dgdir/$grid_stem.v$n.sno"
                 mv -f traduit.out $griddir/$grid_stem.v$n.geo && \
                   /bin/echo -e "The grid in B2.5 format is stored as $griddir/$grid_stem.v$n.geo"
-                ictrans -e 'spooler postfilea4' -e '3Print' gmeta && mv ictrans.tmp.ps $griddir/$grid_stem.v$n.ps
+                ctrans -d ps.mono gmeta > $griddir/$grid_stem.v$n.ps && \
+                  /bin/echo -e "You can view the grid in PostScript format as $griddir/$grid_stem.v$n.ps"
                 touch CARRE.HISTORY
 		echo $user `date +%Y-%m-%d_%H:%M:%S` >> CARRE.HISTORY
 		ls -ls dg.??? | cut -d ' ' -f 9- >> CARRE.HISTORY
