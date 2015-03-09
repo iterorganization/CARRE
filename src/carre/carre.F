@@ -34,6 +34,7 @@ c        1. permettre l'imposition de points fixes ou de coins
 cank-970702: moved dimensions to the CARREDIM.F
 #include <CARREDIM.F>
 #include <COMLAN.F>
+#include <git_version.h>
 
       REAL*8 cstlin,zero,eps_Xpt,rmax,zmax
       common /geom/ eps_Xpt
@@ -272,7 +273,7 @@ c======================================================================
       open(unit=11,status='scratch')
 c
 c  2.1  specify output format
-      write(10,*)'output format: carre70'
+      write(10,*)'output format: carre70; version : ', gitversion
 
 *
 *..3.0  Read the data

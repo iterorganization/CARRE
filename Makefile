@@ -35,7 +35,9 @@ $(OBJDIR)/%.o : %.F
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
-all: ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
+all: VERSION ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
+
+.PHONY: VERSION
 
 standalone: ${OBJDIR}/carre ${OBJDIR}/traduit
 
@@ -87,6 +89,15 @@ listobj:
 	echo "$$l" | eval sed "$$E" > LISTOBJ
 
 LISTOBJ: listobj
+
+VERSION: src/include/git_version.h
+
+src/include/git_version.h:
+ifeq ($(shell [ -d ${SOLPSTOP} ] && echo yes || echo no ),yes)
+	echo "      character*15 :: gitversion ='`(cd ${SOLPSTOP}; git describe --dirty --always)`'" > src/include/git_version.h
+else
+	echo "      character*15 :: gitversion ='`git describe --dirty --always`'" > src/include/git_version.h
+endif
 
 ${OBJDIR}/dependencies.${OBJECTCODE}:
 	-mkdir -p ${OBJDIR}
