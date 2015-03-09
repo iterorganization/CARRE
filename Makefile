@@ -37,7 +37,7 @@ $(OBJDIR)/%.o : %.F
 
 all: VERSION ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
 
-.PHONY: VERSION
+.PHONY: VERSION clean neat standalone all local depend listobj
 
 standalone: ${OBJDIR}/carre ${OBJDIR}/traduit
 
@@ -58,7 +58,7 @@ ${OBJDIR}/libcarre.a: ${DEST}
 	ranlib $@
 
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr src/include/git_version.h
 
 neat:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
