@@ -102,6 +102,8 @@ endif
 ${OBJDIR}/dependencies.${OBJECTCODE}:
 	-mkdir -p ${OBJDIR}
 	touch ${OBJDIR}/dependencies.${OBJECTCODE}
+	${MAKE} VERSION
+	${MAKE} tags
 	${MAKE} listobj
 	${MAKE} depend
 
