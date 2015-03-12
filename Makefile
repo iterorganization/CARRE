@@ -37,11 +37,11 @@ $(OBJDIR)/%.o : %.F
 
 all: VERSION ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
 
-.PHONY: VERSION clean neat standalone all local depend listobj
+.PHONY: VERSION clean neat standalone all local depend listobj force
 
 standalone: ${OBJDIR}/carre ${OBJDIR}/traduit
 
-${OBJDIR}/carre: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a
+${OBJDIR}/carre: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a src/include/git_version.h
 	rm -f ${OBJDIR}/carre 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/carre ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
@@ -92,12 +92,13 @@ LISTOBJ: listobj
 
 VERSION: src/include/git_version.h
 
-src/include/git_version.h:
+src/include/git_version.h: force
 ifeq ($(shell [ -d ${SOLPSTOP} ] && echo yes || echo no ),yes)
-	echo "      character*15 :: gitversion ='`(cd ${SOLPSTOP}; git describe --dirty --always)`'" > src/include/git_version.h
+	@echo "      character*15 :: gitversion ='`(cd ${SOLPSTOP}; git describe --dirty --always)`'" > src/include/git_version_new.h
 else
-	echo "      character*15 :: gitversion ='`git describe --dirty --always`'" > src/include/git_version.h
+	@echo "      character*15 :: gitversion ='`git describe --dirty --always`'" > src/include/git_version_new.h
 endif
+	@if cmp -s src/include/git_version_new.h src/include/git_version.h; then rm src/include/git_version_new.h; else mv src/include/git_version_new.h src/include/git_version.h; fi
 
 ${OBJDIR}/dependencies.${OBJECTCODE}:
 	-mkdir -p ${OBJDIR}
