@@ -1,7 +1,7 @@
       subroutine rdeqdg(lun,ngpr,ngpz,iret, nr,nz,
      ,                                             btf,rtf,rgr,zgr,pfm)
 c=====================================================
-c*** Read the equilibrium data written in the dg-compatible format.
+c*** Read the equilibrium data written in the dg compatible format.
 c***
 c*** Input:
 c***  lun     the logical unit number for the input
