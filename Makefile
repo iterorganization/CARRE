@@ -78,8 +78,8 @@ tags:
 depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	makedepend -f ${OBJDIR}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJDIR}/dependencies.${OBJECTCODE} ${OBJDIR}/dependencies.${OBJECTCODE}.bak
-	sed -e '3,$$s/^\.\.\/src\/[^\/]*\///' ${OBJDIR}/dependencies.${OBJECTCODE}.bak | \
-	sed -e '3,$$s|^|${OBJDIR}/|' > ${OBJDIR}/dependencies.${OBJECTCODE}
+	sed -e 's|src/[a-z]*/|${OBJDIR}/|' ${OBJDIR}/dependencies.${OBJECTCODE}.bak > ${OBJDIR}/dependencies.${OBJECTCODE}
+
 
 listobj:
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; l="OBJS ="; \
