@@ -1,6 +1,9 @@
 #  VERSION : 27.07.97 22:41
 
 OBJDIR = $(OBJECTCODE)
+ifdef SOLPSTOP
+OBJDIR = $(SOLPSTOP)/bin/$(OBJECTCODE)/Carre
+endif
 
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
