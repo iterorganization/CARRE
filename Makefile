@@ -20,7 +20,7 @@ ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no 
 include config.local/compiler.${OBJECTCODE}
 endif
 
-include LISTOBJ
+include ${OBJDIR}/LISTOBJ
 
 DEST = $(OBJS:%.o=$(OBJDIR)/%.o)
 MAINLIST = $(EXCLUDELIS:.=\.)
@@ -79,16 +79,16 @@ depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	sed -e '3,$$s|^|${OBJDIR}/|' > ${OBJDIR}/dependencies.${OBJECTCODE}
 
 listobj:
-	@rm -f LISTOBJ; touch LISTOBJ; l="OBJS ="; \
+	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; l="OBJS ="; \
 	for d in `echo "$(VPATH)" | tr : \ `; do \
 		l="$$l `(cd $$d > /dev/null; echo *.F)`"; \
 	done; \
 	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
-	echo "$$l" | eval sed "$$E" > LISTOBJ
+	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ
 
-LISTOBJ: listobj
+${OBJDIR}/LISTOBJ: listobj
 
 VERSION: src/include/git_version.h
 
