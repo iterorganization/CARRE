@@ -56,8 +56,8 @@ ${OBJDIR}/fcrr: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLP
 	rm -f ${OBJDIR}/fcrr 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/fcrr ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLPS_LIB}/libmscl.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/libcarre.a: ${DEST} src/include/git_version.h
-	ar r $@ ${DEST}
+${OBJDIR}/libcarre.a: ${DEST}
+	ar rcv $@ ${DEST}
 	ranlib $@
 
 clean:
@@ -78,7 +78,7 @@ tags:
 depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	makedepend -f ${OBJDIR}/dependencies.${OBJECTCODE} ${INCLUDE} $^
 	mv ${OBJDIR}/dependencies.${OBJECTCODE} ${OBJDIR}/dependencies.${OBJECTCODE}.bak
-	sed -e 's|src/[a-z]*/|${OBJDIR}/|' ${OBJDIR}/dependencies.${OBJECTCODE}.bak > ${OBJDIR}/dependencies.${OBJECTCODE}
+	sed -e 's|src/[^ ]*/|${OBJDIR}/|' ${OBJDIR}/dependencies.${OBJECTCODE}.bak > ${OBJDIR}/dependencies.${OBJECTCODE}
 
 
 listobj:
