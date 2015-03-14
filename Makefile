@@ -41,7 +41,7 @@ all: VERSION ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
 
 standalone: ${OBJDIR}/carre ${OBJDIR}/traduit
 
-${OBJDIR}/carre: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a src/include/git_version.h
+${OBJDIR}/carre: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a
 	rm -f ${OBJDIR}/carre 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/carre ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
@@ -53,8 +53,8 @@ ${OBJDIR}/fcrr: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLP
 	rm -f ${OBJDIR}/fcrr 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/fcrr ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLPS_LIB}/libmscl.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/libcarre.a: ${DEST}
-	ar r $@ $?
+${OBJDIR}/libcarre.a: ${DEST} src/include/git_version.h
+	ar r $@ ${DEST}
 	ranlib $@
 
 clean:
