@@ -113,15 +113,15 @@ do {
               [ -r $class.aux ] && ln -sf $class.aux dg.aux
             }
             rm -f selptx.inf carre.dat structure.dat rzpsi.dat btor.dat 2>/dev/null
-            $OBJECTCODE/fcrr; q=g; break;;
+            builds/${HOST}.${COMPILER}/fcrr.exe; q=g; break;;
     ( g|G )                                               # create the grid:
-#            $OBJECTCODE/carre; q=s; break;;
-            $OBJECTCODE/carre 2>carre.log; q=$qqs; break;;
+#            builds/${HOST}.${COMPILER}/carre.exe; q=s; break;;
+            builds/${HOST}.${COMPILER}/carre.exe 2>carre.log; q=$qqs; break;;
     ( s|S )                                               # save the control data:
             cp carre.out carre.dat; q=c; break;;
     ( c|C )                                               # convert:
-            /bin/echo -e "carre.out\n4" | $OBJECTCODE/traduit 2>traduit.log; mv traduit.out traduit.sno ;
-            /bin/echo -e "carre.out\n2" | $OBJECTCODE/traduit 2>traduit.log; 
+            /bin/echo -e "carre.out\n4" | builds/${HOST}.${COMPILER}/traduit.exe 2>traduit.log; mv traduit.out traduit.sno ;
+            /bin/echo -e "carre.out\n2" | builds/${HOST}.${COMPILER}/traduit.exe 2>traduit.log; 
             q=t; break;;
     ( t|T )                                               # store the grid:
             [ -r traduit.out ] && {

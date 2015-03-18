@@ -1,5 +1,13 @@
 #  VERSION : 25.10.2000 11:17
 
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+$(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+$(error LD_NCARG not defined)
+endif
+
 # LINK_NCARG	  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
 DEFINES 	= 
@@ -18,7 +26,7 @@ DBLPAD		=
 COMPILE 	= ${FC} -c ${FFLAGS}
 
 #NCAR	 	= ${NCARG} ${NCARG_ROOT}/BD/*.o
-LDLIBS		= -L${SOLPS_LIB} -L/usr/X11R6/lib64
-LDFLAGS 	= ${NCARG}
+LDLIBS		= ${LD_MSCL} ${LD_NCARG}
+LDFLAGS 	= 
 #LDFLAGS 	= -lX11 -lm -lmscl
-DUMMY           = $(OBJECTCODE)/bidon.o 
+#DUMMY           = builds/${HOST}.${COMPILER}/bidon.o 

@@ -1,3 +1,11 @@
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+$(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+$(error LD_NCARG not defined)
+endif
+
 FC		= /opt/Fujitsu/bin/f90
 FC		= f95f
 CPP		= /lib/cpp -C -traditional
@@ -12,6 +20,6 @@ DBLPAD		= -Ad
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-LDLIBS		= -L${SOLPS_LIB}
-LDFLAGS 	= ${NCARG} # ${NCARG_ROOT}/BD/*.o 
+LDLIBS		= ${LD_MSCL}
+LDFLAGS 	= ${LD_NCARG} # ${NCARG_ROOT}/BD/*.o 
 LDEXTRA 	= 
