@@ -6,6 +6,8 @@ ifndef LD_NCARG
 $(error LD_NCARG not defined)
 endif
 
+DEFINES         = 
+
 FC		= pgf90
 CPP		= /lib/cpp -traditional
 
