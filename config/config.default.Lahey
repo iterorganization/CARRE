@@ -25,4 +25,4 @@ COMPILE 	= ${FC} -c ${FFLAGS}
 LDLIBS		= ${LD_MSCL} ${LD_NCARG} -L/usr/X11R6/lib
 #LDFLAGS 	= 
 LDFLAGS 	= -lX11 -lm 
-#DUMMY           = builds/${HOST}.${COMPILER}/bidon.o 
+#DUMMY           = builds/${HOST_NAME}.${COMPILER}/bidon.o 

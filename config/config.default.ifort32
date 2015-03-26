@@ -29,4 +29,4 @@ COMPILE 	= ${FC} -c ${FFLAGS}
 LDLIBS		= ${LD_MSCL} ${LD_NCARG}
 LDFLAGS 	= 
 #LDFLAGS 	= -lX11 -lm -lmscl
-#DUMMY           = builds/${HOST}.${COMPILER}/bidon.o 
+#DUMMY           = builds/${HOST_NAME}.${COMPILER}/bidon.o 
