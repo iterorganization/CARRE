@@ -1,14 +1,38 @@
 #  VERSION : 27.07.97 22:41
 
-OBJDIR = $(OBJECTCODE)
-ifdef SOLPSTOP
-OBJDIR = $(SOLPSTOP)/bin/$(OBJECTCODE)/Carre
+PROG      = carre.exe
+PROG_TRA  = traduit.exe
+PROG_FCRR = fcrr.exe
+
+
+# Test whether necessary environment variables are defined; if not, exit
+ifndef HOST_NAME
+$(error HOST_NAME not defined)
 endif
+ifndef COMPILER
+$(error COMPILER not defined)
+endif
+ifdef SOLPS_DEBUG
+EXT_DEBUG = .debug
+endif
+
+
+OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
 
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
 
-ifdef NCARG
+ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER} ] && echo yes || echo no ),yes)
+include config/config.${HOST_NAME}.${COMPILER}
+else
+$(error config/config.${HOST_NAME}.${COMPILER} not found.)
+endif
+
+ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER}.local ] && echo yes || echo no ),yes)
+include config/config.${HOST_NAME}.${COMPILER}.local
+endif
+
+ifdef LD_NCARG
 VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
 EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
 else
@@ -18,10 +42,6 @@ endif
 
 INCLUDE = -Isrc/include
 
-include config/compiler.${OBJECTCODE}
-ifeq ($(shell [ -e config.local/compiler.${OBJECTCODE} ] && echo yes || echo no ),yes)
-include config.local/compiler.${OBJECTCODE}
-endif
 
 include ${OBJDIR}/LISTOBJ
 
@@ -38,30 +58,30 @@ $(OBJDIR)/%.o : %.F
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
-all: VERSION ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr
+all: VERSION ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR}
 
 .PHONY: VERSION clean neat standalone all local depend listobj force
 
-standalone: ${OBJDIR}/carre ${OBJDIR}/traduit
+standalone: ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
 
-${OBJDIR}/carre: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a
-	rm -f ${OBJDIR}/carre 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJDIR}/carre ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+${OBJDIR}/${PROG}: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a
+	rm -f ${OBJDIR}/${PROG} 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG} ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/traduit: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a
-	rm -f ${OBJDIR}/traduit 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJDIR}/traduit ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+${OBJDIR}/${PROG_TRA}: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a
+	rm -f ${OBJDIR}/${PROG_TRA} 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_TRA} ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/fcrr: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLPS_LIB}/libmscl.a Makefile
-	rm -f ${OBJDIR}/fcrr 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJDIR}/fcrr ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${SOLPS_LIB}/libmscl.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a
+	rm -f ${OBJDIR}/${PROG_FCRR} 2>/dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
 ${OBJDIR}/libcarre.a: ${DEST}
 	ar rcv $@ ${DEST}
 	ranlib $@
 
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/carre ${OBJDIR}/traduit ${OBJDIR}/fcrr src/include/git_version.h
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version.h
 
 neat:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
@@ -76,9 +96,9 @@ tags:
 	rm -f TAGS ; etags src/*/*.F
 
 depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
-	makedepend -f ${OBJDIR}/dependencies.${OBJECTCODE} ${INCLUDE} $^
-	mv ${OBJDIR}/dependencies.${OBJECTCODE} ${OBJDIR}/dependencies.${OBJECTCODE}.bak
-	sed -e 's|src/[^ ]*/|${OBJDIR}/|' ${OBJDIR}/dependencies.${OBJECTCODE}.bak > ${OBJDIR}/dependencies.${OBJECTCODE}
+	makedepend -f ${OBJDIR}/dependencies.${COMPILER} ${INCLUDE} $^
+	mv ${OBJDIR}/dependencies.${COMPILER} ${OBJDIR}/dependencies.${COMPILER}.bak
+	sed -e 's|src/[^ ]*/|${OBJDIR}/|' ${OBJDIR}/dependencies.${COMPILER}.bak > ${OBJDIR}/dependencies.${COMPILER}
 
 
 listobj:
@@ -96,20 +116,16 @@ ${OBJDIR}/LISTOBJ: listobj
 VERSION: src/include/git_version.h
 
 src/include/git_version.h: force
-ifeq ($(shell [ -d ${SOLPSTOP} ] && echo yes || echo no ),yes)
-	@echo "      character*15 :: gitversion ='`(cd ${SOLPSTOP}; git describe --dirty --always)`'" > src/include/git_version_new.h
-else
 	@echo "      character*15 :: gitversion ='`git describe --dirty --always`'" > src/include/git_version_new.h
-endif
 	@if cmp -s src/include/git_version_new.h src/include/git_version.h; then rm src/include/git_version_new.h; else mv src/include/git_version_new.h src/include/git_version.h; fi
 
-${OBJDIR}/dependencies.${OBJECTCODE}:
+${OBJDIR}/dependencies.${COMPILER}:
 	-mkdir -p ${OBJDIR}
-	touch ${OBJDIR}/dependencies.${OBJECTCODE}
+	touch ${OBJDIR}/dependencies.${COMPILER}
 	${MAKE} VERSION
 	${MAKE} tags
 	${MAKE} listobj
 	${MAKE} depend
 
-include ${OBJDIR}/dependencies.${OBJECTCODE}
+include ${OBJDIR}/dependencies.${COMPILER}
 

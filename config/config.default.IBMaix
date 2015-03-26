@@ -1,5 +1,13 @@
 #  VERSION : 01.07.97 14:30
 
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+$(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+$(error LD_NCARG not defined)
+endif
+
 # LINK_NCARG	  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
 DEFINES 	= -DFortran_90 -DAIX
@@ -17,8 +25,7 @@ DBLPAD		= -qrealsize=8
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-# LDLIBS	= -L${SOLPS_LIB} -L${SOLPSMASTER}/@sys/lib -L/usr/local/lib -L/usr/lpp/xlC/lib
-LDLIBS		= -L${SOLPS_LIB}
-LDFLAGS 	= ${NCARG}
+LDLIBS		= ${LD_MSCL} ${LD_NCARG}
+LDFLAGS 	= 
 # LDEXTRA	= -bloadmap:loadmap -bmap:map -bmaxdata:0x80000000 -bmaxstack:0x80000000
 LDEXTRA 	= -bloadmap:loadmap -bmap:map

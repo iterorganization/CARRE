@@ -2,13 +2,26 @@
 
 *~
 
+#ignore local files and directories
+*.local
+*.local/
+
+
 # Local compiler files
 
 TAGS
 LISTOBJ
 git_version.h
-linux.ifort64/
-linux.ifort64.debug/
+linux.*/
+g77*/
+IBMaix*/
+SGIirix*/
+sun*/
+T3E*/
+unicos*/
+bin/
+builds/
+lib/
 
 # Carre temporary files
 

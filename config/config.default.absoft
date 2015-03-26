@@ -1,3 +1,11 @@
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+$(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+$(error LD_NCARG not defined)
+endif
+
 FC		= f95
 CPP		= /lib/cpp -traditional -DREADOPT
 
@@ -11,6 +19,6 @@ DBLPAD		= -N113 -i4
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
-LDLIBS		= -L${SOLPS_LIB}
-LDFLAGS 	= ${NCARG} 
+LDLIBS		= ${LD_MSCL} ${LD_NCARG}
+LDFLAGS 	=  
 LDEXTRA 	= 

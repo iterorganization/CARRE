@@ -1,0 +1,24 @@
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+$(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+$(error LD_NCARG not defined)
+endif
+
+FC		= g95
+CPP		= /lib/cpp -C -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS		= -g -C -fbounds-check -ftrace=full
+else
+FFLAGS		= -g -O
+endif
+
+DBLPAD		= -r8 
+
+COMPILE 	= ${FC} -c ${FFLAGS}
+
+LDLIBS		= ${LD_MSCL} ${NCARG}
+LDFLAGS 	= 
+LDEXTRA 	= 
