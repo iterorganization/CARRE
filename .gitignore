@@ -39,3 +39,8 @@ selptx.inf
 structure.dat
 traduit.log
 dg.*
+
+# Carre archive
+ 
+meshes/
+
