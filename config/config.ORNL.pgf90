@@ -1,10 +1,13 @@
 # check if necessary variables are correctly defined
-ifndef LD_MSCL
-  $(error LD_MSCL not defined)
+ifndef MSCL_ROOT
+  $(error MSCL_ROOT not defined)
 endif
-ifndef LD_NCARG
-  $(error LD_NCARG not defined)
+ifndef NCARG_ROOT
+  $(error NCARG_ROOT not defined)
 endif
+LD_MSCL    = -L${MSCL_ROOT} -lmscl
+LD_NCARG   = -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm
+
 
 DEFINES   = 
 
@@ -23,4 +26,4 @@ COMPILE 	= ${FC} -c ${FFLAGS}
 
 LDLIBS		= ${LD_MSCL} ${LD_NCARG}
 LDFLAGS 	= 
-LDEXTRA 	= 
+

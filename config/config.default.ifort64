@@ -1,3 +1,5 @@
+#  VERSION : 01.04.2015
+
 # check if necessary variables are correctly defined
 ifndef LD_MSCL
   $(error LD_MSCL not defined)
@@ -6,21 +8,21 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-DEFINES   = 
+DEFINES 	= 
 
-FC		    = pgf90
-CPP		    = /lib/cpp -traditional
+FC		    = ifort
+CPP		    = /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C 
+FFLAGS 		= -g -C -debug all -traceback -check all
 else
-FFLAGS		= -O
+FFLAGS		= -O -vec_report0
 endif
 
-DBLPAD		= -r8 -i4
+DBLPAD		= 
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
 LDLIBS		= ${LD_MSCL} ${LD_NCARG}
 LDFLAGS 	= 
-LDEXTRA 	= 
+LDEXTRA   = 

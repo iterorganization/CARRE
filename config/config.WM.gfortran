@@ -8,11 +8,11 @@ endif
 
 DEFINES   = 
 
-FC		    = pgf90
+FC		    = gfortran
 CPP		    = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C 
+FFLAGS		= -g -fcheck=all -fbacktrace
 else
 FFLAGS		= -O
 endif
