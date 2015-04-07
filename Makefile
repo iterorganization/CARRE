@@ -32,7 +32,7 @@ ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER}.local ] && echo yes ||
 include config/config.${HOST_NAME}.${COMPILER}.local
 endif
 
-ifdef LD_NCARG
+ifdef NCARG_ROOT
 VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
 EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
 else
