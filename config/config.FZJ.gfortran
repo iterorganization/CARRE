@@ -1,0 +1,26 @@
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+  $(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+  $(error LD_NCARG not defined)
+endif
+
+DEFINES   = 
+
+FC		    = gfortran
+CPP		    = /lib/cpp -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS		= -g -fcheck=all -fbacktrace
+else
+FFLAGS		= -O
+endif
+
+DBLPAD		= -r8 -i4
+
+COMPILE 	= ${FC} -c ${FFLAGS}
+
+LDLIBS		= ${LD_MSCL} ${LD_NCARG}
+LDFLAGS 	= 
+LDEXTRA 	= 
