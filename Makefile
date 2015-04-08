@@ -81,7 +81,7 @@ ${OBJDIR}/libcarre.a: ${DEST}
 	ranlib $@
 
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version.h
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
 
 neat:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
