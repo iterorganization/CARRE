@@ -77,7 +77,7 @@ ${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
 ${OBJDIR}/libcarre.a: ${DEST}
-	ar rcv $@ ${DEST}
+	ar rucv $@ ${DEST}
 	ranlib $@
 
 clean:
