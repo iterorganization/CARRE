@@ -8,9 +8,8 @@ ifndef LD_NCARG
 $(error LD_NCARG not defined)
 endif
 
-FC              = f77
-FC		= f90
-CPP		= /usr/ccs/lib/cpp
+FC		    = f90
+CPP		    = /usr/ccs/lib/cpp
 
 ifdef SOLPS_DEBUG
 FFLAGS		= -g -C 

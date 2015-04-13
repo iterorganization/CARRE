@@ -51,7 +51,7 @@ LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJDIR)/%.o : %.F
 	- /bin/rm -f ${OBJDIR}/$*.f
-	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
