@@ -9,7 +9,7 @@ endif
 DEFINES   = 
 
 FC		    = gfortran
-CPP		    = /lib/cpp -traditional
+CPP		    = /lib/cpp -traditional -DGFORTRAN
 
 ifdef SOLPS_DEBUG
 FFLAGS		= -g -fcheck=all -fbacktrace
@@ -17,7 +17,7 @@ else
 FFLAGS		= -O
 endif
 
-DBLPAD		= -r8 -i4
+DBLPAD		= 
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 

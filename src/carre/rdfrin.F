@@ -20,7 +20,11 @@ c      read(iunit,*,err=99)ii
 #ifdef READOPT
       read(vari,err=99)ii
 #else
+#ifdef GFORTRAN
+      read(vari,*,err=99)ii
+#else
       read(vari,'(i)',err=99)ii
+#endif
 #endif
       ierror=0
       return
