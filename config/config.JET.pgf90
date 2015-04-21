@@ -1,10 +1,6 @@
 # check if necessary variables are correctly defined
-ifndef LD_MSCL
-  LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
-endif
-ifndef LD_NCARG
-  $(error LD_NCARG not defined)
-endif
+LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
+LD_NCARG  ?= 
 
 DEFINES   = 
 
