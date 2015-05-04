@@ -11,16 +11,16 @@ LD_NCARG  ?= -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
 DEFINES   = 
 
-FC		    = pgf90
-CPP		    = /lib/cpp -traditional
+FC		    = gfortran
+CPP		    = /lib/cpp -traditional -DGFORTRAN
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C 
+FFLAGS		= -g -fcheck=all -fbacktrace
 else
 FFLAGS		= -O
 endif
 
-DBLPAD		= -r8 -i4
+DBLPAD		= -fdefault-real-8
 
 COMPILE 	= ${FC} -c ${FFLAGS}
 
