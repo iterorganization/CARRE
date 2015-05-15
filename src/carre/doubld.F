@@ -18,7 +18,7 @@ c======================================================================
 c======================================================================
 c a faire:
 c  Definition of xmail, ymail before and after a call to doubld.
-c  Don't forget the guard!
+c  Do not forget the guard!
 
 c  N.B. Here, the attempt to work with the relaxation scheme (everything
 c       starting and ending with c---) has been abandoned. The approach
