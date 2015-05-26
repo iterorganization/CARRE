@@ -96,10 +96,10 @@ tags:
 	rm -f TAGS ; etags src/*/*.F
 
 depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
-	makedepend -f ${OBJDIR}/dependencies.${COMPILER} ${INCLUDE} $^
-	mv ${OBJDIR}/dependencies.${COMPILER} ${OBJDIR}/dependencies.${COMPILER}.bak
-	sed -e 's|src/[^ ]*/|${OBJDIR}/|' ${OBJDIR}/dependencies.${COMPILER}.bak > ${OBJDIR}/dependencies.${COMPILER}
-
+	makedepend -f- ${INCLUDE} $^ | \
+	sed -e 's|src/[^ ]*/|${OBJDIR}/|' | \
+	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
+	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
 
 listobj:
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; l="OBJS ="; \
