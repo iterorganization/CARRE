@@ -31,8 +31,8 @@ c* 2.   print mesh parameters
       write(nfin,*)
       write(nfin,'(3x,a/)') 'Element output:'
       write(nfin,*) '   R*Btor =',b0r0
-      write(nfin,*) '   nx =',nx
-      write(nfin,*) '   ny =',ny
+      write(nfin,*) '   nx     =',nx
+      write(nfin,*) '   ny     =',ny
       write(nfin,*) '   ncut   =',ncut
       if(ncut.gt.0) then
         write(nfin,*) '   nxcut  =',(nxcut(i),i=1,ncut)
