@@ -396,7 +396,7 @@ c  ecriture de la maille
       write(nfin,*)'nelem=',nelem
       do ielem=1,nelem
         write(nfin,103)ielem,(v(j,ielem),j=1,3),(e(j,ielem),j=1,3)
- 103    format(i5,2x,3i7,2x,3i8,2x,i3)
+ 103    format(i7,2x,3i7,2x,3i8,2x,i3)
       enddo
       write(nfin,*)'$fin'
 

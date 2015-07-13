@@ -62,7 +62,7 @@ c* 2.3  print B2 input data
 
           write(nfin,101) icell,ix+1,iy+1,crx(ix,iy,2),cry(ix,iy,2),
      .      crx(ix,iy,3),cry(ix,iy,3)
- 101      format(3x,'Element',i5,' = (',i3,',',i3,'): (',
+ 101      format(3x,'Element',i7,' = (',i3,',',i3,'): (',
      .      1pe17.10,',',1pe17.10,')',
      .      6x,'(',1pe17.10,',',1pe17.10,')')
           write(nfin,102)brat,x0,y0
