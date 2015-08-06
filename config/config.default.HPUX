@@ -16,9 +16,9 @@ FC		= f77
 CPP		= /lib/cpp
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C -R8 +FPOZV
+FFLAGS		= -g -C +FPOZV
 else
-FFLAGS		= +O3 -R8
+FFLAGS		= +O3
 endif
 
 DBLPAD		= 
