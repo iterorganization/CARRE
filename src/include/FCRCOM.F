@@ -44,7 +44,7 @@ c*** nstr  : number of the structures imported from dg
 c*** lstr  : array containing their lengths
 c*** nclstr: number of closed structures (they come first)
 c*** xstr,
-c*** ystr  : co-ordinates of the structure nodes
+c*** ystr  : coordinates of the structure nodes
 c*** rbtor : product of the major radius by the toroidal field
 c*** pfm   : poloidal magnetic flux table
 c*** rgr   : R values for pfm
@@ -58,7 +58,7 @@ c*** pasmin,
 c*** rlcept,
 c*** pntrat : scalar parameters for Carre
 c*** nxpt   : actual number of pre-defined x-points
-c*** xptcntr: co-ordinates of the x-points
-c*** xlpcntr: co-ordinates of the o-point
+c*** xptcntr: coordinates of the x-points
+c*** xlpcntr: coordinates of the o-point
 c*** xpttol : tolerance parameter for distinguishing the x-points
 c*** ldgv2  : true if the input from DG v.2.0 or later

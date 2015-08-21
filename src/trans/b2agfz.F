@@ -51,7 +51,7 @@ c***  nisomx: maximum number of isolating cuts
 c***
 c*** Output:
 c***  nx,ny : actual dimensions of the B2 grid
-c***  crx,cry: co-ordinates of the cell corners
+c***  crx,cry: coordinates of the cell corners
 c***  fpsi  : psi values at the cell corners
 c***  ffbz  : "flux function" = 2*pi*B0*R0 for the toroidal geometry
 c***  ncut  : actual number of cuts

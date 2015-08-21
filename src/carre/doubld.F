@@ -79,7 +79,7 @@ c..          direction
 c.. nprad  : number of grid surfaces between the inner and outer
 c..          separatrices
 c.. plaque : index of the leading target
-c.. [xy]ext: co-ordinates of the strike point of the outer separatrix
+c.. [xy]ext: coordinates of the strike point of the outer separatrix
 c..            on the leading target
 c.. [xy]ptxex: coordinates of the outer X-point
 c.. [xy]pto: coordinates of the O-point

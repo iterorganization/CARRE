@@ -15,7 +15,7 @@ c=======================================================================
 *  variables locales
       integer npxmx4
       parameter (npxmx4=4*npxmx)
-      integer i,j,k,l,m,iipx(npxmx4),
+      integer i,j,k,l,m,n,iipx(npxmx4),
      ,  ii(strumx),jj(nbdmx),kk(npxmx),ll(nbdmx),mm(npxmx)
       
       data iipx /npxmx4*0/
@@ -59,7 +59,7 @@ c*** Input:
 c***  inddef  - list of targets (pieces of structure having at least one
 c***            intersection with a separatrix branch (strike-point)
 c***  indxpt  - list of x-points connected to the corresponding targets
-c***  xst,yst - strike-point co-ordinates
+c***  xst,yst - strike-point coordinates
 c***  nbdef   - number of strike-points
 c***  npx     - number of x-points
 c***
@@ -114,9 +114,35 @@ c*** k is the number of "private" targets
       end do !}
 c<<<
       write(0,*) 'Single intersections : ',k
+      if (k.eq.0.and.nbdef.eq.8) then  ! case of a "perfectly symmetric" connected double-null
+cxpb We will try throwing away one of each of the separatrix segments
+       n=0
+       do i=1,nbdef
+        do j=i+1,nbdef
+         if(inddef(i).eq.inddef(j).and.i.ne.j.and.
+     &      indxpt(i).ne.indxpt(j)) then
+          n=n+1
+          k=k+1
+          if(n.le.2) then ! assign to the first X-point
+            ii(inddef(j))=ii(inddef(j))-1
+            jj(k)=j
+            ll(k)=indxpt(j)
+            mm(indxpt(j))=mm(indxpt(j))+1
+          else ! assign to the second X-point
+            ii(inddef(i))=ii(inddef(i))-1
+            jj(k)=i
+            ll(k)=indxpt(i)
+            mm(indxpt(i))=mm(indxpt(i))+1
+          endif
+         endif
+        end do
+       end do
+       write(0,*) 'Single intersections after duplicates removal : ',k
+      end if
+c
       if(k.gt.0) then !{
-        write(0,*) 'jj : ',(jj(i),i=1,k)
-        write(0,*) 'll : ',(ll(i),i=1,k)
+        write(0,'(a,8i4)') 'jj : ',(jj(i),i=1,k)
+        write(0,'(a,8i4)') 'll : ',(ll(i),i=1,k)
       end if !}
 c>>>
 
@@ -128,15 +154,15 @@ c*** m is the number of x-points having two "private" targets
           m=m+1
           kk(m)=j
         else if(mm(j).gt.2) then !}{
-          write(0,*) 'Error found in INSERT (entry TRGARNG): too many ',
-     ,      '"private" targets for one x-point: ',j
+          write(0,*) 'Error found in INSERT (entry TRGARNG): ',
+     ,      'too many "private" targets for one x-point: ',j
           stop '==> Check the targets related to the inner x-point'
         end if !}
       end do !}
 c<<<
       write(0,*) 'Complete x-points: ',m
       if(m.gt.0) then !{
-        write(0,*) 'kk : ',(kk(i),i=1,m)
+        write(0,'(a,4i4)') 'kk : ',(kk(i),i=1,m)
       end if !}
 c>>> 
 c*** Now look for targets intersected twice
@@ -154,9 +180,8 @@ c*** Now look for targets intersected twice
       end do !}
 c<<<
       write(0,*) 'Before re-arrangement. k = ',k
-      if(k.gt.0) write(0,*) 'jj : ',(jj(i),i=1,k)
+      if(k.gt.0) write(0,'(a,8i4)') 'jj : ',(jj(i),i=1,k)
 c>>>
-
       do i=1,k !{
         j=jj(i)
         kk(i)=inddef(j)
@@ -192,8 +217,8 @@ c*** Check the consistency of the "primary targets" once more
       do i=1,npx !{
         if(mm(i).ne.2) then !{
           m=m+1
-          write(0,*) 'Error found in INSERT (entry TRGARNG): wrong ',
-     ,      'number of "private" targets. ipx,n = ',i,mm(i)
+          write(0,*) 'Error found in INSERT (entry TRGARNG): ',
+     ,      'wrong number of "private" targets. ipx,n = ',i,mm(i)
         end if !}
       end do !}
       if(m.gt.0) stop '==> check the target specification' 

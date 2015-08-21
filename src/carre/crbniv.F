@@ -325,7 +325,7 @@ cdps-20051115 Part of the above change.
 
 
 *
-*.. 3   Test pour savoir si la ligne de niveau est soit arrive au bord
+*.. 3   Test pour savoir si la ligne de niveau est soit arrivee au bord
 *       de la maille, soit revenue a son point de depart.
 *
 

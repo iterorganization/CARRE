@@ -20,7 +20,6 @@ c  arguments
      .      nivtot(nbniv),ptsep(4,npx),nreg, nn1,
      .      repart,nx,ny
      
-     
       real*8 xminx,xmaxx,yminx,ymaxx,separx(npnimx,4,npxmx),
      .       separy(npnimx,4,npxmx),
      .       xstruc(npstmx,strumx), ystruc(npstmx,strumx),
@@ -29,7 +28,6 @@ c  arguments
      .       a00(nxmax,nymax,3),a01(nxmax,nymax,3),a10(nxmax,nymax,3),
      .       a11(nxmax,nymax,3),psi(nxmax,nymax),x(nxmax),y(nymax)
       
-
 c
 c  variables locales
       integer i,j,k,nin,nn(2),inouv,sens,npcrb(2),nt,ii,jj,dir,indstr,
@@ -82,21 +80,16 @@ c***
 
 C     ON DESSINE LA SURFACE INTERIEURE
 
-      x1 = xn1(1)
-      y1 = yn1(1)
+          x1 = xn1(1)
+          y1 = yn1(1)
 C     On identifie le point de depart
         
-         valfct=fctini
+          valfct=fctini
 *..Psi value at the X-point
-       x2=xfin
-       y2=yfin 
+          x2=xfin
+          y2=yfin
             
-            sens=1
-
-
-         
-
-          
+          sens=1
           
 *..Parametrisation de la ligne de niveau qui passe par ce point.
           inouv=2
@@ -106,8 +99,6 @@ C     On identifie le point de depart
 
           ii=ifind(x2,x,nx,1)
           jj=ifind(y2,y,ny,1)
-
-   
 
 *..Definition de la courbe a ne pas traverser.
           DO 14 i=1, nn1
@@ -166,13 +157,6 @@ c***
       if(nn(inouv).gt.0) 
      > CALL agcurv(xs,1,ys,1,nn(inouv),nin)
       
-
-
-      
-     
-
-      
-
       return
       end
 

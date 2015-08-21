@@ -3,7 +3,7 @@ c
 c  version : 08.02.99 13:23
 c
 c======================================================================
-c*** Write the co-ordinates of the x- and o-points for Carre
+c*** Write the coordinates of the x- and o-points for Carre
 c*** At present, always a single-null configuration
 c======================================================================
       implicit none

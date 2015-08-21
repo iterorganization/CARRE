@@ -284,7 +284,7 @@ c----------------------------------------------------------------------
 * on colle la dernière ligne de niveau sur trace2 pour avoir 
 * la pénétration.
 
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
      _	       ptsep,npx,nptot,
      _	       nstruc,npstru,xstruc,ystruc,
      _	       nivx,nivy,nivtot,nbniv,
@@ -801,7 +801,7 @@ c----------------------------------------------------------------------
             yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
   371    CONTINUE
 
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
      _	       ptsep,npx,nptot,
      _	       nstruc,npstru,xstruc,ystruc,
      _	       nivx,nivy,nivtot,nbniv,
@@ -1626,7 +1626,7 @@ crm  augmenter ce test
                yn(nn)=separy(ipas,ptsep(4,ipx),ipx)
   111       CONTINUE
 
-*..Co-ordinates of the outer X-point
+*..Coordinates of the outer X-point
 
             xptxex = separx(1,ptsep(3,ipx),ipx)
             yptxex = separy(1,ptsep(3,ipx),ipx)
@@ -1729,7 +1729,7 @@ crm  augmenter ce test
             yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
   381    CONTINUE
 
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
      _	       ptsep,npx,nptot,
      _	       nstruc,npstru,xstruc,ystruc,
      _	       nivx,nivy,nivtot,nbniv,
@@ -2724,7 +2724,7 @@ c----------------------------------------------------------------------
             yn(nn1)=nivy(ipas,1)
   391    CONTINUE
 
-         call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
+         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
      _	       ptsep,npx,nptot,
      _	       nstruc,npstru,xstruc,ystruc,
      _		   nivx,nivy,nivtot,nbniv,

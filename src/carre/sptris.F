@@ -10,7 +10,7 @@ c*** This subroutine finds first the second starting point for each
 c*** separatrix branch (the first point is the X-point). 
 c*** Once such a point is found, a subroutine CRBNIV is called, which 
 c*** traces this branch until it strikes a target or comes to an X-point
-c*** and stores the trace co-ordinates for plotting.
+c*** and stores the trace coordinates for plotting.
 c*** Finally, a subroutine ORDDEF is called to order the targets 
 c*** according to the CARRE conventions, i.e. from right to left, from 
 c*** top to bottom.
@@ -65,7 +65,8 @@ c>>>
         jx = jptx(ipx)
 c<<<
         write(0,*) 
-        write(0,*) 'ipx,ix,jx,ptx,pty =',ipx,ix,jx,ptx(ipx),pty(ipx)
+        write(0,'(a,3i6,1p,2(1x,1e12.5))') 'ipx,ix,jx,ptx,pty =',
+     ,                                      ipx,ix,jx,ptx(ipx),pty(ipx)
         write(0,'(a,1p,4(1x,1e12.5))') 
      ,   'psi(ix,jx),CCW =',psi(ix,jx),psi(ix+1,jx),
      ,                      psi(ix+1,jx+1),psi(ix,jx+1)
@@ -78,7 +79,7 @@ c>>>
      .                            + a11(ix,jx,1)*ptx(ipx)*pty(ipx)
         write(0,*) 'fctpx =',fctpx(ipx)
 
-*..Initialise the co-ordinates of each separatrix curve
+*..Initialise the coordinates of each separatrix curve
 
         do isep=1, 4 !{
           separx(1,isep,ipx) = ptx(ipx)
@@ -95,7 +96,7 @@ c*** searched for the intersections with the separatrix branches - that
 c*** is, for the proper PSI value at each cell boundary. If at some 
 c*** boundary no intersection was found, then the adjacent cell was also
 c*** examined in a similar way. Due to the numerical noise (?), this
-c*** often lead to a confusion when not all the separatrix branches 
+c*** often led to a confusion when not all the separatrix branches 
 c*** could be identified properly.
 c*** Now we check the perimeter of the rim of cells (3x3) surrounding 
 c*** the one with X-point to reduce the effect of noise.
@@ -106,8 +107,8 @@ c*** the one with X-point to reduce the effect of noise.
 	  idir=idirloop
           nbdfav=nbdef
 c<<<
-      write(0,*) 
-      write(0,*) 'idir,nbdfav,isep =',idir,nbdfav,isep
+          write(0,*)
+          write(0,*) 'idir,nbdfav,isep =',idir,nbdfav,isep
 c>>>
 
           do ic=1,3 !{
@@ -140,9 +141,10 @@ c>>>
               endif !}
             
 c<<<
-      write(0,'(a,1p,3i4,2(1x,1e12.5))') 
-     ,  'Cell crossing: k,isep,ipx,separx,separy =',
-     ,                  k,isep,ipx,separx(k,isep,ipx),separy(k,isep,ipx)
+              write(0,'(a,1p,3i4,2(1x,1e12.5))')
+     ,         'Cell crossing: k,isep,ipx,separx,separy =',
+     ,                         k,isep,ipx,separx(k,isep,ipx),
+     ,                                    separy(k,isep,ipx)
 c>>>
 
 *..Call the routine which traces the line and stores the points
@@ -175,18 +177,18 @@ c<<<
       write(0,'(a,4i4)') 'After X-point loop: isep,npx,nbdef,nbdfav = ',
      ,                                        isep,npx,nbdef,nbdfav !###
       if(nbdef.gt.0) then !{
-        write(0,*) 'ixp_hlp :',(ixp_hlp(i),i=1,nbdef)
-        write(0,*) 'xsttmp :',(xsttmp(i),i=1,nbdef)
-        write(0,*) 'ysttmp :',(ysttmp(i),i=1,nbdef)
+        write(0,'(a,8i4)') 'ixp_hlp :',(ixp_hlp(i),i=1,nbdef)
+        write(0,'(a,1p,8(1x,1e12.5))') 'xsttmp :',(xsttmp(i),i=1,nbdef)
+        write(0,'(a,1p,8(1x,1e12.5))') 'ysttmp :',(ysttmp(i),i=1,nbdef)
       end if !}
       if(npx.gt.0 .and. isep.gt.0) then !{
         write(0,*) 'nptot'
         do j=1,npx !{
-          write(0,'(2x,20i4)') (nptot(i,j),i=1,isep)
+          write(0,'(2x,20(i4,1x))') (nptot(i,j),i=1,isep)
         end do !}
         write(0,*) 'indplq'
         do j=1,npx !{
-          write(0,'(2x,20i4)') (indplq(i,j),i=1,isep)
+          write(0,'(2x,20(i4,1x))') (indplq(i,j),i=1,isep)
         end do !}
       end if !}
 c>>>

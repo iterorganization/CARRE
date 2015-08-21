@@ -117,7 +117,7 @@ c.. pointx,pointy: coordinates of the points where the gradient
 c                  vanishes
 c.. ii,jj : x and y indices of the cells where the gradient vanishes
 c.. npx   : number of the X-points
-c.. ptx,pty: X-point co-ordinates
+c.. ptx,pty: X-point coordinates
 c.. iptx,jptx: x and y indices of the cells containing the X-points
 c.. xpto,ypto: coordinates of the O-point
 c.. racord: determines whether the X-points are connected
