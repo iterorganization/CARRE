@@ -272,9 +272,9 @@ c  Define the first point of the level vector.
       niv1x(1) = x2
       niv1y(1) = y2
 
-*..Recheche du deuxieme point sur le perimetre du carre ii,jj.
+*..Recherche du deuxieme point sur le perimetre du carre ii,jj.
 cdps
-c  Search for the second point on the perimeter of cross section ii,jj.
+c  Search for the second point on the perimeter of cross-section ii,jj.
 
       ecart1 = SQRT((x2-xstruc(ind2,plaque))**2 +
      .                       (y2-ystruc(ind2,plaque))**2)
@@ -308,9 +308,9 @@ c  If one has reached the end of the segment, check to see if the point is
 c  inside the structure or if the direction has changed.  If not the latter,
 c  verify that the point is in the interior or if there is a cross-piece
 c  on another segment of the structure.  If this is the case, the direction
-c  must be reversed, to return from a cross section and forget the point
+c  must be reversed, to return from a cross-section and forget the point
 c  just taken.  If not, one continues, preserving the point just obtained,
-c  the direction, and the coordinate cross section.
+c  the direction, and the coordinate cross-section.
 
       IF ((ABS(x2-x(nx)).LT.const1) .OR. (ABS(y2-y(ny)).LT.const1)
      .  .OR. (ABS(x2-x(1)).LT.const1) .OR. (ABS(y2-y(1)).LT.const1))
