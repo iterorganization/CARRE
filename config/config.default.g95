@@ -1,9 +1,9 @@
 # check if necessary variables are correctly defined
 ifndef LD_MSCL
-$(error LD_MSCL not defined)
+  $(error LD_MSCL not defined)
 endif
 ifndef LD_NCARG
-$(error LD_NCARG not defined)
+  $(error LD_NCARG not defined)
 endif
 
 FC		= g95
