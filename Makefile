@@ -81,7 +81,7 @@ ${OBJDIR}/libcarre.a: ${DEST}
 	ranlib $@
 
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
 
 neat:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
@@ -113,11 +113,11 @@ listobj:
 
 ${OBJDIR}/LISTOBJ: listobj
 
-VERSION: src/include/git_version.h
+VERSION: src/include/git_version_Carre.h
 
-src/include/git_version.h: force
-	@echo "      character*27 :: git_version ='`git describe --dirty --always`'" > src/include/git_version_new.h
-	@if cmp -s src/include/git_version_new.h src/include/git_version.h; then rm src/include/git_version_new.h; else mv src/include/git_version_new.h src/include/git_version.h; fi
+src/include/git_version_Carre.h: force
+	@echo "      character*27 :: git_version_Carre ='`git describe --dirty --always`'" > src/include/git_version_new.h
+	@if cmp -s src/include/git_version_new.h src/include/git_version_Carre.h; then rm src/include/git_version_new.h; else mv src/include/git_version_new.h src/include/git_version_Carre.h; fi
 
 ${OBJDIR}/dependencies.${COMPILER}:
 	-mkdir -p ${OBJDIR}
