@@ -116,7 +116,7 @@ ${OBJDIR}/LISTOBJ: listobj
 VERSION: src/include/git_version.h
 
 src/include/git_version.h: force
-	@echo "      character*27 :: gitversion ='`git describe --dirty --always`'" > src/include/git_version_new.h
+	@echo "      character*27 :: git_version ='`git describe --dirty --always`'" > src/include/git_version_new.h
 	@if cmp -s src/include/git_version_new.h src/include/git_version.h; then rm src/include/git_version_new.h; else mv src/include/git_version_new.h src/include/git_version.h; fi
 
 ${OBJDIR}/dependencies.${COMPILER}:
