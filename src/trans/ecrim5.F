@@ -19,7 +19,7 @@ c  arguments
 c
 c  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real x0,y0,brat
+      real x0,y0,brat,psi0
       real psitarg
       real psimin_carre
 c
@@ -64,7 +64,7 @@ c
 cjde   DIVIMP expects cut1 and cut2 as polygon indices of the cells in the PFZ
 cjde  - past the cuts - thus add one to cut2
 c
-      write(0,104)ny,nx,cutrgn,cut1,cut2+1
+      write(0,104) ny,nx,cutrgn,cut1,cut2+1
  104  format('''DIV  - grid characteristics: Number of Rings     ''',i7/
      .       '''                             Number of Knots     ''',i7/
      .       '''                             Cut ring            ''',i7/
@@ -92,15 +92,19 @@ c  2.1  calculate coordinates of cell centre
         y0=0.25*(cry(ix,iy,0)+cry(ix,iy,1)+cry(ix,iy,2)+cry(ix,iy,3))
 c  2.2  calculate magnetic field ratio
         brat=bb(ix,iy,0)/bb(ix,iy,3)
+cjde    calculate normalized psi at cell centre
+        psi0=0.25*(fpsi(ix,iy,0)+fpsi(ix,iy,1)
+     .            +fpsi(ix,iy,2)+fpsi(ix,iy,3))/(-psimin_carre) + 1.0
 c  2.3  print divimp input data
+c       write cell element data
         write(nfin,101)icell,ix,iy,crx(ix,iy,2),cry(ix,iy,2),
      .    crx(ix,iy,3),cry(ix,iy,3)
  101    format(3x,'Element',i7,' = (',i3,',',i3,'): (',
      .    1pe17.10,',',1pe17.10,')',
      .    6x,'(',1pe17.10,',',1pe17.10,')')
-        write(nfin,102)abs(brat),x0,y0
+        write(nfin,102)abs(brat),x0,y0,psi0
  102    format(3x,'Field ratio  = ',1pe17.10,13x,
-     .    '(',1pe17.10,',',1pe17.10,')')
+     .    '(',1pe17.10,',',1pe17.10,')',2x,0pf13.6)
         write(nfin,103)crx(ix,iy,0),cry(ix,iy,0),
      .    crx(ix,iy,1),cry(ix,iy,1)
  103    format(
