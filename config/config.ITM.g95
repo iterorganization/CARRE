@@ -12,7 +12,7 @@ CPP		= /lib/cpp -C -traditional
 ifdef SOLPS_DEBUG
 FFLAGS		= -g -C -fbounds-check -ftrace=full
 else
-FFLAGS		= -g -O
+FFLAGS		= -O
 endif
 
 DBLPAD		= -r8 
