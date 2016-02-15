@@ -133,11 +133,11 @@ c***      *******************|*******************
 c***             left                right
 c***
 c***
-c***      *******************                    
-c***      * c1 :  f1   : i1 *                    
+c***      *******************
+c***      * c1 :  f1   : i1 *
 c***      *....|.......|....*                         sn-...
-c***      * a2 |  d3   | g2 *                    
-c***      *******************                    
+c***      * a2 |  d3   | g2 *
+c***      *******************
 c***
 c***  Here * denotes a guard cell, | is a cut, and . and : separate
 c***  different zones of the grid.
@@ -152,7 +152,7 @@ c*** the carre grid.
 c***
 c*** These data are assigned to the variables:
 c***
-c***  k[a-i]	: carre region projected onto the B2 zone [a-i]
+c***  k[a-i]  : carre region projected onto the B2 zone [a-i]
 c***  l[a-i][pr]: starting index in poloidal or radial direction
 c***  m[a-i][pr]: ending index in poloidal or radial direction
 c***  n[a-i][pr]: number of cells in poloidal or radial direction
@@ -165,13 +165,13 @@ c      write(0,*) 'nppol: ',nppol
 c      write(0,*) 'nprad: ',nprad
 c      write(0,*) 'nptseg: ',nptseg
 c      do k=1,nreg     ! {
-c	write(0,*) 'Region ',k
-c	do j=1,nprad(k)     ! {
-c	  write(0,'(4h r: ,1p,12e10.2/(4x,12e10.2))')
-c     -  					(r(i,j,k),i=1,nppol(k))
-c	  write(0,'(4h z: ,1p,12e10.2/(4x,12e10.2))')
-c     -  					(z(i,j,k),i=1,nppol(k))     ! }
-c	end do	    ! }
+c       write(0,*) 'Region ',k
+c       do j=1,nprad(k)     ! {
+c         write(0,'(4h r: ,1p,12e10.2/(4x,12e10.2))')
+c     -            (r(i,j,k),i=1,nppol(k))
+c         write(0,'(4h z: ,1p,12e10.2/(4x,12e10.2))')
+c     -            (z(i,j,k),i=1,nppol(k))     ! }
+c       end do      ! }
 c      end do
 c>>>
       twopi=2.* 4.*atan(one)
@@ -188,15 +188,15 @@ c*** nominal magnetic field and major radius
         read(17,*,err=10) b0r0
         close(17)
         ex= b0r0 .ne. 0.                                   ! DPC
-        if(.not.ex) write(6,*) 'Zero value of Btor*R "in btor.dat"'   	! }
-      else    	! {
-        write(*,*) 'No file btor.dat found.'  	  ! }
+        if(.not.ex) write(6,*) 'Zero value of Btor*R "in btor.dat"'     ! }
+      else      ! {
+        write(*,*) 'No file btor.dat found.'      ! }
       end if
- 10   if(.not.ex) then	    ! {
+ 10   if(.not.ex) then      ! {
         write(6,*) 'Unable to get data from "btor.dat"'
         write(6,*) 'Please enter the value of Btor*R (0 to quit):'
         read *,b0r0
-        if(b0r0.eq.0.) stop   	! }
+        if(b0r0.eq.0.) stop     ! }
       end if
 c<<<
       write(0,*) 'Input: b0r0 = ',b0r0
@@ -204,14 +204,14 @@ c>>>
 c======================================================================
 c*** Define the equilibrium type
 
-c!!! Change the criteria (O-point is not necessarily around z=0) !!!   	
+c!!! Change the criteria (O-point is not necessarily around z=0) !!!
 c-ank19990108: done. To be honest, ssn-up and ssn-down are treated equally...
 
 c*** Now compare the vertical position of the x-point with that of the mid-SOL
 c      if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.zero) then
       if(nreg.eq.2) then
         equtype='limiter'
-      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.z(nptseg(3)/2,1,3)) 
+      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).gt.z(nptseg(3)/2,1,3))
      . then
         equtype='sn-up'
 c      else if(nreg.eq.3 .and. z(nptseg(1)-1,1,1).lt.zero) then
@@ -238,7 +238,7 @@ c======================================================================
 c*** Create the required mesh
 
       if(index(equtype,'dn-').gt.0) then     ! { ###
-      	if(index(equtype,'ddn-').gt.0) then     !   {
+        if(index(equtype,'ddn-').gt.0) then     ! {
 c----------------------------------------------------------------------
 c*** Construct the full mesh for the disconnected double-null geometry,
 c*** inner x-point either below (down) or above (up) the axis
@@ -247,22 +247,22 @@ c*** The grid is constructed of two adjacent parts corresponding to the
 c*** inner and outer halfs of the edge region.
 c***
 c*** Calculate the indices, increments, and counting for each zone
-  
+
 c----------------------------------------------------------------------
-          if(index(equtype,'ddn-down').gt.0) then  	  ! {  #C
+          if(index(equtype,'ddn-down').gt.0) then      ! {  #C
 c----------------------------------------------------------------------
-  
+
 cc<<<
 c          write(0,'(1x,a8,9a4)') 'ddn-down',
 c     ,                              'a','b','c','d','e','f','g','h','i'
 cc>>>
 c*** Check some grid dimensions for consistency
-  
+
             errenc=.false.
             if(nprad(5).ne.nprad(6)) then
               write(0,*) 'nprad(5) .ne. nprad(6)'
               write(*,*) 'nprad(5) .ne. nprad(6)'
-              errenc=.true.     
+              errenc=.true.
             end if
             if(nprad(2).ne.nprad(4)) then
               write(0,*) 'nprad(2) .ne. nprad(4)'
@@ -274,7 +274,7 @@ c*** Check some grid dimensions for consistency
               write(*,*) 'nprad(5)+nprad(1)-1 .ne. nprad(3)'
               errenc=.true.
             end if
-  
+
             if(errenc) then
               write(0,*) 'nprad: ',nprad
               write(*,*) 'nprad: ',nprad
@@ -282,9 +282,9 @@ c*** Check some grid dimensions for consistency
               write(*,*) '==> check the npr(i) values in carre'
               stop
             end if
-  
+
 c*** Regions
-  
+
             ka(1)=5
             ka(2)=3
             kb(1)=1
@@ -303,110 +303,110 @@ c*** Regions
             kh(2)=1
             ki(1)=4
             ki(2)=2
-  
+
 c*** Starting/ending points
-  
+
             lap(1)=nppol(ka(1))
             map(1)=nptseg(5)
             lap(2)=1
             map(2)=nptseg(1)
-  
+
             lbp(1)=nppol(kb(1))
             mbp(1)=nppol(kb(1))-nptseg(6)+1
             lbp(2)=1
             mbp(2)=nptseg(1)
-  
+
             lcp(1)=1
             mcp(1)=nptseg(6)
             lcp(2)=nppol(kc(2))
             mcp(2)=lcp(2)-nptseg(1)+1
-  
+
             ldp(1)=nppol(kd(1))
             mdp(1)=ldp(1)-nptseg(4)+1
             ldp(2)=mdp(1)
             mdp(2)=1
-  
+
             lep(1)=mbp(1)
             mep(1)=lep(1)-nptseg(4)+1
             lep(2)=mep(1)
             mep(2)=lep(2)-nptseg(3)+1
-  
+
             lfp(1)=mcp(1)
             mfp(1)=lfp(1)+nptseg(4)-1
             lfp(2)=mcp(2)
             mfp(2)=lfp(2)-nptseg(3)+1
-  
+
             lgp(1)=nptseg(1)
             mgp(1)=nppol(kg(1))
             lgp(2)=nptseg(5)
             mgp(2)=1
-  
+
             lhp(1)=nptseg(1)
             mhp(1)=nppol(kh(1))
             lhp(2)=mep(2)
             mhp(2)=1
-  
+
             lip(1)=mfp(1)
             mip(1)=nppol(ki(1))
             lip(2)=mfp(2)
             mip(2)=1
-  
+
             lar(1)=nprad(ka(1))
             mar(1)=1
             lar(2)=nprad(ka(2))
             mar(2)=lar(2)-lar(1)+1
-  
+
             lbr(1)=1
             mbr(1)=nprad(kb(1))
             lbr(2)=mar(2)
             mbr(2)=1
-  
+
             lcr(1)=1
             mcr(1)=nprad(kc(1))
             lcr(2)=1
             mcr(2)=nprad(kc(2))
-  
+
             ldr(1)=nprad(kd(1))
             mdr(1)=1
             ldr(2)=nprad(kd(2))
             mdr(2)=1
-  
+
             ler(1)=1
             mer(1)=nprad(ke(1))
             ler(2)=1
             mer(2)=nprad(ke(2))
-  
+
             lfr(1)=1
             mfr(1)=nprad(kf(1))
             lfr(2)=1
             mfr(2)=nprad(kf(2))
-  
+
             lgr(1)=nprad(kg(1))
             mgr(1)=lgr(1)-lar(1)+1
             lgr(2)=nprad(kg(2))
             mgr(2)=1
-  
+
             lhr(1)=mgr(1)
             mhr(1)=1
             lhr(2)=1
             mhr(2)=nprad(kh(2))
-  
+
             lir(1)=1
             mir(1)=nprad(ki(1))
             lir(2)=1
             mir(2)=nprad(ki(2))
-  
+
 c----------------------------------------------------------------------     ! }
           else if(index(equtype,'ddn-up').gt.0) then     ! {
 c----------------------------------------------------------------------
-  
+
 cc<<<
 c          write(0,'(1x,a8,9a4)') 'ddn-up',
 c     ,                              'a','b','c','d','e','f','g','h','i'
 cc>>>
-  
+
 c*** Check some grid dimensions for consistency
-  
+
             errenc=.false.
             if(nprad(3).ne.nprad(6)) then
               write(0,*) 'nprad(3) .ne. nprad(6)'
@@ -423,7 +423,7 @@ c*** Check some grid dimensions for consistency
               write(*,*) 'nprad(3)+nprad(1)-1 .ne. nprad(5)'
               errenc=.true.
             end if
-  
+
             if(errenc) then
               write(0,*) 'nprad: ',nprad
               write(*,*) 'nprad: ',nprad
@@ -431,9 +431,9 @@ c*** Check some grid dimensions for consistency
               write(*,*) '==> check the npr(i) values in carre'
               stop
             end if
-  
+
 c*** Regions
-  
+
             ka(1)=5
             ka(2)=3
             kb(1)=5
@@ -452,107 +452,107 @@ c*** Regions
             kh(2)=5
             ki(1)=4
             ki(2)=2
-  
+
 c*** Starting/ending points
-  
+
             lap(1)=nppol(ka(1))
             map(1)=nptseg(5)
             lap(2)=1
             map(2)=nptseg(1)
-  
+
             lbp(1)=lap(1)
             mbp(1)=map(1)
             lbp(2)=lap(2)
             mbp(2)=map(2)
-  
+
             lcp(1)=nppol(kc(1))
             mcp(1)=lcp(1)-nptseg(6)+1
             lcp(2)=1
             mcp(2)=nptseg(1)
-  
+
             ldp(1)=nptseg(3)
             mdp(1)=nppol(kd(1))
             ldp(2)=1
             mdp(2)=ldp(1)
-  
+
             lep(1)=nptseg(1)+nptseg(3)-1
             mep(1)=lep(1)+nptseg(4)-1
             lep(2)=nptseg(1)
             mep(2)=lep(1)
-  
+
             lfp(1)=mcp(1)
             mfp(1)=lfp(1)-nptseg(4)+1
             lfp(2)=mcp(2)
             mfp(2)=lfp(2)+nptseg(3)-1
-  
+
             lgp(1)=nptseg(1)
             mgp(1)=nppol(kg(1))
             lgp(2)=nptseg(5)
             mgp(2)=1
-  
+
             lhp(1)=mep(1)
             mhp(1)=nppol(kh(1))
             lhp(2)=lgp(2)
             mhp(2)=mgp(2)
-  
+
             lip(1)=mfp(1)
             mip(1)=1
             lip(2)=mfp(2)
             mip(2)=nppol(ki(2))
-  
+
             lar(1)=nprad(ka(1))
             mar(1)=lar(1)-nprad(kd(1))+1
             lar(2)=nprad(ka(2))
             mar(2)=1
-  
+
             lbr(1)=mar(1)
             mbr(1)=1
             lbr(2)=1
             mbr(2)=nprad(kb(2))
-  
+
             lcr(1)=1
             mcr(1)=nprad(kc(1))
             lcr(2)=1
             mcr(2)=nprad(kc(2))
-  
+
             ldr(1)=nprad(kd(1))
             mdr(1)=1
             ldr(2)=nprad(kd(2))
             mdr(2)=1
-  
+
             ler(1)=1
             mer(1)=nprad(ke(1))
             ler(2)=1
             mer(2)=nprad(ke(2))
-  
+
             lfr(1)=1
             mfr(1)=nprad(kf(1))
             lfr(2)=1
             mfr(2)=nprad(kf(2))
-  
+
             lgr(1)=nprad(kg(1))
             mgr(1)=1
             lgr(2)=nprad(kg(2))
             mgr(2)=lgr(2)-nprad(kd(2))+1
-  
+
             lhr(1)=1
             mhr(1)=nprad(kh(1))
             lhr(2)=mgr(2)
             mhr(2)=1
-  
+
             lir(1)=1
             mir(1)=nprad(ki(1))
             lir(2)=1
             mir(2)=nprad(ki(2))
         ! }
-          else  	  ! {
-  
+          else      ! {
+
             write(*,*) 'Non-recognisable option for disconnected ',
      ,              'double null -- internal error in b2agfz: ',equtype
             stop
         ! }
           end if
-  
+
 cc<<<
 c        write(0,'(1x,a8,9i4/9x,9i4)') 'Regions:',
 c     ,                                (((kq(i,j,k),k=1,3),j=1,3),i=1,2)
@@ -565,9 +565,9 @@ c     ,                               (((lqr(i,j,k),k=1,3),j=1,3),i=1,2)
 c        write(0,'(1x,a8,9i4/9x,9i4)') 'End   r:',
 c     ,                               (((mqr(i,j,k),k=1,3),j=1,3),i=1,2)
 cc>>>
-  
+
 c*** Calculate dimensions of the B2 grid zones
-  
+
           do i=1,2
             do j=1,3
               do k=1,3
@@ -576,19 +576,19 @@ c*** Calculate dimensions of the B2 grid zones
               end do
             end do
           end do
-  
+
 cc<<<
 c        write(0,'(1x,a8,9i4/9x,9i4)') '    nqp:',
 c     ,                               (((nqp(i,j,k),k=1,3),j=1,3),i=1,2)
 c        write(0,'(1x,a8,9i4/9x,9i4)') '    nqr:',
 c     ,                               (((nqr(i,j,k),k=1,3),j=1,3),i=1,2)
 cc>>>
-  
+
 c*** Check them for consistency
-  
+
           errenc=.false.
           do i=1,2      ! {
-            do j=1,3    	! {
+            do j=1,3      ! {
               if(nqp(i,j,1).ne.nqp(i,j,2) .or.
      .           nqp(i,j,1).ne.nqp(i,j,3)) then  ! {
                 kk=j
@@ -597,17 +597,17 @@ c*** Check them for consistency
      ,                                  'Region: ',znptxt(kk),znstxt(i)
                 write(*,*) 'Inconsistent poloidal grid dimensions. ',
      ,                                  'Region: ',znptxt(kk),znstxt(i)
-                errenc=.true.   	! }
-              end if    	! }
+                errenc=.true.     ! }
+              end if      ! }
             end do
-  
+
             if(errenc) then
               write(*,*) 'Inconsistent poloidal grid dimensions.'
               write(*,*) '==> Probably, an internal error in b2agfz'
               stop
             end if
-  
-            do k=1,3    	! {
+
+            do k=1,3      ! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
      .           nqr(i,1,k).ne.nqr(i,3,k)) then ! {
                 write(0,*) 'Inconsistent radial grid dimensions. ',
@@ -615,8 +615,8 @@ c*** Check them for consistency
                 write(*,*) 'Inconsistent radial grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
-                errenc=.true.   	! }
-              end if    	! }
+                errenc=.true.     ! }
+              end if      ! }
             end do      ! }
           end do
           do k=1,3      ! {
@@ -629,27 +629,27 @@ c*** Check them for consistency
               errenc=.true.
             end if      ! }
           end do
-  
+
           if(errenc) then
             write(*,*) 'Inconsistent radial grid dimensions, '
             write(*,*) '==> Check the npr specification in carre. '
             stop
           end if
 c----------------------------------------------------------------------  ! }
-      	else if(index(equtype,'cdn-full').gt.0) then    	! {  #D
+        else if(index(equtype,'cdn-full').gt.0) then      ! {  #D
 c----------------------------------------------------------------------
-  
+
 c<<<
-c	  write(0,'(1x,a8,9a4)') 'cdn-full',
-c     ,  			    'a','b','c','d','e','f','g','h','i'
+c         write(0,'(1x,a8,9a4)') 'cdn-full',
+c     ,            'a','b','c','d','e','f','g','h','i'
 c>>>
 c*** Check some grid dimensions for consistency
-  
+
             errenc=.false.
             if(nprad(1).ne.nprad(3)) then
               write(0,*) 'nprad(1) .ne. nprad(3)'
               write(*,*) 'nprad(1) .ne. nprad(3)'
-              errenc=.true.     
+              errenc=.true.
             end if
             if(nprad(2).ne.nprad(4)) then
               write(0,*) 'nprad(2) .ne. nprad(4)'
@@ -661,7 +661,7 @@ c*** Check some grid dimensions for consistency
               write(*,*) 'nprad(5) .ne. nprad(4)'
               errenc=.true.
             end if
-  
+
             if(errenc) then
               write(0,*) 'nprad: ',nprad
               write(*,*) 'nprad: ',nprad
@@ -669,9 +669,9 @@ c*** Check some grid dimensions for consistency
               write(*,*) '==> check the npr(i) values in carre'
               stop
             end if
-  
+
 c*** Regions  #R
-  
+
             ka(1)=4
             ka(2)=2
             kb(1)=0
@@ -690,114 +690,114 @@ c*** Regions  #R
             kh(2)=0
             ki(1)=3
             ki(2)=1
-  
+
 c*** Starting/ending points
-  
+
             lap(1)=nppol(ka(1))
             map(1)=nptseg(5)
             lap(2)=1
             map(2)=nptseg(1)
-  
+
             lbp(1)=0
             mbp(1)=0
             lbp(2)=0
             mbp(2)=0
-  
+
             lcp(1)=nppol(kc(1))
             mcp(1)=lcp(1)-nptseg(6)+1
             lcp(2)=1
             mcp(2)=nptseg(1)
-  
-            ldp(1)=nptseg(3) 
+
+            ldp(1)=nptseg(3)
             mdp(1)=nppol(kd(1))
             ldp(2)=1
             mdp(2)=ldp(1)
-  
+
             lep(1)=0
             mep(1)=0
             lep(2)=0
             mep(2)=0
-  
+
             lfp(1)=mcp(1)
             mfp(1)=lfp(1)-nptseg(4)+1
             lfp(2)=mcp(2)
             mfp(2)=lfp(2)+nptseg(3)-1
-  
+
             lgp(1)=nptseg(1)
             mgp(1)=nppol(kg(1))
             lgp(2)=nptseg(5)
             mgp(2)=1
-  
+
             lhp(1)=0
             mhp(1)=0
             lhp(2)=0
             mhp(2)=0
-  
+
             lip(1)=mfp(1)
             mip(1)=1
             lip(2)=mfp(2)
             mip(2)=nppol(ki(2))
-  
+
             lar(1)=nprad(ka(1))
             mar(1)=1
             lar(2)=nprad(ka(2))
             mar(2)=1
-  
+
             lbr(1)=0
             mbr(1)=0
             lbr(2)=0
             mbr(2)=0
-  
+
             lcr(1)=1
             mcr(1)=nprad(kc(1))
             lcr(2)=1
             mcr(2)=nprad(kc(2))
-  
+
             ldr(1)=nprad(kd(1))
             mdr(1)=1
             ldr(2)=nprad(kd(2))
             mdr(2)=1
-  
+
             ler(1)=0
             mer(1)=0
             ler(2)=0
             mer(2)=0
-  
+
             lfr(1)=1
             mfr(1)=nprad(kf(1))
             lfr(2)=1
             mfr(2)=nprad(kf(2))
-  
+
             lgr(1)=nprad(kg(1))
             mgr(1)=1
             lgr(2)=nprad(kg(2))
             mgr(2)=1
-  
+
             lhr(1)=0
             mhr(1)=0
             lhr(2)=0
             mhr(2)=0
-  
+
             lir(1)=1
             mir(1)=nprad(ki(1))
             lir(2)=1
             mir(2)=nprad(ki(2))
-  
+
 c<<<
-c	write(0,'(1x,a8,9i4/9x,9i4)') 'Regions:',
-c     ,  			      (((kq(i,j,k),k=1,3),j=1,3),i=1,2)
-c	write(0,'(1x,a8,9i4/9x,9i4)') 'Start p:',
-c     ,  			     (((lqp(i,j,k),k=1,3),j=1,3),i=1,2)
-c	write(0,'(1x,a8,9i4/9x,9i4)') 'End   p:',
-c     ,  			     (((mqp(i,j,k),k=1,3),j=1,3),i=1,2)
-c	write(0,'(1x,a8,9i4/9x,9i4)') 'Start r:',
-c     ,  			     (((lqr(i,j,k),k=1,3),j=1,3),i=1,2)
-c	write(0,'(1x,a8,9i4/9x,9i4)') 'End   r:',
-c     ,  			     (((mqr(i,j,k),k=1,3),j=1,3),i=1,2)
+c       write(0,'(1x,a8,9i4/9x,9i4)') 'Regions:',
+c     ,              (((kq(i,j,k),k=1,3),j=1,3),i=1,2)
+c       write(0,'(1x,a8,9i4/9x,9i4)') 'Start p:',
+c     ,             (((lqp(i,j,k),k=1,3),j=1,3),i=1,2)
+c       write(0,'(1x,a8,9i4/9x,9i4)') 'End   p:',
+c     ,             (((mqp(i,j,k),k=1,3),j=1,3),i=1,2)
+c       write(0,'(1x,a8,9i4/9x,9i4)') 'Start r:',
+c     ,             (((lqr(i,j,k),k=1,3),j=1,3),i=1,2)
+c       write(0,'(1x,a8,9i4/9x,9i4)') 'End   r:',
+c     ,             (((mqr(i,j,k),k=1,3),j=1,3),i=1,2)
 c>>>
-  
+
 c*** Calculate dimensions of the B2 grid zones
-  
+
           do i=1,2
             do j=1,3
               do k=1,3
@@ -806,19 +806,19 @@ c*** Calculate dimensions of the B2 grid zones
               end do
             end do
           end do
-  
+
 c<<<
-c	write(0,'(1x,a8,9i4/9x,9i4)') '    nqp:',
-c     ,  			     (((nqp(i,j,k),k=1,3),j=1,3),i=1,2)
-c	write(0,'(1x,a8,9i4/9x,9i4)') '    nqr:',
-c     ,  			     (((nqr(i,j,k),k=1,3),j=1,3),i=1,2)
+c       write(0,'(1x,a8,9i4/9x,9i4)') '    nqp:',
+c     ,             (((nqp(i,j,k),k=1,3),j=1,3),i=1,2)
+c       write(0,'(1x,a8,9i4/9x,9i4)') '    nqr:',
+c     ,             (((nqr(i,j,k),k=1,3),j=1,3),i=1,2)
 c>>>
-  
+
 c*** Check them for consistency
-  
+
           errenc=.false.
           do i=1,2      ! {
-            do j=1,3    	! {
+            do j=1,3      ! {
               if(nqp(i,j,1).ne.nqp(i,j,3)) then     ! {
                 kk=j
                 if(i.eq.2 .and. kk.ne.2) kk=4-kk
@@ -826,17 +826,17 @@ c*** Check them for consistency
      ,                                  'Region: ',znptxt(kk),znstxt(i)
                 write(*,*) 'Inconsistent poloidal grid dimensions. ',
      ,                                  'Region: ',znptxt(kk),znstxt(i)
-                errenc=.true.   	! }
-              end if    	! }
+                errenc=.true.     ! }
+              end if      ! }
             end do
-  
+
             if(errenc) then
               write(*,*) 'Inconsistent poloidal grid dimensions.'
               write(*,*) '==> Probably, an internal error in b2agfz'
               stop
             end if
-  
-            do k=1,3    	! {
+
+            do k=1,3      ! {
               if(nqr(i,1,k).ne.nqr(i,2,k) .or.
      .           nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
                 write(0,*) 'Inconsistent radial grid dimensions. ',
@@ -844,8 +844,8 @@ c*** Check them for consistency
                 write(*,*) 'Inconsistent radial grid dimensions. ',
      ,                                   'Region: ',znrtxt(k),znstxt(i)
                 write(*,*) '==> Check the npr specification in carre. '
-                errenc=.true.   	! }
-              end if    	! }
+                errenc=.true.     ! }
+              end if      ! }
             end do      ! }
           end do
           do k=1,3      ! {
@@ -858,7 +858,7 @@ c*** Check them for consistency
               errenc=.true.
             end if      ! }
           end do
-  
+
           if(errenc) then
             write(*,*) 'Inconsistent radial grid dimensions, '
             write(*,*) '==> Check the npr specification in carre. '
@@ -874,7 +874,7 @@ c*** Dimensions for one half of the grid
         ny=nqr(1,1,1)+nqr(1,1,2)+nqr(1,1,3)
 
         errenc=.false.
-        if(ny.gt.nymax) then  	  ! {
+        if(ny.gt.nymax) then      ! {
           write(*,*) 'Grid is too large in radial direction: ny=',
      ,                                             ny,' > nymax=',nymax
           write(*,*) '==> Increase nrmamx in CARREDIM.F'
@@ -886,16 +886,16 @@ c*** Dimensions for one half of the grid
 c*** Fill in the arrays
 
 c<<<
-c	write(0,*) 'b2agfz: filling the arrays. ny= ',ny
-c	write(0,'(11a5)') 'ihg','ipz','irz','irg','ix','lp','lr',
-c     ,  					  'mp','mr','iip','iir'
+c       write(0,*) 'b2agfz: filling the arrays. ny= ',ny
+c       write(0,'(11a5)') 'ihg','ipz','irz','irg','ix','lp','lr',
+c     ,              'mp','mr','iip','iir'
 c>>>
 
 c*** Two halves of the grid...
 
         ix=0
         nx=0
-        do ihg=1,2    	! {
+        do ihg=1,2      ! {
           nxx(ihg)=nqp(ihg,1,1)+nqp(ihg,2,1)+nqp(ihg,3,1)
           nx=nx+nxx(ihg)
           if(nx.ge.nxmax) then
@@ -905,11 +905,11 @@ c*** Two halves of the grid...
             stop
           end if
 c*** Three poloidal zones
-          do ipz=1,3  	  ! {
+          do ipz=1,3      ! {
             iy=0
             ixx=ix
 c*** Three radial zones
-            do irz=1,3	    ! {
+            do irz=1,3      ! {
               ix=ixx
               iyy=iy
 c*** Assign the indices and counters
@@ -925,13 +925,13 @@ c*** Assign the indices and counters
               mp=mp-iip
               mr=mr-iir
 c<<<
-c	      write(0,'(11i5)') ihg,ipz,irz,irg,ix,lp,lr,mp,mr,iip,iir
+c              write(0,'(11i5)') ihg,ipz,irz,irg,ix,lp,lr,mp,mr,iip,iir
 c>>>
 
 c*** Calculate the grid data for the zone
-              do j=lp,mp,iip  	  ! {
+              do j=lp,mp,iip      ! {
                 iy=iyy
-                do i=lr,mr,iir	    ! {
+                do i=lr,mr,iir      ! {
                   crx(ix,iy,0)=r(j,i,irg)
                   crx(ix,iy,1)=r(j+iip,i,irg)
                   crx(ix,iy,2)=r(j,i+iir,irg)
@@ -959,8 +959,8 @@ c*** Calculate the grid data for the zone
                   iy=iy+1     ! }
                 end do
                 ix=ix+1     ! }
-              end do  	  ! }
-            end do    	! }
+              end do      ! }
+            end do      ! }
           end do
 c*** Reserve room for the guard cells
           ix=ix+2     ! }
@@ -968,9 +968,9 @@ c*** Reserve room for the guard cells
 
 c*** periphery
         ix=-1
-        do ihg=1,2    	! {
+        do ihg=1,2      ! {
 c<<<
-c	  write(0,*) 'b2agfz: call periph. ix,nxx=',ix,nxx(ihg)
+c        write(0,*) 'b2agfz: call periph. ix,nxx=',ix,nxx(ihg)
 c>>>
 c*** This subroutine creates the guard cells around the grid block
 
@@ -1008,10 +1008,10 @@ c*** Determine the cut positions and lengths
             nycut(1)=nycut(2)+nqr(1,1,2)
           end if
           nycut(3)=nycut(2)
-          nycut(4)=nycut(1)   	! }
+          nycut(4)=nycut(1)     ! }
         end if
-	niso=1
-	nxiso(1)=nxx(1)+1
+        niso=1
+        nxiso(1)=nxx(1)+1
 
 c<<<
         write(0,*) 'nx, ncut, niso = ',nx, ncut, niso
@@ -1020,7 +1020,7 @@ c<<<
         write(0,*) 'nxiso :  ',(nxiso(i),i=1,niso)
 c>>>
 c---------------------------------------------------------------------- ! }
-      else if(index(equtype,'sn-down').gt.0 .or. 
+      else if(index(equtype,'sn-down').gt.0 .or.
      .        index(equtype,'sn-up').gt.0) then ! {
 c----------------------------------------------------------------------
 c  construct the mesh for the bottom single null geometry
@@ -1039,13 +1039,13 @@ c       print*,'npol3=',npol3
 c***
 c
 c  test values of nprad compared to nx and ny
-        if(npol1.ne.nx) then  	! {
+        if(npol1.ne.nx) then    ! {
           write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
-          stop	    ! }
-        else if(nprad(2).ne.nprad(3)) then    	! {
+          stop      ! }
+        else if(nprad(2).ne.nprad(3)) then      ! {
           write(6,*)'error in b2agfz: nprad(2)=',nprad(2),
      .      ' .ne. nprad(3)=',nprad(3)
-          stop	    ! }
+          stop      ! }
         end if
 
 c  edge region
@@ -1083,7 +1083,7 @@ c***
             fpsi(ix,iy,3)=psi(ipol,irad+1,ireg)
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
-            psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)   	! }
+            psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)     ! }
           end do      ! }
         end do
 c  private region: left side
@@ -1120,7 +1120,7 @@ c  private region: left side
         end do
 c  central region
         ireg=3
-        do ipol=npol3,1,-1    	! {
+        do ipol=npol3,1,-1      ! {
           ix=npol2g+(npol3-ipol)
           do irad=1,nprad(ireg)-1     ! {
             iy=(nprad(ireg)-1)-irad
@@ -1184,9 +1184,9 @@ c  private region: right side
         end do
 c  periphery
         call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
-	
+
 c*** Specify the cuts
-      	ncut=2
+        ncut=2
         if(ncut.gt.ncutmx) then ! {
           write(*,*) 'Too many cuts. ncut,ncutmx =',ncut,ncutmx
           write(*,*) '==> Increase ncutmx in tradui.F'
@@ -1196,14 +1196,14 @@ c*** Specify the cuts
           end do  ! }
         else  ! {
           if(index(equtype,'-down').gt.0) then
-  	    nxcut(1)=nptseg(2)-1
-      	  else
-  	    nxcut(1)=nptseg(1)-1
-      	  end if
+            nxcut(1)=nptseg(2)-1
+          else
+            nxcut(1)=nptseg(1)-1
+          end if
           nxcut(2)=nxcut(1)+nptseg(3)-1
-	  nycut(1)=nprad(3)-1
-	  nycut(2)=nycut(1)  ! }
-	end if
+          nycut(1)=nprad(3)-1
+          nycut(2)=nycut(1)  ! }
+        end if
 c
 c----------------------------------------------------------------------  ! }
       else if(index(equtype,'limiter').gt.0) then     ! {
@@ -1222,9 +1222,9 @@ c       print*,'npol2=',npol2
 c***
 c
 c  test values of nprad compared to nx and ny
-        if(npol1.ne.nx) then  	  ! {
+        if(npol1.ne.nx) then      ! {
           write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
-          stop	    ! }
+          stop      ! }
         end if
 
 c  edge region
@@ -1262,12 +1262,12 @@ c***
             fpsi(ix,iy,3)=psi(ipol,irad+1,ireg)
             ffbz(ix,iy,3)=twopi*b0r0
             psidx(ix,iy,3)=psidxm(ipol,irad+1,ireg)
-            psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)   	! }
+            psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)     ! }
           end do      ! }
         end do
 c  central region
         ireg=2
-        do ipol=npol2,1,-1    	! {
+        do ipol=npol2,1,-1      ! {
           ix=npol2g+(npol2-ipol)
           do irad=1,nprad(ireg)-1     ! {
             iy=(nprad(ireg)-1)-irad
@@ -1300,24 +1300,24 @@ c  central region
 c  periphery
         call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
 c----------------------------------------------------------------------  ! }
-      else    	! {
+      else      ! {
 c----------------------------------------------------------------------
         write(6,*) 'fatal error in b2agfz: type not recognized.'
-        stop  	  ! }
+        stop      ! }
       end if
 
 c======================================================================
 c*** Rearrange the mesh if needed, in order to have a right-handed
 c*** system of coordinates
 
-      if( 
+      if(
      . (crx(1,1,1)-crx(1,1,0))*(cry(1,1,2)-cry(1,1,0)) -
      - (crx(1,1,2)-crx(1,1,0))*(cry(1,1,1)-cry(1,1,0)).lt.zero) then ! {
 cc<<<
 c       write(0,*) 'changing the grid orientation...'
 cc>>>
-        do iy=-1,ny   	! {
-          do ix=-1,(nx-1)/2   	! {
+        do iy=-1,ny     ! {
+          do ix=-1,(nx-1)/2     ! {
             i=nx-(ix+1)
 
             tempo=crx(ix,iy,0)
@@ -1355,7 +1355,7 @@ cc>>>
             psidy(ix,iy,2)=psidy(i,iy,3)
             psidy(i,iy,3)=tempo
 
-            if(i.ne.ix) then  	  ! {
+            if(i.ne.ix) then      ! {
               tempo=crx(ix,iy,1)
               crx(ix,iy,1)=crx(i,iy,0)
               crx(i,iy,0)=tempo
@@ -1390,9 +1390,9 @@ cc>>>
               tempo=psidy(ix,iy,3)
               psidy(ix,iy,3)=psidy(i,iy,2)
               psidy(i,iy,2)=tempo     ! }
-            end if    	! }
+            end if      ! }
           end do      ! }
-        end do	    ! }
+        end do      ! }
       end if
 
 * ..return
