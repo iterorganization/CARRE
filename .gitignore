@@ -2,10 +2,10 @@
 
 *~
 
-#ignore local files and directories
+# ignore local files and directories
+
 *.local
 *.local/
-
 
 # Local compiler files
 
@@ -44,4 +44,8 @@ dg.*
 # Carre archive
  
 meshes/
+
+# Temporary files created by scripts
+
+grep.lis
 
