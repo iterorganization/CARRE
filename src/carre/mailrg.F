@@ -506,8 +506,12 @@ c       meilleure orthogonalite possible
                ortmax=zero
                do ipol=ipol1,ipoln
                  if(abs(ort2(ipol)).gt.rlcept) then
-                   del=-ort2(ipol)*(l2(ipol)-l1(ipol))
+                   if (abs(ort2(ipol)-ort1(ipol)).gt.rlcept**2) then
+                     del=-ort2(ipol)*(l2(ipol)-l1(ipol))
      .                            /(ort2(ipol)-ort1(ipol))
+                   else
+                     del=zero
+                   end if
                    if(del.gt.zero) then
                      del=min(del,relax*(l2(ipol+1)-l2(ipol)))
                    else
