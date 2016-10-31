@@ -27,7 +27,7 @@ LDFLAGS 	= -lsocket
 LDEXTRA         = 
 LDEXTRA 	= -lf77compat
 
-!!!Local Variables:
-!!! mode: Makefile
-!!! End:
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
 

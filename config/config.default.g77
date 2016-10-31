@@ -21,7 +21,7 @@ LDLIBS		= ${LD_MSCL}
 LDFLAGS 	= ${LD_NCARG} # ${NCARG_ROOT}/BD/*.o 
 LDEXTRA 	= 
 
-!!!Local Variables:
-!!! mode: Makefile
-!!! End:
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
 
