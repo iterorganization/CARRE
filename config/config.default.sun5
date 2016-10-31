@@ -26,3 +26,8 @@ LDLIBS		= ${LD_MSCL} ${LD_NCARG}
 LDFLAGS 	= -lsocket
 LDEXTRA         = 
 LDEXTRA 	= -lf77compat
+
+!!!Local Variables:
+!!! mode: Makefile
+!!! End:
+

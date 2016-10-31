@@ -30,3 +30,8 @@ LDLIBS		= -Wl, ${LD_MSCL} -Wl,${LD_NCARG} -Wl,-L/usr/lib/X11R5
 #LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -lncarg_loc -lmach -lX11 -lm
 LDFLAGS 	= -lmach
 LDEXTRA 	= 
+
+!!!Local Variables:
+!!! mode: Makefile
+!!! End:
+

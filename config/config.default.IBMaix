@@ -29,3 +29,8 @@ LDLIBS		= ${LD_MSCL} ${LD_NCARG}
 LDFLAGS 	= 
 # LDEXTRA	= -bloadmap:loadmap -bmap:map -bmaxdata:0x80000000 -bmaxstack:0x80000000
 LDEXTRA 	= -bloadmap:loadmap -bmap:map
+
+!!!Local Variables:
+!!! mode: Makefile
+!!! End:
+

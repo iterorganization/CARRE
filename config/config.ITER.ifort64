@@ -22,3 +22,8 @@ COMPILE   = ${FC} -c ${FFLAGS}
 LDLIBS	  = ${LD_MSCL} ${LD_NCARG}
 LDFLAGS   = -i_dynamic
 LDEXTRA   = 
+
+!!!Local Variables:
+!!! mode: Makefile
+!!! End:
+

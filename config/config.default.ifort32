@@ -30,3 +30,8 @@ LDLIBS		= ${LD_MSCL} ${LD_NCARG}
 LDFLAGS 	= 
 #LDFLAGS 	= -lX11 -lm -lmscl
 #DUMMY           = builds/${HOST_NAME}.${COMPILER}/bidon.o 
+
+!!!Local Variables:
+!!! mode: Makefile
+!!! End:
+

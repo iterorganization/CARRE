@@ -27,3 +27,8 @@ COMPILE 	= ${FC} -c ${FFLAGS}
 LDLIBS		= ${LD_MSCL} ${LD_NCARG}
 LDFLAGS 	= 
 
+
+!!!Local Variables:
+!!! mode: Makefile
+!!! End:
+
