@@ -13,13 +13,25 @@ ifndef COMPILER
 $(error COMPILER not defined)
 endif
 
+MAKES = Makefile 
 # Include global SOLPS compiler settings
 ifndef SOLPS_CPP
 ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER} ] && echo yes || echo no ),yes)
   include ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}
+  MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}
+  ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local ] && echo yes || echo no ),yes)
+    include ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
+    MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
+  endif
 else
   $(warning ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER} not found.)
 endif
+else
+  MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}
+  ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local ] && echo yes || echo no ),yes)
+    include ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
+    MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
+  endif
 endif
 
 ifdef SOLPS_DEBUG
@@ -34,12 +46,14 @@ CPP	= /usr/lib/cpp
 
 ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER} ] && echo yes || echo no ),yes)
 include config/config.${HOST_NAME}.${COMPILER}
+MAKES+= config/config.${HOST_NAME}.${COMPILER}
 else
 $(error config/config.${HOST_NAME}.${COMPILER} not found.)
 endif
 
 ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER}.local ] && echo yes || echo no ),yes)
 include config/config.${HOST_NAME}.${COMPILER}.local
+MAKES+= config/config.${HOST_NAME}.${COMPILER}.local
 endif
 
 ifdef NCARG_ROOT
@@ -74,15 +88,15 @@ all: VERSION ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR}
 
 standalone: ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
 
-${OBJDIR}/${PROG}: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a
+${OBJDIR}/${PROG}: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a $(MAKES)
 	rm -f ${OBJDIR}/${PROG} 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG} ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/${PROG_TRA}: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a
+${OBJDIR}/${PROG_TRA}: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a $(MAKES)
 	rm -f ${OBJDIR}/${PROG_TRA} 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_TRA} ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a
+${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a $(MAKES)
 	rm -f ${OBJDIR}/${PROG_FCRR} 2>/dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
