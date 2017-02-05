@@ -57,7 +57,11 @@ cank-970707: dimensions from the file
      .       xint(2),yint(2)
       logical lc,li,l_dbg
       integer n_call
+#ifdef DBG
+      data l_dbg /.true./
+#else
       data l_dbg /.false./
+#endif
       data n_call /0/
 
 *  procedures
@@ -104,17 +108,17 @@ c======================================================================
 *
       n_call=n_call+1
 cc<<<
-c      l_dbg=n_call.le.4
-c      if(l_dbg) then
-c        write(0,*) '===> Entering doubld. n_call = ',n_call
-c        write(0,'(1x,2a5,6a7,a9,3a12)') 'nx','ny','nstruc','nn1',
-c     ,        'nprad','plaque','npcrb2','repart',
-c     ,        'xext','yext','xptxex','yptxex'
-c        write(0,'(1x,2i5,6i7,1p,4e12.4)') nx,ny,nstruc,nn1,nprad,
-c     ,                     plaque,npcrb2,repart,xext,yext,xptxex,yptxex
-c        write(0,'(1x,a6,1p,8e12.4/(7x,8e12.4))') 'pas: ',
-c     ,                                               (pas(i),i=1,nprad)
-c      end if
+      l_dbg=l_dbg.and.n_call.le.4
+      if(l_dbg) then
+        write(0,*) '===> Entering doubld. n_call = ',n_call
+        write(0,'(1x,2a5,6a7,a9,3a12)') 'nx','ny','nstruc','nn1',
+     ,        'nprad','plaque','npcrb2','repart',
+     ,        'xext','yext','xptxex','yptxex'
+        write(0,'(1x,2i5,6i7,1p,4e12.4)') nx,ny,nstruc,nn1,nprad,
+     ,                     plaque,npcrb2,repart,xext,yext,xptxex,yptxex
+        write(0,'(1x,a6,1p,8e12.4/(7x,8e12.4))') 'pas: ',
+     ,                                               (pas(i),i=1,nprad)
+      end if
 cc>>>
 
 *..Copy the arguments into the local variables
@@ -129,7 +133,7 @@ cc>>>
      .       x2,y2,'gauche')
       call trc_stk_out
 cc<<<
-c      if(l_dbg) write(0,*) 'After drctio: sens = ',sens
+      if(l_dbg) write(0,*) 'After drctio: sens = ',sens
 cc>>>
 
 *..Define the second boundary curve
@@ -166,9 +170,9 @@ cc>>>
 
       valfct=fctini
 cc<<<
-c      if(l_dbg) then
-c        write(0,*) '*10: ll,ii,jj,fctini =',ll,ii,jj,fctini
-c      end if
+      if(l_dbg) then
+        write(0,*) '*10: ll,ii,jj,fctini =',ll,ii,jj,fctini
+      end if
 cc>>>
 
 *..Identify xbcl and ybcl for the first curve
@@ -187,11 +191,11 @@ cc>>>
          y1=y2
          ll1=ll
 cc<<<
-c      if(l_dbg) then
-c        write(0,'(8h ---- ir,2a7,a9,4a12)')
-c     -                          'ianc','inouv','ll','x1','x2','y1','y2'
-c        write(0,'(1x,3i7,1p,5e12.4)') ir,ianc,inouv,ll,x1,x2,y1,y2
-c      end if
+      if(l_dbg) then
+        write(0,'(8h ---- ir,2a7,a9,4a12)')
+     -                          'ianc','inouv','ll','x1','x2','y1','y2'
+        write(0,'(1x,3i7,1p,5e12.4)') ir,ianc,inouv,ll,x1,x2,y1,y2
+      end if
 cc>>>
 
 *..Find the starting point of the new level line
@@ -231,11 +235,11 @@ c            call trc_stk_out
          ind=indsgm(xstruc(1,plaque),ystruc(1,plaque),
      ,                                            npstru(plaque),x2,y2)
 cc<<<
-c         if(l_dbg) then
-c           write(0,'(1x,a12,a4,a9,5a12)') 'After SAUTE:',
-c     ,                      'ind','x2','y2','valfct','fctnew','x1','y1'
-c           write(0,'(13x,i4,1p,6e12.4)') ind,x2,y2,valfct,fctnew,x1,y1
-c         end if
+         if(l_dbg) then
+           write(0,'(1x,a12,a4,a9,5a12)') 'After SAUTE:',
+     ,                      'ind','x2','y2','valfct','fctnew','x1','y1'
+           write(0,'(13x,i4,1p,6e12.4)') ind,x2,y2,valfct,fctnew,x1,y1
+         end if
 cc>>>
 
 *..Parametrise the level line passing through this point
@@ -271,18 +275,18 @@ cc>>>
          ecart2=SQRT((x2 - xstruc(ind+1,plaque))**2 +
      .               (y2 - ystruc(ind+1,plaque))**2)
 cc<<<
-c         if(l_dbg) then
-c           write(0,'(2x,6a4,a9,3a12)') 'ind','dir','ii','nx','jj','ny',
-c     ,                                      'x2','y2','ecart1','ecart2'
-c           write(0,'(1x,6i4,1p,4e12.4)') ind,dir,ii,nx,jj,ny,
-c     ,                                              x2,y2,ecart1,ecart2
-c           write(0,'(a10,7a12)')  'xstruc','ystruc',
-c     ,                'xstruc+','ystruc+','x(nx)','y(ny)','x(1)','y(1)'
-c           write(0,'(1x,1p,8e12.4)')
-c     ,           xstruc(ind,plaque),ystruc(ind,plaque),
-c     ,           xstruc(ind+1,plaque),ystruc(ind+1,plaque),
-c     ,           x(nx),y(ny),x(1),y(1)
-c         end if
+         if(l_dbg) then
+           write(0,'(2x,6a4,a9,3a12)') 'ind','dir','ii','nx','jj','ny',
+     ,                                      'x2','y2','ecart1','ecart2'
+           write(0,'(1x,6i4,1p,4e12.4)') ind,dir,ii,nx,jj,ny,
+     ,                                              x2,y2,ecart1,ecart2
+           write(0,'(a10,7a12)')  'xstruc','ystruc',
+     ,                'xstruc+','ystruc+','x(nx)','y(ny)','x(1)','y(1)'
+           write(0,'(1x,1p,8e12.4)')
+     ,           xstruc(ind,plaque),ystruc(ind,plaque),
+     ,           xstruc(ind+1,plaque),ystruc(ind+1,plaque),
+     ,           x(nx),y(ny),x(1),y(1)
+         end if
 cc>>>
 
          IF ((ABS(x2-x(nx)).LT.epsiln) .OR. (ABS(y2-y(ny)).LT.epsiln)

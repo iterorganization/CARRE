@@ -36,6 +36,7 @@ endif
 
 ifdef SOLPS_DEBUG
 EXT_DEBUG = .debug
+DEFINES  += -DDBG
 endif
 
 

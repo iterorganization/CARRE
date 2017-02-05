@@ -27,7 +27,11 @@ c======================================================================
       PARAMETER (psimin=1.E-08,psimi2=1.E-07)
       logical l_dbg
       integer n_call
+#ifdef DBG
+      data l_dbg /.true./
+#else
       data l_dbg /.false./
+#endif
       data n_call /0/
 
 *  procedures
@@ -56,22 +60,22 @@ c======================================================================
 
       n_call=n_call+1
 cc<<<
-c      l_dbg=n_call.gt.225
-c      if(l_dbg) then
-c        write(0,*) '===> Entering SAUTE. n_call = ',n_call
-c        write(0,'(1x,6a5,a9,3a12)') 'npst','sens','nx','ny',
-c     ,                               'nm1','nm2','x1','y1','psi1','pas'
-c        write(0,'(6i5,1p,4e12.4)') npst,sens,nx,ny,nm1,nm2,
-c     ,                                                   x1,y1,psi1,pas
-c        write(0,'(1x,a9,5a12)')
-c     -                      'x(1)','y(1)','x(2)','y(2)','x(nx)','y(ny)'
-c        write(0,'(1x,1p,6e12.4)') x(1),y(1),x(2),y(2),x(nx),y(nx)
-c        write(0,*) 'xst'
-c        write(0,'(1p,10e12.4)') xst
-c        write(0,*) 'yst'
-c        write(0,'(1p,10e12.4)') yst
-c        call trc_stk
-c      end if
+      l_dbg=l_dbg.and.n_call.gt.225
+      if(l_dbg) then
+        write(0,*) '===> Entering SAUTE. n_call = ',n_call
+        write(0,'(1x,6a5,a9,3a12)') 'npst','sens','nx','ny',
+     ,                               'nm1','nm2','x1','y1','psi1','pas'
+        write(0,'(6i5,1p,4e12.4)') npst,sens,nx,ny,nm1,nm2,
+     ,                                                   x1,y1,psi1,pas
+        write(0,'(1x,a9,5a12)')
+     -                      'x(1)','y(1)','x(2)','y(2)','x(nx)','y(ny)'
+        write(0,'(1x,1p,6e12.4)') x(1),y(1),x(2),y(2),x(nx),y(nx)
+        write(0,*) 'xst'
+        write(0,'(1p,10e12.4)') xst
+        write(0,*) 'yst'
+        write(0,'(1p,10e12.4)') yst
+        call trc_stk
+      end if
 cc>>>
 
 *..Initialisation.
@@ -95,12 +99,12 @@ cc>>>
       y0=y1
       psi0 = psi1
 cc<<<
-c      if(l_dbg) then
-c        write(0,'(1x,4a5,a9,5a12)') 'sens','npst','ind1','ind2',
-c     ,              'x1','y1','xst(i1)','yst(i1)','xst(i2)','yst(i2)'
-c        write(0,'(1x,4i5,1p,6e12.2)') sens,npst,ind1,ind2,
-c     ,                    x1,y1,xst(ind1),yst(ind1),xst(ind2),yst(ind2)
-c      end if
+      if(l_dbg) then
+        write(0,'(1x,4a5,a9,5a12)') 'sens','npst','ind1','ind2',
+     ,              'x1','y1','xst(i1)','yst(i1)','xst(i2)','yst(i2)'
+        write(0,'(1x,4i5,1p,6e12.2)') sens,npst,ind1,ind2,
+     ,                    x1,y1,xst(ind1),yst(ind1),xst(ind2),yst(ind2)
+      end if
 cc>>>
 
 *..Make a step according to selected distribution of the grid points
@@ -120,10 +124,10 @@ c---------------------------------------------------------------------{
           y2=y0+zpas/dist*(yst(ind2)-y0)
 
 cc<<<
-c          if(l_dbg) then
-c            write(0,*) '<=== Leaving SAUTE (dist found). x2,y2 = ',
-c     ,                                                            x2,y2
-c          end if
+          if(l_dbg) then
+            write(0,*) '<=== Leaving SAUTE (dist found). x2,y2 = ',
+     ,                                                            x2,y2
+          end if
 cc>>>
           RETURN
 
@@ -147,9 +151,9 @@ c---------------------------------------------------------------------}
       else if (repart .EQ. 2) then
 
 cc<<<
-c        if(l_dbg) then
-c          write(0,'(2x,2a4,a9,3a12)') 'ii','jj','x','y','psi','pas'
-c        end if
+        if(l_dbg) then
+          write(0,'(2x,2a4,a9,3a12)') 'ii','jj','x','y','psi','pas'
+        end if
 cc>>>
 c---------------------------------------------------------------------{
    10   CONTINUE
@@ -239,9 +243,9 @@ cxpb  must find the point where the structure exits this rectangle.
      .         a11(ii,jj,1)*x3*y3
 
 cc<<<
-c        if(l_dbg) then
-c          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x3,y3,psi3,pas
-c        end if
+        if(l_dbg) then
+          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x3,y3,psi3,pas
+        end if
 cc>>>
         IF (ABS(psi3 - pas) .LT. psimi2) then
 
@@ -249,11 +253,11 @@ cc>>>
           y2 = y3
 
 cc<<<
-c          if(l_dbg) then
-c            write(0,'(2a,1p,3e12.4)')
-c     -                   ' <=== Leaving SAUTE (psi3 found). ',
-c     ,                                        'x2,y2,psi3 = ',x2,y2,psi
-c          end if
+          if(l_dbg) then
+            write(0,'(2a,1p,3e12.4)')
+     -              ' <=== Leaving SAUTE (psi3 found). ',
+     ,                                   'x2,y2,psi3 = ',x2,y2,psi3
+          end if
 cc>>>
           RETURN
 
@@ -274,18 +278,18 @@ c---------------------------------------------------------------------{
      .           a11(ii,jj,1)*x2*y2
 
 cc<<<
-c        if(l_dbg) then
-c          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x2,y2,psi2,pas
-c        end if
+        if(l_dbg) then
+          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x2,y2,psi2,pas
+        end if
 cc>>>
           IF (ABS(psi2-pas) .LT. psimin) then
 
 cc<<<
-c            if(l_dbg) then
-c              write(0,'(2a,1p,3e12.4)')
-c     -                   ' <=== Leaving SAUTE (psi2 found). ',
-c     ,                                        'x2,y2,psi3 = ',x2,y2,psi
-c            end if
+            if(l_dbg) then
+              write(0,'(2a,1p,3e12.4)')
+     -                ' <=== Leaving SAUTE (psi2 found). ',
+     ,                                     'x2,y2,psi3 = ',x2,y2,psi3
+            end if
 cc>>>
             RETURN
 

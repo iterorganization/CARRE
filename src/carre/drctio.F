@@ -43,13 +43,13 @@ c=========================
 
       n_call=n_call+1
 cc<<<
-c      l_dbg=n_call.le.4
-c      if(l_dbg) then
-c        write(0,*) '==== Entering drctio: ',n_call
-c        write(0,*) 'doug,npst,x1,y1: ',doug,' ',npst,x1,y1
-c        write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
-c        write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
-c      end if
+      l_dbg=l_dbg.and.n_call.le.4
+      if(l_dbg) then
+        write(0,*) '==== Entering drctio: ',n_call
+        write(0,*) 'doug,npst,x1,y1: ',doug,' ',npst,x1,y1
+        write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
+        write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
+      end if
 cc>>>
 
 cank-19980618
@@ -66,9 +66,9 @@ cank
       end if
       if(y1.gt.zero) sg=-sg
 cc<<<
-c      if(l_dbg) then
-c        write(0,*) 'ind,sg =',ind,sg
-c      end if
+      if(l_dbg) then
+        write(0,*) 'ind,sg =',ind,sg
+      end if
 cc>>>
       IF (xst(ind).NE.x1 .or. yst(ind).ne.y1) then
 c  on trouve d'abord les coordonnees d'un point interieur
@@ -78,18 +78,18 @@ c  on trouve d'abord les coordonnees d'un point interieur
         xin=delta*xin/norm
         yin=delta*yin/norm
 cc<<<
-c        if(l_dbg) then
-c          write(0,*) 'xin,yin,norm=',xin,yin,norm
-c          write(0,'(1x,a4,4(5x,a6,3x))') 'irot','x1+xin','y1+yin',
-c     ,                                            'xin','yin'
-c        end if
+        if(l_dbg) then
+          write(0,*) 'xin,yin,norm=',xin,yin,norm
+          write(0,'(1x,a4,4(5x,a6,3x))') 'irot','x1+xin','y1+yin',
+     ,                                            'xin','yin'
+        end if
 cc>>>
         do 2 irot=1,nrot
 cc<<<
-c          if(l_dbg) then
-c            write(0,'(1x,i3,1x,1p,4e14.6)') irot,
-c     ,                                      x1+xin,y1+yin,xin,yin
-c          end if
+          if(l_dbg) then
+            write(0,'(1x,i3,1x,1p,4e14.6)') irot,
+     ,                                      x1+xin,y1+yin,xin,yin
+          end if
 cc>>>
           if(in(x1+xin,y1+yin,xst,yst,npst)) then
             go to 4
