@@ -11,7 +11,7 @@ C of a selected set of objects on the axes are drawn.  A user may supply
 C a version to change the appearance of these objects.  The arguments
 C are as follows:
 C
-C - IFLG is zero if a particular object is about to be drawn, non-zero
+C - IFLG is zero if a particular object is about to be drawn, nonzero
 C   if it has just been drawn.
 C
 C - IAXS is the number of the axis in question.  The values 1, 2, 3, and

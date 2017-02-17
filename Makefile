@@ -141,8 +141,8 @@ ${OBJDIR}/LISTOBJ: listobj
 VERSION: src/include/git_version_Carre.h
 
 src/include/git_version_Carre.h: force
-	@echo "      character*33 :: git_version_Carre =" > src/include/git_version_new.h
-	@echo "     &   '`git describe --dirty --always`'" >> src/include/git_version_new.h
+	@echo "      character*33 ::" > src/include/git_version_new.h
+	@echo "     . git_version_Carre = '`git describe --dirty --always`'" >> src/include/git_version_new.h
 	@if cmp -s src/include/git_version_new.h src/include/git_version_Carre.h; then rm src/include/git_version_new.h; else mv src/include/git_version_new.h src/include/git_version_Carre.h; fi
 
 ${OBJDIR}/dependencies.${COMPILER}:

@@ -7,7 +7,7 @@ c
       IMPLICIT NONE
 
 
-c*** This sub-routine calculates the positions of the successive points 
+c*** This subroutine calculates the positions of the successive points 
 c*** on a specified level line. It stops when the line crosses a 
 c*** structure or when it reaches the limits of the equilibrium.
 c*** The calculated level line should not cross any of pre-defined

@@ -16,7 +16,7 @@ c
 c======================================================================
 cank -- The comments are translated from French, sorry for errors!
 
-c*** This sub-routine makes the orthogonal curvilinear grid for
+c*** This subroutine makes the orthogonal curvilinear grid for
 c*** various possible magnetic configurations (single null,
 c*** connected double null, disconnected double null, or limiter)
 c======================================================================

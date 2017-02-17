@@ -13,7 +13,7 @@ C informational-label line of text is drawn.  The default version does
 C nothing.  A user may supply a version to change the appearance of the
 C text lines.  The arguments are as follows:
 C
-C - IFLG is zero if a text line is about to be drawn, non-zero if one
+C - IFLG is zero if a text line is about to be drawn, nonzero if one
 C   has just been drawn.
 C
 C - LBNM is the name of the label containing the line in question.

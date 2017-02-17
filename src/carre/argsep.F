@@ -6,7 +6,7 @@ c
 c======================================================================
 cank -- The comments are translated from French, sorry for errors!
 
-c*** This sub-routine arranges the separatrices in the required way
+c*** This subroutine arranges the separatrices in the required way
 c*** and indexes them in correct order
 
 *..  Cette sous-routine arrange les separatrices de la facon demandee

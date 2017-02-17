@@ -11,7 +11,7 @@ C curve is drawn.  The default version does nothing.  A user may supply
 C a version to change the appearance of the curves.  The arguments are
 C as follows:
 C
-C - IFLG is zero if a curve is about to be drawn, non-zero if a curve
+C - IFLG is zero if a curve is about to be drawn, nonzero if a curve
 C   has just been drawn.
 C
 C - KDSH is the last argument of AGCURV, as follows:

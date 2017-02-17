@@ -156,7 +156,7 @@ c.. stpmin: minimum tolerable distance between any two grid points
 c           in the course of relaxation
 c.. rlcept: convergence criterion in the relaxation procedure
 c.. limcfg: indicates when a limiter configuration is considered (when
-c           non zero). This variable is assigned the index of the
+c           nonzero). This variable is assigned the index of the
 c           limiter
 c     N.B.: When the limiter configuration is selected, npx is set equal
 c           to 1 and the coordinates of the X-point correspond to the

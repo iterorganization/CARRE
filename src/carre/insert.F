@@ -27,7 +27,7 @@ c.. inddef: table of target indices
 c.. nbdef:  number of targets
 c=======================================================================
 
-c*** If the structure index is non-zero, it points to a structure 
+c*** If the structure index is nonzero, it points to a structure
 c*** intersecting the separatrix branch. Store all such cases for a 
 c*** while - we will select the primary strikepoints after all x-points
 c*** have been treated.

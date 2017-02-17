@@ -8,7 +8,7 @@ c
 c======================================================================
 cank -- The comments are translated from French, sorry for errors!
 
-c*** This sub-routine finds, in the case of a disconnected double null,
+c*** This subroutine finds, in the case of a disconnected double null,
 c*** the point on the loop of the inner separatrix where it should be
 c*** split into two separatrices (thus forcing a mesh point to be at
 c*** the outer X-point)
