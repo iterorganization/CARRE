@@ -1,18 +1,18 @@
 #  VERSION : 01.04.2015
 
 # check if necessary variables are correctly defined
-LD_MSCL  ?= -L/pfs/work/dpc/SOLPS-ITER/mscl -lmscl
-LD_NCARG ?= -L/pfs/work/dpc/SOLPS-ITER/NCARG/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lxcb
+LD_MSCL  ?= -L/pfs/work/g2dpc/SOLPS-ITER/mscl -lmscl
+LD_NCARG ?= -L/pfs/work/g2dpc/SOLPS-ITER/NCARG/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lxcb
 
 DEFINES   = 
 
 FC        = ifort
-CPP	  = /lib/cpp -C -traditional
+CPP	  = /lib/cpp -C -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG
 FFLAGS 	  = -g -C -debug all -traceback -check all
 else
-FFLAGS	  = -O -vec_report0
+FFLAGS	  = -O
 endif
 
 DBLPAD	  = 
