@@ -57,7 +57,7 @@ include config/config.${HOST_NAME}.${COMPILER}.local
 MAKES+= config/config.${HOST_NAME}.${COMPILER}.local
 endif
 
-ifdef NCARG_ROOT
+ifdef LD_NCARG
 VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
 EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
 else
@@ -66,7 +66,6 @@ EXCLUDELIS = carre.o tradui.o fcrr.o fcrblkd.o
 endif
 
 INCLUDE = -Isrc/include
-
 
 include ${OBJDIR}/LISTOBJ
 
