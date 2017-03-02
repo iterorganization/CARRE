@@ -107,9 +107,10 @@ ${OBJDIR}/${PROG_TRA}: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a $(MAKES)
 
 ${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a $(MAKES)
 	rm -f ${OBJDIR}/${PROG_FCRR} 2> /dev/null; \
-	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/libcarre.a: ${DEST}
+${OBJDIR}/libcarre.a: ${DEST} ${MAKES}
+	[ ! -e ${OBJDIR}/.x ] && ( [ ! -e ${OBJDIR}/.nox ] && rm -f $@ || echo 2> /dev/null )
 	ar rucv $@ ${DEST}
 	ranlib $@
 
