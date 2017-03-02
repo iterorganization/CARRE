@@ -39,7 +39,6 @@ EXT_DEBUG = .debug
 DEFINES  += -DDBG
 endif
 
-
 OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
 
 SHELL	= /bin/sh
@@ -57,19 +56,17 @@ include config/config.${HOST_NAME}.${COMPILER}.local
 MAKES+= config/config.${HOST_NAME}.${COMPILER}.local
 endif
 
-ifdef LD_NCARG
-VPATH	= src/carre:src/cntour:src/graphe:src/trans:src/fcrr:src/dummy
+FPATH	= src/carre:src/trans:src/fcrr:src/dummy
 EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
-else
-VPATH	= src/carre:src/trans:src/fcrr:src/dummy
-EXCLUDELIS = carre.o tradui.o fcrr.o fcrblkd.o
-endif
+GPATH   = src/cntour:src/graphe
+VPATH   = src/carre:src/cntour:src/trans:src/fcrr:src/dummy:src/graphe
 
 INCLUDE = -Isrc/include
 
 include ${OBJDIR}/LISTOBJ
 
 DEST = $(OBJS:%.o=$(OBJDIR)/%.o)
+GDEST = $(GOBJS:%.o=$(OBJDIR)/%.o)
 MAINLIST = $(EXCLUDELIS:.=\.)
 LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
@@ -82,30 +79,46 @@ $(OBJDIR)/%.o : %.F
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
-all: VERSION ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR}
+ifdef LD_NCARG
+all: VERSION ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/.x
+else
+all: VERSION ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/.nox
+endif
 
 .PHONY: VERSION clean neat standalone all local depend listobj force
 
 standalone: ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
 
-${OBJDIR}/${PROG}: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a $(MAKES)
-	rm -f ${OBJDIR}/${PROG} 2>/dev/null; \
-	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG} ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
+ifdef LD_NCARG
+${OBJDIR}/${PROG} ${OBJDIR}/.x: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a $(MAKES)
+	rm -f ${OBJDIR}/${PROG} 2> /dev/null; \
+	rm -f ${OBJDIR}/.nox 2> /dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG} ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) && touch ${OBJDIR}/.x
+else
+${OBJDIR}/${PROG} ${OBJDIR}/.nox: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${OBJDIR}/bidon.o $(MAKES)
+	rm -f ${OBJDIR}/${PROG} 2> /dev/null; \
+	rm -f ${OBJDIR}/.x 2> /dev/null; \
+	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG} ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${OBJDIR}/bidon.o ${LDLIBS} $(LDFLAGS) $(LDEXTRA) && touch ${OBJDIR}/.nox
+endif
 
 ${OBJDIR}/${PROG_TRA}: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a $(MAKES)
-	rm -f ${OBJDIR}/${PROG_TRA} 2>/dev/null; \
+	rm -f ${OBJDIR}/${PROG_TRA} 2> /dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_TRA} ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
 ${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a $(MAKES)
-	rm -f ${OBJDIR}/${PROG_FCRR} 2>/dev/null; \
+	rm -f ${OBJDIR}/${PROG_FCRR} 2> /dev/null; \
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a  ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
 ${OBJDIR}/libcarre.a: ${DEST}
 	ar rucv $@ ${DEST}
 	ranlib $@
 
+${OBJDIR}/libgcarre.a: ${GDEST}
+	ar rucv $@ ${GDEST}
+	ranlib $@
+
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
 
 neat:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
@@ -119,7 +132,7 @@ TAGS:	tags
 tags:
 	rm -f TAGS ; etags src/*/*.F
 
-depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
+depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	makedepend -f- ${INCLUDE} $^ | \
 	sed -e 's|src/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
@@ -127,13 +140,21 @@ depend: ${OBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 
 listobj:
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; l="OBJS ="; \
-	for d in `echo "$(VPATH)" | tr : \ `; do \
+	for d in `echo "$(FPATH)" | tr : \ `; do \
 		l="$$l `(cd $$d > /dev/null; echo *.F)`"; \
 	done; \
 	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
 	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ
+	@ll="GOBJS ="; \
+	for d in `echo "$(GPATH)" | tr : \ `; do \
+		ll="$$ll `(cd $$d > /dev/null; echo *.F)`"; \
+	done; \
+	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
+		E="$$E -e 's/ $$f//'"; \
+	done; \
+	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
 
 ${OBJDIR}/LISTOBJ: listobj
 
@@ -154,3 +175,6 @@ ${OBJDIR}/dependencies.${COMPILER}:
 
 include ${OBJDIR}/dependencies.${COMPILER}
 
+echo:
+	@echo GOBJS=${GOBJS}
+	@echo DEST =${DEST}
