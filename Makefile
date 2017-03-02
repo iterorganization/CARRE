@@ -110,7 +110,8 @@ ${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
 ${OBJDIR}/libcarre.a: ${DEST} ${MAKES}
-	[ ! -e ${OBJDIR}/.x ] && ( [ ! -e ${OBJDIR}/.nox ] && rm -f $@ || echo 2> /dev/null ) || echo 2> /dev/null
+#	[ ! -e ${OBJDIR}/.x ] && ( [ ! -e ${OBJDIR}/.nox ] && rm -f $@ || echo 2> /dev/null ) || echo 2> /dev/null
+	[ -e ${OBJDIR}/.x && -e ${OBJDIR}/.nox ] || ( rm -f $@ || echo 2> /dev/null )
 	ar rucv $@ ${DEST}
 	ranlib $@
 
