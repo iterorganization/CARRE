@@ -176,7 +176,7 @@ c  calcul des indices de garde
 	  nprsb(iseg)=1
 	enddo
    
-* la valeur du sol est précisé dans 'maille' selon l'indice de région et la configuration
+* the value of sol is given in 'maille' according to the region index and the configuration
 * sol = 1 indicates an SOL region
        if (sol.EQ.1) then
 
@@ -185,7 +185,7 @@ c  calcul des indices de garde
          fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
      .          a11(ii,jj,1)*xpto*ypto
 
-* on place un faux segment qui sert d'appui à saute
+* we locate a fictitious segment with serves as a baseline for saute
          xtt(1)= xpto-0.1
          ytt(1)= ypto
          xtt(2)= x(nx)
@@ -194,14 +194,14 @@ c  calcul des indices de garde
 	 ytt(3)= ytt(1)
          ntt=3
 
-* la variable de sens est dedoublée pour ne pas pertuber la valeur du sens qui
-* correspond à la plaque
+* we duplicate the 'sens' (direction) variable so as not to overwrite the
+* direction value used for the plate
 
 	 sensspe=1
          CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sensspe,
      .              2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
        
-*..Calcul des longueurs
+*..Computation of the lengths
 
          gdpsi(1)=1.0
 	 racpsi(1)=1.0

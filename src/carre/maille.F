@@ -281,8 +281,7 @@ c----------------------------------------------------------------------
             yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
   361    CONTINUE
 
-* on colle la dernière ligne de niveau sur trace2 pour avoir 
-* la pénétration.
+*..we append the last level line to trace2 to have the penetration depth
 
          if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
      _	       ptsep,npx,nptot,
@@ -639,7 +638,7 @@ c---
      .       segt(1,ireg))
 
 c----------------------------------------------------------------------
-c  Impression des autres paramètres.
+c  Printout of the remaining parameters.
       
 	write(3,166) gdpsi, racpsi
  166    format(T2,F8.5,T17,F8.5)

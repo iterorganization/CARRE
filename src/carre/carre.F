@@ -162,97 +162,105 @@ c     N.B.: When the limiter configuration is selected, npx is set equal
 c           to 1 and the coordinates of the X-point correspond to the
 c           innermost point of the limiter.
 
-c      GRAND ET PETIT RAYON
-c      sol: variable utilisée dans le cadre du maillage des régions 
-c           périphériques. Si cette valeur=1 alors la région contient 
-c           des courbes de niveau passant par ypto. On peut alors déterminer 
-c           les grandeurs gdpsi,racpsi,gdr,r,a,rho.
-C      gdr: grand rayon (lecture des surfaces poloidales sur l'axe radial)
-c        r: petit rayon
-c        a: petit rayon de la séparatrice
-c       ra: différence entre la petit rayon de la séparatrice et le petit
-c           rayon d'une ligne de niveau.
-c      rho: rapport entre le ptit rayon de la séparatrice et le petit rayon
-c           d'une ligne de niveau.       
-c  sensspe: sens correspondant à la fausse plaque pour le calcul des rayons.
+c      MAJOR AND MINOR RADIUS
+c      sol: variable used for the meshing of the peripheral regions.
+c           If its value is 1, then the region contains level curves
+c           going through ypto. One can then determine the quantities
+c           gdpsi,racpsi,gdr,r,a,rho.
+c      gdr: major radius (intersection of the poloidal surfaces with
+c           the outer midplane)
+c        r: minor radius
+c        a: minor radius for the separatrix
+c       ra: difference between the separatrix minor radius and the minor
+c           radius of a level line
+c      rho: ratio between the minor radius of the separatrix and the
+c           minor radius of a level line
+c  sensspe: direction corresponding to the fictitious plate used for
+c           computing the radii.
 c
 
-C      QUALITE DE LA MAILLE GLOBALE
-*  les variables servent verifier la manière dont est quantifiee la qualité de
-*  la maille (mailrg)
-c    somort:(somme des orthogonalités avec ort1) valeur qui prend en compte 
-c           l'orthogonalité, l'espace et la taille de deux cellules consecutives
-c           ainsi que la répartition des points nppol entre une ligne de niveau 
-c           et celle qui la précède.
-c    somortp:(somme des orthogonalités poussée) cette valeur correspond au somort
-c           à la fin des itérations avec l'utilisation de ort2, le tout divisé par nppol.
-* les itérations fonctionnent correctement meme avec la deuxième ligne de niveau
-* donc non seulement l'instruction fonctionne car la fonction se rapproche de zéro
-* mais en plus elle n'est pas à l'origine de la déformation en zig-zag
-* (de toute facon si c était le cas, on le constaterait systematiquement donc c'est 
-* plutot la géométrie, la géographie ainsi que la longueur des plaques et des lignes
-* de niveau qui deviennent les principaux suspects)
-c    gdsomortp:(grande somme des orthogonalités poussée) cette valeur correspond
-c             à l'ensemble des somortp sur une meme ligne de niveau que l'on
-c             divise par nppol (le but est d'avoir un indice de qualité de la région)
-* gdsomortp n'a pas grande signification et peut tromper sur la qualité de la ligne 
-* de niveau. Il peut être utilisé pour comparer l'influence de chaque composante 
-* de la fonction ort.
+C      GLOBAL MESH QUALITY
+*  the following variables allow for quantification of the mesh quality (mailrg)
+c    somort: (sum of the orthogonality criteria from ort1) value which takes
+c           into account the local mesh orthogonality, the spacing and size
+c           of consecutive cells as well as the poloidal distribution of
+c           points (nppol) between a level line and the previous level line
+c   somortp: (advanced sum of the orthogonality criteria) value which
+c           corresponds to somort at the end of the iterations when using ort2,
+c           divided by nppol.
+* the iterations work correctly even with the second level line thus not only
+* the instruction works because the function approaches zero but it also is not
+* causing the zig-zag deformation
+* (in any case, if this were the case, one would systematically see it so it is
+*  more the geometry, the geography as well as the length of the plates and the
+*  level lines become the main suspects) 
+c gdsomortp: (large advanced sum of orthogonalities) this value corresponds
+c             to the set of somortp values on a single level line, divided by
+c             nppol (the goal is to have a quality index for the region)
+* gdsomortp does not have much meaning and can be misleading about the quality
+* of the level line. It can be used to compare the influence of each component
+* of the ort function. 
 
-C     INFLUENCE DE LA VRAIE ORTHOGONALITE SUR CLORT
-c     ortpur:(orthogonalité pure) cette valeur ne tient compte que de l'orthogonalité
-* ortpur peut prendre des valeurs un million de fois plus élévées que la somme des trois 
-* critères donc il doit y avoir une atténuation dans le calcul de ort.
-c     propo: (proportionalité) cette valeur ne tient compte que de la proportionalité
-c     varr: (variance) cette valeur ne tient compte que de la variation de longueur 
-c     des cellules de la maille pour trois cellules qui se suivent et sur une même ligne de niveau.
-c     tot:(total) correspond à la somme de ortpur, propo et varr. on verifie juste que tot = ort
-c     somortpur, sompropo, somvarr, somtot : correspondent aux sommes de ortpur, propo,
-c      varr et tot pour une ligne de niveau lors du premier déplacement des noeuds.
-c     somortpurp, sompropop, somvarrp, somtotp : correspondent aux sommes de ortpur,
-c      propo, varr et tot pour une ligne de niveau après les itérations.
-c     gdsomortpurp, gdsompropop, gdsomvarr et gdsomtotp: correspondent à la somme,
-c      sur toutes les lignes de niveau de la région de somortpur, sompropo, somvarr et somtotpt.
+C     INFLUENCE OF THE TRUE ORTHOGONALITY ON CLORT
+c     ortpur: (pure orthogonality) this value only takes into account the orthogonality criterion
+* ortpur can take values a million times larger that the sum of all three
+* criteria so there must be some attenuation in the calculation of ort.
+c     propo: (proportionality) this value only takes into account the proportionality criterion
+c     varr: (variance) this value only takes into account the criterion for the
+c     variation in cell length for groups of three contiguous mesh cells on
+c     the same level line
+c     tot: (total) corresponds to the sum of ortpur, propo and varr.
+c     We only check that tot = ort
+c     somortpur, sompropo, somvarr, somtot: correspond to the sums of ortpur,
+c     propo, varr and tot along a level line during the first displacement of
+c     the nodes. 
+c     somortpurp, sompropop, somvarrp, somtotp: correspond to the sums of
+c     ortpur, propo, varr and tot along a level line after the iterations.
+c     gdsomortpurp, gdsompropop, gdsomvarr, gdsomtotp: correspond to the sum,
+c     over all level lines of the same region, of somortpur, sompropo, somvarr
+c     and somtotpt.
 
-C     CORRECTION DES DEFORMATIONS
-c     segt: (segment) cette variable devait servir pour le suivi automatique du grossissement,
-c     elle correspond la longueur totale de la ligne de niveau (l(nppol))  
-c     modif: interrupteur qui permet de sauter l'étape de modification de déplacement
-c     des noeuds (choix de l'utilisateur)
-c     rr : reponse à la redefinition (si choix = 1)
-c     pra : premiere reponse 
-c     sra: seconde réponse
-c     tra: troisieme réponse
-c     la troisième lettre indique la position du segemnt: a le premier, b le deuxième,
-c     c le troisième,...
-c     coefa,coefb,...: coefficient de l'itération qui permet de multiplier un segment
-c     de longueur ipol(1)-ipol(2) par une valeur généralement comprise entre 1 et 1.03
-c     (à l'utilisateur de choisir) 
-c     choix:correspond au choix de l'utilisateur pour la correction des déformations
-c     =1 si tous les points sont déplacés simultanément, =2 si c'est par fragmentation,
-c     =3 si les coefficients sont ceux entrés dans le programme, =4 si par fragmentation
-c     assisté d'un grossissment
-c     deci:décision de l'utilisateur    
+C     CORRECTION OF THE DEFORMATIONS
+c     segt: (segment) this variable is meant for automatic following
+c     of the magnification
+c     it corresponds to the total length along the level line (l(nppol))  
+c     modif: interruptor for jumping the step of modifying the node
+c     displacements (user choice)
+c     rr : answer to the redefinition (if choix = 1)
+c     pra : first answer
+c     sra: second answer
+c     tra: third answer
+c     the third letter indicates the position of the segment: a first, b second,
+c     c third, ...
+c     coefa,coefb,...: iteration coefficient to multiply a segment
+c     of length ipol(1)-ipol(2) by a value usually between 1 and 1.03
+c     (user choice) 
+c     choix: choice from the user for the correction of deformations
+c     =1 if all points are displaced simultaneously
+c     =2 if points are displaced by fragmentation,
+c     =3 if the coefficients are those entered in the program,
+c     =4 if points are displace by fragmentation with magnification
+c     deci: decision from the user
 
-c     GROSSISSEMENT AUTOMATIQUE
-c     lsp : longueur du segment parfait. correspond à la taille et la partie du 
-c      fragment de la ligne de niveau qui doit être représenté dans le zoom, elle
-c      sert de réference dans l'instruction de calcul.
-c     ls : longueur du segment. correspond à la taille du segment de la ligne de
-c     niveau pour chaque indice nppol calculé. 
-C     idep: point de départ
-c     iarr: point d'arrivée
-c     tpr: valeur temporaire. conserve la valeur du point d'arrivée du segment
-c     précédent pour en faire le point de départ du segment suivant.  
-c     deltay: difference entre ymaxi et ymini
-c     deltax: difference entre xmaxi et xmini
-c     deldelta(x ou y): difference entre les deux delta
-c     disdelta(x ou y): dispersion de delta, correspond à l'agrandissement des
-c      des bords sur le plus petit axe
-c     rpt(rapport): nombre de points dans le segment de séparatrice (=npimx)
-c     rptd(rapport par deux): première moitié des points du segment de separatrice
-c     rptt(rapport par trois): premier tiers des points du segment de separatrice
-c     rptq: premier quart des points du segment de separatrice
+c     AUTOMATIC MAGNIFICATION
+c     lsp : length of the perfect segment. corresponds to the size and part
+c      of the level line fragment that is to be represented in the zoom, it
+c      serves as a reference in the computation instructions.
+c     ls  : length of the segment. corresponds to the size of the level line
+c      segment for each computed nppol index.
+c     idep: starting point
+c     iarr: arrival point
+c     tpr : temporary value. keeps the arrival point value from the previous
+c      segment to make it the starting point for the next segment.
+c     deltay: difference between ymaxi and ymini
+c     deltax: difference between xmaxi and xmini
+c     deldelta(x or y): difference between the two delta values
+c     disdelta(x or y): dispersion of delta, corresponds to the magnification
+c      of the sides on the smallest axis
+c     rpt(ratio): number of points in the separatrix segment (=npimx)
+c     rptd(ratio by two): first half of the points from the separatrix segment
+c     rptt(ratio by three): first third of the points from the separatrix segment
+c     rptq: first quarter of the points from the separatrix segment
 
 c======================================================================
 *
@@ -474,24 +482,28 @@ c     &  distnv(1,2),xpto,ypto)
      .           np1,npr,xmail,ymail,nreg,.false.)
 
 #ifdef EXTRA_GRAPHS
-*  13.0 on propose à l'utilisateur dans le cas simple-nul s'il souhaite
-*       observer quelques agrandissements le long de la séparatrice.
-* les valeurs ci-dessous correspondent aux positions des segments de séparatrice dans 
-* un cas de réacteur et ont ete selectionné parmi plusieurs dizaines de clichés effectués 
-* manuellement. Pour adapter les grossissements suivants à tous les cas de figure, il 
-* faut utiliser les coordoonées de la séparatrice en xmini, xmaxi, ymini et ymaxi.
-* Une des possibilités consisterait à fragmenter la séparatrice à prendre la longueur de 
-* chaque segment en fonction du nombre de points total de la séparatrice. Toutefois, 
-* comme avec les lignes de niveau, les grossissements peuvent être de mauvaise qualité.
-* Il est probable que le delta x et le delta y soient trop differents, ce qui ecraserait
-* le dessin. Pour éviter ce genre de problème, l'un des quatre bords du cadre devra dependre 
-* des trois autres. 1) faire la difference en x et la difference en y (xmaxi-xmini et 
-* ymaxi-ymini). 2) faire la difference des deux (delta x - delta y)
-* 2 bis) penser à faire une étude sur la limite de qualité du grossissement, c'est
-* à dire voir à partir de quand la difference entre les deux delta écrase le dessin.
-* 3) si la difference entre les deux delta est trop grande alors le delta le plus
-* grand entre delta x et delta y devient la référence et la difference entre les
-* deux delta est distribuée equitablement sur les bords de l'autre delta.
+*  13.0 the user may choose, for the single-null case, to observe
+*       a few zooms along the separatrix
+* the values below correspond to the positions of the separatrix segments
+* and have been selected among several tens of frames chosen manually.
+* In order to adapt the following zooms for all cases, one must use
+* the coordinates of the separatrix as xmini, xmaxi, ymini, and ymaxi.
+* One of the possibilities would consist in fragmenting the separatrix by
+* taking the length of each segment as a function of the total number of points
+* for the separatrix. However, just as with level lines, the zooms can be of
+* poor quality.
+* It is probable that the delat x and delta y are too different, which would
+* crush the plot. To avoid this type of problem, one of the four sides will
+* need to depend on the three others.
+* 1) make the difference in x and the difference in y (xmaxi-xmini and
+*    ymaxi-ymini).
+* 2) make the difference between the two (delta x - delta y)
+* 2 bis) consider doing a study on the quality limit of the zoom, i.e. see
+*    from when the difference between the two delta values crushes the plot.
+* 3) if the difference between the two delta values is too large then the
+*    larger delta between delta x and delta y becomes the reference and the
+*    difference between the two delta values is split evenly on both sides
+*    of the other delta.
 
   555   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Souhaitez-vous effectuer un suivi automatique?'
