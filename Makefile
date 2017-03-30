@@ -111,11 +111,11 @@ ${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.
 
 ${OBJDIR}/libcarre.a: ${DEST} ${MAKES}
 	[[ -e ${OBJDIR}/.x && -e ${OBJDIR}/.nox ]] || ( rm -f $@ || echo 2> /dev/null )
-	ar rucv $@ ${DEST}
+	@ar rucv $@ ${DEST}
 	ranlib $@
 
 ${OBJDIR}/libgcarre.a: ${GDEST}
-	ar rucv $@ ${GDEST}
+	@ar rucv $@ ${GDEST}
 	ranlib $@
 
 clean:
@@ -134,7 +134,7 @@ tags:
 	rm -f TAGS ; etags src/*/*.F
 
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${EXCLUDELIS:.o=.F}
-	makedepend -f- ${INCLUDE} $^ | \
+	@makedepend -f- ${INCLUDE} $^ | \
 	sed -e 's|src/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
 	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
