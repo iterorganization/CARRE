@@ -9,7 +9,7 @@ c  variables en common
 #include <COMQUA.F>
 c======================================================================
 C The routine AGCHIL is called by AGLBLS just before and just after each
-C informational-label line of text is drawn.  The default version does
+C informational label line of text is drawn.  The default version does
 C nothing.  A user may supply a version to change the appearance of the
 C text lines.  The arguments are as follows:
 C
