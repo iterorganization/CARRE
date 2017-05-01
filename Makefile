@@ -34,11 +34,6 @@ else
   endif
 endif
 
-ifdef SOLPS_DEBUG
-EXT_DEBUG = .debug
-DEFINES  += -DDBG
-endif
-
 OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
 
 SHELL	= /bin/sh
@@ -54,6 +49,11 @@ endif
 ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER}.local ] && echo yes || echo no ),yes)
 include config/config.${HOST_NAME}.${COMPILER}.local
 MAKES+= config/config.${HOST_NAME}.${COMPILER}.local
+endif
+
+ifdef SOLPS_DEBUG
+EXT_DEBUG = .debug
+DEFINES  += -DDBG
 endif
 
 FPATH	= src/carre:src/trans:src/fcrr:src/dummy

@@ -6,10 +6,10 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-DEFINES   = 
+DEFINES   = -DGFORTRAN
 
 FC		    = gfortran
-CPP		    = /lib/cpp -traditional -DGFORTRAN
+CPP		    = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
 FFLAGS		= -g -fcheck=all -fbacktrace

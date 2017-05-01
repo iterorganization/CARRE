@@ -10,6 +10,7 @@ c======================================================================
       integer i, j
       logical ex,uex
       real u, dpi
+      real tgtgrd(4)
       parameter (dpi=2.*3.14159 26535 89793 23846 26433 83280)
 c======================================================================
 c*** (lower single-null configuration)
@@ -120,8 +121,10 @@ c
      ,                            'and the auxiliary input file dg.aux'
         stop
       end if
-      
-c      write(0,*) 'fcrprp: ldgv2 = ',ldgv2
+
+#ifdef DBG
+      write(0,*) 'fcrprp: ldgv2 = ',ldgv2
+#endif
       if(.not.ldgv2) then
 c
 c*** Re-arrange the input data to fit the Carre conventions
@@ -176,5 +179,17 @@ c
         deltr1(i)=deltr1(i)*dpi
         deltrn(i)=deltrn(i)*dpi
       end do
+c
+c*** ... for DN cases, re-order the tgarde array to Carre ordering
+c
+      if (ntrg.eq.4) then
+        do i=1,ntrg ! storing the values in DG order
+          tgtgrd(i)=tgarde(i)
+        end do
+        tgarde(1)=tgtgrd(3)
+        tgarde(2)=tgtgrd(2)
+        tgarde(3)=tgtgrd(4)
+        tgarde(4)=tgtgrd(1)
+      end if
 c======================================================================
       end

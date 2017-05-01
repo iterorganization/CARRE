@@ -2,10 +2,10 @@
 LD_MSCL  ?= `pkg-config mscl --libs`
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2 -lgfortran
 
-DEFINES         =
+DEFINES   = -DGFORTRAN
 
-FC		= gfortran
-CPP		= /lib/cpp -traditional -DGFORTRAN
+FC		    = gfortran
+CPP		    = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
 FFLAGS		= -g -fcheck=all -fbacktrace

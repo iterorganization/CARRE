@@ -9,10 +9,10 @@ LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG  ?= -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
 
-DEFINES   = 
+DEFINES   = -DGFORTRAN
 
 FC		    = gfortran
-CPP		    = /lib/cpp -traditional -DGFORTRAN
+CPP		    = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
 FFLAGS		= -g -fcheck=all -fbacktrace
