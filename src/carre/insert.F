@@ -200,8 +200,8 @@ c<<<
       write(0,*) 'After re-arrangement: ',nbdef
       if(nbdef.gt.0) then !{
         write(0,'(1x,a8,i7,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'xst:',(xst(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'yst:',(yst(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10(e10.3,1x))') 'xst:',(xst(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10(e10.3,1x))') 'yst:',(yst(i),i=1,nbdef)
       end if !}
 c>>> 
 

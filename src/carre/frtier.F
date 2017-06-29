@@ -37,6 +37,10 @@ cank-970707: dimensions from the file
      .  ptxext,indlim
       REAL*8 x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
 
+*  variables en common
+c
+#include <COMLAN.F>
+
 *  procedures
       INTEGER drctio,ifind
       REAL*8 plqdst
@@ -112,21 +116,60 @@ c======================================================================
 
          DO 13 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    13    CONTINUE
 
          DO 14 i=2,nptot(ptsep(3,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(3,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(3,ipx),ipx)
    14    CONTINUE
 
          DO 15 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    15    CONTINUE
@@ -197,14 +240,40 @@ c======================================================================
 
          DO 23 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    23    CONTINUE
 
          DO 24 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    24    CONTINUE
@@ -329,14 +398,40 @@ cc>>>
 
          DO 33 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    33    CONTINUE
 
          DO 34 i=2,nptot(ptsep(3,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(3,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(3,ipx),ipx)
    34    CONTINUE
@@ -345,7 +440,20 @@ cc>>>
 
          DO 35 i=2,nptot(ptsep(1,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    35    CONTINUE
@@ -419,14 +527,40 @@ cc>>>
 
          DO 43 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    43    CONTINUE
 
          DO 44 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    44    CONTINUE
@@ -500,14 +634,40 @@ cc>>>
 
          DO 53 i=nptot(ptsep(2,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    53    CONTINUE
 
          DO 54 i=2,nptot(ptsep(4,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(4,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(4,ipx),ipx)
    54    CONTINUE
@@ -516,7 +676,20 @@ cc>>>
 
          DO 55 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    55    CONTINUE
@@ -590,14 +763,40 @@ cc>>>
 
          DO 63 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    63    CONTINUE
 
          DO 64 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    64    CONTINUE
@@ -732,14 +931,40 @@ cank
 
          DO 73 i=nptot(ptsep(3,ptxext),ptxext),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(3,ptxext),ptxext)
             yt(nt(1),1)=separy(i,ptsep(3,ptxext),ptxext)
    73    CONTINUE
 
          DO 74 i=2,nptot(ptsep(1,ptxext),ptxext)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ptxext),ptxext)
             yt(nt(1),1)=separy(i,ptsep(1,ptxext),ptxext)
    74    CONTINUE
@@ -811,14 +1036,40 @@ cank
 
          DO 83 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    83    CONTINUE
 
          DO 84 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    84    CONTINUE
@@ -894,14 +1145,40 @@ cank
 
          DO 93 i=nptot(ptsep(4,ptxext),ptxext),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(4,ptxext),ptxext)
             yt(nt(1),1)=separy(i,ptsep(4,ptxext),ptxext)
    93    CONTINUE
 
          DO 94 i=2,nptot(ptsep(2,ptxext),ptxext)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ptxext),ptxext)
             yt(nt(1),1)=separy(i,ptsep(2,ptxext),ptxext)
    94    CONTINUE
@@ -973,14 +1250,40 @@ cank
 
          DO 97 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(1,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(1,ipx),ipx)
    97    CONTINUE
 
          DO 98 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) stop 'Increase npnimx'
+	    if(nt(1).gt.npnimx) then
+              if(sellan(1:8).eq.'francais') then
+                write(0,*) 'Trop de points pour la courbe'
+                write(0,*) 'Nombre maximum de points prevu : ', npnimx
+                write(0,*) 'Veuillez augmenter la valeur de npnimx '//
+     &           'dans CARREDIM.F et recompiler !'
+              elseif(sellan(1:7).eq.'english') then
+                write(0,*) 'Too many points along curve'
+                write(0,*) 'Maximum number of points allowed : ', npnimx
+                write(0,*) 'Please increase the value of npnimx '//
+     &           'in CARREDIM.F and recompile !'
+              endif
+              stop 'Increase npnimx'
+            endif
             xt(nt(1),1)=separx(i,ptsep(2,ipx),ipx)
             yt(nt(1),1)=separy(i,ptsep(2,ipx),ipx)
    98    CONTINUE

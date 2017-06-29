@@ -2,7 +2,7 @@ c  version : 07.07.97 20:52
 c
       integer nxmax, nymax , npstmx, npnimx, npxmx , strumx, nivmx,
      .        nbdmx, gradmx, npmamx, nrmamx, nregmx
-      parameter (nxmax=1025,  nymax=1025, npstmx=220, npnimx=3000,
+      parameter (nxmax=1025,  nymax=1025, npstmx=360, npnimx=5000,
      .           npxmx=4   , strumx=60  ,  nivmx=8  , nbdmx=8  ,
      .           gradmx=100, npmamx=500 , nrmamx=200, nregmx=6)
 c

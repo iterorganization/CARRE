@@ -35,6 +35,7 @@ else
 endif
 
 OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
+SRCLOCAL = $(PWD)/src.local
 
 SHELL	= /bin/sh
 CPP	= /usr/lib/cpp
@@ -56,10 +57,14 @@ EXT_DEBUG = .debug
 DEFINES  += -DDBG
 endif
 
-FPATH	= src/carre:src/trans:src/fcrr:src/dummy
+VHEAD   =
+ifeq ($(shell [ -d ${SRCLOCAL} ] && echo yes || echo no ),yes)
+VHEAD   =${SRCLOCAL}:
+endif
+FPATH	= ${VHEAD}src/carre:src/trans:src/fcrr:src/dummy
 EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
 GPATH   = src/cntour:src/graphe
-VPATH   = src/carre:src/cntour:src/trans:src/fcrr:src/dummy:src/graphe
+VPATH   = ${VHEAD}src/carre:src/cntour:src/trans:src/fcrr:src/dummy:src/graphe
 
 INCLUDE = -Isrc/include
 

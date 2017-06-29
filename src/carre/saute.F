@@ -25,7 +25,7 @@ c======================================================================
       REAL*8 zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
       REAL*8 fracx,fracy
       PARAMETER (psimin=1.E-08,psimi2=1.E-07)
-      logical l_dbg
+      logical l_dbg, print_dbg
       integer n_call
 #ifdef DBG
       data l_dbg /.true./
@@ -33,6 +33,7 @@ c======================================================================
       data l_dbg /.false./
 #endif
       data n_call /0/
+      save n_call
 
 *  procedures
       INTEGER indsgm,ifind
@@ -60,8 +61,8 @@ c======================================================================
 
       n_call=n_call+1
 cc<<<
-      l_dbg=l_dbg.and.n_call.gt.225
-      if(l_dbg) then
+      print_dbg=l_dbg.and.n_call.gt.225
+      if(print_dbg) then
         write(0,*) '===> Entering SAUTE. n_call = ',n_call
         write(0,'(1x,6a5,a9,3a12)') 'npst','sens','nx','ny',
      ,                               'nm1','nm2','x1','y1','psi1','pas'
@@ -99,11 +100,11 @@ cc>>>
       y0=y1
       psi0 = psi1
 cc<<<
-      if(l_dbg) then
-        write(0,'(1x,4a5,a9,5a12)') 'sens','npst','ind1','ind2',
+      if(print_dbg) then
+        write(0,'(1x,4a5,a9,5a13)') 'sens','npst','ind1','ind2',
      ,              'x1','y1','xst(i1)','yst(i1)','xst(i2)','yst(i2)'
         write(0,'(1x,4i5,1p,6e12.2)') sens,npst,ind1,ind2,
-     ,                    x1,y1,xst(ind1),yst(ind1),xst(ind2),yst(ind2)
+     ,               x1, y1, xst(ind1),yst(ind1),xst(ind2),yst(ind2)
       end if
 cc>>>
 
@@ -124,7 +125,7 @@ c---------------------------------------------------------------------{
           y2=y0+zpas/dist*(yst(ind2)-y0)
 
 cc<<<
-          if(l_dbg) then
+          if(print_dbg) then
             write(0,*) '<=== Leaving SAUTE (dist found). x2,y2 = ',
      ,                                                            x2,y2
           end if
@@ -151,8 +152,9 @@ c---------------------------------------------------------------------}
       else if (repart .EQ. 2) then
 
 cc<<<
-        if(l_dbg) then
-          write(0,'(2x,2a4,a9,3a12)') 'ii','jj','x','y','psi','pas'
+        if(print_dbg) then
+          write(0,'(2x,1x,2(a4,1x),a9,3a15,2a12)')
+     .     'ii','jj','x','y','psi','pas','diff','min'
         end if
 cc>>>
 c---------------------------------------------------------------------{
@@ -243,8 +245,9 @@ cxpb  must find the point where the structure exits this rectangle.
      .         a11(ii,jj,1)*x3*y3
 
 cc<<<
-        if(l_dbg) then
-          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x3,y3,psi3,pas
+        if(print_dbg) then
+          write(0,'(a2,2(1x,i4),1p,4e15.8,2e12.4)') '3:',
+     .     ii,jj,x3,y3,psi3,pas,abs(psi3-pas),psimi2
         end if
 cc>>>
         IF (ABS(psi3 - pas) .LT. psimi2) then
@@ -253,7 +256,7 @@ cc>>>
           y2 = y3
 
 cc<<<
-          if(l_dbg) then
+          if(print_dbg) then
             write(0,'(2a,1p,3e12.4)')
      -              ' <=== Leaving SAUTE (psi3 found). ',
      ,                                   'x2,y2,psi3 = ',x2,y2,psi3
@@ -278,14 +281,16 @@ c---------------------------------------------------------------------{
      .           a11(ii,jj,1)*x2*y2
 
 cc<<<
-        if(l_dbg) then
-          write(0,'(1x,2i4,1p,4e12.4)') ii,jj,x2,y2,psi2,pas
-        end if
+          if(print_dbg) then
+            write(0,'(a2,2(1x,i4),1p,4e15.8,2e12.4)') '2:',
+     .       ii,jj,x2,y2,psi2,pas,abs(psi2-pas),psimin
+          end if
 cc>>>
-          IF (ABS(psi2-pas) .LT. psimin) then
+          IF (ABS(psi2-pas) .LT. psimin .or.
+     .       (x2.eq.x3 .and. y2.eq.y3)) then
 
 cc<<<
-            if(l_dbg) then
+            if(print_dbg) then
               write(0,'(2a,1p,3e12.4)')
      -                ' <=== Leaving SAUTE (psi2 found). ',
      ,                                     'x2,y2,psi3 = ',x2,y2,psi3
@@ -294,7 +299,7 @@ cc>>>
             RETURN
 
           else if ((MIN(psi0,psi2).LE.pas) .AND.
-     .                         (MAX(psi0,psi2).GE.pas)) then
+     .             (MAX(psi0,psi2).GE.pas)) then
             x3 = x2
             y3 = y2
             psi3 = psi2

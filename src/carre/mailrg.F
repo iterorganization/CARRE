@@ -185,7 +185,7 @@ c  calcul des indices de garde
          fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
      .          a11(ii,jj,1)*xpto*ypto
 
-* we locate a fictitious segment with serves as a baseline for saute
+* we locate a fictitious segment which serves as a baseline for saute
          xtt(1)= xpto-0.1
          ytt(1)= ypto
          xtt(2)= x(nx)
@@ -273,9 +273,10 @@ c---
 
          ENDIF
 c***
-
-c        print*,'x1, y1=',x1,y1
-c        print*,'x2, y2=',x2,y2
+#ifdef DBG
+        print*,'x1, y1=',x1,y1
+        print*,'x2, y2=',x2,y2
+#endif
 c***
 
          xn(1,inouv)=x2
