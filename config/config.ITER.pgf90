@@ -2,24 +2,24 @@
 LD_MSCL  ?= `pkg-config mscl --libs`
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2 -lgfortran
 
-DEFINES   = -DGFORTRAN
+DEFINES   = 
 
-FC        = gfortran
+FC        = pgf90
 CPP       = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS    = -g -fcheck=all -fbacktrace
+FFLAGS    = -g -C 
 else
 FFLAGS    = -O
 endif
 
-DBLPAD    =
+DBLPAD    = -r8 -i4
 
 COMPILE   = ${FC} -c ${FFLAGS}
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS   =
-LDEXTRA   =
+LDFLAGS   = 
+LDEXTRA   = 
 
 #!!!Local Variables:
 #!!! mode: Makefile
