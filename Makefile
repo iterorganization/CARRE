@@ -144,7 +144,7 @@ depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
 	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
 
-${OBJDIR}/LISTOBJ:
+listobj:
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; l="OBJS ="; \
 	for d in `echo "$(FPATH)" | tr : \ `; do \
 		l="$$l `(cd $$d > /dev/null; echo *.F)`"; \
@@ -162,7 +162,7 @@ ${OBJDIR}/LISTOBJ:
 	done; \
 	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
 
-listobj: ${OBJDIR}/LISTOBJ
+${OBJDIR}/LISTOBJ: listobj
 
 VERSION: src/include/git_version_Carre.h
 
