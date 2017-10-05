@@ -260,16 +260,16 @@ c---
          IF (repart .EQ. 1) THEN
 
             CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),
-     .                npstru(plaque),x1,y1,valfct,x2,y2,pas(ir-1),sens,
-     .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+     .                 npstru(plaque),x1,y1,valfct,x2,y2,pas(ir-1),sens,
+     .                 repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
          ELSE IF (repart .EQ. 2) THEN
 
             fctnew=valfct + pas(ir-1)
 
             CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),
-     .                npstru(plaque),x1,y1,valfct,x2,y2,fctnew,sens,
-     .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
+     .                 npstru(plaque),x1,y1,valfct,x2,y2,fctnew,sens,
+     .                 repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
          ENDIF
 c***

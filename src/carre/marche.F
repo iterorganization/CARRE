@@ -198,10 +198,12 @@ c  Look for the next point.
      .           x1,y1,psi1,x2,y2,pas,sens,repart,nx,ny,x,y,
      .           a00,a10,a01,a11,nxmax,nymax)
 c***
-c     print*,' '
-c     print*,'pas=',pas
-c     print*,'apres saute: x1,y1=',x1,y1
-c     print*,'             x2,y2=',x2,y2
+#ifdef DBG
+      write(0,*) ' '
+      write(0,*) 'sens,pas=',sens,pas
+      write(0,*) 'apres saute: x1,y1=',x1,y1
+      write(0,*) '             x2,y2=',x2,y2
+#endif
 c     pause
 c***
 
@@ -210,7 +212,7 @@ cdps
 c  Make sure we did not go past the end of the mesh.
 
       IF ((x2 .LT. x(1)) .OR. (x2 .GT. x(nx)) .OR. (y2 .LT. y(1)) .OR.
-     .      (y2 .GT. y(ny))) THEN
+     .    (y2 .GT. y(ny))) THEN
 
          pastmp = pastmp/2.
          pas = pastmp
@@ -230,7 +232,9 @@ c  Index of the segment of the structure containing x2, y2.
       ind2 = indsgm(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque),
      .              x2,y2)
 c***
-c     print*,'ind1, ind2=',ind1,ind2
+#ifdef DBG
+      write(0,*) 'ind1, ind2 =', ind1, ind2
+#endif
 c***
 
       IF (ind1 .NE. ind2) THEN
@@ -241,6 +245,7 @@ c***
             ind3 = ind2
          ELSE
             ind3 = ind1
+            ind2 = ind3+sens
          ENDIF
 
          x2 = xstruc(ind3,plaque)
@@ -250,6 +255,10 @@ c***
 
          pas = SQRT((x1-x2)**2 + (y1-y2)**2)
 
+#ifdef DBG
+         write(0,'(a,i3,1p,5e12.5)') 'ind3, x1, y1, x2, y2, pas =',
+     .                                ind3, x1, y1, x2, y2, pas
+#endif
       ENDIF
 
 *..Calcul de la fonction pour le point 2.
@@ -443,10 +452,10 @@ c     print*,'k=',k
 c***
       IF ((indstr .EQ. fraplq) .AND. (.NOT.(echec))) THEN
 
-        DO 15 j=1, k
-           nivox(j) = niv1x(j)
-           nivoy(j) = niv1y(j)
-   15   CONTINUE
+         DO 15 j=1, k
+            nivox(j) = niv1x(j)
+            nivoy(j) = niv1y(j)
+   15    CONTINUE
 
          nvotot = k
 
@@ -476,6 +485,11 @@ c***
          ind2 = ind1
 
       ENDIF
+
+#ifdef DBG
+      write(0,'(a,l1,1p,2e12.5)') 'At end of marche : ',
+     .                             coin, pas, pastmp
+#endif
 
       GO TO 10
 

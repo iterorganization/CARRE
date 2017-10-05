@@ -64,13 +64,13 @@ cc<<<
       print_dbg=l_dbg.and.n_call.gt.225
       if(print_dbg) then
         write(0,*) '===> Entering SAUTE. n_call = ',n_call
-        write(0,'(1x,6a5,a9,3a12)') 'npst','sens','nx','ny',
+        write(0,'(1x,6a5,a7,3a12)') 'npst','sens','nx','ny',
      ,                               'nm1','nm2','x1','y1','psi1','pas'
-        write(0,'(6i5,1p,4e12.4)') npst,sens,nx,ny,nm1,nm2,
+        write(0,'(1x,6i5,1p,4e12.4)') npst,sens,nx,ny,nm1,nm2,
      ,                                                   x1,y1,psi1,pas
-        write(0,'(1x,a9,5a12)')
-     -                      'x(1)','y(1)','x(2)','y(2)','x(nx)','y(ny)'
-        write(0,'(1x,1p,6e12.4)') x(1),y(1),x(2),y(2),x(nx),y(nx)
+        write(0,'(a9,5a12)')
+     -                    'x(1)','y(1)','x(2)','y(2)','x(nx)','y(ny)'
+        write(0,'(1p,6e12.4)') x(1),y(1),x(2),y(2),x(nx),y(ny)
         write(0,*) 'xst'
         write(0,'(1p,10e12.4)') xst
         write(0,*) 'yst'
@@ -101,7 +101,7 @@ cc>>>
       psi0 = psi1
 cc<<<
       if(print_dbg) then
-        write(0,'(1x,4a5,a9,5a13)') 'sens','npst','ind1','ind2',
+        write(0,'(2x,4a5,a8,a12,3x,4a12)') 'sens','npst','ind1','ind2',
      ,              'x1','y1','xst(i1)','yst(i1)','xst(i2)','yst(i2)'
         write(0,'(1x,4i5,1p,6e12.2)') sens,npst,ind1,ind2,
      ,               x1, y1, xst(ind1),yst(ind1),xst(ind2),yst(ind2)
@@ -120,14 +120,22 @@ c---------------------------------------------------------------------{
 
         dist = SQRT((xst(ind2)-x0)**2+(yst(ind2)-y0)**2)
 
+cc<<<
+        if(print_dbg) then
+          write(0,'(a,2i3,1p,6e12.4)')
+     .     'ind1,ind2,zpas,dist,x0,y0,xst,yst',
+     .      ind1,ind2,zpas,dist,x0,y0,xst(ind2),yst(ind2)
+        end if
+cc>>>
         IF (dist.gt.zpas) then
           x2=x0+zpas/dist*(xst(ind2)-x0)
           y2=y0+zpas/dist*(yst(ind2)-y0)
 
 cc<<<
           if(print_dbg) then
-            write(0,*) '<=== Leaving SAUTE (dist found). x2,y2 = ',
-     ,                                                            x2,y2
+            write(0,'(a,2i4,1p,2e14.7)')
+     ,       '<=== Leaving SAUTE (dist found). ind1,ind2,x2,y2 = ',
+     ,                                         ind1,ind2,x2,y2
           end if
 cc>>>
           RETURN
@@ -314,16 +322,13 @@ c---------------------------------------------------------------------}
         else
           IF (compt .EQ. npst) then
 
-c            PRINT *,'On a fait le tour de la structure sans trouver'
-c     .                ,' la fonction dans SAUTE'
-
             if(sellan(1:8).eq.'francais') then
-            write(*,*) 'On a fait le tour de la structure sans trouver'
-     .                ,' la fonction dans SAUTE'
+              write(*,*) 'On a fait le tour de la structure ',
+     .                   'sans trouver la fonction dans SAUTE'
             else
-            write(*,*) 'Error in saute: the psi value not found ',
+              write(*,*) 'Error in saute: the psi value not found ',
      ,                                  'on the structure.  pas = ',pas
-            write(*,*) '==> Check whether all four targets ',
+              write(*,*) '==> Check whether all four targets ',
      ,                                 'intersect the outer separatrix'
             endif
             call trc_stk
