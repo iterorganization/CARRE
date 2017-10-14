@@ -11,17 +11,22 @@ c======================================================================
 c
       integer nnm
       parameter (nnm=7)
-      character nms(nnm)*8
+      character*8 name, nms(nnm)
       integer i
+      logical streql
+      external streql
+c
+c*** List of the valid input keywords
       data nms /
      1    'repart  ','nrelax  ','relax   ','pasmin  ','rlcept  ',
      2    'tgarde  ','xpttol  '/
 c======================================================================
 c
+      write(name,'(a8)') nam
       do i=1,nnm
-        if(nam.eq.nms(i)) go to (10,20,30,40,50,60,70),i
+        if(streql(name,nms(i))) go to (10,20,30,40,50,60,70),i
       end do
-      call fcrtrn(nam)
+      call fcrtrn(name)
       return
 c
  10   call resimi(repart)

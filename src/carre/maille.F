@@ -8,8 +8,6 @@
      .     sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
      .     ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
-  
-
 c
 c  version : 23.06.98 19:53
 c
@@ -25,14 +23,14 @@ c======================================================================
 cank-970707: dimensions from the file
 *  dimensions
 #include <CARREDIM.F>
-      
+
 
 *  arguments
       INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint,
      .        nstruc,npstru(nstruc),nreg,inddef(4),
      .        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg,nn1,
      .        sol,ir,nprad,ipol,nppol,ireg,modif,re,nprsb(nregmx)
-     
+
       LOGICAL racord
       REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),
      .  xpto,ypto,separx(npnimx,4,npx),
@@ -180,10 +178,10 @@ c----------------------------------------------------------------------
          ient = 9
          isor = 0
 
-	 tgarde(1)=0
-	 tgarde(2)=0
-	 tgarde(3)=0
-	 tgarde(4)=0
+         tgarde(1)=0
+         tgarde(2)=0
+         tgarde(3)=0
+         tgarde(4)=0
          CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .               pntrat,tgarde,distxo,ient,isor,ifail)
 
@@ -227,7 +225,7 @@ c----------------------------------------------------------------------
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin +
      .               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini
@@ -284,9 +282,9 @@ c----------------------------------------------------------------------
 *..we append the last level line to trace2 to have the penetration depth
 
          if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _	       ptsep,npx,nptot,
-     _	       nstruc,npstru,xstruc,ystruc,
-     _	       nivx,nivy,nivtot,nbniv,
+     _         ptsep,npx,nptot,
+     _         nstruc,npstru,xstruc,ystruc,
+     _         nivx,nivy,nivtot,nbniv,
      _         pntrat,distxo,xn,yn,nn1,
      .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
      .         a00,a01,a10,a11,psi,nx,ny,x,y)
@@ -306,32 +304,32 @@ c----------------------------------------------------------------------
          if(rep(1:1).eq.'n' .or. rep(1:1).eq.'N' .or. .not.correct) then
 
             ient = 5
-	    isor = 6
+            isor = 6
 
-            pntrat_old = pntrat        
-            
+            pntrat_old = pntrat
+
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
 
             if (pntrat.ne.pntrat_old) then
               call endpag
 
-	        call trace2(x(1),x(nx),y(1),y(ny),
-     .  		 separx,separy,ptsep,npx,nptot,
-     .         nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .         nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
-            
+              call trace2(x(1),x(nx),y(1),y(ny),
+     .                    separx,separy,ptsep,npx,nptot,
+     .                    nstruc,npstru,xstruc,ystruc,nivx,nivy,
+     .                    nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+
             endif
 
 
             GO TO 3
 
-       
+
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
      .             dpmin,dpmax,drmin,drmax,distxo,10,correct)
-      
+
 
          ENDIF
 
@@ -347,7 +345,7 @@ c----------------------------------------------------------------------
      .     nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt)
-     
+
 
 *..1.2  Distribute the points along separatrices
 
@@ -380,16 +378,16 @@ c----------------------------------------------------------------------
 #ifdef MODIF
     8    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=9,err=8) modif
-    9	 continue
+         read(5,*,end=9,err=8) modif
+    9   continue
 #else
          modif = 0
 #endif
-         
+
          np1(ireg) = 0
 
          DO 10 ipas=nptseg(1), 1, -1
@@ -461,7 +459,7 @@ c----------------------------------------------------------------------
 *..Call the routine which grids this region
 
 c---
-        
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -494,14 +492,14 @@ c  1.3.2  region 2
 #ifdef MODIF
    18    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=19,err=18) modif
-   19	 continue
+         read(5,*,end=19,err=18) modif
+   19    continue
 #endif
-         
+
          np1(ireg) = 0
 
          DO 20 ipas=nptseg(1), 1, -1
@@ -560,7 +558,7 @@ c  1.3.2  region 2
 *..Call the routine which grids this region
 
 c---
-         
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -639,10 +637,10 @@ c---
 
 c----------------------------------------------------------------------
 c  Printout of the remaining parameters.
-      
-	write(3,166) gdpsi, racpsi
+
+        write(3,166) gdpsi(1,ireg), racpsi(1,ireg)
  166    format(T2,F8.5,T17,F8.5)
-      
+
       ELSE IF ((npx.EQ.2) .AND. (racord)) THEN
 
 *..2.   Connected double null
@@ -731,7 +729,7 @@ c----------------------------------------------------------------------
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin +
      .               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini
@@ -801,9 +799,9 @@ c----------------------------------------------------------------------
   371    CONTINUE
 
          if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _	       ptsep,npx,nptot,
-     _	       nstruc,npstru,xstruc,ystruc,
-     _	       nivx,nivy,nivtot,nbniv,
+     _         ptsep,npx,nptot,
+     _         nstruc,npstru,xstruc,ystruc,
+     _         nivx,nivy,nivtot,nbniv,
      _         pntrat,distxo,xn,yn,nn1,
      .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
      .         a00,a01,a10,a11,psi,nx,ny,x,y)
@@ -825,12 +823,12 @@ c----------------------------------------------------------------------
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
             if (pntrat.ne.pntrat_old) then
 
-	      call endpag
-	      call trace2(x(1),x(nx),y(1),y(ny),
+              call endpag
+              call trace2(x(1),x(nx),y(1),y(ny),
      .          separx,separy,ptsep,npx,nptot,
      .          nstruc,npstru,xstruc,ystruc,nivx,nivy,
      .          nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
-           
+
             endif
 
             GO TO 43
@@ -906,16 +904,16 @@ c----------------------------------------------------------------------
 #ifdef MODIF
    48    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=49,err=48) modif
-   49	 continue
+         read(5,*,end=49,err=48) modif
+   49    continue
 #else
          modif = 0
 #endif
-         
+
          np1(ireg) = 0
 
          DO 50 ipas=nptseg(1), 1, -1
@@ -991,7 +989,7 @@ c----------------------------------------------------------------------
 *..Call the routine which grids this region
 
 c---
-        
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -1025,14 +1023,14 @@ c---
 #ifdef MODIF
    58    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=59,err=58) modif
-   59	 continue  
+         read(5,*,end=59,err=58) modif
+   59    continue
 #endif
-        
+
          np1(ireg) = 0
 
          DO 60 ipas=nptseg(1), 1, -1
@@ -1093,7 +1091,7 @@ c---
 *..Call the routine which grids this region
 
 c---
-        
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -1127,14 +1125,14 @@ c---
 #ifdef MODIF
    68    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=69,err=68) modif
-   69	 continue
+         read(5,*,end=69,err=68) modif
+   69    continue
 #endif
-       
+
          np1(ireg) = 0
 
          DO 70 ipas=nptseg(2), 1, -1
@@ -1209,7 +1207,7 @@ c---
 *..Call the routine which grids this region
 
 c---
-        
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -1245,14 +1243,14 @@ c---
 #ifdef MODIF
    78    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=79,err=78) modif
-   79	 continue
+         read(5,*,end=79,err=78) modif
+   79    continue
 #endif
-	   
+
          np1(ireg) = 0
 
          DO 80 ipas=nptseg(5), 1, -1
@@ -1314,7 +1312,7 @@ c---
 *..Call the routine which grids this region
 
 c---
-        
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -1406,7 +1404,7 @@ c---
 
 
 
-     
+
 c----------------------------------------------------------------------
 
       ELSE IF ((npx.EQ.2) .AND. (.NOT.(racord))) THEN
@@ -1547,7 +1545,7 @@ c----------------------------------------------------------------------
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin +
      .               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini
@@ -1729,9 +1727,9 @@ crm  augmenter ce test
   381    CONTINUE
 
          if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _	       ptsep,npx,nptot,
-     _	       nstruc,npstru,xstruc,ystruc,
-     _	       nivx,nivy,nivtot,nbniv,
+     _         ptsep,npx,nptot,
+     _         nstruc,npstru,xstruc,ystruc,
+     _         nivx,nivy,nivtot,nbniv,
      _         pntrat,distxo,xn,yn,nn1,
      .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
      .         a00,a01,a10,a11,psi,nx,ny,x,y)
@@ -1752,8 +1750,8 @@ crm  augmenter ce test
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
             if (pntrat.ne.pntrat_old) then
-	      call endpag
-	      call trace2(x(1),x(nx),y(1),y(ny),
+              call endpag
+              call trace2(x(1),x(nx),y(1),y(ny),
      .          separx,separy,ptsep,npx,nptot,
      .          nstruc,npstru,xstruc,ystruc,nivx,nivy,
      .          nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
@@ -1776,7 +1774,7 @@ crm  augmenter ce test
      .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt)
-     
+
 *..3.2  Distribute the points along separatrices
 
 *..Determine the two parts of the inner separatrix which make a loop
@@ -1895,12 +1893,12 @@ crm  augmenter ce test
 #ifdef MODIF
   128   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Avec ou sans modifications?'
-	  write(6,*) 'Répondez 1 avec modif et 0 sans modif'
-         elseif(sellan(1:7).eq.'english') then
-           write(6,*) 'With (1) or without (0) manual modifications?'
-         endif
-	read(5,*,end=129,err=128) modif
-  129	continue
+          write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+        elseif(sellan(1:7).eq.'english') then
+          write(6,*) 'With (1) or without (0) manual modifications?'
+        endif
+        read(5,*,end=129,err=128) modif
+  129   continue
 #else
         modif = 0
 #endif
@@ -1923,7 +1921,7 @@ crm  augmenter ce test
   131    CONTINUE
 
 *..Define the primary curve and the grid points
-        
+
          np1(ireg) = 0
 
          IF (ptxint .EQ. 1) THEN
@@ -2048,7 +2046,7 @@ crm  augmenter ce test
 *..Call the routine which grids this region
 
 c---
-         
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -2094,18 +2092,18 @@ c---
 #ifdef MODIF
   148    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=149,err=148) modif
-  149	 continue
+         read(5,*,end=149,err=148) modif
+  149    continue
 #endif
          nbcrb = 1
 
 *..Define the primary curve and the grid points
 
-        
+
          np1(ireg) = 0
 
          IF (ptxint .EQ. 1) THEN
@@ -2187,7 +2185,7 @@ c---
 *..Call the routine which grids this region
 
 c---
-        
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -2222,14 +2220,14 @@ c---
 #ifdef MODIF
   158    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=159,err=158) modif
-  159	 continue
+         read(5,*,end=159,err=158) modif
+  159    continue
 #endif
-        
+
          np1(ireg) = 0
 
          DO 160 ipas=nptseg(1),1,-1
@@ -2289,7 +2287,7 @@ c---
 *..Call the routine which grids this region
 
 c---
-         
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -2319,18 +2317,18 @@ c---
 #ifdef MODIF
   168    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
- 	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+            write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=169,err=168) modif
-  169	 continue
+         read(5,*,end=169,err=168) modif
+  169    continue
 #endif
          nbcrb = 1
 
 *..Define the primary curve and the grid points
 
-        
+
          np1(ireg) = 0
 
          IF (ptxint .EQ. 1) THEN
@@ -2414,7 +2412,7 @@ c---
 *..Call the routine which grids this region
 
 c---
-         
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -2444,18 +2442,18 @@ c---
 #ifdef MODIF
   178    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=179,err=178) modif
-  179 	 continue
+         read(5,*,end=179,err=178) modif
+  179    continue
 #endif
          nbcrb = 1
 
 *..Define the primary curve and the grid points
 
-         
+
          np1(ireg) = 0
 
          DO 180 ipas=nptseg(5), 1, -1
@@ -2514,7 +2512,7 @@ c---
 *..Call the routine which grids this region
 
 c---
-         
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .               np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -2535,7 +2533,7 @@ c---
      .               nivx,nivy,
      .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
      .               xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ptxint)
- 
+
          modif=0
 
 *..3.3.6  Region 6: central region
@@ -2677,7 +2675,7 @@ c----------------------------------------------------------------------
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin +
      .               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini
@@ -2724,12 +2722,12 @@ c----------------------------------------------------------------------
   391    CONTINUE
 
          if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _	       ptsep,npx,nptot,
-     _	       nstruc,npstru,xstruc,ystruc,
-     _		   nivx,nivy,nivtot,nbniv,
-     _           pntrat,distxo,xn,yn,nn1,
-     .           repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
-     .           a00,a01,a10,a11,psi,nx,ny,x,y)
+     _         ptsep,npx,nptot,
+     _         nstruc,npstru,xstruc,ystruc,
+     _         nivx,nivy,nivtot,nbniv,
+     _         pntrat,distxo,xn,yn,nn1,
+     .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
+     .         a00,a01,a10,a11,psi,nx,ny,x,y)
          if(correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -2746,13 +2744,13 @@ c----------------------------------------------------------------------
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
             if (pntrat.ne.pntrat_old) then
-	      call endpag
+              call endpag
 
 
-	call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
+        call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
      .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
      .        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
-            
+
 
             endif
             GO TO 203
@@ -2774,7 +2772,7 @@ c----------------------------------------------------------------------
      .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt)
-     
+
 
 
 *..4.2  Distribute the points along separatrices
@@ -2805,16 +2803,16 @@ c----------------------------------------------------------------------
 #ifdef MODIF
   378    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-	   write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
-	 read(5,*,end=379,err=378) modif
-  379	 continue
+         read(5,*,end=379,err=378) modif
+  379    continue
 #else
          modif = 0
 #endif
-        
+
          np1(ireg) = 0
 
          DO ipas=1, nptseg(1)
@@ -2874,7 +2872,7 @@ c        print*,'ireg, idef, inddef=',ireg,idef,inddef(idef)
 c        print*,'np1, npr=',np1(ireg),npr(ireg)
 c***
 c---
-         
+
 c---
          CALL MAILRG(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,sens,pas,
      .              np1(ireg),npr(ireg),inddef(idef),x2,y2,nx,ny,
@@ -2969,7 +2967,7 @@ c======================================================================
      .  somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .  sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .  somtot,somtotp,gdsomtotp,segt)
-     
+
 cc<<<
 c      write(0,*) '<=== Leaving maille'
 cc>>>

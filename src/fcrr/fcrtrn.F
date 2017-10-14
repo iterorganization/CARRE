@@ -7,13 +7,15 @@ c*** Input of target data for Carre
 c======================================================================
       implicit none
 #include <FCRCOM.F>
-      character*(8) nam
+      character*8 nam
       integer lun
 c
       integer nnms
       parameter (nnms=8)
       integer i
-      character*8 unm(nnms), uline*80
+      character*8 name, unm(nnms), uline*80
+      logical streql
+      external streql
 c
 c*** List of the valid input keywords
       data unm /
@@ -21,8 +23,9 @@ c*** List of the valid input keywords
      2    'dltpn   ','pntrat  ','clstruct'/
 c======================================================================
 c
+      write(name,'(a8)') nam
       do i=1,nnms
-          if(nam.eq.unm(i)) go to (10,20,30,40,50,60,70,80),i
+        if(streql(name,unm(i))) go to (10,20,30,40,50,60,70,80),i
       end do
       call scipit
       return

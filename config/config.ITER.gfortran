@@ -8,7 +8,7 @@ FC        = gfortran
 CPP       = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS    = -g -fcheck=all -fbacktrace
+FFLAGS    = -g -gdwarf-2 -fcheck=all -fbacktrace -ffpe-trap=denormal
 else
 FFLAGS    = -O
 endif

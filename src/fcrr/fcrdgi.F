@@ -7,12 +7,14 @@ c*** Input of dg data for Carre
 c======================================================================
       implicit none
 #include <FCRCOM.F>
-      character*(8) nam
+      character*(*) nam
 c
       integer nnms
       parameter (nnms=4)
       integer i, j, lutrg
-      character*8 unm(nnms)
+      character*8 name, unm(nnms)
+      logical streql
+      external streql
 c
 c*** List of the valid input keywords
       data unm /
@@ -20,8 +22,9 @@ c*** List of the valid input keywords
       data lutrg / 0 /
 c======================================================================
 c
+      write(name,'(a8)') nam
       do i=1,nnms
-          if(nam.eq.unm(i)) go to (10,20,30,40),i
+        if(streql(name,unm(i))) go to (10,20,30,40),i
       end do
       call skipit
       return
@@ -33,12 +36,12 @@ c*** xptcntr
         write(*,*) '*** fcrtrn: too few values for xptcntr'
         xptcntr(1,1)=-1.
       else
-      	nxpt=max(i/3,1)
-	do j=1,nxpt
-	  do i=1,3
+        nxpt=max(i/3,1)
+        do j=1,nxpt
+          do i=1,3
             xptcntr(i,j)=0.001*xptcntr(i,j)
-	  end do
-	end do
+          end do
+        end do
       end if
       return
 c*** xlpcntr

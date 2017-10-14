@@ -22,7 +22,7 @@ c
      i  repart,nrelax,nxpt,
      ,  nsgm,nptseg,nrgn,npr,ntrg,
      ,  nstr,lstr,nclstr,nr,nz,
-     l	ldgv2  
+     l  ldgv2  
 c
 c*** nnstr : maximum number of structures to be imported from dg
 c*** nmstr : maximum number of nodes in all the structures
