@@ -22,7 +22,7 @@ c*** List of the valid input keywords
       data lutrg / 0 /
 c======================================================================
 c
-      write(name,'(a8)') nam
+      call locase(nam,name,8)
       do i=1,nnms
         if(streql(name,unm(i))) go to (10,20,30,40),i
       end do

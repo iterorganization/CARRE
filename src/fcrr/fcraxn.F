@@ -22,7 +22,7 @@ c*** List of the valid input keywords
      2    'tgarde  ','xpttol  '/
 c======================================================================
 c
-      write(name,'(a8)') nam
+      call locase(nam,name,8)
       do i=1,nnm
         if(streql(name,nms(i))) go to (10,20,30,40,50,60,70),i
       end do

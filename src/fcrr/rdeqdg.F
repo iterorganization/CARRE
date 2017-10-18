@@ -36,7 +36,8 @@ c
       call rdeqlh(lun,nr,nz,ubtf,urtf,*99)
       btf=ubtf
       rtf=urtf
-      print *,'rdeqdg: after rdeqlh. nr,nz,btf,rtf= ',nr,nz,btf,rtf
+      print '(a,2i5,1p,2(1x,e14.7))',
+     .  'rdeqdg: after rdeqlh. nr,nz,btf,rtf= ',nr,nz,btf,rtf
       if(rtf.le.0.) then
 c
 c*** Read the toroidal field and the corresponding radius
