@@ -260,18 +260,20 @@ c*** Check some grid dimensions for consistency
 
             errenc=.false.
             if(nprad(5).ne.nprad(6)) then
-              write(0,*) 'nprad(5) .ne. nprad(6)'
-              write(*,*) 'nprad(5) .ne. nprad(6)'
+              write(0,*) 'You must have nprad(5) .eq. nprad(6)'
+              write(*,*) 'You must have nprad(5) .eq. nprad(6)'
               errenc=.true.
             end if
             if(nprad(2).ne.nprad(4)) then
-              write(0,*) 'nprad(2) .ne. nprad(4)'
-              write(*,*) 'nprad(2) .ne. nprad(4)'
+              write(0,*) 'You must have nprad(2) .eq. nprad(4)'
+              write(*,*) 'You must have nprad(2) .eq. nprad(4)'
               errenc=.true.
             end if
             if(nprad(5)+nprad(1)-1.ne.nprad(3)) then
-              write(0,*) 'nprad(5)+nprad(1)-1 .ne. nprad(3)'
-              write(*,*) 'nprad(5)+nprad(1)-1 .ne. nprad(3)'
+              write(0,*)
+     .         'You must have nprad(5)+nprad(1)-1 .eq. nprad(3)'
+              write(*,*)
+     .         'You must have nprad(5)+nprad(1)-1 .eq. nprad(3)'
               errenc=.true.
             end if
 
@@ -409,18 +411,20 @@ c*** Check some grid dimensions for consistency
 
             errenc=.false.
             if(nprad(3).ne.nprad(6)) then
-              write(0,*) 'nprad(3) .ne. nprad(6)'
-              write(*,*) 'nprad(3) .ne. nprad(6)'
+              write(0,*) 'You must have nprad(3) .eq. nprad(6)'
+              write(*,*) 'You must have nprad(3) .eq. nprad(6)'
               errenc=.true.
             end if
             if(nprad(2).ne.nprad(4)) then
-              write(0,*) 'nprad(2) .ne. nprad(4)'
-              write(*,*) 'nprad(2) .ne. nprad(4)'
+              write(0,*) 'You must have nprad(2) .eq. nprad(4)'
+              write(*,*) 'You must have nprad(2) .eq. nprad(4)'
               errenc=.true.
             end if
             if(nprad(3)+nprad(1)-1.ne.nprad(5)) then
-              write(0,*) 'nprad(3)+nprad(1)-1 .ne. nprad(5)'
-              write(*,*) 'nprad(3)+nprad(1)-1 .ne. nprad(5)'
+              write(0,*)
+     .         'You must have nprad(3)+nprad(1)-1 .eq. nprad(5)'
+              write(*,*)
+     .         'You must have nprad(3)+nprad(1)-1 .eq. nprad(5)'
               errenc=.true.
             end if
 
@@ -647,18 +651,18 @@ c*** Check some grid dimensions for consistency
 
             errenc=.false.
             if(nprad(1).ne.nprad(3)) then
-              write(0,*) 'nprad(1) .ne. nprad(3)'
-              write(*,*) 'nprad(1) .ne. nprad(3)'
+              write(0,*) 'You must have nprad(1) .eq. nprad(3)'
+              write(*,*) 'You must have nprad(1) .eq. nprad(3)'
               errenc=.true.
             end if
             if(nprad(2).ne.nprad(4)) then
-              write(0,*) 'nprad(2) .ne. nprad(4)'
-              write(*,*) 'nprad(2) .ne. nprad(4)'
+              write(0,*) 'You must have nprad(2) .eq. nprad(4)'
+              write(*,*) 'You must have nprad(2) .eq. nprad(4)'
               errenc=.true.
             end if
             if(nprad(5).ne.nprad(4)) then
-              write(0,*) 'nprad(5) .ne. nprad(4)'
-              write(*,*) 'nprad(5) .ne. nprad(4)'
+              write(0,*) 'You must have nprad(5) .eq. nprad(4)'
+              write(*,*) 'You must have nprad(5) .eq. nprad(4)'
               errenc=.true.
             end if
 
