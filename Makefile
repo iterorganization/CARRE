@@ -16,6 +16,7 @@ endif
 MAKES = Makefile 
 # Include global SOLPS compiler settings
 ifndef SOLPS_CPP
+NODENAME = $(shell echo `hostname`)
 ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER} ] && echo yes || echo no ),yes)
   include ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}
   MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}
