@@ -2741,16 +2741,19 @@ c----------------------------------------------------------------------
 
             ient = 5
             isor = 6
+
+            pntrat_old = pntrat
+
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .                  pntrat,tgarde,distxo,ient,isor,ifail)
+
             if (pntrat.ne.pntrat_old) then
               call endpag
 
-
-        call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
-     .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
-
+              call trace2(x(1),x(nx),y(1),y(ny),
+     .         separx,separy,ptsep,npx,nptot,
+     .         nstruc,npstru,xstruc,ystruc,nivx,nivy,
+     .         nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
 
             endif
             GO TO 203
