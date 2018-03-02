@@ -55,7 +55,7 @@ cank-970707: dimensions from the file
       INTEGER ipas,indstr,ianc,inouv,ii,jj,ir,dir,ipol,i,nn(2),nt,sens
      .        ,npcrb(2),plaque,ntt
       REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,xn(npnimx,2),
-     .       yn(npnimx,2),fctnew,xt(3),yt(3),fctxo,xtt(3),ytt(3),
+     .       yn(npnimx,2),fctnew,xt(3),yt(3),fctxo,xtt(4),ytt(4),
      .       fctanc,x22,y22,x23,y23
       PARAMETER(zero=0.,epsmai=1.e-6)
       REAL*8 xcrb(npnimx,2),ycrb(npnimx,2)
@@ -135,11 +135,13 @@ c***
      .       a11(ii,jj,1)*xpto*ypto
       xtt(1)= xpto-0.1
       ytt(1)= ypto
-      xtt(2)= x(nx)
+      xtt(2)= xpto
       ytt(2)= ypto
-      xtt(3)= xtt(1)
-      ytt(3)= ytt(1)
-      ntt=3
+      xtt(3)= x(nx)
+      ytt(3)= ypto
+      xtt(4)= xtt(1)
+      ytt(4)= ytt(1)
+      ntt=4
       sens=1
       CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sens,
      .            2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)

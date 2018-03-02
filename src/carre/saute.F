@@ -61,7 +61,7 @@ c======================================================================
 
       n_call=n_call+1
 cc<<<
-      print_dbg=l_dbg.and.n_call.gt.225
+      print_dbg=l_dbg.and.n_call.ge.165
       if(print_dbg) then
         write(0,*) '===> Entering SAUTE. n_call = ',n_call
         write(0,'(1x,6a5,a7,3a12)') 'npst','sens','nx','ny',
@@ -146,7 +146,7 @@ cc>>>
           IF (sens .EQ. 1) then
             ind2=MOD(ind1,n)+sens
           else
-            ind2=MOD(ind1,npst)+sens
+            ind2=MOD(ind1+sens,npst)
             IF (ind2 .EQ. 0) ind2=n
           end if
 
@@ -326,8 +326,9 @@ c---------------------------------------------------------------------}
               write(*,*) 'On a fait le tour de la structure ',
      .                   'sans trouver la fonction dans SAUTE'
             else
-              write(*,*) 'Error in saute: the psi value not found ',
-     ,                                  'on the structure.  pas = ',pas
+              write(*,'(a,1p,1e15.8)')
+     ,                   'Error in saute: the psi value not found '//
+     ,                   'on the structure.  pas = ',pas
               write(*,*) '==> Check whether all four targets ',
      ,                                 'intersect the outer separatrix'
             endif
@@ -342,7 +343,7 @@ c---------------------------------------------------------------------}
           IF (sens .EQ. 1) then
             ind2=MOD(ind1,n)+sens
           else
-            ind2=MOD(ind1,npst)+sens
+            ind2=MOD(ind1+sens,npst)
             IF (ind2 .EQ. 0) ind2=n
           end if
 
