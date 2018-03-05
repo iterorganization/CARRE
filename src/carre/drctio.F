@@ -4,6 +4,7 @@ c  version : 30.06.98 17:18
 c
 c======================================================================
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..Determination de la direction anti-horaire (dir=+1) ou horaire (-1)
 *  qui correspond a un deplacement vers la droite ou vers la gauche
@@ -11,13 +12,13 @@ c======================================================================
 
 *  arguments
       INTEGER npst
-      REAL*8 xst(npst),yst(npst),x1,y1
+      REAL(kind=R8) xst(npst),yst(npst),x1,y1
       CHARACTER*(*) doug
 
 *  variables locales
       INTEGER ind,nrot,irot
-      REAL*8 sg,delta,xin,yin,xin1,yin1,zero,norm,pi,cs,sn
-      parameter(delta=1.e-4,zero=0.,nrot=10,pi=3.141592654)
+      REAL(kind=R8) sg,delta,xin,yin,xin1,yin1,zero,norm,pi,cs,sn
+      parameter(delta=1.0e-4_R8,zero=0.0_R8,nrot=10,pi=3.141592654_R8)
 
 *  procedures
       intrinsic sqrt,sin,cos
@@ -47,14 +48,14 @@ cc<<<
       if(l_dbg) then
         write(0,*) '==== Entering drctio: ',n_call
         write(0,*) 'doug,npst,x1,y1: ',doug,' ',npst,x1,y1
-        write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
-        write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
+        write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' xst:', xst
+        write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' yst:', yst
       end if
 cc>>>
 
 cank-19980618
-      cs=cos((2.*pi)/nrot)
-      sn=sin((2.*pi)/nrot)
+      cs=cos((2.0_R8*pi)/nrot)
+      sn=sin((2.0_R8*pi)/nrot)
 cank
 
       ind=indsgm(xst,yst,npst,x1,y1)
@@ -107,8 +108,8 @@ c        write(0,*)'on ne trouve pas de point interieur dans drctio'
         write(0,*) 'Interior point not found in drctio ',
      ,                                  '- an internal error in Carre?'
         write(0,*) '*2: n_call,x1,y1=',n_call,x1,y1
-        write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
-        write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
+        write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' xst:', xst
+        write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' yst:', yst
         call trc_stk
         write(0,*) '==> Check whether the structures representing ',
      ,                                         'the targets are closed'
@@ -146,8 +147,8 @@ c  on teste maintenant l'orientation
             go to 8
           else
 cank-19980618
-c            cs=cos((2.*pi*irot)/nrot)
-c            sn=sin((2.*pi*irot)/nrot)
+c            cs=cos((2.0_R8*pi*irot)/nrot)
+c            sn=sin((2.0_R8*pi*irot)/nrot)
 cank
             norm=xin
             xin=xin*cs-yin*sn
@@ -158,8 +159,8 @@ c        write(0,*)'on ne trouve pas de point interieur dans drctio'
         write(0,*) 'Interior point not found in drctio ',
      ,                                  '- an internal error in Carre?'
         write(0,*) '*6: n_call,x1,y1=',n_call,x1,y1
-        write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
-        write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
+        write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' xst:', xst
+        write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' yst:', yst
         call trc_stk
         write(0,*) '==> Check whether the structures representing ',
      ,                                         'the targets are closed'

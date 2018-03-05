@@ -1,23 +1,25 @@
 
 ************************************************************************
-      REAL*8 FUNCTION plqdst(x0,y0,x2,y2,xst,yst,npst,doug)
+      FUNCTION plqdst(x0,y0,x2,y2,xst,yst,npst,doug)
 ************************************************************************
 c
 c  version : 18.06.98 20:20
 c
       IMPLICIT NONE
+#include <CARRETYPES.F>
+      real(kind=R8) plqdst
 
 *..Cette sous-routine calcule la distance entre deux points sur une meme
 *  structure, en longeant les segments de structure.
 
 *  arguments
       INTEGER npst
-      REAL*8 x0,y0,x2,y2,xst(npst),yst(npst)
+      REAL(kind=R8) x0,y0,x2,y2,xst(npst),yst(npst)
       CHARACTER*(*) doug
 
 *  variables locales
       INTEGER ind,ind1,ind2,sens
-      REAL*8 x1,y1,x3,y3,dist
+      REAL(kind=R8) x1,y1,x3,y3,dist
 
 *  procedures
       INTEGER indsgm,drctio

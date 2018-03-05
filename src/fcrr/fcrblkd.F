@@ -5,6 +5,7 @@ c
 c======================================================================
       implicit none
       integer n
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
       parameter(n=nxptm*3)
       data repart , nrelax  ,  relax, pasmin, rlcept,  tgarde /

@@ -1,8 +1,10 @@
 
 ************************************************************************
-      REAL*8 FUNCTION aazero(fcn,x0,dx0,dxmin,fmin,xmin,xmax,itmax)
+      FUNCTION aazero(fcn,x0,dx0,dxmin,fmin,xmin,xmax,itmax)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
+      REAL(kind=R8) aazero
 c
 c  Purpose: find the zero of a REAL function fcn by the secant method.
 c
@@ -15,7 +17,7 @@ c  15/11/91     R. Marchand         initial installation
 c
 c  Input/output variables:
       INTEGER itmax
-      REAL*8 x0,dx0,dxmin,fmin,xmin,xmax
+      REAL(kind=R8) x0,dx0,dxmin,fmin,xmin,xmax
 c  x0: initial guess
 c  dx0: initial step
 c  dxmin: minimum acceptable step: aazero is accepted if dx.le.dxmin
@@ -30,20 +32,21 @@ c  Common variables: none
 c
 c  Local variables:
       INTEGER it
-      REAL*8 dxmax,x1,f1,x2,f2,zfmin,dx,dxinv,one,xl,xr,sgl,sgr,sg
+      REAL(kind=R8)
+     . dxmax,x1,f1,x2,f2,zfmin,dx,dxinv,one,xl,xr,sgl,sgr,sg
       save one
 c
 c  Procedures:
-      REAL*8 fcn
+      REAL(kind=R8) fcn
       external fcn
       intrinsic abs,sign,min,max
 c
 c  Data:
-      data one/1./
+      data one/1.0_R8/
 c
 c  Computation:
 c
-      dxmax=100.*abs(dx0)
+      dxmax=100._R8*abs(dx0)
       if(xmin.lt.xmax) then
         x1=max(xmin,min(xmax,x0))
       else

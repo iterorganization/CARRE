@@ -3,6 +3,7 @@
       SUBROUTINE UNTANG(xn,yn,npni,x,y,ux,uy,d,period)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette sous-routine calcule le vecteur unite tangent a la courbe
 *  parametrisee au point x,y. La direction de ce vecteur est obtenue par
@@ -10,7 +11,7 @@
 
 * arguments
       INTEGER npni
-      REAL*8 xn(npni), yn(npni), x, y, ux, uy,d,period
+      REAL(kind=R8) xn(npni), yn(npni), x, y, ux, uy,d,period
 
 *  variables en common
 
@@ -18,7 +19,7 @@
 
 *  variables locales
       INTEGER indp1, ind, jnd, jndp, ipp
-      REAL*8 unx1,uny1,unx2,uny2,z,w1
+      REAL(kind=R8) unx1,uny1,unx2,uny2,z,w1
 
 *  procedures
       INTEGER indcrb

@@ -3,6 +3,7 @@
       INTEGER FUNCTION indcrb(vx,vy,n,x,y,d)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction renvoie l'indice du point du debut du segment entre
 *  2 points parametrises sur lequel se trouve le point x,y. On effectue
@@ -14,12 +15,12 @@
 
 *  arguments
       INTEGER n
-      REAL*8 vx(n),vy(n),x,y,d
+      REAL(kind=R8) vx(n),vy(n),x,y,d
 
 *  variables locales
       INTEGER i
-      REAL*8 mumin, mu, ax, ay, bx, by, dist, eps,dd
-      PARAMETER (eps=1.E-6)
+      REAL(kind=R8) mumin, mu, ax, ay, bx, by, dist, eps,dd
+      PARAMETER (eps=1.0E-6_R8)
 
 *  procedures
       INTRINSIC SQRT
@@ -34,7 +35,7 @@ c=========================
 
 *..Initialisation.
 
-      mumin = 1.
+      mumin = 1.0_R8
       indcrb = 1
 
 *..Test pour savoir si le point x,y est egal au premier point parame-

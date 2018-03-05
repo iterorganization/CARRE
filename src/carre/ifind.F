@@ -2,6 +2,7 @@
       INTEGER FUNCTION ifind(x,t,n,inc)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction retourne l'indice i tel que t(i)<=x<t(i+1) sur un
 *  tableau t d'indice 1, ..., n par bonds de inc.
@@ -9,7 +10,7 @@
 
 *  arguments
       INTEGER n,inc
-      REAL*8 x, t(n)
+      REAL(kind=R8) x, t(n)
 
 *  variables locales
       INTEGER j, jp

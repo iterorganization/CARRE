@@ -3,18 +3,19 @@
       subroutine intrsc(x1,y1,x2,y2,vx,vy,n,x,y,iint,nint,sens)
 ************************************************************************
       implicit none
+#include <CARRETYPES.F>
 
 *..  cette routine determine le point d'intersection entre un segment
 c    1-2 et une courbe parametrisee de n points de coordonnees vx vy.
 
 *  arguments
       integer n,iint(2),nint,sens
-      real*8 x1,y1,x2,y2,vx(n),vy(n),x(2),y(2)
+      real(kind=R8) x1,y1,x2,y2,vx(n),vy(n),x(2),y(2)
 
 *  variables locales
       integer i,i1,i2,ii
-      real*8 determ, mult1,mult2,zero,un,multmn,zx,zy
-      parameter(zero=0.,un=1.)
+      real(kind=R8) determ, mult1,mult2,zero,un,multmn,zx,zy
+      parameter(zero=0.0_R8,un=1.0_R8)
 c  procedures
       integer tourne
       external tourne
@@ -33,7 +34,7 @@ c.. mult1: facteur multiplicatif du segment 1-2
 c.. mult2: facteur multiplicatif du segment de la courbe v.
 c=========================
 *..boucle sur tous les segments de la courbe.
-      multmn=2.
+      multmn=2.0_R8
       nint=0
       i2=1
       do 10 i=1, n-1

@@ -6,6 +6,7 @@ c======================================================================
 c*** Data transformation from DG to Carre
 c======================================================================
       implicit none
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
       integer i, j
       logical ex,uex

@@ -6,6 +6,7 @@ c======================================================================
 c*** Input of auxiliary data for Carre
 c======================================================================
       implicit none
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
       character*8 nam
 c

@@ -7,6 +7,7 @@ c  version : 04.04.97 21:00
 c
 c======================================================================
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette sous-routine permet a l'utilisateur d'entrer tous les parame-
 *  tres au clavier, en considerant chaque configuration.
@@ -14,7 +15,7 @@ c======================================================================
 *  arguments
       INTEGER nx,ny,npx,nptseg(*),npr(*),repart,nm1,nm2,limcfg
       LOGICAL racord
-      REAL*8 x(nx),y(ny),xx,yy,distnv(5,*),lg(*),pntrat,
+      REAL(kind=R8) x(nx),y(ny),xx,yy,distnv(5,*),lg(*),pntrat,
      .       deltp1(10),deltpn(10),deltr1(10),deltrn(10),fctini,difpsi,
      .       a00(nm1,nm2,3),a10(nm1,nm2,3),
      .       a01(nm1,nm2,3),a11(nm1,nm2,3),
@@ -22,7 +23,7 @@ c======================================================================
 
 *  variables locales
       INTEGER ii,jj
-      REAL*8 fctfin,xfin,yfin
+      REAL(kind=R8) fctfin,xfin,yfin
 
 *  procedures
       INTEGER ifind

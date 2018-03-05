@@ -13,11 +13,13 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER nptseg(*),repart,npr(*),nreg,nsep,npx,iusor
-      REAL*8 deltp1(*),deltpn(*),deltr1(*),deltrn(*),pntrat,lg(*),
+      REAL(kind=R8)
+     .       deltp1(*),deltpn(*),deltr1(*),deltrn(*),pntrat,lg(*),
      .       distnv(5,*),difpsi,dpmin(*),dpmax(*),drmin(*),drmax(*),
      .       tgarde(4),distxo
       LOGICAL correct

@@ -7,11 +7,13 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 c  arguments
       integer nstruc,npstru(strumx)
-      real*8 x1,x2,y1,y2,xstruc(npstmx,strumx),ystruc(npstmx,strumx)
+      real(kind=R8)
+     .  x1,x2,y1,y2,xstruc(npstmx,strumx),ystruc(npstmx,strumx)
 c
 c  variables locales
       integer i,nin,k,npmx,np

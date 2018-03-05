@@ -8,9 +8,10 @@ c*** file 'field.dg'
 c======================================================================
       implicit none
       integer lun
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
       integer i
-      real*8 btf,rtf
+      real(kind=R8) btf,rtf
       logical ex
 c======================================================================
 c

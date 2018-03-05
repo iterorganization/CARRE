@@ -1,8 +1,8 @@
       SUBROUTINE SORTIE(nsep,nreg,nptseg,npr,np1,deltp1,deltpn,deltr1,
      .    deltrn,pntrat,tgarde,distxo,repart,xmail,ymail,
      .    nx,ny,x,y,a00,a10,a01,a11,ptx,pty,npx,racord,numero,
-     .    fctpx,gdpsi,racpsi,a,gdr,r,ra,rho,nprad,somort,ir,ipol,
-     .    somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .    fctpx,gdpsi,racpsi,a,gdr,r,ra,rho,somort,
+     .    somortp,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .    sompropo,
      .    sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .    somtot,somtotp,gdsomtotp,segt)
@@ -17,12 +17,14 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER nsep,nreg,repart,nptseg(nsep),npr(nreg),np1(nreg),
-     .        nx,ny,npx,numero,ir(nreg),nprad,ipol,nppol
-      REAL*8 pntrat,deltp1(nsep),deltpn(nsep),deltr1(nreg),deltrn(nreg),
+     .        nx,ny,npx,numero
+      REAL(kind=R8)
+     .     pntrat,deltp1(nsep),deltpn(nsep),deltr1(nreg),deltrn(nreg),
      .     xmail(npmamx,nrmamx,nreg),ymail(npmamx,nrmamx,nreg),
      .     tgarde(4),distxo,x(nxmax),y(nymax),
      .     a00(nxmax,nymax,3),a10(nxmax,nymax,3),
@@ -42,7 +44,6 @@ cank-970707: dimensions from the file
      .     somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
      .     gdsomtotp(nregmx),segt(nrmamx,nregmx)
     
-     
       logical racord
 
 *  variables en common
@@ -51,7 +52,7 @@ cank-970707: dimensions from the file
 
 *  variables locales
       INTEGER i,j,isep,ireg,ii,jj
-      REAL*8 xx,yy,psimai,psidx,psidy
+      REAL(kind=R8) xx,yy,psimai,psidx,psidy
 
 *  procedures
       INTEGER ifind

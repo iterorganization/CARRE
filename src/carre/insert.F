@@ -4,13 +4,14 @@ c  version: 17.11.99 23:56
 c
 c=======================================================================
       implicit none
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *.. This routine creates a vector of indices of the divertor targets
 
 *  arguments
       integer indstr,nbdef,inddef(nbdmx),indxpt(nbdmx),ipx,npx
-      real*8 xst(nbdmx),yst(nbdmx),xtt(nbdmx),ytt(nbdmx)
+      real(kind=R8) xst(nbdmx),yst(nbdmx),xtt(nbdmx),ytt(nbdmx)
 
 *  variables locales
       integer npxmx4

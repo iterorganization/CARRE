@@ -1,23 +1,25 @@
 
 ************************************************************************
-      REAL*8 FUNCTION ruban(xn,yn,n,x1,y1,d)
+      FUNCTION ruban(xn,yn,n,x1,y1,d)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
+      REAL(KIND=R8) ruban
 
 *..  Cette fonction retourne la distance entre le debut de la courbe et
 *  le point x1,y1.
 
 *  arguments
       INTEGER n
-      REAL*8 x1,y1,xn(n),yn(n),d
+      REAL(KIND=R8) x1,y1,xn(n),yn(n),d
 
 *  variables locales
       INTEGER ind
-      REAL*8 dist
+      REAL(KIND=R8) dist
 
 *  procedures
       INTEGER indcrb
-      REAL*8 long
+      REAL(KIND=R8) long
       INTRINSIC SQRT
       EXTERNAL indcrb, long
 
@@ -27,7 +29,7 @@ c.. n  : nombre de points de la courbe.
 c.. x1,y1: coordonnees du point.
 c=========================
 
-      ruban = 0.
+      ruban = 0.0_R8
 
       ind = indcrb(xn,yn,n,x1,y1,d)
 

@@ -21,20 +21,18 @@ c*** Output:
 c***  The function value gives the index of the point found
 
       implicit none
+#include <CARRETYPES.F>
 
 *  arguments
       integer n
-      real*8 vx(n), vy(n), rx, ry
+      real(kind=R8) vx(n), vy(n), rx, ry
 
 *  variables locales
       integer i, imn, irp
-      real*8 const, rmn, tol, r
-      parameter (const=0.001, tol=const*const)
+      real(kind=R8) const, rmn, tol, r
+      parameter (const=0.001_R8, tol=const*const)
       character c
 
-*  procedures
-      intrinsic abs
-      
       data irp /0/
 c=======================================================================
 

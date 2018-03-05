@@ -7,6 +7,7 @@ c*** Create the structure file for Carre
 c======================================================================
       implicit none
       character chcstr*(*)
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
       integer i,j,k,l
 c======================================================================
@@ -17,7 +18,7 @@ c
       write(2,'(a)') '$structures'
       k=0
       do j=1,nstr
-	write(2,'(a,i4)') 'Structure ',j
+        write(2,'(a,i4)') 'Structure ',j
         if(j.eq.1) then
 c*** This is for structures in "Sonnet" format:
 c*** the first one contains the closing box which should be removed

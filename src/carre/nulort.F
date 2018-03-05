@@ -1,4 +1,4 @@
-      REAL*8 FUNCTION nulort(d)
+      FUNCTION nulort(d)
 c
 c  version : 07.07.97 18:37
 c
@@ -9,17 +9,19 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
+      REAL(kind=R8) nulort
 
 * arguments
-      REAL*8 d
+      REAL(kind=R8) d
 
 *  variables en common
 
 #include <COMORT.F>
 
 *  variables locales
-      REAL*8 x2,y2,ux2,uy2,x12,y12,zlong,dd
+      REAL(kind=R8) x2,y2,ux2,uy2,x12,y12,zlong,dd
 
 *  procedures
       INTRINSIC SQRT,INT

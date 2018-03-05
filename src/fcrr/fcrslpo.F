@@ -9,6 +9,7 @@ c======================================================================
       implicit none
       integer i
       character ofile*(*)
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
 c======================================================================
 c
@@ -17,17 +18,17 @@ c
         rewind(2)
         write(2,*) xpttol
         write(2,*) nxpt
-	do i=1,nxpt
+        do i=1,nxpt
           write(2,*) xptcntr(1,i),xptcntr(2,i)
-	end do
+        end do
         write(2,*) xlpcntr(1),xlpcntr(2)
-	if(nxpt.eq.2) then
-	  if(nrgn.eq.6) then
-	    write(2,*) 0
-	  else if(nrgn.eq.5) then
-	    write(2,*) 1
-	  end if
-	end if
+        if(nxpt.eq.2) then
+          if(nrgn.eq.6) then
+            write(2,*) 0
+          else if(nrgn.eq.5) then
+            write(2,*) 1
+          end if
+        end if
         close(2)
       end if
 c======================================================================

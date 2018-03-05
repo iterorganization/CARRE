@@ -3,6 +3,7 @@
       SUBROUTINE NUNIFO(npoint,l,d1,dn,interv,dmin,dmax)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette sous-routine repartit les points de facon non uniforme sur
 *  une courbe en faisant passer une parabole par le premier et le
@@ -11,11 +12,11 @@
 
 *  arguments
       INTEGER npoint
-      REAL*8 l,d1,dn,interv(npoint-1),dmin,dmax
+      REAL(kind=R8) l,d1,dn,interv(npoint-1),dmin,dmax
 
 *  variables locales
       INTEGER i,n
-      REAL*8 denom,aa,bb,cc
+      REAL(kind=R8) denom,aa,bb,cc
 
 *  procedures
       INTRINSIC MIN,MAX

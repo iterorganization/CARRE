@@ -19,7 +19,7 @@ c======================================================================
 c*** Output of the tracing information
         if(l.gt.0) then
           write(0,*) 'Tracing info:'
-          write(0,'(6h from ,a,4h at ,a)') (call_from(i),
+          write(0,'(a6,a,a4,a)') (' from ',call_from(i),' at ',
      ,                                             call_at(i), i=l,1,-1)
         end if
       return

@@ -4,6 +4,7 @@
      .          pointx,pointy,ii,jj,npxtot,a00,a10,a01,a11)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette sous-routine verifie pour chaque carre si il y a intersection
 *  entre les lignes de niveau psidx=0 et psidy=0 et si oui elle garde
@@ -11,13 +12,13 @@
 
 *  arguments
       INTEGER nxmax,nymax,nx,ny,gradmx,ii(gradmx),jj(gradmx),npxtot
-      REAL*8 pointx(gradmx), pointy(gradmx),x(nx),y(ny)
+      REAL(kind=R8) pointx(gradmx), pointy(gradmx),x(nx),y(ny)
      .  ,a00(nxmax,nymax,3),a10(nxmax,nymax,3),a01(nxmax,nymax,3)
      .  ,a11(nxmax,nymax,3)
 
 *  variables locales
       INTEGER i, j
-      REAL*8 aa,bb,cc,x1,x2,y1,y2
+      REAL(kind=R8) aa,bb,cc,x1,x2,y1,y2
 
 *  procedures
       INTRINSIC SQRT

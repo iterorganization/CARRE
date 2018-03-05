@@ -20,13 +20,15 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(strumx),indlim,
      .        nvotot,plaque,fraplq,sens,nbcrb,nt(2)
 
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx),
+      REAL(kind=R8)
+     .     x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx),
      .     ystruc(npstmx,strumx),x0,y0,stp0,stpmin,nivox(npnimx),
      .     nivoy(npnimx),a00(nxmax,nymax,3),a10(nxmax,nymax,3),
      .     a01(nxmax,nymax,3),a11(nxmax,nymax,3),
@@ -34,9 +36,9 @@ cank-970707: dimensions from the file
 
 *  variables locales
       INTEGER ii,jj,dir,k,j,repart,ind1,ind2,ind3,indstr
-      REAL*8 const1
-      PARAMETER (const1=1.E-08)
-      REAL*8 pas,x1,y1,x2,y2,psi1,psi2,pastmp,ecart1,ecart2,
+      REAL(kind=R8) const1
+      PARAMETER (const1=1.0E-08_R8)
+      REAL(kind=R8) pas,x1,y1,x2,y2,psi1,psi2,pastmp,ecart1,ecart2,
      .       niv1x(npnimx),niv1y(npnimx)
       LOGICAL echec,coin,ouvert
 

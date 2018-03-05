@@ -23,7 +23,11 @@ c      read(iunit,*,err=99)ii
 #ifdef GFORTRAN
       read(vari,*,err=99)ii
 #else
+#ifdef NAGFOR
+      read(vari,*,err=99)ii
+#else
       read(vari,'(i)',err=99)ii
+#endif
 #endif
 #endif
       ierror=0

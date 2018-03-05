@@ -3,17 +3,18 @@
       SUBROUTINE DERIV(nmax, r, f, fp, n)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..   Cette sous-routine calcule la derivee fp en chaque point r d'un
 *  vecteur f.
 
 *  arguments
       INTEGER nmax, n
-      REAL*8 r(n), f(nmax), fp(nmax)
+      REAL(kind=R8) r(n), f(nmax), fp(nmax)
 
 *  variables locales
       INTEGER i
-      REAL*8 r2,r3,f2,f3
+      REAL(kind=R8) r2,r3,f2,f3
 
 c=========================
 c.. r  : tableau de la coordonnee des points.

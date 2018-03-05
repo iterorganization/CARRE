@@ -3,18 +3,19 @@
       SUBROUTINE COORD1(vx,vy,n,d,x,y,period)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..Cette sous-routine renvoit les coordonnees x et y d'un point situe
 *  sur une courbe v, et a une distance d du debut de celle-ci.
 
 *  arguments
       INTEGER n
-      REAL*8 vx(n),vy(n),d,x,y,period
+      REAL(kind=R8) vx(n),vy(n),d,x,y,period
 
 *  variables locales
       INTEGER i
-      REAL*8 dist,distot,eps,zero,dd
-      PARAMETER (eps=1.E-06,zero=0.)
+      REAL(kind=R8) dist,distot,eps,zero,dd
+      PARAMETER (eps=1.0E-06_R8,zero=0.0_R8)
 
 *  procedures
       INTRINSIC SQRT

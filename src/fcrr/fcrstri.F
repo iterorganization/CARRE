@@ -7,6 +7,7 @@ c*** Read the structure file from dg
 c======================================================================
       implicit none
       integer lun
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
       integer i,j,k,l,n
 c======================================================================

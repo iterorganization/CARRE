@@ -7,6 +7,7 @@ c*** Create the toroidal field file for Carre
 c======================================================================
       implicit none
       character ofile*(*)
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
 c======================================================================
 c

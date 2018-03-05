@@ -3,17 +3,18 @@
       LOGICAL FUNCTION trvers(x1,y1,x2,y2,vx,vy,n)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction nous dit si le segment de 1 a 2 traverse la courbe v
 
 *  arguments
       INTEGER n
-      REAL*8 x1,y1,x2,y2,vx(n),vy(n)
+      REAL(KIND=R8) x1,y1,x2,y2,vx(n),vy(n)
 
 *  variables locales
       INTEGER i
-      REAL*8 determ, mult1,mult2,zero,un
-      parameter(zero=0.,un=1.)
+      REAL(KIND=R8) determ, mult1,mult2,zero,un
+      parameter(zero=0.0_R8,un=1.0_R8)
 
 c=========================
 c.. vx,vy: tableaux des coordonees des points de la courbe.

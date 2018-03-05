@@ -9,11 +9,12 @@ c
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 c  arguments
       integer n1,n2
-      real*8 f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
+      real(kind=R8) f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
 c
 c  variables en common
 #include <PERIM.F>
@@ -32,10 +33,11 @@ c
 c  1.   premier tableau
 c
 c  1.1  copie des variables double a simple precision
-      do 2 i1=1,n1
-      do 2 i2=1,n2
-      y(i1,i2)=f1(i1,i2)
-2     continue
+      do i1=1,n1
+        do i2=1,n2
+          y(i1,i2)=f1(i1,i2)
+        end do
+      end do
 c
 c  1.2  on trace les lignes de niveau
 c
@@ -90,10 +92,11 @@ c
 c
 c  2.   deuxieme tableau
 c  2.1  copie des variables double a simple precision
-      do 4 i1=1,n1
-      do 4 i2=1,n2
-      y(i1,i2)=f2(i1,i2)
-4     continue
+      do i1=1,n1
+        do i2=1,n2
+          y(i1,i2)=f2(i1,i2)
+        end do
+      end do
 c
 c  2.2  on trace les lignes de niveau
 c

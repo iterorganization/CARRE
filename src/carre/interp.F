@@ -1,15 +1,17 @@
 
 ************************************************************************
-      REAL*8 FUNCTION interp(r1, r2, f1, f2, f)
+      FUNCTION interp(r1, r2, f1, f2, f)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
+      REAL(kind=R8) interp
 
 *    Cette fonction renvoie la valeur de l'interpolation lineaire entre
 *  les points r1 et r2 de la valeur de la fonction f, en connaissant la
 *  valeur de la fonction en chaque point.
 
 *  arguments
-      REAL*8 r1, r2, f1, f2, f
+      REAL(kind=R8) r1, r2, f1, f2, f
 
 c=========================
 c.. r1,r2: points de references.

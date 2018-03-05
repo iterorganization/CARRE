@@ -32,11 +32,12 @@ c        1. permettre l'imposition de points fixes ou de coins
 *  variables.
 
 cank-970702: moved dimensions to the CARREDIM.F
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 #include <COMLAN.F>
 #include <git_version_Carre.h>
 
-      REAL*8 cstlin,zero,eps_Xpt,rmax,zmax
+      REAL(kind=R8) cstlin,zero,eps_Xpt,rmax,zmax
       common /geom/ eps_Xpt
       PARAMETER (cstlin=0.00, zero=0.)
       INTEGER i, j, nx, ny, nstruc, npstru(strumx),
@@ -45,11 +46,10 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx),
      .   nbdef, nivtot(nivmx), nbniv,ptxint,nreg,
      .   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,
-     .   itmp,nn1,sol,ir,nprad,ipol,nppol,mini,maxi,re,rp,rz,ireg,ro,rv,
-     .   ry,modif,reb,rzb,rpb,chgt,nprsb(nregmx),
-     .   rg,ipx,ig,ireg1,ireg2,idep,iarr,idp2,iar2,n
-    
-      REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax),
+     .   itmp,ireg,
+     .   modif,nprsb(nregmx)
+
+      REAL(kind=R8) x(nxmax), y(nymax), psi(nxmax,nymax),
      .   psidx(nxmax,nymax), psidy(nxmax,nymax),
      .   xstruc(npstmx,strumx), ystruc(npstmx,strumx),
      .   pointx(gradmx), pointy(gradmx),
@@ -58,7 +58,7 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx),
      .   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx),
      .   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3),
-     .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), 
+     .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3),
      .   pntrat,distxo,gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),
      .   a(nregmx),
      .   gdr(nrmamx,nregmx),
@@ -73,21 +73,29 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   gdsomvarrp(nregmx),
      .   somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
      .   gdsomtotp(nregmx),segt(nrmamx,nregmx),
-     .   vx(npmamx),vy(npmamx),ls,tgarde(4)
+     .   tgarde(4)
 
-      LOGICAL racord, last
+      LOGICAL racord
       character lign80*80,nomstr(strumx)*80
 
-      REAL*8 stp0, stpmin
-      PARAMETER (stp0=0.01,stpmin=0.001)
+      REAL(kind=R8) stp0, stpmin
+      PARAMETER (stp0=0.01_R8,stpmin=0.001_R8)
+
+#ifdef EXTRA_GRAPHS
+      INTEGER ig, ipx, idep, iarr, idp2, iar2, ireg1, ireg2, n,
+     .  re, rg, ro, rp, rv, ry
+      REAL(kind=R8) ls, vx(npmamx), vy(npmamx)
+      REAL(kind=R8) long
+      LOGICAL last
+      EXTERNAL long
+#endif
 
 *..Procedures
 *
-      INTRINSIC ABS,MIN,index
-	REAL*8 long
+      INTRINSIC MIN,index
       EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0,
      .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete
-     ,        ,trc_stk_in,trc_stk_out,long
+     ,        ,trc_stk_in,trc_stk_out
 c======================================================================
 c.. nxmax,nymax: maximum number of the data points in x and y
 c.. gradmx: maximum number of points where the gradient vanishes
@@ -163,10 +171,6 @@ c           to 1 and the coordinates of the X-point correspond to the
 c           innermost point of the limiter.
 
 c      MAJOR AND MINOR RADIUS
-c      sol: variable used for the meshing of the peripheral regions.
-c           If its value is 1, then the region contains level curves
-c           going through ypto. One can then determine the quantities
-c           gdpsi,racpsi,gdr,r,a,rho.
 c      gdr: major radius (intersection of the poloidal surfaces with
 c           the outer midplane)
 c        r: minor radius
@@ -193,13 +197,13 @@ c           divided by nppol.
 * causing the zig-zag deformation
 * (in any case, if this were the case, one would systematically see it so it is
 *  more the geometry, the geography as well as the length of the plates and the
-*  level lines become the main suspects) 
+*  level lines become the main suspects)
 c gdsomortp: (large advanced sum of orthogonalities) this value corresponds
 c             to the set of somortp values on a single level line, divided by
 c             nppol (the goal is to have a quality index for the region)
 * gdsomortp does not have much meaning and can be misleading about the quality
 * of the level line. It can be used to compare the influence of each component
-* of the ort function. 
+* of the ort function.
 
 C     INFLUENCE OF THE TRUE ORTHOGONALITY ON CLORT
 c     ortpur: (pure orthogonality) this value only takes into account the orthogonality criterion
@@ -213,7 +217,7 @@ c     tot: (total) corresponds to the sum of ortpur, propo and varr.
 c     We only check that tot = ort
 c     somortpur, sompropo, somvarr, somtot: correspond to the sums of ortpur,
 c     propo, varr and tot along a level line during the first displacement of
-c     the nodes. 
+c     the nodes.
 c     somortpurp, sompropop, somvarrp, somtotp: correspond to the sums of
 c     ortpur, propo, varr and tot along a level line after the iterations.
 c     gdsomortpurp, gdsompropop, gdsomvarr, gdsomtotp: correspond to the sum,
@@ -223,7 +227,7 @@ c     and somtotpt.
 C     CORRECTION OF THE DEFORMATIONS
 c     segt: (segment) this variable is meant for automatic following
 c     of the magnification
-c     it corresponds to the total length along the level line (l(nppol))  
+c     it corresponds to the total length along the level line (l(nppol))
 c     modif: interruptor for jumping the step of modifying the node
 c     displacements (user choice)
 c     rr : answer to the redefinition (if choix = 1)
@@ -234,7 +238,7 @@ c     the third letter indicates the position of the segment: a first, b second,
 c     c third, ...
 c     coefa,coefb,...: iteration coefficient to multiply a segment
 c     of length ipol(1)-ipol(2) by a value usually between 1 and 1.03
-c     (user choice) 
+c     (user choice)
 c     choix: choice from the user for the correction of deformations
 c     =1 if all points are displaced simultaneously
 c     =2 if points are displaced by fragmentation,
@@ -286,11 +290,11 @@ c  2.1  specify output format
 *
 *..3.0  Read the data
 101   CONTINUE
-  
+
 *..Read the values of x
-      
+
 100   format(a)
-     
+
       iflag=-1
       rewind(7)
       rewind(8)
@@ -382,8 +386,8 @@ cank-970702: moved dimensions to the included file
      .            pty,iptx,jptx,xpto,ypto,racord,limcfg)
 
 
-*  
-         
+*
+
 *..8.0  Parametrise the separatrices
 *
       IF (npx.GT.0 .and. limcfg.eq.0) THEN
@@ -392,9 +396,9 @@ c
      .      iptx,jptx,fctpx,separx,separy,nptot,
      .      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef,
      .      a00,a10,a01,a11)
-        
-	  
-        
+
+
+
 *
 *..9.0  Arrange the separatrices
 *
@@ -411,9 +415,9 @@ c
      .      nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef,
      .      a00,a10,a01,a11)
 
-	do itmp=1,4
-	  ptsep(itmp,1) = 0
-	enddo
+        do itmp=1,4
+          ptsep(itmp,1) = 0
+        enddo
 
       ENDIF
 
@@ -422,17 +426,17 @@ c
 *..10.0  Find the level lines in more detail
 *
 c<<<
-	write(0,*) '=== carre *..10.0 - before frtier'
-	write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') ptx(1:npx)
-	write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') pty(1:npx)
+        write(0,*) '=== carre *..10.0 - before frtier'
+        write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' ptx:', ptx(1:npx)
+        write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' pty:',pty(1:npx)
         if(limcfg.eq.0) then
-	  write(0,*) 'nptot(4,nxpoints)'
-	  write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
-	  write(0,*) 'Strike points (presumably)'
-	  write(0,'(3h x:,1p,8e12.4/(3x,8e12.4))')
-     -	   ((separx(nptot(i,j),i,j),i=1,4),j=1,npx)
-	  write(0,'(3h y:,1p,8e12.4/(3x,8e12.4))')
-     -	   ((separy(nptot(i,j),i,j),i=1,4),j=1,npx)
+          write(0,*) 'nptot(4,nxpoints)'
+          write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
+          write(0,*) 'Strike points (presumably)'
+          write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' x:',
+     -     ((separx(nptot(i,j),i,j),i=1,4),j=1,npx)
+          write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' y:',
+     -     ((separy(nptot(i,j),i,j),i=1,4),j=1,npx)
 c>>>
           call trc_stk_in('carre','*..10.0')
           CALL FRTIER(nx,ny,x,y,psi,nstruc,
@@ -442,12 +446,11 @@ c>>>
      .      distnv,ptxint,a00,a10,a01,a11)
           call trc_stk_out
         endif
-      
-	call trace2(x(1),x(nx),y(1),y(ny),separx,separy,
-     _	       ptsep,npx,nptot,
-     _	       nstruc,npstru,xstruc,ystruc,
-     _	       nivx,nivy,nivtot,nbniv,pntrat,
-     _         distxo,xn,yn,nn1)
+
+        call trace2(x(1),x(nx),y(1),y(ny),separx,separy,
+     _         ptsep,npx,nptot,
+     _         nstruc,npstru,xstruc,ystruc,
+     _         nivx,nivy,nivtot,nbniv)
 
 *
 *..11.0  Grid the regions
@@ -458,12 +461,12 @@ c>>>
      .    xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail,
      .    np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv,
      .    a00,a10,a01,a11,fctpx,limcfg,gdpsi,racpsi,
-     .    a,gdr,r,ra,rho,sol,somort,ir,nprad,ipol,somortp,
-     .    nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .    a,gdr,r,ra,rho,somort,somortp,
+     .    gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .    sompropo,
      .    sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .    somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
-     .    ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
+     .    ymini,ymaxi,distxo,pntrat,nprsb,tgarde)
 
 c*
 c* WARNINGS CALCULATION AND OUTPUT
@@ -515,16 +518,16 @@ c     &  distnv(1,2),xpto,ypto)
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Type 1 for yes and 2 for no'
         endif
-	read(5,*,end=31, err=88) re
+        read(5,*,end=31, err=88) re
 
         if (re.eq.1) then
            last = re.eq.1
            call endpag
 
-	   xmini= 2.44
-	   xmaxi= 2.60
-	   ymini= -1.48
-	   ymaxi= -1.32
+           xmini= 2.44
+           xmaxi= 2.60
+           ymini= -1.48
+           ymaxi= -1.32
            if(sellan(1:8).eq.'francais') then
              write(6,*) 'Région 2 près de la plaque 1'
            elseif(sellan(1:7).eq.'english') then
@@ -534,16 +537,16 @@ c     &  distnv(1,2),xpto,ypto)
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,
      .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
-       
+
            if(sellan(1:8).eq.'francais') then
              write(6,*) 'Observation du point X'
            elseif(sellan(1:7).eq.'english') then
              write(6,*) 'X-point region'
            endif
            xmini= 2.36
-	   xmaxi= 2.56
-	   ymini= -1.60
-	   ymaxi= -1.40
+           xmaxi= 2.56
+           ymini= -1.60
+           ymaxi= -1.40
 
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -556,9 +559,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'HFS separatrix segment above X-point'
            endif
            xmini= 2.35
-	   xmaxi= 2.55
-	   ymini= -1.40
-	   ymaxi= -1.20
+           xmaxi= 2.55
+           ymini= -1.40
+           ymaxi= -1.20
 
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -571,9 +574,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'HFS separatrix'
            endif
            xmini= 1.95
-	   xmaxi= 2.15
-	   ymini= -0.20
-	   ymaxi= 0.00
+           xmaxi= 2.15
+           ymini= -0.20
+           ymaxi= 0.00
 
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -586,9 +589,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'HFS separatrix near top of machine'
            endif
            xmini= 2.00
-	   xmaxi= 2.20
-	   ymini= 0.94
-	   ymaxi= 1.14
+           xmaxi= 2.20
+           ymini= 0.94
+           ymaxi= 1.14
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,
@@ -600,9 +603,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'Separatrix at top of machine'
            endif
            xmini= 2.60
-	   xmaxi= 2.80
-	   ymini= 1.60
-	   ymaxi= 1.80
+           xmaxi= 2.80
+           ymini= 1.60
+           ymaxi= 1.80
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,
@@ -614,9 +617,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'LFS separatrix near top of machine'
            endif
            xmini= 3.30
-	   xmaxi= 3.50
-	   ymini= 1.20
-	   ymaxi= 1.40
+           xmaxi= 3.50
+           ymini= 1.20
+           ymaxi= 1.40
 
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -629,9 +632,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'LFS separatrix near outer midplane'
            endif
            xmini= 3.70
-	   xmaxi= 3.90
-	   ymini= 0.00
-	   ymaxi= 0.20
+           xmaxi= 3.90
+           ymini= 0.00
+           ymaxi= 0.20
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,
@@ -643,9 +646,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'LFS separatrix above X-point'
            endif
            xmini= 2.70
-	   xmaxi= 2.90
-	   ymini= -1.30
-	   ymaxi= -1.10
+           xmaxi= 2.90
+           ymini= -1.30
+           ymaxi= -1.10
 
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -658,9 +661,9 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'Region 2 near X-point'
            endif
            xmini= 2.50
-	   xmaxi= 2.70
-	   ymini= -1.60
-	   ymaxi= -1.40
+           xmaxi= 2.70
+           ymini= -1.60
+           ymaxi= -1.40
 
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -673,39 +676,39 @@ c     &  distnv(1,2),xpto,ypto)
              write(6,*) 'Region 2 near plate 2'
            endif
            xmini= 2.60
-	   xmaxi= 2.80
-	   ymini= -1.70
-	   ymaxi= -1.50
-        
+           xmaxi= 2.80
+           ymini= -1.70
+           ymaxi= -1.50
+
            call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,npr,xmail,ymail,nreg,.not.last)
-       
+
         endif
-        
-  987	if(sellan(1:8).eq.'francais') then
+
+  987   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Voir la région 2?'
           write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Do you wish to see region 2?'
           write(6,*) 'Type 1 for yes and 2 for no'
         endif
-	read(5,*,end=39, err=987) ro
+        read(5,*,end=39, err=987) ro
 
    39   if (ro.eq.1) then
           call endpag
           xmini= 2.40
-	  xmaxi= 2.70
-	  ymini= -1.70
-	  ymaxi= -1.40
+          xmaxi= 2.70
+          ymini= -1.70
+          ymaxi= -1.40
           call trace(xmini,xmaxi,ymini,ymaxi,
      .           separx,separy,ptsep,npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,npr,xmail,ymail,nreg,.false.)
         endif
 
- 986	if(sellan(1:8).eq.'francais') then
+ 986    if(sellan(1:8).eq.'francais') then
           write(6,*) 'Voir la séparatrice à la frontière 1/2 ?'
           write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
         elseif(sellan(1:7).eq.'english') then
@@ -717,8 +720,8 @@ c     &  distnv(1,2),xpto,ypto)
    36   if (ry.eq.1) then
           call endpag
           xmini= 2.55
-	  xmaxi= 2.60
-	  ymini= -1.52
+          xmaxi= 2.60
+          ymini= -1.52
           ymaxi= -1.47
           call trace(xmini,xmaxi,ymini,ymaxi,
      .           separx,separy,ptsep,npx,nptot,
@@ -726,36 +729,36 @@ c     &  distnv(1,2),xpto,ypto)
      .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
 
           xmini= 2.58
-	  xmaxi= 2.63
-	  ymini= -1.58
+          xmaxi= 2.63
+          ymini= -1.58
           ymaxi= -1.53
           call trace(xmini,xmaxi,ymini,ymaxi,
-     .		 separx,separy,ptsep,npx,nptot,
+     .           separx,separy,ptsep,npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,
      .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
 
           xmini= 2.6
-	  xmaxi= 2.65
-	  ymini= -1.6
+          xmaxi= 2.65
+          ymini= -1.6
           ymaxi= -1.55
           call trace(xmini,xmaxi,ymini,ymaxi,
-     .		 separx,separy,ptsep,npx,nptot,
+     .           separx,separy,ptsep,npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,
      .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
 
           xmini= 2.63
-	  xmaxi= 2.68
-	  ymini= -1.63
-	  ymaxi= -1.58
+          xmaxi= 2.68
+          ymini= -1.63
+          ymaxi= -1.58
           call trace(xmini,xmaxi,ymini,ymaxi,
-     .		   separx,separy,ptsep,npx,nptot,
+     .           separx,separy,ptsep,npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,
      .           nivx,nivy,nivtot,nbniv,np1,npr,xmail,ymail,nreg,.true.)
 
           xmini= 2.65
-	  xmaxi= 2.7
-	  ymini= -1.65
-	  ymaxi= -1.6
+          xmaxi= 2.7
+          ymini= -1.65
+          ymaxi= -1.6
           call trace(xmini,xmaxi,ymini,ymaxi,
      .           separx,separy,ptsep,npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
@@ -773,7 +776,7 @@ c     &  distnv(1,2),xpto,ypto)
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Type 1 for yes and 2 for no'
         endif
-	read(5,*,end=31, err=76) rv
+        read(5,*,end=31, err=76) rv
         if (rv.eq.1) go to 36
 
   666   if(sellan(1:8).eq.'francais') then
@@ -786,101 +789,101 @@ c     &  distnv(1,2),xpto,ypto)
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Type 1 for yes and 2 for no'
         endif
-	read(5,*,end=31, err=77) re
+        read(5,*,end=31, err=77) re
 
    31   if (re.eq.2) then
           GO TO 119
-	endif
-	
-    9	if(sellan(1:8).eq.'francais') then
+        endif
+
+    9   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Définissez les bords.'
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Define the edges.'
         endif
-   10	if(sellan(1:8).eq.'francais') then
+   10   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Limite inférieure en R'
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Lower bound in R'
         endif
-	read(5,*,end=11, err=10) xmini
-   11	if(sellan(1:8).eq.'francais') then
+        read(5,*,end=11, err=10) xmini
+   11   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Limite supérieure en R'
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Upper bound in R'
         endif
-	read(5,*,end=12,err=11) xmaxi
-   12	if(sellan(1:8).eq.'francais') then
+        read(5,*,end=12,err=11) xmaxi
+   12   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Limite inferieure en Z'
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Lower bound in Z'
         endif
-	read (5,*,end=13,err=12) ymini
-   13	if(sellan(1:8).eq.'francais') then
+        read (5,*,end=13,err=12) ymini
+   13   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Limite superieure en Z'
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Upper bound in Z'
         endif
-	read(5,*,end=14,err=13) ymaxi
- 
+        read(5,*,end=14,err=13) ymaxi
+
    14   call endpag
         call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,npr,xmail,ymail,nreg,.false.)
-         
+
         rp = 1
         do while (rp.eq.1)
-  913	  if(sellan(1:8).eq.'francais') then
+  913     if(sellan(1:8).eq.'francais') then
             write(6,*) 'Voulez-vous faire un autre agrandissement?'
-	    write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
+            write(6,*) 'Répondez 1 si c''est oui ou 2 si c''est non'
           else if(sellan(1:7).eq.'english') then
             write(6,*) 'Do you wish to make another zoom?'
             write(6,*) 'Type 1 for yes and 2 for no'
           endif
           read(5,*,end=69, err=913) rp
-   69     continue 
+   69     continue
           if (rp.eq.1) then
             if(sellan(1:8).eq.'francais') then
               write(6,*) 'Définissez les bords.'
             elseif(sellan(1:7).eq.'english') then
               write(6,*) 'Define the edges.'
             endif
-   70	    if(sellan(1:8).eq.'francais') then
+   70       if(sellan(1:8).eq.'francais') then
               write(6,*) 'Limite inférieure en R'
             elseif(sellan(1:7).eq.'english') then
               write(6,*) 'Lower bound in R'
             endif
             read(5,*,end=71, err=70) xmini
-   71	    if(sellan(1:8).eq.'francais') then
+   71       if(sellan(1:8).eq.'francais') then
               write(6,*) 'Limite supérieure en R'
             elseif(sellan(1:7).eq.'english') then
               write(6,*) 'Upper bound in R'
             endif
-	    read(5,*,end=72,err=71) xmaxi
-   72	    if(sellan(1:8).eq.'francais') then
+            read(5,*,end=72,err=71) xmaxi
+   72       if(sellan(1:8).eq.'francais') then
               write(6,*) 'Limite inférieure en Z'
             elseif(sellan(1:7).eq.'english') then
               write(6,*) 'Lower bound in Z'
             endif
-	    read (5,*,end=73,err=72) ymini
-   73	    if(sellan(1:8).eq.'francais') then
+            read (5,*,end=73,err=72) ymini
+   73       if(sellan(1:8).eq.'francais') then
               write(6,*) 'Limite supérieure en Z'
             elseif(sellan(1:7).eq.'english') then
               write(6,*) 'Upper bound in Z'
             endif
-	    read(5,*,end=74,err=73) ymaxi
- 
+            read(5,*,end=74,err=73) ymaxi
+
    74       call endpag
             call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,npr,xmail,ymail,nreg,.false.)
 
-	  endif
-	enddo
+         endif
+        enddo
   119   continue
 
-	if(sellan(1:8).eq.'francais') then
+        if(sellan(1:8).eq.'francais') then
           write(6,*) 'Souhaitez-vous voir les gardes?'
         else if(sellan(1:7).eq.'english') then
           write(6,*) 'Do you wish to see the guard regions?'
@@ -890,71 +893,71 @@ c     &  distnv(1,2),xpto,ypto)
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'Type 1 for yes and 2 for no'
         endif
-	read(5,*,end=1119, err=78) rg
+        read(5,*,end=1119, err=78) rg
 
-	if (rg.eq.1) then
+        if (rg.eq.1) then
 
-	  do ipx = 1, npx
+          do ipx = 1, npx
 
-	    do ig = 1, 2
+            do ig = 1, 2
 
               if (npx.eq.1) then
-	        ireg1 = 1
-	        ireg2 = 2
-	      else if (racord) then
-	        ireg1 = (ig-1)*2+1
-	        ireg2 = 2*ipx
+                ireg1 = 1
+                ireg2 = 2
+              else if (racord) then
+                ireg1 = (ig-1)*2+1
+                ireg2 = 2*ipx
               else ! non raccorde
-	        ireg2 = 2*ipx+1
-	        if (ipx.eq.ptxint) then
-	          ireg1 = 1
-	        else
-	          ireg1 = 2*ig
+                ireg2 = 2*ipx+1
+                if (ipx.eq.ptxint) then
+                  ireg1 = 1
+                else
+                  ireg1 = 2*ig
                 endif
               end if
-	          
-              if (tgarde((ipx-1)*2+ig).gt.0.) then
-	          
-	        if (ig.eq.1) then
-                  idep = 1
-	          iarr = 1
-	          idp2 = 1
-	          iar2 = 1
-	        else if (ig.eq.2) then
-	          idep = np1(ireg1)
-	          iarr = np1(ireg1)
-	          idp2 = np1(ireg2)
-	          iar2 = np1(ireg2)
-	        endif
 
-	        vx(1)=xmail(idep,1,ireg1)
-	        vy(1)=ymail(idep,1,ireg1)
-	        ls = 0
-	        n = 0
-	        do while (ls.lt.tgarde((ipx-1)*2+1)
-     .           .and. n.lt.np1(ireg1)) 
-	          if (ig.eq.1) then
-	            iarr=iarr+1
-	            iar2=iar2+1
-	            vx(iarr-idep+1)=xmail(iarr,1,ireg1)
+              if (tgarde((ipx-1)*2+ig).gt.0.) then
+
+                if (ig.eq.1) then
+                  idep = 1
+                  iarr = 1
+                  idp2 = 1
+                  iar2 = 1
+                else if (ig.eq.2) then
+                  idep = np1(ireg1)
+                  iarr = np1(ireg1)
+                  idp2 = np1(ireg2)
+                  iar2 = np1(ireg2)
+                endif
+
+                vx(1)=xmail(idep,1,ireg1)
+                vy(1)=ymail(idep,1,ireg1)
+                ls = 0
+                n = 0
+                do while (ls.lt.tgarde((ipx-1)*2+1)
+     .           .and. n.lt.np1(ireg1))
+                  if (ig.eq.1) then
+                    iarr=iarr+1
+                    iar2=iar2+1
+                    vx(iarr-idep+1)=xmail(iarr,1,ireg1)
                     vy(iarr-idep+1)=ymail(iarr,1,ireg1)
-	          else if (ig.eq.2) then
-	            idep=idep-1
-	            idp2=idp2-1
-	            vx(iarr-idep+1)=xmail(idep,1,ireg1)
+                  else if (ig.eq.2) then
+                    idep=idep-1
+                    idp2=idp2-1
+                    vx(iarr-idep+1)=xmail(idep,1,ireg1)
                     vy(iarr-idep+1)=ymail(idep,1,ireg1)
-	          endif
-	          n=iarr-idep+1
-	          ls=long(vx,vy,n)
+                  endif
+                  n=iarr-idep+1
+                  ls=long(vx,vy,n)
                 enddo
-	          
-	        xmini= min(minval(xmail(idep:iarr,1:npr(ireg1),ireg1)),
+
+                xmini= min(minval(xmail(idep:iarr,1:npr(ireg1),ireg1)),
      .                     minval(xmail(idp2:iar2,1:npr(ireg2),ireg2)))
-	        xmaxi= max(maxval(xmail(idep:iarr,1:npr(ireg1),ireg1)),
+                xmaxi= max(maxval(xmail(idep:iarr,1:npr(ireg1),ireg1)),
      .                     maxval(xmail(idp2:iar2,1:npr(ireg2),ireg2)))
-	        ymini= min(minval(ymail(idep:iarr,1:npr(ireg1),ireg1)),
+                ymini= min(minval(ymail(idep:iarr,1:npr(ireg1),ireg1)),
      .                     minval(ymail(idp2:iar2,1:npr(ireg2),ireg2)))
-	        ymaxi= max(maxval(ymail(idep:iarr,1:npr(ireg1),ireg1)),
+                ymaxi= max(maxval(ymail(idep:iarr,1:npr(ireg1),ireg1)),
      .                     maxval(ymail(idp2:iar2,1:npr(ireg2),ireg2)))
 
                 call endpag
@@ -962,8 +965,8 @@ c     &  distnv(1,2),xpto,ypto)
      .             npx,nptot,
      .             nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .             np1,npr,xmail,ymail,nreg,.false.)
-	      end if
-	    end do
+              end if
+            end do
 
           end do
         end if
@@ -973,7 +976,7 @@ c     &  distnv(1,2),xpto,ypto)
         call endpag
 
       ENDIF
-    
+
 *
 *.. Close the graphics
 *

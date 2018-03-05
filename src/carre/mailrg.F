@@ -9,8 +9,7 @@
      .            somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
      .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .            nivx,nivy,
-     .            nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .            xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+     .            nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 c
 c
 c  version : 07.07.97 19:11
@@ -24,16 +23,18 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad,
      .        plaque,repart,nbcrb,npcrb2,nnlast,sol,ireg,modif,
      .        npx,nptot(4,npxmx),nbniv,
-     .        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg,re,
-     .        nprsb(nregmx),ipx
+     .        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg,
+     .        nprsb(nregmx)
 
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
+      REAL(kind=R8)
+     .     x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
      .     ystruc(npstmx,nstruc),mailx(npmamx,nrmamx),
      .     maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2,
      .     a00(nxmax,nymax,3),a10(nxmax,nymax,3),a01(nxmax,nymax,3),
@@ -50,8 +51,7 @@ cank-970707: dimensions from the file
      .     xmini,xmaxi,ymini,ymaxi,separx(npnimx,4,npxmx),
      .     separy(npnimx,4,npxmx),
      .     nivx(npnimx,nbniv),nivy(npnimx,nbniv),
-     .     xmail(npmamx,nrmamx,nrmamx),ymail(npmamx,nrmamx,nrmamx),
-     .     xptxo,yptxo,pntrat,xfin,yfin,fctfin,distxo
+     .     xmail(npmamx,nrmamx,nrmamx),ymail(npmamx,nrmamx,nrmamx)
 
       LOGICAL nuldec
 
@@ -63,25 +63,26 @@ cank-970707: dimensions from the file
 
 *  variables locales
       INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,ipol,i,nn(2),
-     .  ig1,ig2,npcrb(2),ntt,sensspe,choix,interir,interirbis,deci,
-     .  rr,rrr,rrrr,pra,sra,tra,prb,srb,trb,prc,src,trc,prd,srd,trd,
-     .  pre,sre,tre,prf,srf,trf,prg,srg,trg,pri,sri,tri,prj,srj,trj,
-     .  prk,srk,trk,prl,srl,trl,idep,iarr,prh,srh,trh,n,nnc,iseg
-      REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2,
-     .       epsiln,xn(npnimx,2),yn(npnimx,2),dd1,dd2,gard1,gard2
-     .       ,fctini,fctnew,fctxo,x22,y22,x23,y23,xtt(5),ytt(5),fctanc,
-     .        longu,tpr,xc(npnimx),yc(npnimx)
-      PARAMETER(zero=0.,epsmai=1.e-6,epsiln=1.E-08)
-      REAL*8 xcrb(npnimx,2),ycrb(npnimx,2),coefa,coefb,coefc,coefd,
-     .      coefe,coeff,coefg,coefh,coefi,coefj,coefk,coefl,coef,lsp,ls,
-     .      vx(nrmamx),vy(nrmamx),lsd
-      LOGICAL interval
+     .  ig1,ig2,npcrb(2),ntt,sensspe,iseg
+      REAL(kind=R8)
+     .       ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2,
+     .       epsiln,xn(npnimx,2),yn(npnimx,2),dd1,dd2,gard1,gard2,
+     .       fctini,fctnew,fctxo,x22,y22,x23,y23,xtt(5),ytt(5),fctanc
+      PARAMETER(zero=0.0_R8,epsmai=1.0e-6_R8,epsiln=1.0E-08_R8)
+      REAL(kind=R8)
+     .      xcrb(npnimx,2),ycrb(npnimx,2)
       CHARACTER*1 reponse
       save valfct,fctini,fctxo,fctanc
 
+#ifdef MODIF
+      INTEGER n, rr, choix, idep, iarr, pra, pri, sra, tra
+      REAL(kind=R8) coef, coefa, ls, lsd, lsp, tpr
+      REAL(kind=R8) vx(nrmamx), vy(nrmamx)
+#endif
+
 *  procedures
       INTEGER indsgm,ifind,drctio
-      REAL*8 aazero,long,nulort,ruban
+      REAL(kind=R8) aazero,long,nulort,ruban
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort,
@@ -94,22 +95,22 @@ c======================================================================
 
       garde1=gardd1
       garde2=gardd2
-      somort=0.0
-      somortp=0.0
-      gdsomortp=0.0
-      somortpur=0.0
-      somortpurp=0.0
-      gdsomortpurp=0.0
-      sompropo=0.0
-      sompropop=0.0
-      gdsompropop=0.0
-      somvarr=0.0
-      somvarrp=0.0
-      gdsomvarrp=0.0
-      somtot=0.0
-      somtotp=0.0
-      gdsomtotp=0.0
-      segt=0.0
+      somort=0.0_R8
+      somortp=0.0_R8
+      gdsomortp=0.0_R8
+      somortpur=0.0_R8
+      somortpurp=0.0_R8
+      gdsomortpurp=0.0_R8
+      sompropo=0.0_R8
+      sompropop=0.0_R8
+      gdsompropop=0.0_R8
+      somvarr=0.0_R8
+      somvarrp=0.0_R8
+      gdsomvarrp=0.0_R8
+      somtot=0.0_R8
+      somtotp=0.0_R8
+      gdsomtotp=0.0_R8
+      segt=0.0_R8
 
 *..S'il y a deux courbes a ne pas traverser alors on definit la deuxieme
 
@@ -142,7 +143,7 @@ c***
       ii=ifind(xn(1,1),x,nx,1)
       jj=ifind(yn(1,1),y,ny,1)
 
-      fctini=a00(ii,jj,1) + a10(ii,jj,1)*xn(1,1) + 
+      fctini=a00(ii,jj,1) + a10(ii,jj,1)*xn(1,1) +
      .       a01(ii,jj,1)*yn(1,1) + a11(ii,jj,1)*xn(1,1)*yn(1,1)
 
       valfct=fctini
@@ -169,19 +170,19 @@ c  calcul des indices de garde
 12    continue
 
       do iseg=1,ireg-1
-	  nprsb(iseg)=npr(iseg)
-	enddo    
-	 
-	do iseg=ireg+1,nreg
-	  nprsb(iseg)=1
-	enddo
-   
+        nprsb(iseg)=npr(iseg)
+      enddo
+
+      do iseg=ireg+1,nreg
+        nprsb(iseg)=1
+      enddo
+
 * the value of sol is given in 'maille' according to the region index and the configuration
 * sol = 1 indicates an SOL region
        if (sol.EQ.1) then
 
          ii = ifind(xpto,x,nx,1)
-	 jj = ifind(ypto,y,ny,1)
+         jj = ifind(ypto,y,ny,1)
          fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto +
      .          a11(ii,jj,1)*xpto*ypto
 
@@ -189,35 +190,35 @@ c  calcul des indices de garde
          xtt(1)= xpto-0.1
          ytt(1)= ypto
          xtt(2)= x(nx)
-	 ytt(2)= ypto
-   	 xtt(3)= xtt(1)
-	 ytt(3)= ytt(1)
+         ytt(2)= ypto
+         xtt(3)= xtt(1)
+         ytt(3)= ytt(1)
          ntt=3
 
 * we duplicate the 'sens' (direction) variable so as not to overwrite the
 * direction value used for the plate
 
-	 sensspe=1
+         sensspe=1
          CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sensspe,
      .              2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
-       
+
 *..Computation of the lengths
 
-         gdpsi(1)=1.0
-	 racpsi(1)=1.0
-	 gdr(1)=x22
+         gdpsi(1)=1.0_R8
+         racpsi(1)=1.0_R8
+         gdr(1)=x22
          r(1)=x22-xpto
-	 a=r(1)
-	 ra(1)= r(1)-a
-	 rho(1)=r(1)/a
+         a=r(1)
+         ra(1)= r(1)-a
+         rho(1)=r(1)/a
 
          fctanc=valfct
 
       else
 
-         gdpsi(1)=1.0
-	 racpsi(1)=1.0
-         
+         gdpsi(1)=1.0_R8
+         racpsi(1)=1.0_R8
+
       endif
 
       DO 25 ir=2, nprad
@@ -232,7 +233,7 @@ c---
          y1=y2
 
          ll1=ll
-     
+
 *..On verifie si on est a la derniere serie de points de maille dans la
 *  direction poloidale, dans le cas de la region entre les deux separa-
 *  trices du double nul deconnecte.
@@ -324,7 +325,7 @@ c***
 
 *..Il faut s'assurer que la ligne de niveau part dans la bonne
 *  direction.
-*  We must ensure that stepping along the contour line starts 
+*  We must ensure that stepping along the contour line starts
 *  in the right direction
 
          ecart1=SQRT((x2 - xstruc(ind,plaque))**2 +
@@ -411,20 +412,20 @@ c***
 *.. Calcul de grand psi
          gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
          racpsi(ir)= sqrt(gdpsi(ir))
-       
-         if (sol.EQ.1) then 
 
-	   x1 = gdr(ir-1)
-	   y1=ypto	  
-	   sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
+         if (sol.EQ.1) then
+
+           x1 = gdr(ir-1)
+           y1=ypto
+           sensspe=1 ! drctio(xtt,ytt,ntt,x1,y1,'d')
            CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sensspe,
      .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
 *..Calcul des longueurs
 
-	   gdr(ir)=x23
+           gdr(ir)=x23
            r(ir)=x23-xpto
-	   ra(ir)= r(ir)-a
+           ra(ir)= r(ir)-a
            rho(ir)=r(ir)/a
          endif
 
@@ -489,13 +490,13 @@ c  3.   on procede a un premier deplacement des noeuds
                  endif
                  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-	       
-	        somort(ir)= somort(ir)+ (ort1(ipol)/nppol)
-	        somortpur(ir)= somortpur (ir)+ (ortpur1(ipol)/nppol)
+
+                somort(ir)= somort(ir)+ (ort1(ipol)/nppol)
+                somortpur(ir)= somortpur (ir)+ (ortpur1(ipol)/nppol)
                 sompropo(ir)= sompropo(ir)+ (propo1(ipol)/nppol)
                 somvarr(ir)= somvarr(ir)+ (varr1(ipol)/nppol)
                 somtot(ir)= somtot(ir)+ (tot1(ipol)/nppol)
-      
+
                enddo
 c
 c  4.   on relaxe les points de facon iterative pour realiser la
@@ -596,13 +597,13 @@ c       meilleure orthogonalite possible
              endif
  19          continue
              do ipol=ipol1,ipoln
-	        somortp(ir)= somortp(ir)+ (ort2(ipol)/nppol)
+                somortp(ir)= somortp(ir)+ (ort2(ipol)/nppol)
                 somortpurp(ir)= somortpurp(ir)+ (ortpur2(ipol)/nppol)
                 sompropop(ir)= sompropop(ir)+ (propo2(ipol)/nppol)
                 somvarrp(ir)= somvarrp(ir)+ (varr2(ipol)/nppol)
                 somtotp(ir)= somtotp(ir)+ (tot2(ipol)/nppol)
               enddo
-             
+
            endif
 
          else
@@ -645,7 +646,7 @@ c  distribution des points dans la region de garde
              call coord(xn(1,inouv),yn(1,inouv),nn(inouv),dd2,
      .        mailx(ipol,ir),maily(ipol,ir))
 23         continue
-         
+
 *..Le dernier point de la maille coincide avec le dernier point de la
 *  courbe.
            mailx(nppol,ir)=xn(nn(inouv),inouv)
@@ -656,80 +657,80 @@ c---
          nprsb(ireg)=ir
 #ifdef MODIF
 1000     if (modif.eq.1) then
-         	 if (ir.eq.2) then
-             write(6,*) 
-     .		   'Vous avez choisi d''effectuer des modifications'
-             write(6,*) 'sur la position des noeuds. Les modifications ' 
+           if (ir.eq.2) then
+             write(6,*)
+     .        'Vous avez choisi d''effectuer des modifications'
+             write(6,*) 'sur la position des noeuds. Les modifications '
              write(6,*) 's''effectueront par ligne de niveau.'
-	     endif
-	     write(6,*) 'Voulez-vous que les modifications se fassent' 
+           endif
+           write(6,*) 'Voulez-vous que les modifications se fassent'
            write(6,*) 'uniformément le long de la ligne de niveau ou '
            write(6,*) 'qu''elles se fassent par section?'
-  123	     write(6,*) 'Répondez 1 pour uniforme, 2 pour les sections, '
+  123      write(6,*) 'Répondez 1 pour uniforme, 2 pour les sections, '
            write(6,*) 'et 3 pour des sections avec des pas predisposés.'
-	     read(5,*,end=270,err=123) choix
+           read(5,*,end=270,err=123) choix
   270      continue
 
            if (choix.eq.1) then
 
-  345	       write(6,*) 'Choississez un coefficient'
+  345        write(6,*) 'Choississez un coefficient'
              write(6,*) ' (qui multipliera la valeur actuelle des ipol)'
-	       read(5,*,end=271,err=345) coef 
+             read(5,*,end=271,err=345) coef
   271        continue
              do ipol=2,ipoln
                l2(ipol)=l2(ipol)* coef
              enddo
-  709	       write(6,*) 'Définissez les bords.'
-  710	       write(6,*) 'Limite inférieure en R'
-	       read(5,*,end=711, err=710) xmini
-  711	       write(6,*) 'Limite supérieure en R'
-	       read(5,*,end=712,err=711) xmaxi
-  712	       write(6,*) 'Limite inférieure en Z'
-	       read (5,*,end=713,err=712) ymini
-  713	       write(6,*) 'Limite supérieure en Z'
-	       read(5,*,end=714,err=713) ymaxi
-        
+  709        write(6,*) 'Définissez les bords.'
+  710        write(6,*) 'Limite inférieure en R'
+             read(5,*,end=711, err=710) xmini
+  711        write(6,*) 'Limite supérieure en R'
+             read(5,*,end=712,err=711) xmaxi
+  712        write(6,*) 'Limite inférieure en Z'
+             read (5,*,end=713,err=712) ymini
+  713        write(6,*) 'Limite supérieure en Z'
+             read(5,*,end=714,err=713) ymaxi
+
   714        call endpag
              call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,nprsb,xmail,ymail,nreg,.false.)
              write(6,*) 'Voulez-vous redefinir les bords?'
-  715        write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'	 
+  715        write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
              read(5,*,end=716,err=715) rr
   716        if (rr.eq.1) go to 709
 
-	     elseif (choix.eq.2) then
+           elseif (choix.eq.2) then
 
              do iseg = 6,1,-1
 
                lsp=(l2(nppol)/(iseg+1))
                if (iseg.eq.6) then
-	           lsd = 0
-	           idep = 1
-	         else
-		       lsd=(l2(nppol)/(iseg+2))
-	           idep = iarr
-	         endif
-	         iarr=idep
+                 lsd = 0
+                 idep = 1
+               else
+                 lsd=(l2(nppol)/(iseg+2))
+                 idep = iarr
+               endif
+               iarr=idep
 
-	         vx(1)=xmail(idep,ir,ireg)
-	         vy(1)=ymail(idep,ir,ireg)
-	         ls = 0
-			 do while (ls.lt.lsp-lsd) 
-	           iarr=iarr+1
-	           n=iarr-idep+1
-	           vx(iarr-idep+1)=xmail(iarr,ir,ireg)
+               vx(1)=xmail(idep,ir,ireg)
+               vy(1)=ymail(idep,ir,ireg)
+               ls = 0
+               do while (ls.lt.lsp-lsd)
+                 iarr=iarr+1
+                 n=iarr-idep+1
+                 vx(iarr-idep+1)=xmail(iarr,ir,ireg)
                  vy(iarr-idep+1)=ymail(iarr,ir,ireg)
-	           ls=long(vx,vy,n)
+                 ls=long(vx,vy,n)
                enddo
 
-	         xmini= minval(xmail(idep:iarr,1:ir,ireg))
-	         xmaxi= maxval(xmail(idep:iarr,1:ir,ireg))
-	         ymini= minval(ymail(idep:iarr,1:ir,ireg))
-	         ymaxi= maxval(ymail(idep:iarr,1:ir,ireg))
+               xmini= minval(xmail(idep:iarr,1:ir,ireg))
+               xmaxi= maxval(xmail(idep:iarr,1:ir,ireg))
+               ymini= minval(ymail(idep:iarr,1:ir,ireg))
+               ymaxi= maxval(ymail(idep:iarr,1:ir,ireg))
 
-	         tpr=n
+               tpr=n
 
                call endpag
                call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
@@ -738,20 +739,20 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  1211          write(6,*) 'Voulez-vous redefinir les bords?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'	 
+               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=1212,err=1211) pra
  1212          if (pra.eq.0) go to 350
-	         
- 1213	         write(6,*) 'Définissez les bords.'
- 1214	         write(6,*) 'Limite inférieure en R'
-	         read(5,*,end=1215, err=1214) xmini
- 1215	         write(6,*) 'Limite supérieure en R'
-	         read(5,*,end=1216,err=1215) xmaxi
- 1216	         write(6,*) 'Limite inférieure en Z'
-	         read (5,*,end=1217,err=1216) ymini
- 1217	         write(6,*) 'Limite supérieure en Z'
-	         read(5,*,end=1218,err=1217) ymaxi
- 
+
+ 1213          write(6,*) 'Définissez les bords.'
+ 1214          write(6,*) 'Limite inférieure en R'
+               read(5,*,end=1215, err=1214) xmini
+ 1215          write(6,*) 'Limite supérieure en R'
+               read(5,*,end=1216,err=1215) xmaxi
+ 1216          write(6,*) 'Limite inférieure en Z'
+               read (5,*,end=1217,err=1216) ymini
+ 1217          write(6,*) 'Limite supérieure en Z'
+               read(5,*,end=1218,err=1217) ymaxi
+
  1218          call endpag
                call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -759,67 +760,67 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  1219          write(6,*) 'Recommencer?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'	 
+               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=1220,err=1219) sra
- 1220          if (sra.eq.1) go to 1213 
-       
+ 1220          if (sra.eq.1) go to 1213
+
   350          write(6,*) 'Choississez un coefficient qui sera utilisé '
                write(6,'(a,i1)') 'dans la partie inférieure à 1/',iseg+1
                write(6,*) 'de nppol et qui multipliera la valeur '
-			 write(6,*) 'actuelle des ipol'
+               write(6,*) 'actuelle des ipol'
                read(5,*,end=310,err=350) coefa
 
   310          continue
                do ipol=2,ipoln
                  if(l2(ipol).ge.lsd.and.l2(ipol).le.lsp)then
                    l2(ipol)= l2(ipol)*coefa
-	             call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .              mailx(ipol,ir),maily(ipol,ir))		  
+                   call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .              mailx(ipol,ir),maily(ipol,ir))
                  endif
                enddo
 
-	         call endpag
+               call endpag
                call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
   430          write(6,*) 'Souhaitez-vous choisir un autre coefficient?'
-	         write(6,*) 'Répondez 1 si oui, 0 si non.'
-               read(5,*,end=340,err=430)tra
+               write(6,*) 'Répondez 1 si oui, 0 si non.'
+               read(5,*,end=340,err=430) tra
   340          continue
                if (tra.eq.1) go to 350
-	      
-		   enddo
-            
+
+             enddo
+
              do iseg = 1,6
 
                lsd=(iseg*l2(nppol)/(iseg+1))
                if (iseg.eq.6) then
-	           lsp = l2(nppol)
-	         else
-		       lsp =((iseg+1)*l2(nppol)/(iseg+2))
-	         endif
-	         idep=iarr
-	         iarr=idep
+                 lsp = l2(nppol)
+               else
+                 lsp =((iseg+1)*l2(nppol)/(iseg+2))
+               endif
+               idep=iarr
+               iarr=idep
 
                vx(1)=xmail(idep,ir,ireg)
-	         vy(1)=ymail(idep,ir,ireg)
-	         ls = 0
-	         do while (ls.lt.lsp-lsd.and.iarr.lt.nppol) 
-	           iarr=iarr+1
-	           n=iarr-idep+1
-	           vx(iarr-idep+1)=xmail(iarr,ir,ireg)
+               vy(1)=ymail(idep,ir,ireg)
+               ls = 0
+               do while (ls.lt.lsp-lsd.and.iarr.lt.nppol)
+                 iarr=iarr+1
+                 n=iarr-idep+1
+                 vx(iarr-idep+1)=xmail(iarr,ir,ireg)
                  vy(iarr-idep+1)=ymail(iarr,ir,ireg)
-	           ls=long(vx,vy,n)
+                 ls=long(vx,vy,n)
                enddo
 
-	         xmini= minval(xmail(idep:iarr,1:ir,ireg))
-	         xmaxi= maxval(xmail(idep:iarr,1:ir,ireg))
-	         ymini= minval(ymail(idep:iarr,1:ir,ireg))
-	         ymaxi= maxval(ymail(idep:iarr,1:ir,ireg))
+               xmini= minval(xmail(idep:iarr,1:ir,ireg))
+               xmaxi= maxval(xmail(idep:iarr,1:ir,ireg))
+               ymini= minval(ymail(idep:iarr,1:ir,ireg))
+               ymaxi= maxval(ymail(idep:iarr,1:ir,ireg))
 
-	         tpr=n
+               tpr=n
 
                call endpag
                call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
@@ -828,20 +829,20 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  2211          write(6,*) 'Voulez-vous redefinir les bords?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'	 
+               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=2212,err=2211) pra
  2212          if (pra.eq.0) go to 2350
-	         
- 2213	         write(6,*) 'Définissez les bords.'
- 2214	         write(6,*) 'Limite inférieure en R'
-	         read(5,*,end=2215, err=2214) xmini
- 2215	         write(6,*) 'Limite supérieure en R'
-	         read(5,*,end=2216,err=2215) xmaxi
- 2216	         write(6,*) 'Limite inférieure en Z'
-	         read (5,*,end=2217,err=2216) ymini
- 2217	         write(6,*) 'Limite supérieure en Z'
-	         read(5,*,end=2218,err=2217) ymaxi
- 
+
+ 2213          write(6,*) 'Définissez les bords.'
+ 2214          write(6,*) 'Limite inférieure en R'
+               read(5,*,end=2215, err=2214) xmini
+ 2215          write(6,*) 'Limite supérieure en R'
+               read(5,*,end=2216,err=2215) xmaxi
+ 2216          write(6,*) 'Limite inférieure en Z'
+               read (5,*,end=2217,err=2216) ymini
+ 2217          write(6,*) 'Limite supérieure en Z'
+               read(5,*,end=2218,err=2217) ymaxi
+
  2218          call endpag
                call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
@@ -849,44 +850,44 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  2219          write(6,*) 'Recommencer?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'	 
+               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=2220,err=2219) sra
- 2220          if (sra.eq.1) go to 2213 
-       
+ 2220          if (sra.eq.1) go to 2213
+
  2350          write(6,*) 'Choississez un coefficient qui sera utilisé '
                write(6,'(a,i1,a,i1)') 'dans la partie supérieure à ',
-     .		  iseg,'/',iseg+1
+     .          iseg,'/',iseg+1
                write(6,*) 'de nppol et qui multipliera la valeur '
-			 write(6,*) 'actuelle des ipol'
+               write(6,*) 'actuelle des ipol'
                read(5,*,end=2310,err=2350) coefa
 
  2310          continue
                do ipol=2,ipoln
-	           if(l2(ipol).ge.lsd.and.l2(ipol).le.lsp)then
+                 if(l2(ipol).ge.lsd.and.l2(ipol).le.lsp)then
                    l2(ipol)= l2(ipol)*coefa
-	             call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .              mailx(ipol,ir),maily(ipol,ir))		  
+                   call coord(xn(1,inouv),yn(1,inouv),nn(inouv),
+       .            l2(ipol),mailx(ipol,ir),maily(ipol,ir))
                  endif
                enddo
 
-	         call endpag
+               call endpag
                call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  2430          write(6,*) 'Souhaitez-vous choisir un autre coefficient?'
-	         write(6,*) 'Répondez 1 si oui, 0 si non.'
+               write(6,*) 'Répondez 1 si oui, 0 si non.'
                read(5,*,end=2340,err=2430) tra
  2340          continue
                if (tra.eq.1) go to 2350
-	      
-		   enddo
- 	   
+
+             enddo
+
            elseif (choix.eq.3) then
 
              IF (ir.eq.2) then
-       
+
                do ipol=2,ipoln
 
        if(l2(ipol).lt.l2(nppol)/1.and.l2(ipol).gt.l2(nppol)*6/7)then
@@ -896,33 +897,33 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)*6/7.and.l2(ipol).gt.l2(nppol)*5/6)
-     .   	 then
+     .   then
                    l2(ipol)=l2(ipol)*1.001
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
 
        elseif(l2(ipol).lt.l2(nppol)*5/6.and.l2(ipol).gt.l2(nppol)*4/5)
-     .	 then
+     .   then
                    l2(ipol)=l2(ipol)*1.001
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
 
        elseif(l2(ipol).lt.l2(nppol)*4/5.and.l2(ipol).gt.l2(nppol)*3/4)
-     .	 then
+     .   then
                    l2(ipol)=l2(ipol)*1.001
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
 
        elseif(l2(ipol).lt.l2(nppol)*3/4.and.l2(ipol).gt.l2(nppol)*2/3)
-     .	 then
+     .   then
                    l2(ipol)=l2(ipol)*1.001
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)*2/3.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.009
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -930,7 +931,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.01               
+                   l2(ipol)= l2(ipol)*1.01
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -939,7 +940,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.02
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -947,23 +948,23 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.022               
+                   l2(ipol)= l2(ipol)*1.022
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
        elseif(l2(ipol).lt.l2(nppol)/6.and.l2(ipol).gt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.025
-        call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
 
-        elseif(l2(ipol).lt.l2(nppol)/7)then
+       elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.025
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
-               endif
-           
-       enddo
+         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
+       endif
+
+      enddo
         ELSEIF (ir.eq.3) then
 
       do        ipol=2,ipoln
@@ -971,8 +972,8 @@ c---
                    l2(ipol)=l2(ipol)*1.005
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.017
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -980,7 +981,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.017               
+                   l2(ipol)= l2(ipol)*1.017
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -989,7 +990,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.034
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -997,7 +998,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.036              
+                   l2(ipol)= l2(ipol)*1.036
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1009,10 +1010,10 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.04
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
-               endif
-           
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
+        endif
+
        enddo
 
        ELSEIF (ir.eq.4) then
@@ -1022,8 +1023,8 @@ c---
                    l2(ipol)=l2(ipol)*1.007
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.016
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1031,7 +1032,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.02                
+                   l2(ipol)= l2(ipol)*1.02
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1040,7 +1041,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.04
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1048,7 +1049,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.048            
+                   l2(ipol)= l2(ipol)*1.048
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1060,10 +1061,10 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.05
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
-           
+
        enddo
 
        ELSEIF (ir.eq.5) then
@@ -1073,8 +1074,8 @@ c---
                    l2(ipol)=l2(ipol)*1.012
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.02
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1082,7 +1083,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.02               
+                   l2(ipol)= l2(ipol)*1.02
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1091,7 +1092,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.045
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1099,7 +1100,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.055          
+                   l2(ipol)= l2(ipol)*1.055
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1111,10 +1112,10 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.062
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
-           
+
        enddo
 
          ELSEIF (ir.eq.6) then
@@ -1124,8 +1125,8 @@ c---
                    l2(ipol)=l2(ipol)*1.009
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.016
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1133,7 +1134,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.022               
+                   l2(ipol)= l2(ipol)*1.022
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1142,7 +1143,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.052
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1150,7 +1151,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.056             
+                   l2(ipol)= l2(ipol)*1.056
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1162,8 +1163,8 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.063
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
 
        ENDDO
@@ -1174,8 +1175,8 @@ c---
                    l2(ipol)=l2(ipol)*1.01
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.016
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1183,7 +1184,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.022               
+                   l2(ipol)= l2(ipol)*1.022
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1192,7 +1193,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.052
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1200,7 +1201,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.058              
+                   l2(ipol)= l2(ipol)*1.058
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1212,11 +1213,11 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.058
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
-           
-       
+
+
        enddo
       ELSEIF (ir.eq.8) then
 
@@ -1225,8 +1226,8 @@ c---
                    l2(ipol)=l2(ipol)*1.01
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.016
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1234,7 +1235,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.02             
+                   l2(ipol)= l2(ipol)*1.02
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1243,7 +1244,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.045
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1251,7 +1252,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.047           
+                   l2(ipol)= l2(ipol)*1.047
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1263,11 +1264,11 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.049
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
-           
-       
+
+
        enddo
 
        ELSEIF (ir.eq.9) then
@@ -1277,8 +1278,8 @@ c---
                    l2(ipol)=l2(ipol)*1.005
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.01
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1286,7 +1287,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.017               
+                   l2(ipol)= l2(ipol)*1.017
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1295,7 +1296,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.033
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1303,7 +1304,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.043           
+                   l2(ipol)= l2(ipol)*1.043
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1315,22 +1316,22 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.043
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
-           
-       
+
+
        enddo
-        
-	  ELSEIF (ir.eq.10) then
+
+          ELSEIF (ir.eq.10) then
 
       do        ipol=2,ipoln
          if(l2(ipol).lt.l2(nppol)/1.1.and.l2(ipol).gt.l2(nppol)/1.5)then
                    l2(ipol)=l2(ipol)*1.00
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.00
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1338,7 +1339,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.00                
+                   l2(ipol)= l2(ipol)*1.00
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1347,7 +1348,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.005
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1355,7 +1356,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.01           
+                   l2(ipol)= l2(ipol)*1.01
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1367,11 +1368,11 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.0
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
-           
-       
+
+
        enddo
 
        ELSEIF (ir.eq.11) then
@@ -1381,8 +1382,8 @@ c---
                    l2(ipol)=l2(ipol)*1.00
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-           
-              
+
+
        elseif(l2(ipol).lt.l2(nppol)/1.5.and.l2(ipol).gt.l2(nppol)/2)then
                    l2(ipol)= l2(ipol)*1.00
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1390,7 +1391,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/2.and.l2(ipol).gt.l2(nppol)/3)then
-                   l2(ipol)= l2(ipol)*1.00                
+                   l2(ipol)= l2(ipol)*1.00
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1399,7 +1400,7 @@ c---
         call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
-	        
+
        elseif(l2(ipol).lt.l2(nppol)/4.and.l2(ipol).gt.l2(nppol)/5)then
                    l2(ipol)= l2(ipol)*1.005
          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
@@ -1407,7 +1408,7 @@ c---
 
 
        elseif(l2(ipol).lt.l2(nppol)/5.and.l2(ipol).gt.l2(nppol)/6)then
-                   l2(ipol)= l2(ipol)*1.01            
+                   l2(ipol)= l2(ipol)*1.01
           call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
 
@@ -1419,11 +1420,11 @@ c---
 
         elseif(l2(ipol).lt.l2(nppol)/7)then
                    l2(ipol)= l2(ipol)*1.0
-	  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
-     .             mailx(ipol,ir),maily(ipol,ir))		  
+          call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
+     .             mailx(ipol,ir),maily(ipol,ir))
                endif
-           
-       
+
+
        enddo
          ELSEIF (ir.ge.12) then
 
@@ -1434,43 +1435,43 @@ c         IF (ir.lt.nprad/2) then
       do        ipol=2,ipoln
               if(l2(ipol).lt.l2(nppol)/1.1) then
                 l2(ipol)=l2(ipol)*1.0
-                
+
                  endif
                 if(l2(ipol).lt.l2(nppol)/4) then
                    l2(ipol)= l2(ipol)*1.015
-                
-                 
+
+
                  call coord(xn(1,inouv),yn(1,inouv),nn(inouv),l2(ipol),
      .             mailx(ipol,ir),maily(ipol,ir))
-	      ENDIF
-	    enddo
+              ENDIF
+            enddo
         ENDIF
-	  ENDIF ! choix
-	      
-	  call endpag
+          ENDIF ! choix
+
+          call endpag
         call trace(xmini,xmaxi,ymini,ymaxi,separx,separy,ptsep,
      .           npx,nptot,
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,nprsb,xmail,ymail,nreg,.false.)
-       
- 321	  write(6,*) 'Voulez-vous refaire des modifications sur cette '
-	  write(6,*) 'ligne de niveau?'
-	  write(6,*) '(1 si c''est oui et 0 si c''est non)'
-	  read(5,*,end=25,err=321) pri
-	  if (pri.eq.1) goto 1000
 
-	endif  ! modif
+ 321      write(6,*) 'Voulez-vous refaire des modifications sur cette '
+          write(6,*) 'ligne de niveau?'
+          write(6,*) '(1 si c''est oui et 0 si c''est non)'
+          read(5,*,end=25,err=321) pri
+          if (pri.eq.1) goto 1000
+
+        endif  ! modif
 #endif
 c---
    25 CONTINUE
-      
+
        do ir=2,nprad
-	 
-	 gdsomortp= gdsomortp + (somortp(ir)/(nprad-1)) 
-	 gdsomortpurp= gdsomortpurp+ (somortpurp(ir)/(nprad-1)) 
-	 gdsompropop= gdsompropop+ (sompropop(ir)/(nprad-1))
-	 gdsomvarrp= gdsomvarrp+ (somvarrp(ir)/(nprad-1))
-	 gdsomtotp= gdsomtotp+ (somtotp(ir)/(nprad-1)) 
+
+         gdsomortp= gdsomortp + (somortp(ir)/(nprad-1))
+         gdsomortpurp= gdsomortpurp+ (somortpurp(ir)/(nprad-1))
+         gdsompropop= gdsompropop+ (sompropop(ir)/(nprad-1))
+         gdsomvarrp= gdsomvarrp+ (somvarrp(ir)/(nprad-1))
+         gdsomtotp= gdsomtotp+ (somtotp(ir)/(nprad-1))
 
       enddo
 

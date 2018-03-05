@@ -10,10 +10,12 @@ c*** This subroutine finds the next point on the structure for a
 c*** starting point and the step value
 c======================================================================
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *  arguments
       INTEGER npst,sens,repart,nx,ny,nm1,nm2
-      REAL*8 x1,y1,psi1,x2,y2,pas,xst(npst),yst(npst),x(nx),y(ny),
+      REAL(KIND=R8)
+     .       x1,y1,psi1,x2,y2,pas,xst(npst),yst(npst),x(nx),y(ny),
      .       a00(nm1,nm2,3),a10(nm1,nm2,3),a01(nm1,nm2,3),a11(nm1,nm2,3)
 
 *  variables en common
@@ -22,9 +24,9 @@ c======================================================================
 
 *  variables locales
       INTEGER n,ind1,ind2,ii,jj, compt
-      REAL*8 zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
-      REAL*8 fracx,fracy
-      PARAMETER (psimin=1.E-08,psimi2=1.E-07)
+      REAL(KIND=R8) zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
+      REAL(KIND=R8) fracx,fracy
+      PARAMETER (psimin=1.0E-08_R8,psimi2=1.0E-07_R8)
       logical l_dbg, print_dbg
       integer n_call
 #ifdef DBG

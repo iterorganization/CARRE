@@ -3,6 +3,7 @@
       integer function horair(xpto,ypto,x0,y0,xstruc,ystruc,npst,sens)
 ************************************************************************
       implicit none
+#include <CARRETYPES.F>
 c  Determination du sens de parcours "sens" sur une structure donnee,
 c  a partir d'un point de depart x0, y0, pour que le trajet initial
 c  soit dans le sens horaire (sens=-1) ou anti-horaire (sens=1) tel que
@@ -11,11 +12,11 @@ c  N.B.: la structure est supposee fermee.
 c
 c  arguments
       integer npst,sens
-      real*8 xpto,ypto,x0,y0,xstruc(npst),ystruc(npst)
+      real(kind=R8) xpto,ypto,x0,y0,xstruc(npst),ystruc(npst)
 c
 c  variables locales
       integer ind,im,ip
-      real*8 v0x,v0y,norm,vmx,vmy,vpx,vpy
+      real(kind=R8) v0x,v0y,norm,vmx,vmy,vpx,vpy
 c
 c  procedures
       integer indsgm

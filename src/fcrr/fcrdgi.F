@@ -6,6 +6,7 @@ c======================================================================
 c*** Input of dg data for Carre
 c======================================================================
       implicit none
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
       character*(*) nam
 c

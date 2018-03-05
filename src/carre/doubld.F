@@ -28,13 +28,15 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),
      .        nn1,nprad,plaque,repart,npcrb2
 
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
+      REAL(kind=R8)
+     .     x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
      .     ystruc(npstmx,nstruc),bouclx,boucly,xptxex,yptxex,xn1(nn1),
      .     yn1(nn1),pas(nrmamx),xext,yext,a00(nxmax,nymax,3),
      .     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3),
@@ -49,11 +51,12 @@ cank-970707: dimensions from the file
 *  variables locales
       INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,i,nn(2),crbnmx,
      .        npcrb(2),nbcrb,nrmx,sens,iint(2),nint,sns
-      REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2,
+      REAL(kind=R8)
+     .       ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2,
      .       epsiln,xn(npnimx,2),yn(npnimx,2),fctini,fctnew,x2,y2
-      PARAMETER(zero=0.,epsmai=1.e-6,epsiln=1.E-08,
+      PARAMETER(zero=0.0_R8,epsmai=1.0e-6_R8,epsiln=1.0E-08_R8,
      ,                                       crbnmx=npnimx,nrmx=nrmamx)
-      REAL*8 xcrb(crbnmx,2),ycrb(crbnmx,2),xbcl(nrmx),ybcl(nrmx),
+      REAL(kind=R8) xcrb(crbnmx,2),ycrb(crbnmx,2),xbcl(nrmx),ybcl(nrmx),
      .       xint(2),yint(2)
       logical lc,li,l_dbg
       integer n_call
@@ -66,7 +69,7 @@ cank-970707: dimensions from the file
 
 *  procedures
       INTEGER indsgm,ifind,drctio
-      REAL*8 aazero,long,nulort,ruban
+      REAL(kind=R8) aazero,long,nulort,ruban
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort,
@@ -192,8 +195,8 @@ cc>>>
          ll1=ll
 cc<<<
       if(l_dbg) then
-        write(0,'(8h ---- ir,2a7,a9,4a12)')
-     -                          'ianc','inouv','ll','x1','x2','y1','y2'
+        write(0,'(a8,2a7,a9,4a12)')
+     -           ' ---- ir','ianc','inouv','ll','x1','x2','y1','y2'
         write(0,'(1x,3i7,1p,5e12.4)') ir,ianc,inouv,ll,x1,x2,y1,y2
       end if
 cc>>>

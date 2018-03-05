@@ -13,25 +13,26 @@ c*** and indexes them in correct order
 *  et les ordonnes selon un ordre precis.
 c======================================================================
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *  arguments
       INTEGER npnimx,npx,indplq(4,npx),nptot(4,npx),ptsep(4,npx),
      ,                                       ptxint,nbdef,inddef(nbdef)
-      REAL*8 ptx(npx),pty(npx),separx(npnimx,4,npx),
+      REAL(kind=R8) ptx(npx),pty(npx),separx(npnimx,4,npx),
      .       separy(npnimx,4,npx),fctpx(npx+1),ypto
       LOGICAL racord
 
 *  variables locales
       INTEGER kkmax
       PARAMETER (kkmax=10)
-      real*8 wx(4),wy(4),zero
-      parameter(zero=0.)
+      real(kind=R8) wx(4),wy(4),zero
+      parameter(zero=0.0_R8)
       INTEGER ipx, ipx2, j, i, k0, kk(kkmax), kkp, k, ind,
      ,        i1, i2, ipi, j1, j2, k1, k2, l1, l2
 
 *  procedures
       INTEGER coinci
-      real*8 aire
+      real(kind=R8) aire
       LOGICAL tsplaq
       INTRINSIC MOD, ABS
       EXTERNAL coinci,tsplaq,aire

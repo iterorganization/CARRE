@@ -11,17 +11,19 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER nx, ny
-      REAL*8 psi(nxmax,nymax), psidx(nxmax,nymax), psidy(nxmax,nymax),
+      REAL(kind=R8)
+     .  psi(nxmax,nymax), psidx(nxmax,nymax), psidy(nxmax,nymax),
      .  x(nx),y(ny)
 
 *  variables locales
       INTEGER i, j, nxymax
       parameter (nxymax=nymax)
-      REAL*8 tmp(nxymax), tmpp(nxymax)
+      REAL(kind=R8) tmp(nxymax), tmpp(nxymax)
 
 *  procedures
       EXTERNAL DERIV

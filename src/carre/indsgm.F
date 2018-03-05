@@ -2,6 +2,7 @@
       INTEGER FUNCTION indsgm(xst,yst,n,xx,yy)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction trouve le segment d'une structure auquel est associe
 *  un point de contact (xx,yy). Les erreurs numeriques font que ce point
@@ -15,12 +16,12 @@
 
 *  arguments
       INTEGER n
-      REAL*8 xst(n), yst(n), xx, yy
+      REAL(kind=R8) xst(n), yst(n), xx, yy
 
 *  variables locales
       INTEGER i
-      REAL*8 mumin, mu, ax, ay, bx, by,eps,dist
-      PARAMETER (eps=1.E-6)
+      REAL(kind=R8) mumin, mu, ax, ay, bx, by,eps,dist
+      PARAMETER (eps=1.0E-6_R8)
 
 *  procedures
       INTRINSIC sqrt
@@ -37,7 +38,7 @@ c=========================
 
 *..Initialisation.
 
-      mumin = 1.
+      mumin = 1.0_R8
 
 *..Test pour savoir si le point x,y est egal au premier point parame-
 *  trise.

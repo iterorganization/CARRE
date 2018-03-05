@@ -3,6 +3,8 @@
       subroutine plurap(tx1,ty1,n1,tx2,ty2,n2,x0,y0,ind0)
 ************************************************************************
       implicit none
+#include <CARRETYPES.F>
+
 c  Determination des coordonnees (x0,y0) et de l'indice de segment ind0
 c  du point de la structure parametrisee par [tx1, ty1, n1], qui est
 c  le plus rapproche de la courbe parametrisee par [tx2, ty2, n2].
@@ -10,12 +12,12 @@ c  N.B.: On suppose qu'il n'y a pas intersection entre les deux courbes.
 c
 c  arguments
       integer n1,n2,ind0
-      real*8 tx1(n1),ty1(n1),tx2(n2),ty2(n2),x0,y0
+      real(kind=R8) tx1(n1),ty1(n1),tx2(n2),ty2(n2),x0,y0
 c
 c  variables locales
       integer i1,i2
-      real*8 h,hmin,x,y,x1,y1,x2,y2,base,zero,un
-      parameter(zero=0.,un=1.)
+      real(kind=R8) h,hmin,x,y,x1,y1,x2,y2,base,zero,un
+      parameter(zero=0.0_R8,un=1.0_R8)
 c
 c  procedures
       intrinsic abs,sqrt

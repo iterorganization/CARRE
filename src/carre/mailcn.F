@@ -1,9 +1,8 @@
       SUBROUTINE MAILCN(mailx,maily,xn1,yn1,nn1,pntrat,pas,nppol,nprad,
-     .               x2,y2,xfin,yfin,fctini,nx,ny,x,y,psi,
+     .               x2,y2,fctini,nx,ny,x,y,psi,
      .               nstruc,npstru,xstruc,ystruc,
      .               a00,a10,a01,a11,repart,xptxo,yptxo,xpto,ypto,
-     .               nivx,nivy,nivtot,nbniv,distxo,fctfin,gdpsi,racpsi,
-     .               npr,ireg,xrad,yrad,fctrad,
+     .               nivx,nivy,nivtot,nbniv,distxo,gdpsi,racpsi,
      .               a,gdr,r,ra,rho,somort,somortp,gdsomortp,
      .               somortpur,somortpurp,gdsomortpurp,
      .               sompropo,
@@ -24,6 +23,7 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 #include <COMORT.F>
@@ -32,17 +32,16 @@ cank-970707: dimensions from the file
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),
-     .  nn1,nppol,nprad,repart,nivtot(nivmx),nbniv,npr,ireg,isep,ipx
+     .  nn1,nppol,nprad,repart,nivtot(nivmx),nbniv
      
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
+      REAL(kind=R8)
+     .  x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc),
      .  ystruc(npstmx,nstruc),mailx(npmamx,nrmamx),
      .  maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2,
-     .  xfin,yfin,fctini,a00(nxmax,nymax,3),a10(nxmax,nymax,3),
+     .  fctini,a00(nxmax,nymax,3),a10(nxmax,nymax,3),
      .  a01(nxmax,nymax,3),a11(nxmax,nymax,3),
      .  xptxo,yptxo,xpto,ypto,nivx(npnimx,nivmx),
-     .  nivy(npnimx,nivmx),pntrat,distxo,separx(npnimx,4,npxmx),
-     .  separy(npnimx,4,npxmx),ptsep,npx,nptot,
-     .  np1,fctfin,xrad(nrmamx),yrad(nrmamx),fctrad(nrmamx),
+     .  nivy(npnimx,nivmx),pntrat,distxo,
      .  a,gdr(nrmamx),r(nrmamx),ra(nrmamx),
      .  rho(nrmamx), gdpsi(nrmamx),racpsi(nrmamx),somort(nrmamx),
      .  somortp(nrmamx),gdsomortp,somortpur(nrmamx),
@@ -54,17 +53,18 @@ cank-970707: dimensions from the file
 *  variables locales
       INTEGER ipas,indstr,ianc,inouv,ii,jj,ir,dir,ipol,i,nn(2),nt,sens
      .        ,npcrb(2),plaque,ntt
-      REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,xn(npnimx,2),
+      REAL(kind=R8)
+     .       ll,zero,pasini,epsmai,dist,dernie,valfct,xn(npnimx,2),
      .       yn(npnimx,2),fctnew,xt(3),yt(3),fctxo,xtt(3),ytt(3),
      .       fctanc,x22,y22,x23,y23
-      PARAMETER(zero=0.,epsmai=1.e-6)
-      REAL*8 xcrb(npnimx,2),ycrb(npnimx,2)
+      PARAMETER(zero=0.0_R8,epsmai=1.0e-6_R8)
+      REAL(kind=R8) xcrb(npnimx,2),ycrb(npnimx,2)
       CHARACTER*1 reponse
 
 *  procedures
       INTEGER ifind
-      REAL*8 aazero,long,nulort,ruban
-      INTRINSIC MOD,int,abs
+      REAL(kind=R8) aazero,long,nulort,ruban
+      INTRINSIC MOD,abs
       EXTERNAL aazero,long,COORD1,ifind,CRBNIV,nulort,UNTANG,ruban
 c
 c  remarque: cette routine doit etre appelee apres frtier ou, dans le
@@ -86,21 +86,21 @@ c     print*,'npnimx=',npnimx
 c***
 
 *..Initialisation.
-      somort=0.0
-      somortp=0.0
-      gdsomortp=0.0
-      somortpur=0.0
-      somortpurp=0.0
-      gdsomortpurp=0.0
-      sompropo=0.0
-      sompropop=0.0
-      gdsompropop=0.0
-      somvarr=0.0
-      somvarrp=0.0
-      gdsomvarrp=0.0
-      somtot=0.0
-      somtotp=0.0
-      gdsomtotp=0.0
+      somort=0.0_R8
+      somortp=0.0_R8
+      gdsomortp=0.0_R8
+      somortpur=0.0_R8
+      somortpurp=0.0_R8
+      gdsomortpurp=0.0_R8
+      sompropo=0.0_R8
+      sompropop=0.0_R8
+      gdsompropop=0.0_R8
+      somvarr=0.0_R8
+      somvarrp=0.0_R8
+      gdsomvarrp=0.0_R8
+      somtot=0.0_R8
+      somtotp=0.0_R8
+      gdsomtotp=0.0_R8
 
       plaque=0
 
@@ -250,8 +250,8 @@ c***
           gdpsi(ir)= (valfct-fctxo)/(fctini-fctxo)
           racpsi(ir)= sqrt(gdpsi(ir))
           sens=2
-	  x1 = gdr(ir-1)
-	  y1=ypto
+          x1 = gdr(ir-1)
+          y1=ypto
           CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens,
      .               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 

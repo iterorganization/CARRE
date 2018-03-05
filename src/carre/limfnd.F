@@ -15,6 +15,7 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 c  arguments
@@ -22,18 +23,18 @@ c  arguments
      .  nx,ny,npx,
      .  nstruc,npstru(strumx),
      .  indplq(4,npxmx),inddef(nbdmx),nbdef
-      REAL*8 xpto,ypto,nivx(npnimx,*),nivy(npnimx,*),stp0,stpmin,
+      REAL(kind=R8) xpto,ypto,nivx(npnimx,*),nivy(npnimx,*),stp0,stpmin,
      .  distnv(5,*),a00(nxmax,nymax,3),a10(nxmax,nymax,3),
      .  a01(nxmax,nymax,3),a11(nxmax,nymax,3),
      .  x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx),
      .  fctpx(npxmx),xstruc(npstmx,strumx),ystruc(npstmx,strumx)
 c
 c  local variables
-      real*8 zero
-      parameter(zero=0.)
+      real(kind=R8) zero
+      parameter(zero=0.0_R8)
       integer dir,sens,nt(2),nbcrb,ind0,i,ii,jj,k,plaque,nstrp1,
      .  idef,idniv,indlim,ipx
-      real*8 xt(npnimx,2),yt(npnimx,2),
+      real(kind=R8) xt(npnimx,2),yt(npnimx,2),
      ,                                       x0,y0,psi0,x2,y2,psi2,norm
 c
 c  ind0: indice du point du limiteur qui est le plus rapproche de la
@@ -43,7 +44,7 @@ c  x0, y0: coordonees du point d'indice ind0
 c
 c  procedures
       integer ifind,horair
-      real*8 aire,plqdst
+      real(kind=R8) aire,plqdst
       external aire,crbniv,horair,ifind,plqdst
       intrinsic sqrt
 c
@@ -59,7 +60,7 @@ c       the separatrix
         xstruc(2,nstrp1)=xpto
         ystruc(2,nstrp1)=max(y(1),y(ny))
         xstruc(3,nstrp1)=xpto
-        ystruc(3,nstrp1)=1.e20
+        ystruc(3,nstrp1)=1.0e20_R8
       else
         write(6,*)'Dimension of structures (strumx) must be increased.'
         write(6,*)'strumx, nstruc=',strumx,nstruc

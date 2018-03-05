@@ -5,13 +5,14 @@ c  version : 05.04.97 16:19
 c
 c======================================================================
       implicit none
+#include <CARRETYPES.F>
 #include <COMLAN.F>
 c  read data concerning structures
 c
 c  arguments
 
       integer nstrmx,npstmx,nstr,npstru(nstrmx),iunit
-      real*8 xstruc(npstmx,nstrmx),ystruc(npstmx,nstrmx)
+      real(kind=R8) xstruc(npstmx,nstrmx),ystruc(npstmx,nstrmx)
       character nomstr(nstrmx)*80
 c
 c  iunit: unit of file containing structure data

@@ -19,13 +19,15 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(strumx),
      .        nbdef,inddef(nbdef),npx,nptot(4,npx),
      .        ptsep(4,npx),nivtot(nivmx),nbniv,ptxint
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx),
+      REAL(kind=R8)
+     .     x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx),
      .     ystruc(npstmx,strumx),separx(npnimx,4,npxmx),
      .     separy(npnimx,4,npxmx),nivx(npnimx,nivmx),nivy(npnimx,nivmx),
      .     distnv(5,nivmx),a00(nxmax,nymax,3),a10(nxmax,nymax,3),
@@ -35,7 +37,7 @@ cank-970707: dimensions from the file
 *  variables locales
       INTEGER ipx,idniv,fraplq,i,j,idef,nbcrb,sens,nt(2),ii,jj,
      .  ptxext,indlim
-      REAL*8 x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
+      REAL(kind=R8) x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
 
 *  variables en common
 c
@@ -43,7 +45,7 @@ c
 
 *  procedures
       INTEGER drctio,ifind
-      REAL*8 plqdst
+      REAL(kind=R8) plqdst
       INTRINSIC MOD
       EXTERNAL MARCHE,drctio,ifind,plqdst
      ,        ,trc_stk_in,trc_stk_out
@@ -112,11 +114,11 @@ c======================================================================
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          DO 13 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -136,7 +138,7 @@ c======================================================================
 
          DO 14 i=2,nptot(ptsep(3,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -156,7 +158,7 @@ c======================================================================
 
          DO 15 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -236,11 +238,11 @@ c======================================================================
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          DO 23 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -260,7 +262,7 @@ c======================================================================
 
          DO 24 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -392,13 +394,13 @@ cc>>>
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          ipx = 1
 
          DO 33 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -418,7 +420,7 @@ cc>>>
 
          DO 34 i=2,nptot(ptsep(3,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -440,7 +442,7 @@ cc>>>
 
          DO 35 i=2,nptot(ptsep(1,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -521,13 +523,13 @@ cc>>>
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          ipx = 1
 
          DO 43 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -547,7 +549,7 @@ cc>>>
 
          DO 44 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -628,13 +630,13 @@ cc>>>
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          ipx = 1
 
          DO 53 i=nptot(ptsep(2,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -654,7 +656,7 @@ cc>>>
 
          DO 54 i=2,nptot(ptsep(4,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -676,7 +678,7 @@ cc>>>
 
          DO 55 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -757,13 +759,13 @@ cc>>>
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          ipx = 2
 
          DO 63 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -783,7 +785,7 @@ cc>>>
 
          DO 64 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -927,11 +929,11 @@ cank
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          DO 73 i=nptot(ptsep(3,ptxext),ptxext),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -951,7 +953,7 @@ cank
 
          DO 74 i=2,nptot(ptsep(1,ptxext),ptxext)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -1032,11 +1034,11 @@ cank
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          DO 83 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -1056,7 +1058,7 @@ cank
 
          DO 84 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -1141,11 +1143,11 @@ cank
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          DO 93 i=nptot(ptsep(4,ptxext),ptxext),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -1165,7 +1167,7 @@ cank
 
          DO 94 i=2,nptot(ptsep(2,ptxext),ptxext)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -1246,11 +1248,11 @@ cank
 *..Parametrisation of the separating curve
 
          nt(1)=0
-	 nt(2)=0
+         nt(2)=0
 
          DO 97 i=nptot(ptsep(1,ipx),ipx),1,-1
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
@@ -1270,7 +1272,7 @@ cank
 
          DO 98 i=2,nptot(ptsep(2,ipx),ipx)
             nt(1)=nt(1)+1
-	    if(nt(1).gt.npnimx) then
+            if(nt(1).gt.npnimx) then
               if(sellan(1:8).eq.'francais') then
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx

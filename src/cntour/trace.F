@@ -9,6 +9,7 @@ c
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 c
@@ -16,7 +17,8 @@ c  arguments
       integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv,
      .        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg
      .
-      real*8 x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
+      real(kind=R8)
+     .       x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
      .       xstruc(npstmx,strumx), ystruc(npstmx,strumx),
      .       nivx(npnimx,nbniv),nivy(npnimx,nbniv),
      .       xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*)

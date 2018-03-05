@@ -1,6 +1,6 @@
       subroutine trace2(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot,
      .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .        nivtot,nbniv,pntrat,distxo,xn1,yn1,nn1)
+     .        nivtot,nbniv)
 c======================================================================
 c
 c  version : 07.07.97 20:15
@@ -9,35 +9,26 @@ c
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 c
 c  arguments
       integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv,
-     .      nivtot(nbniv),ptsep(4,npx),nreg, nn1,
-     .      repart,nx,ny
+     .      nivtot(nbniv),ptsep(4,npx)
      
-     
-      real*8 x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
-     .       xstruc(npstmx,strumx), ystruc(npstmx,strumx),
-     .       nivx(npnimx,nbniv),nivy(npnimx,nbniv),pntrat,distxo,
-     .       xn1(nn1),yn1(nn1),xptxo,yptxo,fctini,xfin,yfin,
-     .       a00(nxmax,nymax,3),a01(nxmax,nymax,3),a10(nxmax,nymax,3),
-     .       a11(nxmax,nymax,3),psi(nxmax,nymax)
+      real(kind=R8)
+     .       x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
+     .       xstruc(npstmx,strumx),ystruc(npstmx,strumx),
+     .       nivx(npnimx,nbniv),nivy(npnimx,nbniv)
       
-
 c
 c  variables locales
-      integer i,j,k,nin,nn(2),inouv,sens,npcrb(2),nt,ii,jj,dir,indstr,
-     .  plaque
-      real*8 valfct,fctnew,xt(3),yt(3),zero
-      parameter(zero=0.)
-      real*8 xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2)
+      integer i,j,k,nin
       real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
       character echx*3,echy*3
 c
 c  procedures
-      integer ifind
       external agcurv,newpag,endpag
 c
 c  calculs
@@ -98,7 +89,6 @@ c***
    20   CONTINUE
    10 CONTINUE
 
-      
       DO 40 i=1, nbniv
          DO 50 k=1, nivtot(i)
 
@@ -114,12 +104,6 @@ c     enddo
 c***
             if(nivtot(i).gt.0) CALL agcurv(x,1,y,1,nivtot(i),nin)
    40 CONTINUE
-
-
-
-     
-
-      
 
       return
       end

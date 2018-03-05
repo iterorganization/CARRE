@@ -3,11 +3,11 @@
      .     xstruc,ystruc,inddef,nreg,xn,yn,xmail,ymail,
      .     np1,npr,ptx,pty,nivx,nivy,nivtot,nbniv,
      .     a00,a10,a01,a11,fctpx,limcfg,gdpsi,racpsi,
-     .     a,gdr,r,ra,rho,sol,somort,ir,nprad,ipol,somortp,nppol,
+     .     a,gdr,r,ra,rho,somort,somortp,
      .     gdsomortp,somortpur,somortpurp,gdsomortpurp,sompropo,
      .     sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
-     .     ymini,ymaxi,re,distxo,pntrat,nprsb,tgarde)
+     .     ymini,ymaxi,distxo,pntrat,nprsb,tgarde)
 c
 c  version : 23.06.98 19:53
 c
@@ -22,6 +22,7 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 
@@ -29,10 +30,10 @@ cank-970707: dimensions from the file
       INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint,
      .        nstruc,npstru(nstruc),nreg,inddef(4),
      .        np1(nregmx),npr(nregmx),nivtot(nivmx),nbniv,limcfg,nn1,
-     .        sol,ir,nprad,ipol,nppol,ireg,modif,re,nprsb(nregmx)
+     .        ireg,modif,nprsb(nregmx)
 
       LOGICAL racord
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),
+      REAL(kind=R8) x(nxmax),y(nymax),psi(nxmax,nymax),
      .  xpto,ypto,separx(npnimx,4,npx),
      .  separy(npnimx,4,npx),xstruc(npstmx,nstruc),pty(npx+1),
      .  ystruc(npstmx,nstruc),xn(npnimx),yn(npnimx),ptx(npx+1),
@@ -41,9 +42,7 @@ cank-970707: dimensions from the file
      .  nivx(npnimx,nivmx),nivy(npnimx,nivmx),fctpx(npx+1),
      .  a00(nxmax,nymax,3),a10(nxmax,nymax,3),
      .  a01(nxmax,nymax,3),a11(nxmax,nymax,3),
-     .  gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),xrad(nrmamx),
-     .  yrad(nrmamx),
-     .  fctrad(nrmamx),
+     .  gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),
      .  a(nregmx),
      .  gdr(nrmamx,nregmx),
      .  r(nrmamx,nregmx),ra(nrmamx,nregmx),
@@ -67,12 +66,12 @@ cank-970707: dimensions from the file
       INTEGER nptseg(10),isep,ipas,ipx,sens,nn,idef,
      .  repart,nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2
      .  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
-      REAL*8 dist,x2,y2,lg(10),deltp1(10),deltpn(10),
+      REAL(kind=R8) dist,x2,y2,lg(10),deltp1(10),deltpn(10),
      .  deltr1(10),deltrn(10),xx,yy,fctini,fctfin,difpsi,dpmin(10),
      .  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1,
      .  gardd2,xptxo,yptxo,xint,yint,xext,yext,psiint,
      .  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
-      REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10),
+      REAL(kind=R8) sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10),
      .  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx)
      .  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx),
      .  ynlast(npnimx)
@@ -81,11 +80,10 @@ cank-970707: dimensions from the file
 
 *  procedures
       INTEGER drctio,horair,ifind
-      REAL*8 long,plqdst,ruban
+      REAL(kind=R8) long,plqdst,ruban
       EXTERNAL long,COORD,drctio,horair,ifind,LECCLE,lecclf,DOUBLD,
      .         ruban,plqdst,trace3
      ,        ,trc_stk_in,trc_stk_out
-      intrinsic max
 c=========================
 c.. npnimx: <=> npnimx
 c.. nreg  : number of regions
@@ -281,13 +279,11 @@ c----------------------------------------------------------------------
 
 *..we append the last level line to trace2 to have the penetration depth
 
-         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _         ptsep,npx,nptot,
+         if (nn1.gt.1) call trace3(
      _         nstruc,npstru,xstruc,ystruc,
-     _         nivx,nivy,nivtot,nbniv,
      _         pntrat,distxo,xn,yn,nn1,
-     .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
-     .         a00,a01,a10,a11,psi,nx,ny,x,y)
+     .         xfin,yfin,fctfin,
+     .         psi,nx,ny,x,y)
 
          if (correct) then
            if(sellan(1:8).eq.'francais') then
@@ -317,19 +313,16 @@ c----------------------------------------------------------------------
               call trace2(x(1),x(nx),y(1),y(ny),
      .                    separx,separy,ptsep,npx,nptot,
      .                    nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .                    nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+     .                    nivtot,nbniv)
 
             endif
 
-
             GO TO 3
-
 
          else
             CALL RAPPEL(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
      .             pntrat,tgarde,lg,difpsi,distnv,nreg,nsep,npx,
      .             dpmin,dpmax,drmin,drmax,distxo,10,correct)
-
 
          ENDIF
 
@@ -341,8 +334,8 @@ c----------------------------------------------------------------------
      .     gdpsi,racpsi,
      .     a,gdr,r,
      .     ra,rho,
-     .     nprad,somort,ir,ipol,somortp,
-     .     nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     somort,somortp,
+     .     gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt)
 
@@ -478,9 +471,7 @@ c---
      .              segt(1,ireg),ireg,modif,xmini,xmaxi,
      .              ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .              nivx,nivy,
-     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
-     .              distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,
-     .              nprsb,ipx)
+     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
 c
 c  1.3.2  region 2
@@ -576,9 +567,7 @@ c---
      .              gdsomtotp(ireg),segt(1,ireg),ireg,modif,xmini,xmaxi,
      .              ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .              nivx,nivy,
-     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
-     .              distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,
-     .              ipx)
+     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 c
@@ -622,11 +611,11 @@ c---
          print*, 'ireg=', ireg
 c---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat,
-     .       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
+     .       pas,np1(ireg),npr(ireg),x2,y2,fctini,
      .       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .       a00,a10,a01,a11,repart,
-     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
-     .       gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,
+     .       gdpsi(1,ireg),racpsi(1,ireg),
      .       a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
      .       somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
      .       somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
@@ -798,13 +787,11 @@ c----------------------------------------------------------------------
             yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
   371    CONTINUE
 
-         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _         ptsep,npx,nptot,
+         if (nn1.gt.1) call trace3(
      _         nstruc,npstru,xstruc,ystruc,
-     _         nivx,nivy,nivtot,nbniv,
      _         pntrat,distxo,xn,yn,nn1,
-     .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
-     .         a00,a01,a10,a11,psi,nx,ny,x,y)
+     .         xfin,yfin,fctfin,
+     .         psi,nx,ny,x,y)
 
          if(correct) then
            if(sellan(1:8).eq.'francais') then
@@ -827,7 +814,7 @@ c----------------------------------------------------------------------
               call trace2(x(1),x(nx),y(1),y(ny),
      .          separx,separy,ptsep,npx,nptot,
      .          nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .          nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+     .          nivtot,nbniv)
 
             endif
 
@@ -846,8 +833,8 @@ c----------------------------------------------------------------------
      .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,
      .     gdpsi,racpsi,a,
      .     gdr,r,ra,
-     .     rho,nprad,somort,ir,ipol,
-     .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     rho,somort,
+     .     somortp,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt)
 
@@ -1008,9 +995,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
-     .               distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,
-     .               ipx)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -1110,9 +1095,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
-     .               distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,
-     .               ipx)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -1227,9 +1210,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,
-     .               distxo,xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,
-     .               ipx)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -1331,8 +1312,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .               xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 *
@@ -1389,11 +1369,11 @@ c---
          print*, 'ireg=', ireg
 c---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat,
-     .       pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
+     .       pas,np1(ireg),npr(ireg),x2,y2,fctini,
      .       nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .       a00,a10,a01,a11,repart,
-     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
-     .       gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .       xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,
+     .       gdpsi(1,ireg),racpsi(1,ireg),
      .       a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
      .       somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
      .       somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
@@ -1726,13 +1706,11 @@ crm  augmenter ce test
             yn(nn1)=separy(ipas,ptsep(3,ipx),ipx)
   381    CONTINUE
 
-         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _         ptsep,npx,nptot,
+         if (nn1.gt.1) call trace3(
      _         nstruc,npstru,xstruc,ystruc,
-     _         nivx,nivy,nivtot,nbniv,
      _         pntrat,distxo,xn,yn,nn1,
-     .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
-     .         a00,a01,a10,a11,psi,nx,ny,x,y)
+     .         xfin,yfin,fctfin,
+     .         psi,nx,ny,x,y)
 
          if (correct) then
            if(sellan(1:8).eq.'francais') then
@@ -1754,7 +1732,7 @@ crm  augmenter ce test
               call trace2(x(1),x(nx),y(1),y(ny),
      .          separx,separy,ptsep,npx,nptot,
      .          nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .          nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
+     .          nivtot,nbniv)
             endif
             GO TO 105
          else
@@ -1770,8 +1748,8 @@ crm  augmenter ce test
      .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,
      .     gdpsi,racpsi,a,
      .     gdr,r,ra,
-     .     rho,nprad,somort,ir,ipol,
-     .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     rho,somort,
+     .     somortp,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt)
 
@@ -2065,8 +2043,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .               xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -2204,9 +2181,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .               xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
-
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -2306,8 +2281,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .               xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -2431,8 +2405,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .               xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -2531,8 +2504,7 @@ c---
      .               segt(1,ireg),ireg,modif,xmini,xmaxi,
      .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .               xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ptxint)
+     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
          modif=0
 
@@ -2584,11 +2556,11 @@ c---
          print*, 'ireg=', ireg
 c---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat,
-     .      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
+     .      pas,np1(ireg),npr(ireg),x2,y2,fctini,
      .      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .      a00,a10,a01,a11,repart,
-     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
-     .      gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,
+     .      gdpsi(1,ireg),racpsi(1,ireg),
      .      a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
      .      somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
      .      somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
@@ -2721,13 +2693,11 @@ c----------------------------------------------------------------------
             yn(nn1)=nivy(ipas,1)
   391    CONTINUE
 
-         if (nn1.gt.1) call trace3(x(1),x(nx),y(1),y(ny),separx,separy,
-     _         ptsep,npx,nptot,
+         if (nn1.gt.1) call trace3(
      _         nstruc,npstru,xstruc,ystruc,
-     _         nivx,nivy,nivtot,nbniv,
      _         pntrat,distxo,xn,yn,nn1,
-     .         repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
-     .         a00,a01,a10,a11,psi,nx,ny,x,y)
+     .         xfin,yfin,fctfin,
+     .         psi,nx,ny,x,y)
          if(correct) then
            if(sellan(1:8).eq.'francais') then
              WRITE(6,301)
@@ -2746,11 +2716,10 @@ c----------------------------------------------------------------------
             if (pntrat.ne.pntrat_old) then
               call endpag
 
-
-        call trace2(x(1),x(nx),y(1),y(ny),separx,separy,ptsep,npx,nptot,
-     .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .        nivtot,nbniv,pntrat,distxo,xn,yn,nn1)
-
+              call trace2(x(1),x(nx),y(1),y(ny),
+     .          separx,separy,ptsep,npx,nptot,
+     .          nstruc,npstru,xstruc,ystruc,nivx,nivy,
+     .          nivtot,nbniv)
 
             endif
             GO TO 203
@@ -2768,8 +2737,8 @@ c----------------------------------------------------------------------
      .     x,y,a00,a10,a01,a11,ptx,pty,npx,racord,1,fctpx,
      .     gdpsi,racpsi,a,
      .     gdr,r,ra,
-     .     rho,nprad,somort,ir,ipol,
-     .     somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .     rho,somort,
+     .     somortp,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .     sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .     somtot,somtotp,gdsomtotp,segt)
 
@@ -2891,9 +2860,7 @@ c---
      .              segt(1,ireg),ireg,modif,xmini,xmaxi,
      .              ymini,ymaxi,separx,separy,ptsep,npx,nptot,
      .              nivx,nivy,
-     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,re,distxo,
-     .              xptxo,yptxo,pntrat,xfin,yfin,fctfin,nprsb,ipx)
-
+     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
 
 *..4.3.2  Region 2
 
@@ -2938,11 +2905,11 @@ c---
          print*, 'ireg=', ireg
 c---
          CALL MAILCN(xmail(1,1,ireg),ymail(1,1,ireg),xn,yn,nn,pntrat,
-     .      pas,np1(ireg),npr(ireg),x2,y2,xfin,yfin,fctini,
+     .      pas,np1(ireg),npr(ireg),x2,y2,fctini,
      .      nx,ny,x,y,psi,nstruc,npstru,xstruc,ystruc,
      .      a00,a10,a01,a11,repart,
-     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,fctfin,
-     .      gdpsi(1,ireg),racpsi(1,ireg),npr,ireg,xrad,yrad,fctrad,
+     .      xptxo,yptxo,xpto,ypto,nivx,nivy,nivtot,nbniv,distxo,
+     .      gdpsi(1,ireg),racpsi(1,ireg),
      .      a,gdr(1,ireg),r(1,ireg),ra(1,ireg),rho(1,ireg),
      .      somort(1,ireg),somortp(1,ireg),gdsomortp(ireg),
      .      somortpur(1,ireg),somortpurp(1,ireg),gdsomortpurp(ireg),
@@ -2963,8 +2930,8 @@ c======================================================================
      .  gdpsi,
      .  racpsi,a,
      .  gdr,r,ra,
-     .  rho,nprad,somort,ir,ipol,
-     .  somortp,nppol,gdsomortp,somortpur,somortpurp,gdsomortpurp,
+     .  rho,somort,
+     .  somortp,gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .  sompropo,sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
      .  somtot,somtotp,gdsomtotp,segt)
 

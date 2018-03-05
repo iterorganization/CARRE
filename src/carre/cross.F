@@ -3,17 +3,18 @@
       LOGICAL FUNCTION cross(ind,xx,yy,xst,yst,n)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction verifie si un segment traverse un segment de
 *  structure autre que celui sur lequel on est en train de marcher.
 
 *  arguments
       INTEGER ind, n
-      REAL*8 xx(*),yy(*),xst(n),yst(n)
+      REAL(kind=R8) xx(*),yy(*),xst(n),yst(n)
 
 *  variables locales
       INTEGER i
-      REAL*8 mult1,mult2,determ
+      REAL(kind=R8) mult1,mult2,determ
 
 c=========================
 c.. xst,yst: tableaux des coordonnees des points de la structure.

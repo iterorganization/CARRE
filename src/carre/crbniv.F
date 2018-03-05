@@ -5,7 +5,7 @@ c
 c  version : 12.05.97 14:05
 c
       IMPLICIT NONE
-
+#include <CARRETYPES.F>
 
 c*** This subroutine calculates the positions of the successive points 
 c*** on a specified level line. It stops when the line crosses a 
@@ -16,7 +16,7 @@ c*** limiting curves.
 *  arguments
       INTEGER ii,jj,k,idir,nxmax,nymax,nx,ny,npnimx,plaque,
      .     strumx,npstmx,nstruc,npstru(strumx),indstr,nbcrb,nt(2)
-      REAL*8 x(nxmax),y(nymax),f(nxmax,nymax),niv,crbx(npnimx),
+      REAL(kind=R8) x(nxmax),y(nymax),f(nxmax,nymax),niv,crbx(npnimx),
      .     crby(npnimx),xstruc(npstmx,strumx),
      .     ystruc(npstmx,strumx),xt(npnimx,2),yt(npnimx,2),
      .     x0,y0
@@ -24,12 +24,12 @@ c*** limiting curves.
 *  variables locales
       LOGICAL trvers2
       INTEGER i,j,dir,ist,jst,igrace,ngrace
-      REAL*8 determ,mult1,mult2,dist,proxim
-      parameter(proxim=1.e-8,ngrace=3)
+      REAL(kind=R8) determ,mult1,mult2,dist,proxim
+      parameter(proxim=1.0e-8_R8,ngrace=3)
 
 *  procedures
       LOGICAL milieu, trvers
-      REAL*8 interp
+      REAL(kind=R8) interp
       INTRINSIC ABS,SQRT
       EXTERNAL interp,milieu,trvers
 

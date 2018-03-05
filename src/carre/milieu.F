@@ -3,12 +3,13 @@
       LOGICAL FUNCTION milieu(f1, f2, niv)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *    Cette fonction verifie si la valeur d'une fonction niv est presente
 *  entre deux valeurs de fonction: f1 et f2.
 
 *  arguments
-      REAL*8 f1, f2, niv
+      REAL(kind=R8) f1, f2, niv
 
 c=========================
 c.. f1,f2: valeurs de la fonction aux points 1 et 2.

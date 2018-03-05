@@ -7,16 +7,17 @@ C Calculation of the distance separatrix-outer border limit
 C in the SOL-region and output on the file 'warnings.dat'
 C for the use in the automatic grid generator AGG
 c****************************************************************
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
-      REAL*8 nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo
-      REAL*8 separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto,
+      REAL(KIND=R8)
+     & nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo
+      REAL(KIND=R8)
+     & separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto,
      & distnv
       
       open (33,file='warnings.dat')
       rewind 33
       
-
-     
       adzu=100.
       adzo=100.
       bdzu=100.

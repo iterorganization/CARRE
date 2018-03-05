@@ -2,17 +2,18 @@
       LOGICAL FUNCTION in(x,y,xstr,ystr,n)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction determine si un point est a l'interieur d'une
 *  structure fermee.
 
 *  arguments
       INTEGER n
-      REAL*8 x, y, xstr(n), ystr(n)
+      REAL(kind=R8) x, y, xstr(n), ystr(n)
 
 *  variables locales
       INTEGER i
-      REAL*8 angtot,theta,prdvec,a
+      REAL(kind=R8) angtot,theta,prdvec,a
 
 *  procedures
       INTRINSIC ACOS,ABS
@@ -36,19 +37,19 @@ c=========================
       DO 10 i=1, n-1
          prdvec = (xstr(i)-x)*(ystr(i+1)-y) - (ystr(i)-y)*(xstr(i+1)-x)
 
-	 if (prdvec.ne.0.) then
+         if (prdvec.ne.0.) then
            theta = acos(((xstr(i)-x)*(xstr(i+1)-x) +
      .                   (ystr(i)-y)*(ystr(i+1)-y))/
      .                   (sqrt(((xstr(i)-x)**2+(ystr(i)-y)**2)*
      .                   ((xstr(i+1)-x)**2+(ystr(i+1)-y)**2))))
          else
-	   theta = 3.14159
-	 endif
+           theta = 3.14159_R8
+         endif
 
-         IF (prdvec.lt.0.) THEN
-            a = -1.
+         IF (prdvec.lt.0.0_R8) THEN
+            a = -1.0_R8
          ELSE
-            a = 1.
+            a = 1.0_R8
          ENDIF
 
          angtot = angtot + a*theta

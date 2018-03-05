@@ -7,8 +7,9 @@ c*** Create the input file for Carre
 c======================================================================
       implicit none
       character ofile*(*)
+#include <CARRETYPES.F>
 #include <FCRCOM.F>
-      integer*4 niscl,nrscl
+      integer(kind=I4) niscl,nrscl
       parameter (niscl=2, nrscl=4)
 c*** niscl : number of integer scalar parameters in the Carre input
 c*** nrscl : number of real scalar parameters in the Carre input
@@ -46,9 +47,9 @@ c
       write(2,'(a)') '$end'
       close(2)
 c======================================================================
-  700 format(a,3h = ,i5)
+  700 format(a,' = ',i5)
   710 format(a,'(',i1,') = ',i5)
-  720 format(a,3h = ,1p,e15.7)
+  720 format(a,' = ',1p,e15.7)
   730 format(a,'(',i1,') = ',1p,e15.7)
 c======================================================================
       end

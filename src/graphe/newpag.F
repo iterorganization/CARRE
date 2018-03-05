@@ -27,7 +27,6 @@ c  variables locales
       real zx(2),zy(2),xmi,xma,ymi,yma,etalx,etaly
 c
 c  procedures
-      REAL ABS,MAX
       INTRINSIC ABS,MAX
       EXTERNAL AGSETF,AGSETI,AGSETC,AGSTUP,WTSTR,AGBACK
      .  ,EZXY,FRAME,AGCURV,getset,cadre

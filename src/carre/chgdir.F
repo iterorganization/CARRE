@@ -2,14 +2,15 @@
       LOGICAL FUNCTION chgdir(nivox,nivoy,nivxtm,nivytm)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction verifie si 2 vecteurs sont de sens inverse ou non.
 
 *  arguments
-      REAL*8 nivox(*),nivoy(*),nivxtm(*),nivytm(*)
+      REAL(kind=R8) nivox(*),nivoy(*),nivxtm(*),nivytm(*)
 
 *  variables locales
-      REAL*8 x1,x2,y1,y2,scal
+      REAL(kind=R8) x1,x2,y1,y2,scal
 
 c=========================
 c.. nivox,nivoy: tableaux contenant les coordonnees des points du
@@ -27,7 +28,7 @@ c=========================
 
       scal = x1*x2 + y1*y2
 
-      IF (scal .LT. 0.) THEN
+      IF (scal .LT. 0.0_R8) THEN
          chgdir = .TRUE.
       ELSE
          chgdir = .FALSE.

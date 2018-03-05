@@ -4,13 +4,14 @@
      .        	ortpur,propo,varr,tot)
 ************************************************************************
       implicit none
+#include <CARRETYPES.F>
 c  calcul des fonctions qui s'annulent quand deux series de points sont
 c  disposees de facon "orthogonale".
 c
 c  arguments
       integer nppol
-      real*8 x1(nppol),y1(nppol),x2(nppol),y2(nppol),ort(nppol),pasmin,
-     .  g1,g2,l0(nppol),l2(nppol),ortpur(nppol),propo(nppol),
+      real(kind=R8) x1(nppol),y1(nppol),x2(nppol),y2(nppol),ort(nppol),
+     .  pasmin,g1,g2,l0(nppol),l2(nppol),ortpur(nppol),propo(nppol),
      .  varr(nppol),
      .  tot(nppol)
 c
@@ -25,9 +26,9 @@ c  l2: tableau des positions actuelles
 c
 c  variables locales
       integer i
-      real*8 cs1,cs2,cs3,cs4,l1m,l1p,l2m,l2p,l12,zero,fac1,fac2,fac,
-     .  l12t,un
-      parameter(zero=0.,un=1.)
+      real(kind=R8) cs1,cs2,cs3,cs4,l1m,l1p,l2m,l2p,l12,zero,
+     .  fac1,fac2,fac,l12t,un
+      parameter(zero=0._R8,un=1._R8)
 c
 c  procedures
       intrinsic sqrt
@@ -58,7 +59,7 @@ c
      .       +(y2(i)-y1(i))*(y1(i-1)-y1(i))
           cs4=(x2(i)-x1(i))*(x1(i+1)-x1(i))
      .       +(y2(i)-y1(i))*(y1(i+1)-y1(i))
-	    
+
           cs1=cs1/(l2m*l12)
           cs2=cs2/(l2p*l12)
           cs3=cs3/(l1m*l12)
@@ -68,12 +69,12 @@ c
      .      -((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2)
      .      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
      .      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
-	  ortpur=cs2+cs3-cs1-cs4
+          ortpur=cs2+cs3-cs1-cs4
           propo(i)= - ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2)
      .      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
           varr(i)= (pasmin/(l2(i)-l2(i-1)))**2-
      .             (pasmin/(l2(i+1)-l2(i)))**2
-	  tot(i)= ortpur(i) + propo(i) + varr(i)
+          tot(i)= ortpur(i) + propo(i) + varr(i)
         enddo
       else
         do i=2,nppol-1
@@ -99,12 +100,12 @@ c
           ort(i)=
      .       cs2+cs3-cs1-cs4
      .      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
-	  ortpur=cs2+cs3-cs1-cs4
+          ortpur=cs2+cs3-cs1-cs4
           propo(i)=  ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2)
      .      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
           varr(i)= (pasmin/(l2(i)-l2(i-1)))**2-
      .             (pasmin/(l2(i+1)-l2(i)))**2
-	  tot(i)= ortpur(i)- propo(i) + varr(i)
+          tot(i)= ortpur(i)- propo(i) + varr(i)
         enddo
       endif
 c

@@ -1,9 +1,8 @@
-      subroutine trace3(xminx,xmaxx,yminx,ymaxx,separx,separy,
-     .        ptsep,npx,nptot,
-     .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
-     .        nivtot,nbniv,pntrat,distxo,xn1,yn1,nn1,
-     .        repart,xptxo,yptxo,fctini,xfin,yfin,fctfin,
-     .        a00,a01,a10,a11,psi,nx,ny,x,y)
+      subroutine trace3(
+     .        nstruc,npstru,xstruc,ystruc,
+     .        pntrat,distxo,xn1,yn1,nn1,
+     .        xfin,yfin,fctfin,
+     .        psi,nx,ny,x,y)
 c======================================================================
 c
 c  version : 07.07.97 20:15
@@ -12,85 +11,48 @@ c
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 c
 c  arguments
-      integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv,
-     .      nivtot(nbniv),ptsep(4,npx),nreg, nn1,
-     .      repart,nx,ny
+      integer nstruc,npstru(strumx),nn1,nx,ny
      
-      real*8 xminx,xmaxx,yminx,ymaxx,separx(npnimx,4,npxmx),
-     .       separy(npnimx,4,npxmx),
-     .       xstruc(npstmx,strumx), ystruc(npstmx,strumx),
-     .       nivx(npnimx,nbniv),nivy(npnimx,nbniv),pntrat,distxo,
-     .       xn1(nn1),yn1(nn1),xptxo,yptxo,fctini,xfin,yfin,fctfin,
-     .       a00(nxmax,nymax,3),a01(nxmax,nymax,3),a10(nxmax,nymax,3),
-     .       a11(nxmax,nymax,3),psi(nxmax,nymax),x(nxmax),y(nymax)
+      real(kind=R8)
+     .       xstruc(npstmx,strumx),ystruc(npstmx,strumx),
+     .       pntrat,distxo,
+     .       xn1(nn1),yn1(nn1),xfin,yfin,fctfin,
+     .       psi(nxmax,nymax),x(nxmax),y(nymax)
       
 c
 c  variables locales
-      integer i,j,k,nin,nn(2),inouv,sens,npcrb(2),nt,ii,jj,dir,indstr,
-     .  plaque
-      real*8 valfct,fctnew,xt(3),yt(3),zero,xpto,ypto,fctpto
-      parameter(zero=0.)
-      real*8 xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2),x1,
-     .  x2,y1,y2
-      real xs(npnimx),ys(npnimx),xmin,xmax,ymin,ymax
-      character echx*3,echy*3
+      integer i,nin,nn(2),inouv,npcrb(2),ii,jj,dir,indstr,plaque
+      real(kind=R8) zero
+      parameter(zero=0.0_R8)
+      real(kind=R8)
+     .  xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2),
+     .  x2,y2
+      real xs(npnimx),ys(npnimx)
 c
 c  procedures
       integer ifind
       external agcurv,newpag,endpag
 c
 c  calculs
-      echx='LIN'
-      echy='LIN'
       nin=1
 
 c  Copie des variables de double a simple precision.
-
-c     xmin=0.5
-c     xmax=1.2
-c     ymin =-0.3
-c     ymax=0.5
-      xmin=xminx
-      xmax=xmaxx
-      ymin=yminx
-      ymax=ymaxx
-c***
-c     xmin=0.6
-c     xmax=0.8
-c     ymin=0.3
-c     ymax=0.46
-c***
-c***
-c     DO 2 j=1, nstruc
-c        DO 4 i=1, npstru(j)
-c
-c            xmin=MIN(xmin,xstruc(i,j))
-c            xmax=MAX(xmax,xstruc(i,j))
-c            ymin=MIN(ymin,ystruc(i,j))
-c            ymax=MAX(ymax,ystruc(i,j))
-c   4    CONTINUE
-c   2 CONTINUE
-c***
 
       if(pntrat.lt.distxo) then
 
 C     ON DESSINE LA SURFACE INTERIEURE
 
-          x1 = xn1(1)
-          y1 = yn1(1)
 C     On identifie le point de depart
         
-          valfct=fctini
 *..Psi value at the X-point
           x2=xfin
           y2=yfin
             
-          sens=1
-          
 *..Parametrisation de la ligne de niveau qui passe par ce point.
           inouv=2
           xn(1,inouv)=x2

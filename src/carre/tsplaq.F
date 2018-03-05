@@ -3,16 +3,17 @@
       LOGICAL FUNCTION tsplaq(vx,vy,k,npx,px,py)
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette fonction verifie si l'accroissement d'une courbe est monotone
 
 *  arguments
       INTEGER k, npx
-      REAL*8 vx(k), vy(k), px,py
+      REAL(kind=R8) vx(k), vy(k), px,py
 
 *  variables locales
       INTEGER i
-      REAL*8 dist1,dist2,eps_Xpt
+      REAL(kind=R8) dist1,dist2,eps_Xpt
       common /geom/ eps_Xpt
 cxpb      PARAMETER (eps=0.015)
 c!!!  attention a ce facteur de 0.05. Xavier a du l'augmenter dans
@@ -35,7 +36,7 @@ c=========================
             RETURN
          ENDIF
          IF (npx .GT. 1) THEN
-	   IF (SQRT((vx(i)-px)**2 + (vy(i)-py)**2) .LT. eps_Xpt) THEN
+           IF (SQRT((vx(i)-px)**2 + (vy(i)-py)**2) .LT. eps_Xpt) THEN
                tsplaq = .FALSE.
                RETURN
             ENDIF

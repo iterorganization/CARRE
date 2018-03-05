@@ -19,13 +19,15 @@ c=======================================================================
       implicit none
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       integer nx,ny,npx,iptx(npx),jptx(npx),
      .     nptot(4,npxmx),nstruc,npstru(strumx),
      .     indplq(4,npxmx),inddef(nbdmx),nbdef
-      real*8 x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx),
+      real(kind=R8)
+     .     x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx),
      .     fctpx(npxmx),separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
      .     xstruc(npstmx,strumx),ystruc(npstmx,strumx),
      .     a00(nxmax,nymax,3),a10(nxmax,nymax,3),
@@ -34,7 +36,7 @@ cank-970707: dimensions from the file
 *  variables locales
       integer ipx,ix,jx,isep,i1,i2,j1,j2,iref,jref,k,idir,
      .  indstr,plaque,nbdfav,nt(2),ixp_hlp(nbdmx),idirloop
-      real*8 xsttmp(nbdmx),ysttmp(nbdmx)
+      real(kind=R8) xsttmp(nbdmx),ysttmp(nbdmx)
       integer i,j     !!!
       integer incri(4),incrj(4),incrir(4),incrjr(4),ic
       data incri  /0, -1,  0,  1/,  incrj  / 1, 0, -1,  0/
@@ -43,7 +45,6 @@ cank-970707: dimensions from the file
 *  procedures
       logical milieu
       real*8 interp
-      intrinsic int,mod
       external crbniv,insert,interp,milieu,orddef
 c=======================================================================
 
@@ -104,7 +105,7 @@ c*** the one with X-point to reduce the effect of noise.
         i2=ix+2
         j2=jx-1
         do idirloop=1,4 !{
-	  idir=idirloop
+          idir=idirloop
           nbdfav=nbdef
 c<<<
           write(0,*)

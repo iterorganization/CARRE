@@ -3,18 +3,19 @@
 c  version : 21.07.2000 16:18
 c=======================================================================
       implicit none
+#include <CARRETYPES.F>
 
 c*** Calculate the x and y coordinates of a point located on a curve v 
 c*** at a distance d from the origin of the curve
 
 *  arguments
       integer n
-      real*8 vx(n),vy(n),d,x,y
+      real(kind=R8) vx(n),vy(n),d,x,y
 
 *  variables locales
       integer i
-      real*8 dist,distot,eps
-      parameter (eps=1.e-06)
+      real(kind=R8) dist,distot,eps
+      parameter (eps=1.0e-06_R8)
 
 *  procedures
       intrinsic sqrt
@@ -30,7 +31,7 @@ c========================
 
 *..Initialisation.
 
-      distot = 0.0
+      distot = 0.0_R8
 
 *..Loop over the curve segments
 

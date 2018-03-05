@@ -15,12 +15,13 @@ c======================================================================
 
 cank-970702: moved dimensions into a separate file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 *  arguments
       INTEGER npxtot,npx,ii(gradmx),jj(gradmx),iptx(npxmx),
-     .        jptx(npxmx),limcfg,ios
-      REAL*8 pointx(gradmx),pointy(gradmx),ptx(npxmx),pty(npxmx),
+     .        jptx(npxmx),limcfg
+      REAL(kind=R8) pointx(gradmx),pointy(gradmx),ptx(npxmx),pty(npxmx),
      .       xpto,ypto
       LOGICAL racord
 
@@ -29,10 +30,10 @@ cank-970702: moved dimensions into a separate file
 
 *  variables locales
       INTEGER i, j, k, ipx, ipo, iptxtm, jptxtm
-      REAL*8 ptxtmp,ptytmp,eps_hlp
-      CHARACTER rep*1, ch*2
+      REAL(KIND=R8) ptxtmp,ptytmp,eps_hlp
+      CHARACTER rep*1
 c*** Tolerance for coinciding X-points
-      parameter (eps_hlp=1.e-5)
+      parameter (eps_hlp=1.0e-5_R8)
 cank-970701 <<<
 c*** Automatic definition of the X- and O-points from DG data
 c***
@@ -62,9 +63,9 @@ c
       integer nptxm,nptx,lun,lconn
       parameter (nptxm=2)
       integer kptx(nptxm)
-      real*8 xptxm(nptxm),yptxm(nptxm),xptom,yptom,
+      real(kind=R8) xptxm(nptxm),yptxm(nptxm),xptom,yptom,
      ,                         xpttol,xptdist(gradmx),rdist,x1,x2,y1,y2
-c      parameter (xpttol=5.e-2)
+c      parameter (xpttol=5.0e-2_R8)
       logical ex,op
 cank>>>
 c======================================================================
@@ -89,7 +90,7 @@ c======================================================================
 
   2   npx = 0
       do i=1,nptxm
-	kptx(i)=0
+        kptx(i)=0
       enddo
       lconn=-1
 
@@ -119,8 +120,8 @@ c*** Check whether the point specification file is present
           read(lun,*,err=14) xptom,yptom
 c*** lconn>0 means "connect x-points")
           read(lun,*,end=11, err=111) lconn
-	  go to 11
- 111  	  lconn=-1
+          go to 11
+ 111      lconn=-1
 
 c*** Set the absolute tolerance for each candidate point
 
@@ -144,7 +145,7 @@ c
               if(k.eq.0) then
                 k=i
               else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k))
-     .      	      	      	      	      	      .gt.eps_hlp) then
+     .                       .gt.eps_hlp) then
                 write(*,*) 'Ambiguous definition of the O-point: ',
      ,                         'points ',k,'  and ',i,'  are too close'
                 ex=.false.
@@ -167,7 +168,7 @@ c
                 if(k.eq.0) then
                   k=i
               else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k))
-     .      	      	      	      	      	      .gt.eps_hlp) then
+     .                       .gt.eps_hlp) then
                   write(*,*) 'Ambiguous definition of the X-point',
      ,                     j,': points ',k,'  and ',i,'  are too close'
                   ex=.false.
@@ -208,16 +209,16 @@ c
             write(*,'(1x,a9,1p,2e14.4/(10x,2e14.4))')
      -           'X-point: ',(pointx(kptx(i)),pointy(kptx(i)),i=1,nptx)
             if(nptx.gt.1) then
-	      if(lconn.gt.0) then
-	      	write(*,*) 'Connected double-null'
-	      else if(lconn.eq.0) then
-	      	write(*,*) 'Disconnected double-null'
+              if(lconn.gt.0) then
+                write(*,*) 'Connected double-null'
+              else if(lconn.eq.0) then
+                write(*,*) 'Disconnected double-null'
               end if
             end if
           else
             write(*,*) 'No X-point - limiter configuration'
           end if
-	  
+
           write(*,*)
           write(*,*) 'Do you accept the selection (y/n)?'
           read(*,'(a)') rep
@@ -273,7 +274,7 @@ c-langue
           write(6,*)' -1   pour une configuration limiteur'
           write(6,*)' Pour une configuration deflecteur, selectionnez',
      .    ' le ou les points X.'
-	  
+
 c       write(6,*)' Choisissez en donnant l''indice approprie.'
         elseif(sellan(1:7).eq.'english') then
           WRITE(6,225) (i,pointx(i),pointy(i), i=1, npxtot)
@@ -290,7 +291,7 @@ c       write(6,*)' Choose option by typing the appropriate index.'
 *..Indexation des points X.
 
    30   CONTINUE
-      
+
         READ (5,*, end=31, err=666) ipx
         GO TO 31
   666   if(sellan(1:8).eq.'francais') then
@@ -299,8 +300,8 @@ c       write(6,*)' Choose option by typing the appropriate index.'
           PRINT *, "Invalid input. Please try again."
         end if
         go to 2
-   31	continue
-        if (ipx.lt.-1 .or. ipx.gt.npxtot) goto 666 
+   31   continue
+        if (ipx.lt.-1 .or. ipx.gt.npxtot) goto 666
 
         IF (ipx.GT.0) THEN
           npx = npx + 1
@@ -356,7 +357,7 @@ cank-970701
      .       ' Voulez-vous que les points X soient raccordes? (o/n)'
           else if(sellan(1:7).eq.'english') then
             write(6,*) 'Do you wish to force connection ',
-     .        	      	      	      	'of the two X-points (y/n)?'
+     .                 'of the two X-points (y/n)?'
           end if
           read(5,35) rep
    35     format (a)
@@ -395,7 +396,7 @@ cank-970701
       end if
 
 cnba  The 'endpag' call below closes the graphics window opened by 'cntour'.
-cnba  L'appel a 'endpag' ci-dessous ferme la fenetre graphique ouverte par 
+cnba  L'appel a 'endpag' ci-dessous ferme la fenetre graphique ouverte par
 cnba  'cntour'.
       call endpag
 

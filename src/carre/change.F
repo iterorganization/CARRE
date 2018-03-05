@@ -6,6 +6,7 @@ c  version : 07.07.97 18:38
 c
 ************************************************************************
       IMPLICIT NONE
+#include <CARRETYPES.F>
 
 *..  Cette sous-routine remplace la valeur d'une variable par une
 *  nouvelle valeur desiree. Elle est appelee pour la lecture des parame-
@@ -18,7 +19,7 @@ cank-970707: dimensions from the file
 
 *  arguments
       INTEGER nptseg(10),repart,npr(nregmx),ient,isor,ifail
-      REAL*8 deltp1(10),deltpn(10),deltr1(10),deltrn(10),pntrat
+      REAL(kind=R8) deltp1(10),deltpn(10),deltr1(10),deltrn(10),pntrat
      .       ,tgarde(4),distxo
 
 *  variables locales
