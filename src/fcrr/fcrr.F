@@ -44,10 +44,10 @@ c
       call import(fcrtrn)
       open(1,file=chstr)
       call fcrstri(1)
-      open(1,file=chequ)
-      call fcrfldi(1)
       open(1,file=chdgo)
       call import(fcrdgi)
+      open(1,file=chequ)
+      call fcrfldi(1)
       inquire(file=chaux,exist=ex)
       if(ex) then
         open(1,file=chaux)

@@ -18,6 +18,16 @@ c
 c      nsgm=3
 c      nrgn=3
 c
+c*** Convert data for limiter configurations
+      if (lm_cnfg.eq.1) then
+        write (*,*) 'Limiter configuration'
+        npr(2)=npr(nrgn)
+        nptseg(1)=nptseg(nsgm)
+        deltr1(2)=deltr1(nrgn)
+        deltrn(2)=deltrn(nrgn)
+        nrgn=2
+        pntrat = lm_pntrt
+      end if
 c*** Check the data
 c
       ex=.false.
@@ -125,7 +135,7 @@ c
 #ifdef DBG
       write(0,*) 'fcrprp: ldgv2 = ',ldgv2
 #endif
-      if(.not.ldgv2) then
+      if(.not.ldgv2.and.lm_cnfg.eq.0) then
 c
 c*** Re-arrange the input data to fit the Carre conventions
 c*** (lower single-null configuration created with old DG)
@@ -166,7 +176,7 @@ c
         deltp1(i)=0.001*deltp1(i)
         deltpn(i)=0.001*deltpn(i)
       end do
-      pntrat=0.001*pntrat
+      if (lm_cnfg.eq.0) pntrat=0.001*pntrat
 c
 c*** ... and the poloidal flux from wb/rad (DG) to wb (Carre)
 c
