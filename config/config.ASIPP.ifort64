@@ -19,7 +19,7 @@ CPP		    = /lib/cpp -C -traditional
 ifdef SOLPS_DEBUG
 FFLAGS 		= -g -C -debug all -traceback -check all
 else
-FFLAGS		= -O -vec_report0
+FFLAGS		= -O
 endif
 
 DBLPAD		= 
