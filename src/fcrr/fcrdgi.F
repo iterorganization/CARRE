@@ -11,7 +11,7 @@ c======================================================================
       character*(*) nam
 c
       integer nnms
-      parameter (nnms=4)
+      parameter (nnms=7)
       integer i, j, lutrg
       character*8 name, unm(nnms)
       logical streql
@@ -19,13 +19,14 @@ c
 c
 c*** List of the valid input keywords
       data unm /
-     1    'xptcntr ','xlpcntr ','trg_spcf','tgtgrd  '/
+     1    'xptcntr ','xlpcntr ','trg_spcf','tgtgrd  ','lm_cnfg ',
+     2    'lm_pntrt','lm_grcln'/
       data lutrg / 0 /
 c======================================================================
 c
       call locase(nam,name,8)
       do i=1,nnms
-        if(streql(name,unm(i))) go to (10,20,30,40),i
+        if(streql(name,unm(i))) go to (10,20,30,40,50,60,70),i
       end do
       call skipit
       return
@@ -66,6 +67,15 @@ c*** tgtgrd
       else !}{
         call resime(tgarde(lutrg))
       end if !}
+      return
+c***  lm_cnfg
+ 50   call resimi(lm_cnfg)
+      return
+c***  lm_pntrt
+ 60   call resime(lm_pntrt)
+      return
+c***  lm_grcln
+ 70   call resime(lm_grcln)
       return
 c======================================================================
       end

@@ -1,15 +1,12 @@
 #  VERSION : 01.04.2015
 
 # check if necessary variables are correctly defined
-ifndef MSCL_ROOT
-  $(error MSCL_ROOT not defined)
+ifndef LD_MSCL
+  $(error LD_MSCL not defined)
 endif
-ifndef NCARG_ROOT
-  $(error NCARG_ROOT not defined)
+ifndef LD_NCARG
+  $(error LD_NCARG not defined)
 endif
-LD_MSCL   ?= -L{MSCL_ROOT} -lmscl
-LD_NCARG  ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm # for NCARG v4.x.x
-
 
 DEFINES 	= 
 
@@ -19,7 +16,7 @@ CPP		    = /lib/cpp -C -traditional
 ifdef SOLPS_DEBUG
 FFLAGS 		= -g -C -debug all -traceback -check all
 else
-FFLAGS		= -O
+FFLAGS		= -O -vec_report0
 endif
 
 DBLPAD		= 
