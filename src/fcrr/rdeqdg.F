@@ -1,5 +1,4 @@
-      subroutine rdeqdg(lun,ngpr,ngpz,iret, nr,nz,
-     ,                                             btf,rtf,rgr,zgr,pfm)
+      subroutine rdeqdg(lun,ngpr,ngpz,iret,nr,nz,btf,rtf,rgr,zgr,pfm)
 c=====================================================
 c*** Read the equilibrium data written in the dg compatible format.
 c***
@@ -23,10 +22,14 @@ c=====================================================
 c
 c  version : 25.02.98 20:54
 c
-      real*8 rgr(*), zgr(*), pfm(ngpr, *)
+      implicit none
+#include "CARRETYPES.F"
+      integer lun, ngpr, ngpz, iret, nr, nz
+      real(kind=R8) :: rgr(*), zgr(*), pfm(ngpr, *)
 c... toroidal field in tesla, radius in m
-      real*8 btf, rtf
+      real(kind=R8) :: btf, rtf
       real ubtf, urtf
+      integer i, j
 c-----------------------------------------------------
 c
 c*** Read the plasma equilibrium ...
