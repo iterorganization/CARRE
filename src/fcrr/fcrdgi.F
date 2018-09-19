@@ -13,6 +13,7 @@ c
       integer nnms
       parameter (nnms=7)
       integer i, j, lutrg
+      real(kind=R4) x(3), xarray(3,nxptm), rdummy
       character*8 name, unm(nnms)
       logical streql
       external streql
@@ -32,28 +33,28 @@ c
       return
 c-----------------------------------------------------------------------
 c*** xptcntr
- 10   call rearre(xptcntr,3*nxptm,i)
+ 10   call rearre(xarray,3*nxptm,i)
       nxpt=0
       if(i.lt.2) then
         write(*,*) '*** fcrtrn: too few values for xptcntr'
-        xptcntr(1,1)=-1.
+        xptcntr(1,1)=-1.0_R8
       else
         nxpt=max(i/3,1)
         do j=1,nxpt
           do i=1,3
-            xptcntr(i,j)=0.001*xptcntr(i,j)
+            xptcntr(i,j)=0.001_R8*real(xarray(i,j),R8)
           end do
         end do
       end if
       return
 c*** xlpcntr
- 20   call rearre(xlpcntr,3,i)
+ 20   call rearre(x,3,i)
       if(i.lt.2) then
         write(*,*) '*** fcrtrn: too few values for xlpcntr'
-        xlpcntr(1)=-1.
+        xlpcntr(1)=-1.0_R8
       else
-        xlpcntr(1)=0.001*xlpcntr(1)
-        xlpcntr(2)=0.001*xlpcntr(2)
+        xlpcntr(1)=0.001_R8*real(x(1),R8)
+        xlpcntr(2)=0.001_R8*real(x(2),R8)
       end if
       return
 c*** trg_spcf
@@ -65,7 +66,8 @@ c*** tgtgrd
         write(*,*) 'Target index outside limits: ',lutrg
         stop ' ==> Corrupted DG output files?' 
       else !}{
-        call resime(tgarde(lutrg))
+        call resime(rdummy)
+        tgarde(lutrg) = real(rdummy,R8)
       end if !}
       return
 c***  lm_cnfg

@@ -7,6 +7,7 @@ c*** Converts the dg data into the input files for Carre
 c======================================================================
 c      implicit none
 #include <CARRETYPES.F>
+#include <FCRCOM.F>
 #include <impcon.inc>
       logical ex
       character*14 chtrg,chstr,chequ,chaux,chdgo,
@@ -43,18 +44,22 @@ c
       open(1,file=chtrg)
       call fcrchktp(1)
       call import(fcrtrn)
+      close(1)
       open(1,file=chstr)
       call fcrstri(1)
+      close(1)
       open(1,file=chdgo)
       call import(fcrdgi)
+      close(1)
       open(1,file=chequ)
       call fcrfldi(1)
+      close(1)
       inquire(file=chaux,exist=ex)
       if(ex) then
         open(1,file=chaux)
         call import(fcraxn)
+        close(1)
       end if
-      close(1)
 c
 c*** ... make the necessary transformations
 c

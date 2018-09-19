@@ -15,9 +15,9 @@ c======================================================================
       logical ex
 c======================================================================
 c
-      rbtor=0.
-      btf=0.
-      rtf=0.
+      rbtor=0.0_R8
+      btf=0.0_R8
+      rtf=0.0_R8
       inquire(file='field.dg',exist=ex)
       if(ex) then
         open(lun+2,file='field.dg')
@@ -30,7 +30,7 @@ c
       end if
       if(ex) close(lun+2)
       rbtor=rtf*btf
-      if(rbtor.ne.0.) return                                           ! DPC
+      if(rbtor.ne.0.0_R8) return                                       ! DPC
 c======================================================================
       write(*,*) 'fcrfldi: no data on the toroidal field found.'
       write(*,*) 'These data should be either in the equilibrium file',

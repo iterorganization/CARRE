@@ -12,6 +12,7 @@ c======================================================================
 c
       integer nnm
       parameter (nnm=7)
+      real(kind=4) rdummy, rarray(ntrgx)
       character*8 name, nms(nnm)
       integer i
       logical streql
@@ -34,15 +35,20 @@ c
       return
  20   call resimi(nrelax)
       return
- 30   call resime(relax)
+ 30   call resime(rdummy)
+      relax = real(rdummy,R8)
       return
- 40   call resime(pasmin)
+ 40   call resime(rdummy)
+      pasmin = real(rdummy,R8)
       return
- 50   call resime(rlcept)
+ 50   call resime(rdummy)
+      rlcept = real(rdummy,R8)
       return
- 60   call rearre(tgarde,ntrgx,ntrg)
+ 60   call rearre(rarray,ntrgx,ntrg)
+      tgarde(1:ntrg) = real(rarray(1:ntrg),R8)
       return
- 70   call resime(xpttol)
+ 70   call resime(rdummy)
+      xpttol = real(rdummy,R8)
       return
 c======================================================================
       end

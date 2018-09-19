@@ -14,6 +14,7 @@ c
       integer nnms
       parameter (nnms=8)
       integer i
+      real(kind=R4) rdummy(1), rarray(nrgnx), parray(nsgmx)
       character*8 name, unm(nnms), uline*80
       logical streql
       external streql
@@ -36,7 +37,7 @@ c----------------------------------------------------------------------
         if(nrgn.gt.0) then
           if(nrgn.ne.i) then
             write(0,*) 'Inconsistent number of regions found for npr:',
-     ,                  i,'  instead of ',nrgn
+     ,                  i,' instead of ',nrgn
           end if
           nrgn=max(nrgn,i)
         else
@@ -49,7 +50,7 @@ c----------------------------------------------------------------------
         if(nsgm.gt.0) then
           if(nsgm.ne.i) then
             write(0,*) 'Inconsistent number of sections found for ',
-     ,                  'nptseg:',i,'  instead of ',nsgm
+     ,                  'nptseg:',i,' instead of ',nsgm
           end if
           nsgm=max(nsgm,i)
         else
@@ -57,59 +58,64 @@ c----------------------------------------------------------------------
         end if
       end if
       return
- 30   call rearre(deltr1,nrgnx,i)
+ 30   call rearre(rarray,nrgnx,i)
       if(i.gt.0) then
         if(nrgn.gt.0) then
           if(nrgn.ne.i) then
             write(0,*) 'Inconsistent number of regions found for ',
-     ,                  'deltr1:',i,'  instead of ',nrgn
+     ,                  'deltr1:',i,' instead of ',nrgn
           end if
           nrgn=max(nrgn,i)
         else
           nrgn=i
         end if
+        deltr1(1:i) = real(rarray(1:i),R8)
       end if
-       return
- 40   call rearre(deltrn,nrgnx,i)
+      return
+ 40   call rearre(rarray,nrgnx,i)
       if(i.gt.0) then
         if(nrgn.gt.0) then
           if(nrgn.ne.i) then
             write(0,*) 'Inconsistent number of regions found for ',
-     ,                  'deltrn:',i,'  instead of ',nrgn
+     ,                  'deltrn:',i,' instead of ',nrgn
           end if
           nrgn=max(nrgn,i)
         else
           nrgn=i
         end if
+        deltrn(1:i) = real(rarray(1:i),R8)
       end if
       return
- 50   call rearre(deltp1,nsgmx,i)
+ 50   call rearre(parray,nsgmx,i)
       if(i.gt.0) then
         if(nsgm.gt.0) then
           if(nsgm.ne.i) then
             write(0,*) 'Inconsistent number of sections found for ',
-     ,                  'deltp1:',i,'  instead of ',nsgm
+     ,                  'deltp1:',i,' instead of ',nsgm
           end if
           nsgm=max(nsgm,i)
         else
           nsgm=i
         end if
+        deltp1(1:i) = real(parray(1:i),R8)
       end if
       return
- 60   call rearre(deltpn,nsgmx,i)
+ 60   call rearre(parray,nsgmx,i)
       if(i.gt.0) then
         if(nsgm.gt.0) then
           if(nsgm.ne.i) then
             write(0,*) 'Inconsistent number of sections found for ',
-     ,                  'deltpn:',i,'  instead of ',nsgm
+     ,                  'deltpn:',i,' instead of ',nsgm
           end if
           nsgm=max(nsgm,i)
         else
           nsgm=i
         end if
+        deltpn(1:i) = real(parray(1:i),R8)
       end if
       return
- 70   call resime(pntrat)
+ 70   call rearre(rdummy,1,i)
+      pntrat = real(rdummy(1),R8)
       return
  80   call resimi(nclstr)
       return

@@ -9,12 +9,11 @@ c
      ,  nr,nz,
      ,  lm_cnfg
       logical ldgv2
-      real(kind=R4) relax,pasmin,rlcept,pntrat,
-     ,  deltp1(nsgmx),deltr1(nrgnx),
-     ,  deltpn(nsgmx),deltrn(nrgnx),tgarde(ntrgx),
-     ,  xstr(nmstr),ystr(nmstr),rbtor,
-     ,  xptcntr(3,nxptm),xlpcntr(3),xpttol,
-     ,  lm_pntrt,lm_grcln
+      real(kind=R4) lm_pntrt,lm_grcln
+      real(kind=R8)
+     ,  deltr1(nrgnx),deltrn(nrgnx),deltp1(nsgmx),deltpn(nsgmx),
+     ,  xstr(nmstr),ystr(nmstr),xptcntr(3,nxptm),xlpcntr(3),
+     ,  rbtor,relax,rlcept,pasmin,xpttol,pntrat,tgarde(ntrgx)
       real(kind=R8) pfm(ngpr,ngpz),rgr(ngpr),zgr(ngpz)
       common/fcrcom/pfm,rgr,zgr,
      ,  relax,pasmin,rlcept,pntrat,

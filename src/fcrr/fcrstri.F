@@ -10,6 +10,7 @@ c======================================================================
 #include <CARRETYPES.F>
 #include <FCRCOM.F>
       integer i,j,k,l,n
+      real(kind=R4) x, y
 c======================================================================
 c
       rewind(lun)
@@ -20,9 +21,9 @@ c
         read(lun,*,err=900) k
         do j=1,k
           l=l+1
-          read(lun,*,err=900) xstr(l),ystr(l)
-          xstr(l)=1.e-3*xstr(l)
-          ystr(l)=1.e-3*ystr(l)
+          read(lun,*,err=900) x,y
+          xstr(l)=1.e-3_R8*real(x,R8)
+          ystr(l)=1.e-3_R8*real(y,R8)
         end do
         nstr=nstr+1
         lstr(nstr)=k

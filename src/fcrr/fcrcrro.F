@@ -15,7 +15,7 @@ c*** niscl : number of integer scalar parameters in the Carre input
 c*** nrscl : number of real scalar parameters in the Carre input
       integer i,j
       integer iprmeq(niscl)
-      real rprmeq(nrscl)
+      real(kind=R8) rprmeq(nrscl)
       equivalence (iprmeq,repart), (rprmeq,relax)
       character*8 chiprm(niscl),chrprm(nrscl)
       data chiprm / 'repart  ','nrelax  '/

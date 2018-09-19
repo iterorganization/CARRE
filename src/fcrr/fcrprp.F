@@ -10,9 +10,9 @@ c======================================================================
 #include <FCRCOM.F>
       integer i, j
       logical ex,uex
-      real u, dpi
-      real tgtgrd(4)
-      parameter (dpi=2.*3.14159 26535 89793 23846 26433 83280)
+      real(kind=R8) u, dpi
+      real(kind=R8) tgtgrd(4)
+      parameter (dpi=2.*3.14159 26535 89793 23846 26433 83280_R8)
 c======================================================================
 c*** (lower single-null configuration)
 c
@@ -27,7 +27,7 @@ c*** Convert data for limiter configurations
         deltr1(2)=deltr1(nrgn)
         deltrn(2)=deltrn(nrgn)
         nrgn=2
-        pntrat = lm_pntrt
+        pntrat = real(lm_pntrt,R8)
       end if
 c*** Check the data
 c
@@ -44,21 +44,21 @@ c
         ex=.true.
         write (*,*) 'fcrprp: wrong value of nrelax',nrelax
       end if
-      if(relax.le.0.) then
+      if(relax.le.0.0_R8) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of relax',relax
       end if
-      if(pasmin.le.0.) then
+      if(pasmin.le.0.0_R8) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of pasmin',pasmin
       end if
-      if(rlcept.le.0.) then
+      if(rlcept.le.0.0_R8) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of rlcept',rlcept
       end if
       uex=.false.
       do i=1,nrgn
-      	uex=uex .or. npr(i).le.1
+        uex=uex .or. npr(i).le.1
       end do
       if(uex) then
         ex=.true.
@@ -67,7 +67,7 @@ c
       end if
       uex=.false.
       do i=1,nsgm
-      	uex=uex .or. nptseg(i).le.1
+        uex=uex .or. nptseg(i).le.1
       end do
       if(uex) then
         ex=.true.
@@ -76,7 +76,7 @@ c
       end if
       uex=.false.
       do i=1,nrgn
-      	uex=uex .or. deltr1(i).eq.0
+        uex=uex .or. deltr1(i).eq.0.0_R8
       end do
       if(uex) then
         ex=.true.
@@ -85,7 +85,7 @@ c
       end if
       uex=.false.
       do i=1,nrgn
-      	uex=uex .or. deltrn(i).eq.0
+        uex=uex .or. deltrn(i).eq.0.0_R8
       end do
       if(uex) then
         ex=.true.
@@ -94,7 +94,7 @@ c
       end if
       uex=.false.
       do i=1,nsgm
-      	uex=uex .or. deltp1(i).eq.0
+        uex=uex .or. deltp1(i).eq.0.0_R8
       end do
       if(uex) then
         ex=.true.
@@ -103,7 +103,7 @@ c
       end if
       uex=.false.
       do i=1,nsgm
-      	uex=uex .or. deltpn(i).eq.0
+        uex=uex .or. deltpn(i).eq.0.0_R8
       end do
       if(uex) then
         ex=.true.
@@ -174,10 +174,10 @@ c
 c*** ... re-scale the poloidal dimensions from mm (DG) to m (Carre)
 c
       do i=1,nsgm
-        deltp1(i)=0.001*deltp1(i)
-        deltpn(i)=0.001*deltpn(i)
+        deltp1(i)=0.001_R8*deltp1(i)
+        deltpn(i)=0.001_R8*deltpn(i)
       end do
-      if (lm_cnfg.eq.0) pntrat=0.001*pntrat
+      if (lm_cnfg.eq.0) pntrat=0.001_R8*pntrat
 c
 c*** ... and the poloidal flux from wb/rad (DG) to wb (Carre)
 c

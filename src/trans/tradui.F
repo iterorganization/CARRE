@@ -12,6 +12,7 @@ c======================================================================
 
 cank-970707: dimensions from the file
 *  dimensions
+#include <CARRETYPES.F>
 #include <CARREDIM.F>
 
 c  variables locales
@@ -20,11 +21,11 @@ c  variables locales
       integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx),
      ,        nptseg(10),repart,npr(10),ifail,nx,ny,
      ,        ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1)
-      real r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx),
+      real(kind=R8) r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx),
      .  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx),
      .  psidym(npmamx,nrmamx,nregmx),deltp1(10),deltpn(10),deltr1(10),
      .  deltrn(10),tgarde(4),distxo,pntrat
-      real crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3),
+      real(kind=R8) crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3),
      .  bb(-1:nxmx,-1:nymx,0:3),b0r0,
      .  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3),
      .  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3)
