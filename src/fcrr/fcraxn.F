@@ -12,7 +12,7 @@ c======================================================================
 c
       integer nnm
       parameter (nnm=7)
-      real(kind=4) rdummy, rarray(ntrgx)
+      real(kind=R4) rdummy, rarray(ntrgx)
       character*8 name, nms(nnm)
       integer i
       logical streql
