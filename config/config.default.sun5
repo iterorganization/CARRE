@@ -8,24 +8,23 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-FC		    = f90
-CPP		    = /usr/ccs/lib/cpp
+FC      = f90
+CPP     = /usr/ccs/lib/cpp
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C 
+FFLAGS  = -g -C 
 else
-FFLAGS		= -O
+FFLAGS  = -O
 endif
 
-DBLPAD		= -r8 -i4
-DBLPAD		= -xtypemap=real:64,double:64,integer:32
+DBLPAD  = -r8 -i4
+DBLPAD  = -xtypemap=real:64,double:64,integer:32
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-LDLIBS		= ${LD_MSCL} ${LD_NCARG}
-LDFLAGS 	= -lsocket
-LDEXTRA         = 
-LDEXTRA 	= -lf77compat
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = -lsocket
+LDEXTRA = -lf77compat
 
 #!!!Local Variables:
 #!!! mode: Makefile

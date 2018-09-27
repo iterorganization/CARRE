@@ -8,24 +8,24 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-DEFINES 	= 
+DEFINES = 
 
-FC		    = ifort
-CPP		    = /lib/cpp -traditional
+FC      = ifort
+CPP     = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS 		= -g -C -debug all -traceback -check all
+FFLAGS  = -g -C -debug all -traceback -check all
 else
-FFLAGS		= -O
+FFLAGS  = -O
 endif
 
-DBLPAD		= 
+DBLPAD  = 
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-LDLIBS		= ${LD_MSCL} ${LD_NCARG}
-LDFLAGS 	= 
-LDEXTRA   = 
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
+LDEXTRA = 
 
 #!!!Local Variables:
 #!!! mode: Makefile

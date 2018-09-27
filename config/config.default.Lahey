@@ -8,24 +8,24 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-# LINK_NCARG	  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
+# LINK_NCARG  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
-DEFINES 	= -DFortran_90
+DEFINES = -DFortran_90
 
-FC		= f95f
-CPP		= /lib/cpp -C -traditional
+FC      = f95f
+CPP     = /lib/cpp -C -traditional
 
-FFLAGS		= -O --tpp
+FFLAGS  = -O --tpp
 
-DBLPAD		= --dbl
+DBLPAD  = --dbl
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-#NCAR	 	= ${NCARG} ${NCARG_ROOT}/BD/*.o
-LDLIBS		= ${LD_MSCL} ${LD_NCARG} -L/usr/X11R6/lib
-#LDFLAGS 	= 
-LDFLAGS 	= -lX11 -lm 
-#DUMMY           = builds/${HOST_NAME}.${COMPILER}/bidon.o 
+#NCAR   = ${NCARG} ${NCARG_ROOT}/BD/*.o
+LDLIBS  = ${LD_MSCL} ${LD_NCARG} -L/usr/X11R6/lib
+#LDFLAGS = 
+LDFLAGS = -lX11 -lm 
+#DUMMY  = builds/${HOST_NAME}.${COMPILER}/bidon.o 
 
 #!!!Local Variables:
 #!!! mode: Makefile

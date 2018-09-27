@@ -6,22 +6,22 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-FC		= f95i
-CPP		= /lib/cpp -C -traditional
+FC      = f95i
+CPP     = /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -O -C
+FFLAGS  = -g -O -C
 else
-FFLAGS		= -O3 -tpp7
+FFLAGS  = -O3 -tpp7
 endif
 
-DBLPAD		= -Ad 
+DBLPAD  = -Ad 
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-LDLIBS		= ${LD_MSCL} ${LD_NCARG}
-LDFLAGS 	= 
-LDEXTRA 	= 
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
+LDEXTRA = 
 
 #!!!Local Variables:
 #!!! mode: Makefile

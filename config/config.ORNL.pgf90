@@ -9,23 +9,23 @@ LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG  ?= -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
 
-DEFINES   = 
+DEFINES = 
 
-FC		    = pgf90
-CPP		    = /lib/cpp -traditional
+FC      = pgf90
+CPP     = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C 
+FFLAGS  = -g -C 
 else
-FFLAGS		= -O
+FFLAGS  = -O
 endif
 
-DBLPAD		= -r8 -i4
+DBLPAD  = -r8 -i4
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-LDLIBS		= ${LD_MSCL} ${LD_NCARG}
-LDFLAGS 	= 
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
 
 
 #!!!Local Variables:

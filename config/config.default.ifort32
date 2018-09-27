@@ -8,28 +8,28 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-# LINK_NCARG	  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
+# LINK_NCARG  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
-DEFINES 	= 
+DEFINES = 
 
-FC		= ifort
-CPP		= /lib/cpp -C -traditional
+FC      = ifort
+CPP     = /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS 		= -g -C -debug all
+FFLAGS  = -g -C -debug all
 else
-FFLAGS		= -O -vec_report0
+FFLAGS  = -O -vec_report0
 endif
 
-DBLPAD		= 
+DBLPAD  = 
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-#NCAR	 	= ${NCARG} ${NCARG_ROOT}/BD/*.o
-LDLIBS		= ${LD_MSCL} ${LD_NCARG}
-LDFLAGS 	= 
-#LDFLAGS 	= -lX11 -lm -lmscl
-#DUMMY           = builds/${HOST_NAME}.${COMPILER}/bidon.o 
+#NCAR = ${NCARG} ${NCARG_ROOT}/BD/*.o
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
+#LDFLAGS = -lX11 -lm -lmscl
+#DUMMY   = builds/${HOST_NAME}.${COMPILER}/bidon.o 
 
 #!!!Local Variables:
 #!!! mode: Makefile

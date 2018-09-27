@@ -11,24 +11,24 @@ LD_MSCL   ?= -L{MSCL_ROOT} -lmscl
 LD_NCARG  ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm # for NCARG v4.x.x
 
 
-DEFINES 	= 
+DEFINES    = 
 
-FC		    = ifort
-CPP		    = /lib/cpp -C -traditional
+FC         = ifort
+CPP        = /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS 		= -g -C -debug all -traceback -check all
+FFLAGS     = -g -C -debug all -traceback -check all
 else
-FFLAGS		= -O
+FFLAGS     = -O
 endif
 
-DBLPAD		= 
+DBLPAD     = 
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE    = ${FC} -c ${FFLAGS}
 
-LDLIBS		= ${LD_MSCL} ${LD_NCARG}
-LDFLAGS 	= 
-LDEXTRA   = 
+LDLIBS     = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS    = 
+LDEXTRA    = 
 
 #!!!Local Variables:
 #!!! mode: Makefile

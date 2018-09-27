@@ -8,28 +8,28 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-# LINK_NCARG	  = -Wl,-L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
+# LINK_NCARG  = -Wl,-L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
-DEFINES 	= -DHPUX
+DEFINES = -DHPUX
 
-FC		= f77
-CPP		= /lib/cpp
+FC      = f77
+CPP     = /lib/cpp
 
 ifdef SOLPS_DEBUG
-FFLAGS		= -g -C +FPOZV
+FFLAGS  = -g -C +FPOZV
 else
-FFLAGS		= +O3
+FFLAGS  = +O3
 endif
 
-DBLPAD		= 
+DBLPAD  = 
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-# LDLIBS	= -Wl,-L${SOLPSLIB} -Wl,-L${SOLPSMASTER}/@sys/lib -Wl,-L/usr/local/lib
-LDLIBS		= -Wl, ${LD_MSCL} -Wl,${LD_NCARG} -Wl,-L/usr/lib/X11R5
-#LDFLAGS 	= -lncarg -lncarg_gks -lncarg_c -lncarg_loc -lmach -lX11 -lm
-LDFLAGS 	= -lmach
-LDEXTRA 	= 
+# LDLIBS= -Wl,-L${SOLPSLIB} -Wl,-L${SOLPSMASTER}/@sys/lib -Wl,-L/usr/local/lib
+LDLIBS  = -Wl, ${LD_MSCL} -Wl,${LD_NCARG} -Wl,-L/usr/lib/X11R5
+#LDFLAGS = -lncarg -lncarg_gks -lncarg_c -lncarg_loc -lmach -lX11 -lm
+LDFLAGS = -lmach
+LDEXTRA = 
 
 #!!!Local Variables:
 #!!! mode: Makefile
