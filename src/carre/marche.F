@@ -73,7 +73,7 @@ c           structure designee fraplq.
 c.. indstr: indice de la derniere structure frappee.
 c.. repart: variable necessaire pour signifier a "SAUTE" que l'on
 c           travaille en distance absolue.
-c.. ecart1,ecart2: distance entre un point et chaque extremitee du
+c.. ecart1,ecart2: distance entre un point et chaque extremite du
 c                  segment sur lequel il se trouve.
 c.. rien: logique, si oui ou non on n'a pas encore rencontre une
 c         structure differente de fraplq.
@@ -108,8 +108,8 @@ c           fraplq.
 c.. indstr: index of the final structure hit.
 c.. repart: specifies whether "SAUTE" works with distance along the target
 c           (repart=1) or the new psi value (repart=2).
-c.. ecart1,ecart2: distance between a point and the boundary segment on 
-c                  which it is.
+c.. ecart1,ecart2: distance between a point and the ends of the boundary
+c                  segment on which it is.
 c.. rien: logical variable indicating whether or not a structure other than
 c         fraplq has been hit.
 c.. echec: logical variable indicating whether or not a curve fails to
@@ -248,8 +248,12 @@ c***
          ELSE
             ind3 = ind1
             ind2 = ind3+sens
+            if (ind2.eq.0) ind2 = npstru(plaque)
          ENDIF
 
+#ifdef DBG
+         write(0,*) 'COIN: ind1, ind2, ind3 =', ind1, ind2, ind3
+#endif
          x2 = xstruc(ind3,plaque)
          y2 = ystruc(ind3,plaque)
 

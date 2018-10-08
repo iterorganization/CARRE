@@ -89,21 +89,23 @@ c=========================
                   ENDIF
                ENDIF
 
-               IF (y2.GE.y(j).AND.y2.LE.y(j+1).AND.aa.NE.0.) THEN
-                  if(a10(i,j,2)+a11(i,j,2)*y2.ne.0.) then
-                    x2 = (-a00(i,j,2)-(a01(i,j,2)*y2))/(a10(i,j,2)
-     .                   +(a11(i,j,2)*y2))
-                  else
-                    x2 = 2.*x(1)-x(2)
-                  endif
-                  IF (x2.GE.x(i).AND.x2.LE.x(i+1)) THEN
+               IF (aa.NE.0.) THEN
+                  IF (y2.GE.y(j).AND.y2.LE.y(j+1)) THEN
+                     if(a10(i,j,2)+a11(i,j,2)*y2.ne.0.) then
+                        x2 = (-a00(i,j,2)-(a01(i,j,2)*y2))/(a10(i,j,2)
+     .                       +(a11(i,j,2)*y2))
+                     else
+                        x2 = 2.*x(1)-x(2)
+                     endif
+                     IF (x2.GE.x(i).AND.x2.LE.x(i+1)) THEN
 
-                     npxtot = npxtot + 1
-                     pointx(npxtot) = x2
-                     pointy(npxtot) = y2
-                     ii(npxtot) = i
-                     jj(npxtot) = j
+                        npxtot = npxtot + 1
+                        pointx(npxtot) = x2
+                        pointy(npxtot) = y2
+                        ii(npxtot) = i
+                        jj(npxtot) = j
 
+                     ENDIF
                   ENDIF
                ENDIF
             ENDIF

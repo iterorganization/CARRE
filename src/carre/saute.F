@@ -331,6 +331,7 @@ c---------------------------------------------------------------------}
               write(*,'(a,1p,1e15.8)')
      ,                   'Error in saute: the psi value not found '//
      ,                   'on the structure.  pas = ',pas
+              write(*,'(a,1p,2e15.8)') 'psi0, psi3 = ', psi0, psi3
               write(*,*) '==> Check whether all four targets ',
      ,                                 'intersect the outer separatrix'
             endif
