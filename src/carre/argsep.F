@@ -14,6 +14,7 @@ c*** and indexes them in correct order
 c======================================================================
       IMPLICIT NONE
 #include <CARRETYPES.F>
+#include <COMLAN.F>
 
 *  arguments
       INTEGER npnimx,npx,indplq(4,npx),nptot(4,npx),ptsep(4,npx),
@@ -70,22 +71,22 @@ c.. kkp   : separatrix pointer
 c.. k     : index of the point where 2 separatrices coincide
 c.. ipx,ipx2: indices of each X-point
 c======================================================================
-cc<<<
-c      write(0,*) '=== Entering argsep. npx,racord=',npx,racord
-c      write(0,*) 'nbdef,inddef: ',nbdef,inddef
-c      write(0,*) 'nptot : ',nptot
-c      write(0,*)
-c      write(0,'(1x,a16,1p,4e12.4)') 'separx(i,1)',
-c     ,                     (separx(nptot(i,1),i,1),i=1,4)
-c      write(0,'(1x,a16,1p,4e12.4)') 'separy(i,1)',
-c     ,                     (separy(nptot(i,1),i,1),i=1,4)
-c      write(0,*)
-c      write(0,'(1x,a16,1p,4e12.4)') 'separx(i,2)',
-c     ,                     (separx(nptot(i,2),i,2),i=1,4)
-c      write(0,'(1x,a16,1p,4e12.4)') 'separy(i,2)',
-c     ,                        (separy(nptot(i,2),i,2),i=1,4)
-c      write(0,*)
-cc>>>
+#ifdef DBG
+      write(0,*) '=== Entering argsep. npx,racord=',npx,racord
+      write(0,*) 'nbdef,inddef: ',nbdef,inddef
+      write(0,*) 'nptot : ',nptot
+      write(0,*)
+      write(0,'(1x,a16,1p,4e12.4)') 'separx(i,1)',
+     ,                     (separx(nptot(i,1),i,1),i=1,4)
+      write(0,'(1x,a16,1p,4e12.4)') 'separy(i,1)',
+     ,                     (separy(nptot(i,1),i,1),i=1,4)
+      write(0,*)
+      write(0,'(1x,a16,1p,4e12.4)') 'separx(i,2)',
+     ,                     (separx(nptot(i,2),i,2),i=1,4)
+      write(0,'(1x,a16,1p,4e12.4)') 'separy(i,2)',
+     ,                        (separy(nptot(i,2),i,2),i=1,4)
+      write(0,*)
+#endif
 *..Initialisation.
 
       ptxint = 0
@@ -102,11 +103,11 @@ cc>>>
             nptot(j,i) = nptot(j,i) - 1
     2    CONTINUE
     1 CONTINUE
-cc<<<
-c      write(0,*) '** after 1 continue'
-c      write(0,*) 'nptot : ',nptot
-c      write(0,'(13h indplq in : ,8i5)') indplq
-cc>>>
+#ifdef DBG
+      write(0,*) '** after 1 continue'
+      write(0,*) 'nptot : ',nptot
+      write(0,'(a13,8i5)') ' indplq in : ',indplq
+#endif
 
 *..Find the separatrices which go directly to a target
       do 10 ipx=1, npx
@@ -129,9 +130,9 @@ cc>>>
             end if
    15     CONTINUE
         end if
-cc<<<
-c        write(0,'(13h indplq out: ,8i5)') indplq
-cc>>>
+#ifdef DBG
+        write(0,'(a13,8i5)') ' indplq out: ',indplq
+#endif
         k0 = 0
         do 20 j=1, 4
           IF (indplq(j,ipx) .NE. 0) then
@@ -157,12 +158,12 @@ cc>>>
         wy(3)=separy(nptot(kk(2),ipx),kk(2),ipx)
         wx(4)=wx(1)
         wy(4)=wy(1)
-cc<<<
-c        write(0,'(17h ypto,pty,aire = ,1p,4e12.4)') ypto,pty,
-c     ,                                                    aire(wx,wy,4)
-c        write(0,'(5h wx: ,1p,4e12.4)') wx
-c        write(0,'(5h wy: ,1p,4e12.4)') wy
-cc>>>
+#ifdef DBG
+        write(0,'(a17,1p,4e12.4)') ' ypto,pty,aire = ',
+     ,                               ypto,pty,aire(wx,wy,4)
+        write(0,'(a5,1p,4e12.4)') ' wx: ',wx
+        write(0,'(a5,1p,4e12.4)') ' wy: ',wy
+#endif
         if((pty(ipx)-ypto)*aire(wx,wy,4).ge.zero) then
           ptsep(1,ipx)=kk(1)
           ptsep(2,ipx)=kk(2)
@@ -171,16 +172,16 @@ cc>>>
           ptsep(2,ipx)=kk(1)
         end if
    10 CONTINUE
-cc<<<
-c      write(0,*) '** After 10 continue. npx = ',npx
-c      write(0,*) 'ptsep: ',ptsep
-cc>>>
+#ifdef DBG
+      write(0,*) '** After 10 continue. npx = ',npx
+      write(0,*) 'ptsep: ',ptsep
+#endif
 *..First case: ONE X-point
       IF (npx .EQ. 1) then
 c----------------------------------------------------------------------
-cc<<<
-c        write(0,*) '-- Single null'
-cc>>>
+#ifdef DBG
+        write(0,*) '-- Single null'
+#endif
 *..Initialisation
          ipx = 1
          k0 = 0
@@ -226,9 +227,9 @@ c----------------------------------------------------------------------
 *..If the X-points are connected...
          IF (racord) then
 c----------------------------------------------------------------------
-cc<<<
-c        write(0,*) '-- Connected double null'
-cc>>>
+#ifdef DBG
+        write(0,*) '-- Connected double null'
+#endif
 *..Identification of each curve which does not go to a plate
             k0 = 0
             do 30 ipx=1, npx
@@ -298,10 +299,13 @@ cc>>>
                ptxint = 2
                ipx = ptxint
             else
-               WRITE(0,*) 'Equal psi values at both X-points for the ',
-     ,                                       'disconnected double null'
-c  100          FORMAT('Double nul deconnecte mais valeur de fonction',
-c     .                ' egale'/'pour chaque point X. PROBLEME !!')
+               if (sellan(1:8).eq.'francais') then
+                  WRITE(0,*) 'Double nul deconnecte mais valeur de '//
+     .             ' fonction egale pour chaque point X. PROBLEME !!'
+               else
+                  WRITE(0,*) 'Equal psi values at both X-points '//
+     ,                       'for the disconnected double null'
+               endif
                call pltend
                STOP
             end if
@@ -327,12 +331,12 @@ cc>>>
             wy(3)=separy(2,kk(2),ipx)
             wx(4)=wx(1)
             wy(4)=wy(1)
-cc<<<
-c            write(0,'(17h ypto,pty,aire = ,1p,4e12.4)') ypto,pty,
-c     ,                                                    aire(wx,wy,4)
-c            write(0,'(5h wx: ,1p,4e12.4)') wx
-c            write(0,'(5h wy: ,1p,4e12.4)') wy
-cc>>>
+#ifdef DBG
+            write(0,'(a17,1p,4e12.4)') ' ypto,pty,aire = ',
+     ,                                   ypto,pty,aire(wx,wy,4)
+            write(0,'(a5,1p,4e12.4)') ' wx: ',wx
+            write(0,'(a5,1p,4e12.4)') ' wy: ',wy
+#endif
             if((pty(ipx)-ypto)*aire(wx,wy,4).le.zero) then
               ptsep(3,ipx) = kk(1)
               kkp = kk(2)
@@ -452,9 +456,9 @@ cank
 c----------------------------------------------------------------------
          end if
       end if
-cc<<<
-c      write(0,*) 'Leaving argsep. ptsep : ',ptsep
-cc>>>
+#ifdef DBG
+      write(0,*) 'Leaving argsep. ptsep : ',ptsep
+#endif
       RETURN
 c======================================================================
       END

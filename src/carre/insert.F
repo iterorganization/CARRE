@@ -58,7 +58,7 @@ c*** Each x-point must be connected to two "primary" strike-points.
 c***
 c*** Input:
 c***  inddef  - list of targets (pieces of structure having at least one
-c***            intersection with a separatrix branch (strike-point)
+c***            intersection with a separatrix branch: strike-point)
 c***  indxpt  - list of x-points connected to the corresponding targets
 c***  xst,yst - strike-point coordinates
 c***  nbdef   - number of strike-points
