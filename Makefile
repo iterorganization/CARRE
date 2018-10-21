@@ -137,7 +137,7 @@ local:
 TAGS:	tags
 
 tags:
-	rm -f TAGS ; etags src/*/*.F
+	rm -f TAGS ; etags src/*/*.F || touch TAGS
 
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	@makedepend -f- ${INCLUDE} $^ | \
