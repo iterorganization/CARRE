@@ -166,13 +166,14 @@ c
 
       subroutine get_psimin_carre(psimin_carre)
       implicit none
+      include 'CARRETYPES.F'
       include 'CARREDIM.F'
       real psimin_carre
       
       character lign80*80
       integer nx,ny,i,j
       integer ierror,iflag
-      REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax)
+      REAL(kind=R8) x(nxmax), y(nymax), psi(nxmax,nymax)
       
       ierror = 0
       iflag = 0
