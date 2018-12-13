@@ -1,13 +1,8 @@
 #  VERSION : 18.03.2015
 
 # check if necessary variables are correctly defined
-ifneq (,$(findstring hpc-login0,${NODENAME}))
 LD_MSCL  ?= `pkg-config mscl --libs` -lgfortran
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lm -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
-else
-LD_MSCL  ?= `pkg-config mscl --libs`
-LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lm -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2 -lgfortran
-endif
 
 DEFINES   = 
 
