@@ -6,7 +6,7 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-DEFINES = -DGFORTRAN
+DEFINES =
 
 FC      = gfortran
 CPP     = /lib/cpp -traditional

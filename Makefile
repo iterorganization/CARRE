@@ -37,8 +37,8 @@ endif
 OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
 SRCLOCAL = $(PWD)/src.local
 
-SHELL	= /bin/sh
-CPP	= /usr/lib/cpp
+SHELL = /bin/sh
+CPP = /usr/lib/cpp
 
 ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER} ] && echo yes || echo no ),yes)
 include config/config.${HOST_NAME}.${COMPILER}
@@ -61,7 +61,7 @@ VHEAD   =
 ifeq ($(shell [ -d ${SRCLOCAL} ] && echo yes || echo no ),yes)
 VHEAD   =${SRCLOCAL}:
 endif
-FPATH	= ${VHEAD}src/carre:src/trans:src/fcrr:src/dummy
+FPATH = ${VHEAD}src/carre:src/trans:src/fcrr:src/dummy
 EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
 GPATH   = src/cntour:src/graphe
 VPATH   = ${VHEAD}src/carre:src/cntour:src/trans:src/fcrr:src/dummy:src/graphe
@@ -77,7 +77,7 @@ LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJDIR)/%.o : %.F
 	- /bin/rm -f ${OBJDIR}/$*.f
-	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	${CPP} ${SOLPS_CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
