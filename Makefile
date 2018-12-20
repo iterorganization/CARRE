@@ -4,7 +4,6 @@ PROG      = carre.exe
 PROG_TRA  = traduit.exe
 PROG_FCRR = fcrr.exe
 
-
 # Test whether necessary environment variables are defined; if not, exit
 ifndef HOST_NAME
 $(error HOST_NAME not defined)
@@ -34,6 +33,20 @@ ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local ] && 
   MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
 endif
 
+# Extensions for object directories when various options are used
+ifdef SOLPS_OPENMP
+EXT_OPENMP = .openmp
+endif
+ifdef SOLPS_MPI
+EXT_MPI = .mpi
+endif
+ifdef USE_IMPGYRO
+EXT_IMPGYRO = .ig
+endif
+ifdef SOLPS_DEBUG
+EXT_DEBUG = .debug
+endif
+
 OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
 SRCLOCAL = $(PWD)/src.local
 
@@ -53,7 +66,6 @@ MAKES+= config/config.${HOST_NAME}.${COMPILER}.local
 endif
 
 ifdef SOLPS_DEBUG
-EXT_DEBUG = .debug
 DEFINES  += -DDBG
 endif
 
