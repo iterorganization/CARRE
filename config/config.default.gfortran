@@ -7,6 +7,9 @@ ifndef LD_NCARG
 endif
 
 DEFINES =
+ifndef SOLPS_CPP
+DEFINES += -DGFORTRAN
+endif
 
 FC      = gfortran
 CPP     = /lib/cpp -traditional
