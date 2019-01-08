@@ -1,28 +1,27 @@
 #  VERSION : 01.04.2015
 
 # check if necessary variables are correctly defined
-ifndef LD_MSCL
-  $(error LD_MSCL not defined)
-endif
-ifndef LD_NCARG
-  $(error LD_NCARG not defined)
-endif
+IRISLIB ?= /fusion/projects/codes/solps/SOLPS-ITER/public_lib/GA.ifort64
+MSCL_ROOT ?= ${IRISLIB}
+NCARG_ROOT ?= ${IRISLIB}/NCARG
+LD_MSCL ?= -L${MSCL_ROOT} -lmscl
+LD_NCARG ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm
 
-DEFINES 	= 
+DEFINES = 
 
-FC		    = ifort
-CPP		    = /lib/cpp -C -traditional
+FC      = ifort
+CPP     = /lib/cpp -C -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS 		= -g -C -debug all -traceback -check all
+FFLAGS  = -g -C -debug all -traceback -check all
 else
-FFLAGS		= -O -vec_report0
+FFLAGS  = -O -vec_report0
 endif
 
-DBLPAD		= 
+DBLPAD  = 
 
-COMPILE 	= ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS}
 
-LDLIBS		= ${LD_MSCL} ${LD_NCARG}
-LDFLAGS 	= 
-LDEXTRA   = 
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
+LDEXTRA = 
