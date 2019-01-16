@@ -44,7 +44,7 @@ cank-970707: dimensions from the file
 
 *  procedures
       logical milieu
-      real*8 interp
+      real(kind=R8) interp
       external crbniv,insert,interp,milieu,orddef
 c=======================================================================
 
