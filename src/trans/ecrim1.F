@@ -2,20 +2,21 @@ c=======================================================================
       subroutine ecrim1(nout,nfin,rm,zm,nptseg,nreg,nppol,nprad,
      .  npmamx,nrmamx)
       implicit none
+#include <CARRETYPES.F>
 c  cette sousroutine ecrit une maille curviligne orthogonale produite
 c  par le programme carre, sous un format particulier.
 c
 c  arguments
       integer npmamx,nrmamx,nout,nfin,nreg,nppol(*),nprad(*),
      .  nptseg(*)
-      real rm(npmamx,nrmamx,*),zm(npmamx,nrmamx,*)
+      real(kind=R8) rm(npmamx,nrmamx,*),zm(npmamx,nrmamx,*)
 c
 c  variables locales
       integer ntrmax
       parameter(ntrmax=3000)
       integer ncoord,nelem,ielem,iplq(4),iflx(5),ir,ipol,ireg,i,j,
      .  e(3,ntrmax),v(3,ntrmax),icoord,itrop,iremp,cotali(ntrmax),t,r
-      real xmail(ntrmax/2),ymail(ntrmax/2)
+      real(kind=R8) xmail(ntrmax/2),ymail(ntrmax/2)
 c
 c  iplq(i): indice de frontiere associe a la plaque i
 c  iflx(i): indice de frontiere associe a la surface de flux i

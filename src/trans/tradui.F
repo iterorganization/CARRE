@@ -33,7 +33,7 @@ c  variables locales
 
 c  procedures
       external limail, change, ecrim1, b2agfz, b2agbb, ecrim2, ecrim3,
-     ,	       ecrim4
+     ,         ecrim4
 c======================================================================
 c*** nregmx: maximum number of regions
 c*** npmamx: maximum number of points in poloidal direction for a data
@@ -107,10 +107,10 @@ c
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
      .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
-     ,	  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+     ,    ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb,
      .    crx,cry,psidx,psidy,nxmx,nymx)
-        call ecrim2(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
+        call ecrim2(nfin,nx,ny,crx,cry,bb,fpsi,ffbz,distxo,nxmx,nymx)
 c
 c Original SONNET/DIVIMP format
 c
@@ -119,7 +119,7 @@ c
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
      .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
-     ,	  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+     ,    ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb,
      .    crx,cry,psidx,psidy,nxmx,nymx)
         call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
@@ -131,7 +131,7 @@ c
         call b2agfz(nx,ny,crx,cry,fpsi,ffbz,nxmx,nymx,
      .    r,z,nreg,nppol,nprad,npmamx,nrmamx,
      .    nptseg,psidx,psidy,psi,psidxm,psidym,b0r0,
-     ,	  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
+     ,    ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
 c<<<
 c        write(0,*) 'call b2agbb'
 c>>>
@@ -140,8 +140,8 @@ c>>>
 c<<<
 c        write(0,*) 'call ecrim4: nx,ny = ',nx,ny
 c>>>
-        call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmx,nymx,
-     ,	      	      	      	      	   ncut,nxcut,nycut,niso,nxiso)
+        call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,ffbz,distxo,
+     ,                          nxmx,nymx,ncut,nxcut,nycut,niso,nxiso)
 c<<<
 c        write(0,*) 'after ecrim4'
 c>>>

@@ -7,10 +7,12 @@ c======================================================================
 c*** This routine apparently creates the "guard cells" around the mesh
 c======================================================================
       implicit none
+#include <CARRETYPES.F>
 c
 c  arguments
       integer nx,ny,nxmax,nymax
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real(kind=R8)
+     .  crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3),del,
      .  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3)
 c

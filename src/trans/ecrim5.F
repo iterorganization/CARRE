@@ -1,6 +1,7 @@
 c=======================================================================
       subroutine ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmax,nymax)
       implicit none
+#include <CARRETYPES.F>
 c  cette routine ecrit la maille sous format DIVIMP. elle est identique
 c  a la routine mhdvmp de b2ag.F
 c
@@ -13,15 +14,16 @@ c
 c
 c  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real(kind=R8) 
+     .  crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  bb(-1:nxmax,-1:nymax,0:3),b0r0
-      real fpsi(-1:nxmax,-1:nymax,0:3)
+      real(kind=R8) fpsi(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real x0,y0,brat,psi0
-      real psitarg
-      real psimin_carre
+      real(kind=R8) x0,y0,brat,psi0
+      real(kind=R8) psitarg
+      real(kind=R8) psimin_carre
 c
 c     Read in the rzpsi.dat file to get the reference PSI values - in particular
 c     the minimum value of PSI on the grid. 
@@ -168,7 +170,7 @@ c
       implicit none
       include 'CARRETYPES.F'
       include 'CARREDIM.F'
-      real psimin_carre
+      real(kind=R8) psimin_carre
       
       character lign80*80
       integer nx,ny,i,j

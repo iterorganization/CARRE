@@ -2,6 +2,7 @@ c=======================================================================
       subroutine limail(nrid,nreg,nppol,nprad,r,z,psi,psidxm,psidym,
      .  npomax,nramax)
       implicit none
+#include <CARRETYPES.F>
 c
 c  lecture de la maille produite par le programme carre pour traitement
 c  ulterieur
@@ -18,7 +19,8 @@ c  nramax: dimention declaree dans la direction radiale
 c
 c  arguments
       integer nrid,nreg,nppol(*),nprad(*),npomax,nramax
-      real r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*),
+      real(kind=R8)
+     .     r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*),
      .     psidxm(npomax,nramax,*),psidym(npomax,nramax,*)
 c
 c  variables locales

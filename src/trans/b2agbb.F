@@ -5,15 +5,19 @@ c  version : 24.06.98 14:25
 c
 c======================================================================
       implicit none
+#include <CARRETYPES.F>
 
 c======================================================================
 *   ..input arguments (unchanged on exit)
       integer nx, ny,nxmax,nymax
-      real fpsi(-1:nxmax,-1:nymax,0:3), ffbz(-1:nxmax,-1:nymax,0:3)
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real(kind=R8)
+     .  fpsi(-1:nxmax,-1:nymax,0:3), ffbz(-1:nxmax,-1:nymax,0:3)
+      real(kind=R8)
+     .  crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3)
 *   ..output arguments (unspecified on entry)
-      real bb(-1:nxmax,-1:nymax,0:3)
+      real(kind=R8)
+     .  bb(-1:nxmax,-1:nymax,0:3)
 
 *-----------------------------------------------------------------------
 *.documentation
@@ -68,7 +72,7 @@ c======================================================================
 
 *   ..local variables
       integer ix, iy
-      real t0,psdx,psdy,babs,pi,r0,b0
+      real(kind=R8) t0,psdx,psdy,babs,pi,r0,b0
 *   ..procedures
       intrinsic sqrt,sign
 *-----------------------------------------------------------------------

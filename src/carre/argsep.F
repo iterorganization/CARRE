@@ -81,11 +81,13 @@ c======================================================================
       write(0,'(1x,a16,1p,4e12.4)') 'separy(i,1)',
      ,                     (separy(nptot(i,1),i,1),i=1,4)
       write(0,*)
-      write(0,'(1x,a16,1p,4e12.4)') 'separx(i,2)',
+      if (npx.ge.2) then
+        write(0,'(1x,a16,1p,4e12.4)') 'separx(i,2)',
      ,                     (separx(nptot(i,2),i,2),i=1,4)
-      write(0,'(1x,a16,1p,4e12.4)') 'separy(i,2)',
-     ,                        (separy(nptot(i,2),i,2),i=1,4)
-      write(0,*)
+        write(0,'(1x,a16,1p,4e12.4)') 'separy(i,2)',
+     ,                     (separy(nptot(i,2),i,2),i=1,4)
+        write(0,*)
+      end if
 #endif
 *..Initialisation.
 

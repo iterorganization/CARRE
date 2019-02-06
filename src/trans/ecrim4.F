@@ -1,5 +1,5 @@
-      subroutine ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmax,nymax,
-     ,                                	   ncut,nxcut,nycut,niso,nxiso)
+      subroutine ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,ffbz,distxo,
+     ,                       nxmax,nymax,ncut,nxcut,nycut,niso,nxiso)
 c
 c  version : 11.01.99 22:40
 c
@@ -11,16 +11,19 @@ cxpb-20070424: removed the abs() of brat so the helicity information
 c              is kept !
 c======================================================================
       implicit none
+#include <CARRETYPES.F>
 c
 c  arguments
       integer i,nfin,nx,ny,nxmax,nymax,ncut,nxcut(ncut),nycut(ncut),
      ,	      niso,nxiso(niso+1)
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
-     .  bb(-1:nxmax,-1:nymax,0:3),b0r0
+      real(kind=R8)
+     .  crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+     .  bb(-1:nxmax,-1:nymax,0:3),b0r0,distxo,
+     .  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real x0,y0,brat
+      real(kind=R8) x0,y0,brat
 c
 c  procedures
 c======================================================================
@@ -79,6 +82,16 @@ c* 2.3  print B2 input data
           icell=icell+1
         enddo
       enddo
+
+      do iy=-1,ny
+        do ix=-1,nx
+          write(nfin,110) ix+1,iy+1,
+     .     fpsi(ix,iy,0)/distxo,fpsi(ix,iy,1)/distxo,
+     .     fpsi(ix,iy,2)/distxo,fpsi(ix,iy,3)/distxo,
+     .     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
+        end do
+      enddo
+ 110  format(i4,1x,i4,1x,8(f12.8,1x))
 c
 c* 3.   look for the outermost ring with a cut and determine the indices
 c       of the polygon on which these cuts occur

@@ -1,6 +1,7 @@
 c=======================================================================
       subroutine ecrim3(nfin,nx,ny,crx,cry,bb,nxmax,nymax)
       implicit none
+#include <CARRETYPES.F>
 c  cette routine ecrit la maille sous format DIVIMP. elle est identique
 c  a la routine mhdvmp de b2ag.F
 cxpb-20070424: removed the abs() of brat so the helicity information 
@@ -8,12 +9,13 @@ c              is kept !
 c
 c  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
+      real(kind=R8)
+     .  crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
      .  bb(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real x0,y0,brat
+      real(kind=R8) x0,y0,brat
 c
 c  procedures
 c
