@@ -48,8 +48,8 @@ c* print B2.5
       do iy=-1,ny
         do ix=-1,nx
           write (nfin,117) ix+1,iy+1,
-     &     fpsi(ix,iy,0)/distxo,fpsi(ix,iy,1)/distxo,
-     &     fpsi(ix,iy,2)/distxo,fpsi(ix,iy,3)/distxo,
+     &     fpsi(ix,iy,0)-distxo,fpsi(ix,iy,1)-distxo,
+     &     fpsi(ix,iy,2)-distxo,fpsi(ix,iy,3)-distxo,
      &     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
         enddo
       enddo
