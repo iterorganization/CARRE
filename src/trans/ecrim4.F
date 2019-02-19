@@ -1,4 +1,4 @@
-      subroutine ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,ffbz,distxo,
+      subroutine ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,ffbz,delpsi,
      ,                       nxmax,nymax,ncut,nxcut,nycut,niso,nxiso)
 c
 c  version : 11.01.99 22:40
@@ -18,7 +18,7 @@ c  arguments
      ,	      niso,nxiso(niso+1)
       real(kind=R8)
      .  crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
-     .  bb(-1:nxmax,-1:nymax,0:3),b0r0,distxo,
+     .  bb(-1:nxmax,-1:nymax,0:3),b0r0,delpsi,
      .  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
@@ -86,8 +86,8 @@ c* 2.3  print B2 input data
       do iy=-1,ny
         do ix=-1,nx
           write(nfin,110) ix+1,iy+1,
-     .     fpsi(ix,iy,0)-distxo,fpsi(ix,iy,1)-distxo,
-     .     fpsi(ix,iy,2)-distxo,fpsi(ix,iy,3)-distxo,
+     .     fpsi(ix,iy,0)-delpsi,fpsi(ix,iy,1)-delpsi,
+     .     fpsi(ix,iy,2)-delpsi,fpsi(ix,iy,3)-delpsi,
      .     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
         end do
       enddo

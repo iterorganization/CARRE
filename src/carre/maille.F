@@ -70,7 +70,7 @@ cank-970707: dimensions from the file
      .  deltr1(10),deltrn(10),xx,yy,fctini,fctfin,difpsi,dpmin(10),
      .  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1,
      .  gardd2,xptxo,yptxo,xint,yint,xext,yext,psiint,
-     .  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
+     .  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old,psi_X(2),psi_O
       REAL(kind=R8) sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10),
      .  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx)
      .  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx),
@@ -181,7 +181,7 @@ c----------------------------------------------------------------------
          tgarde(3)=0
          tgarde(4)=0
          CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .               pntrat,tgarde,distxo,ient,isor,ifail)
+     .               pntrat,tgarde,distxo,psi_X,psi_O,ient,isor,ifail)
 
 *..Calculate the length of each separatrix
 
@@ -305,7 +305,8 @@ c----------------------------------------------------------------------
             pntrat_old = pntrat
 
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,ient,isor,ifail)
+     .                  pntrat,tgarde,distxo,psi_X,psi_O,
+     .                  ient,isor,ifail)
 
             if (pntrat.ne.pntrat_old) then
               call endpag
@@ -670,7 +671,7 @@ c----------------------------------------------------------------------
          isor = 0
 
          CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .               pntrat,tgarde,distxo,ient,isor,ifail)
+     .               pntrat,tgarde,distxo,psi_X,psi_O,ient,isor,ifail)
 
 *..Calculate the length of each separatrix
 
@@ -810,7 +811,9 @@ c----------------------------------------------------------------------
             pntrat_old = pntrat
 
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,ient,isor,ifail)
+     .                  pntrat,tgarde,distxo,psi_X,psi_O,
+     .                  ient,isor,ifail)
+
             if (pntrat.ne.pntrat_old) then
 
               call endpag
@@ -1480,7 +1483,7 @@ c----------------------------------------------------------------------
          isor = 0
 
          CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .               pntrat,tgarde,distxo,ient,isor,ifail)
+     .               pntrat,tgarde,distxo,psi_X,psi_O,ient,isor,ifail)
 
 *..Calculate the length of each separatrix
 
@@ -1732,7 +1735,9 @@ crm  augmenter ce test
             pntrat_old = pntrat
 
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,ient,isor,ifail)
+     .                  pntrat,tgarde,distxo,psi_X,psi_O,
+     .                  ient,isor,ifail)
+
             if (pntrat.ne.pntrat_old) then
               call endpag
               call trace2(x(1),x(nx),y(1),y(ny),
@@ -2617,7 +2622,7 @@ c----------------------------------------------------------------------
          isor = 0
 
          CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .               pntrat,tgarde,distxo,ient,isor,ifail)
+     .               pntrat,tgarde,distxo,psi_X,psi_O,ient,isor,ifail)
 
 *..Calculate the length of each separatrix
 
@@ -2721,7 +2726,8 @@ c----------------------------------------------------------------------
             pntrat_old = pntrat
 
             CALL CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,ient,isor,ifail)
+     .                  pntrat,tgarde,distxo,psi_X,psi_O,
+     .                  ient,isor,ifail)
 
             if (pntrat.ne.pntrat_old) then
               call endpag

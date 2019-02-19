@@ -24,7 +24,7 @@ c  variables locales
       real(kind=R8) r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx),
      .  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx),
      .  psidym(npmamx,nrmamx,nregmx),deltp1(10),deltpn(10),deltr1(10),
-     .  deltrn(10),tgarde(4),distxo,pntrat
+     .  deltrn(10),tgarde(4),distxo,psi_X(2),psi_O,pntrat,delpsi
       real(kind=R8) crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3),
      .  bb(-1:nxmx,-1:nymx,0:3),b0r0,
      .  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3),
@@ -71,8 +71,15 @@ c     open(unit=nout,file='traduit.tmp',status='unknown')
 c* 2.   Read the parameters used to create the grid
 
       distxo=1.0e30
+      psi_X=-1.0e30
+      psi_O=-1.0e30
       call change(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,nin,nout,ifail)
+     .            pntrat,tgarde,distxo,psi_X,psi_O,nin,nout,ifail)
+      if (abs(psi_X(1)-psi_O).le.abs(psi_X(2)-psi_O)) then
+        delpsi=psi_X(1)-psi_O
+      else
+        delpsi=psi_X(2)-psi_O
+      end if
 
 c* 3.   Read the grid
 
@@ -110,7 +117,7 @@ c
      ,    ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso)
         call b2agbb (nx,ny,fpsi,ffbz,bb,
      .    crx,cry,psidx,psidy,nxmx,nymx)
-        call ecrim2(nfin,nx,ny,crx,cry,bb,fpsi,ffbz,distxo,nxmx,nymx)
+        call ecrim2(nfin,nx,ny,crx,cry,bb,fpsi,ffbz,delpsi,nxmx,nymx)
 c
 c Original SONNET/DIVIMP format
 c
@@ -140,7 +147,7 @@ c>>>
 c<<<
 c        write(0,*) 'call ecrim4: nx,ny = ',nx,ny
 c>>>
-        call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,ffbz,distxo,
+        call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,ffbz,delpsi,
      ,                          nxmx,nymx,ncut,nxcut,nycut,niso,nxiso)
 c<<<
 c        write(0,*) 'after ecrim4'

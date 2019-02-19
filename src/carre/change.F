@@ -1,6 +1,7 @@
 ************************************************************************
       SUBROUTINE CHANGE(nptseg,deltp1,deltpn,repart,npr,deltr1,deltrn,
-     .                  pntrat,tgarde,distxo,ient,isor,ifail)
+     .                  pntrat,tgarde,distxo,psi_X,psi_O,
+     .                  ient,isor,ifail)
 c
 c  version : 07.07.97 18:38
 c
@@ -20,10 +21,11 @@ cank-970707: dimensions from the file
 *  arguments
       INTEGER nptseg(10),repart,npr(nregmx),ient,isor,ifail
       REAL(kind=R8) deltp1(10),deltpn(10),deltr1(10),deltrn(10),pntrat
-     .       ,tgarde(4),distxo
+     .       ,tgarde(4),distxo,psi_X(2),psi_O
 
 *  variables locales
-      INTEGER ieg,ierror
+      INTEGER ieg,ierror,ipx,npx
+      REAL(KIND=R8) x, y
       CHARACTER*80 vari, novlan
 
 *  variables en common
@@ -33,6 +35,8 @@ c
 c     save relax,pasmin,rlcept,nrelax
 
 *  procedures
+      INTEGER lnblnk
+      EXTERNAL lnblnk
       INTRINSIC INDEX, MIN
 
 c=========================
@@ -70,6 +74,17 @@ c  d'un fichier
       if(ient.ne.5) then
    5    continue
         read(ient,2,end=99)vari
+        if(index(vari,'Number').ne.0.or.index(vari,'Nombre').ne.0) then
+          ieg = index(vari,':')
+          read(vari(ieg+1:lnblnk(vari)),*) npx
+          read(ient,1028,end=99)
+          do ipx = 1, npx
+            read(ient,*,end=99) x, y, psi_X(ipx)
+          end do
+          read(ient,1028,end=99)
+          read(ient,1028,end=99)
+          read(ient,*,end=99) x, y, psi_O
+        end if
         if(index(vari,'$paramet').eq.0) go to 5
       endif
 
@@ -341,7 +356,7 @@ c        READ(vari(ieg+1:80),*,err=98) deltrn(6)
          GO TO 10
       ELSE IF (vari(1:3).EQ.'fin' .or. vari(1:3).eq.'end' .or.
      .       index(vari(1:4),'$fin')+index(vari(1:4),'$end').gt.0) then
-        return
+         return
       ELSE
          if(sellan(1:8).eq.'francais') then
            write(6,*)'Variable inexistante ou inchangeable.'
@@ -363,5 +378,6 @@ c-langue
    99 CONTINUE
       ifail = 1
 
+ 1028 FORMAT()
       RETURN
       END
