@@ -1,0 +1,34 @@
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+  $(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+  $(error LD_NCARG not defined)
+endif
+
+DEFINES =
+ifndef SOLPS_CPP
+DEFINES += -DGFORTRAN
+endif
+
+FC      = gfortran
+CPP     = /lib/cpp -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS  = -g -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
+else
+FFLAGS  = -O
+endif
+
+DBLPAD  = 
+
+COMPILE = ${FC} -c ${FFLAGS}
+
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
+LDEXTRA = 
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+
