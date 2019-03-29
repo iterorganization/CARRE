@@ -79,7 +79,7 @@ cank-970702: moved dimensions to the CARREDIM.F
       character lign80*80,nomstr(strumx)*80
 
       REAL(kind=R8) stp0, stpmin
-      PARAMETER (stp0=0.01_R8,stpmin=0.001_R8)
+      PARAMETER (stp0=0.001_R8,stpmin=0.0001_R8)
 
 #ifdef EXTRA_GRAPHS
       INTEGER ig, ipx, idep, iarr, idp2, iar2, ireg1, ireg2, n,
