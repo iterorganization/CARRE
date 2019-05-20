@@ -6,9 +6,9 @@
 #include <CARRETYPES.F>
 
 *..  Cette sous-routine repartit les points de facon non uniforme sur
-*  une courbe en faisant passer une parabole par le premier et le
-*  dernier intervalle donnee. Les intervalles intermediaires sont
-*  determinees par la parabole.
+*  une courbe en faisant passer une parabole par les premier et
+*  dernier intervalles donnes. Les intervalles intermediaires sont
+*  determines par la parabole.
 
 *  arguments
       INTEGER npoint

@@ -79,7 +79,7 @@ cank-970702: moved dimensions to the CARREDIM.F
       character lign80*80,nomstr(strumx)*80
 
       REAL(kind=R8) stp0, stpmin
-      PARAMETER (stp0=0.001_R8,stpmin=0.0001_R8)
+      PARAMETER (stpmin=0.0001_R8)
 
 #ifdef EXTRA_GRAPHS
       INTEGER ig, ipx, idep, iarr, idp2, iar2, ireg1, ireg2, n,
@@ -313,6 +313,8 @@ c  2.1  specify output format
       i=index(lign80,'=')
       call rdfrin(11,lign80(i+1:80),ny,ierror)
       READ(7,*) (y(i), i=1, ny)
+      stp0 = min(max(abs(x(nx)-x(1))/1000.,
+     ,               abs(y(ny)-y(1))/1000.,10.*stpmin),100.*stpmin)
 
       rmax = 0.0
       do i = 1, nx-1
@@ -427,15 +429,15 @@ c
 *
 c<<<
         write(0,*) '=== carre *..10.0 - before frtier'
-        write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' ptx:', ptx(1:npx)
-        write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' pty:',pty(1:npx)
+        write(0,'(a5,1p,8e12.4)') ' ptx:',ptx(1:npx)
+        write(0,'(a5,1p,8e12.4)') ' pty:',pty(1:npx)
         if(limcfg.eq.0) then
           write(0,*) 'nptot(4,nxpoints)'
           write(0,'(1x,16i5)') ((nptot(i,j),i=1,4),j=1,npx)
           write(0,*) 'Strike points (presumably)'
-          write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' x:',
+          write(0,'(a3,1p,8e12.4)') ' x:',
      -     ((separx(nptot(i,j),i,j),i=1,4),j=1,npx)
-          write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' y:',
+          write(0,'(a3,1p,8e12.4)') ' y:',
      -     ((separy(nptot(i,j),i,j),i=1,4),j=1,npx)
 c>>>
           call trc_stk_in('carre','*..10.0')

@@ -540,19 +540,19 @@ c       meilleure orthogonalite possible
      .          'l''orthogonalite de la maille n''a pas converge !'
                print*,'ortmax=',ortmax
                print*,'Pensez a relancer le programme avec: '
-               print*,
+               write (6,'(a,i6)') 
      .          '1) Un plus grand nombre d''iterations, '//
      .           'actuellement nrelax = ',nrelax
-               print*,
+               write (6,'(a,1p,1e12.5)')
      .          '2) Un autre facteur de relaxation, '//
      .           'actuellement relax = ',relax
-               print*,
+               write (6,'(a,1p,1e12.5)')
      .          '3) Un espacement minimal plus petit, '//
      .           'actuellement pasmin = ',pasmin
-               print*,
+               write (6,'(a,1p,1e12.5)')
      .          '4) Un critere d''orthogonalite moins strict, '//
      .           'actuellement rlcept = ',rlcept
-               print*,
+               write (6,'(a,1p,2e12.5)')
      .          '5) Des longueurs de garde plus importantes '//
      .           '(ou nulles), actuellement tgarde = ',garde1,garde2
                print*,
@@ -563,19 +563,19 @@ c       meilleure orthogonalite possible
      .          ' did not converge !'
                print*,'ortmax=',ortmax
                print*,'Consider re-running with: '
-               print*,
+               write (6,'(a,i6)')
      .          '1) A larger number of iterations, '//
      .           'currently nrelax = ',nrelax
-               print*,
+               write (6,'(a,1p,1e12.5)')
      .          '2) Changing the relaxation factor, '//
      .           'currently relax = ',relax
-               print*,
+               write (6,'(a,1p,1e12.5)')
      .          '3) A smaller minimal spacing, '//
      .           'currently pasmin = ',pasmin
-               print*,
+               write (6,'(a,1p,1e12.5)')
      .          '4) A less stringent orthogonality criterion, '//
      .           'currently rlcept = ',rlcept
-               print*,
+               write (6,'(a,1p,2e12.5)')
      .          '5) Longer (or zero) guard lengths, '//
      .           'currently tgarde = ',garde1,garde2
                print*,

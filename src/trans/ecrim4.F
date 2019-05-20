@@ -74,7 +74,7 @@ c* 2.3  print B2 input data
           write(nfin,103)crx(ix,iy,0),cry(ix,iy,0),
      .      crx(ix,iy,1),cry(ix,iy,1)
  103      format(
-     .      t30,'(',1pe17.10,',',1pe17.10,')',
+     .      t32,'(',1pe17.10,',',1pe17.10,')',
      .      6x,'(',1pe17.10,',',1pe17.10,')')
           write(nfin,105)
  105      format(3x,'------------------------------------------------',
@@ -91,7 +91,7 @@ c* 2.3  print B2 input data
      .     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
         end do
       enddo
- 110  format(i4,1x,i4,1x,8(f12.8,1x))
+ 110  format(i4,1x,i4,1x,8(f13.8,1x))
 c
 c* 3.   look for the outermost ring with a cut and determine the indices
 c       of the polygon on which these cuts occur

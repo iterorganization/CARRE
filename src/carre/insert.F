@@ -79,10 +79,10 @@ c=======================================================================
 c<<<
       write(0,*) 'Entering trgarng: nbdef=',nbdef
       if(nbdef.gt.0) then !{
-        write(0,'(1x,a8,i7,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
-        write(0,'(1x,a8,i7,9i10)') 'indxpt: ',(indxpt(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'xst:',(xst(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'yst:',(yst(i),i=1,nbdef)
+        write(0,'(1x,a8,i7,9i12)') 'inddef: ',(inddef(i),i=1,nbdef)
+        write(0,'(1x,a8,i7,9i12)') 'indxpt: ',(indxpt(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10e12.4)') 'xst:',(xst(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10e12.4)') 'yst:',(yst(i),i=1,nbdef)
       end if !}
 c>>>
 c*** Select the primary x-points and correct the number of targets
@@ -142,8 +142,8 @@ cxpb We will try throwing away one of each of the separatrix segments
       end if
 c
       if(k.gt.0) then !{
-        write(0,'(a,8i4)') 'jj : ',(jj(i),i=1,k)
-        write(0,'(a,8i4)') 'll : ',(ll(i),i=1,k)
+        write(0,'(1x,a,8i4)') 'jj : ',(jj(i),i=1,k)
+        write(0,'(1x,a,8i4)') 'll : ',(ll(i),i=1,k)
       end if !}
 c>>>
 
@@ -163,7 +163,7 @@ c*** m is the number of x-points having two "private" targets
 c<<<
       write(0,*) 'Complete x-points: ',m
       if(m.gt.0) then !{
-        write(0,'(a,4i4)') 'kk : ',(kk(i),i=1,m)
+        write(0,'(1x,a,4i4)') 'kk : ',(kk(i),i=1,m)
       end if !}
 c>>> 
 c*** Now look for targets intersected twice
@@ -181,7 +181,7 @@ c*** Now look for targets intersected twice
       end do !}
 c<<<
       write(0,*) 'Before re-arrangement. k = ',k
-      if(k.gt.0) write(0,'(a,8i4)') 'jj : ',(jj(i),i=1,k)
+      if(k.gt.0) write(0,'(1x,a,8i4)') 'jj : ',(jj(i),i=1,k)
 c>>>
       do i=1,k !{
         j=jj(i)
@@ -200,7 +200,7 @@ c>>>
 c<<<
       write(0,*) 'After re-arrangement: ',nbdef
       if(nbdef.gt.0) then !{
-        write(0,'(1x,a8,i7,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
+        write(0,'(1x,a8,i6,9i11)') 'inddef: ',(inddef(i),i=1,nbdef)
         write(0,'(1x,a4,4x,1p,10(e10.3,1x))') 'xst:',(xst(i),i=1,nbdef)
         write(0,'(1x,a4,4x,1p,10(e10.3,1x))') 'yst:',(yst(i),i=1,nbdef)
       end if !}
