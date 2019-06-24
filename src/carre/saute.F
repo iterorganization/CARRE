@@ -66,8 +66,8 @@ cc<<<
       print_dbg=l_dbg.and.n_call.ge.165
       if(print_dbg) then
         write(0,*) '===> Entering SAUTE. n_call = ',n_call
-        write(0,'(1x,6a5,a7,3a12)') 'npst','sens','nx','ny',
-     ,                               'nm1','nm2','x1','y1','psi1','pas'
+        write(0,'(1x,6a5,a8,3a12)') 'npst','sens','nx','ny',
+     ,                              'nm1','nm2','x1','y1','psi1','pas'
         write(0,'(1x,6i5,1p,4e12.4)') npst,sens,nx,ny,nm1,nm2,
      ,                                                   x1,y1,psi1,pas
         write(0,'(a9,5a12)')
@@ -103,7 +103,7 @@ cc>>>
       psi0 = psi1
 cc<<<
       if(print_dbg) then
-        write(0,'(2x,4a5,a8,a12,3x,4a12)') 'sens','npst','ind1','ind2',
+        write(0,'(1x,4a5,a8,a12,3x,4a12)') 'sens','npst','ind1','ind2',
      ,              'x1','y1','xst(i1)','yst(i1)','xst(i2)','yst(i2)'
         write(0,'(1x,4i5,1p,6e12.2)') sens,npst,ind1,ind2,
      ,               x1, y1, xst(ind1),yst(ind1),xst(ind2),yst(ind2)
@@ -124,7 +124,7 @@ c---------------------------------------------------------------------{
 
 cc<<<
         if(print_dbg) then
-          write(0,'(a,2i3,1p,6e12.4)')
+          write(0,'(1x,a,2i3,1p,6e12.4)')
      .     'ind1,ind2,zpas,dist,x0,y0,xst,yst',
      .      ind1,ind2,zpas,dist,x0,y0,xst(ind2),yst(ind2)
         end if
@@ -135,7 +135,7 @@ cc>>>
 
 cc<<<
           if(print_dbg) then
-            write(0,'(a,2i4,1p,2e14.7)')
+            write(0,'(1x,a,2i4,1p,2e14.6)')
      ,       '<=== Leaving SAUTE (dist found). ind1,ind2,x2,y2 = ',
      ,                                         ind1,ind2,x2,y2
           end if
@@ -163,7 +163,7 @@ c---------------------------------------------------------------------}
 
 cc<<<
         if(print_dbg) then
-          write(0,'(2x,1x,2(a4,1x),a9,3a15,2a12)')
+          write(0,'(2x,1x,2(a4,1x),a9,3a16,a14,a12)')
      .     'ii','jj','x','y','psi','pas','diff','min'
         end if
 cc>>>
@@ -256,7 +256,7 @@ cxpb  must find the point where the structure exits this rectangle.
 
 cc<<<
         if(print_dbg) then
-          write(0,'(a2,2(1x,i4),1p,4e15.8,2e12.4)') '3:',
+          write(0,'(a2,2(1x,i4),1p,4e16.8,2e12.4)') '3:',
      .     ii,jj,x3,y3,psi3,pas,abs(psi3-pas),psimi2
         end if
 cc>>>
@@ -292,7 +292,7 @@ c---------------------------------------------------------------------{
 
 cc<<<
           if(print_dbg) then
-            write(0,'(a2,2(1x,i4),1p,4e15.8,2e12.4)') '2:',
+            write(0,'(a2,2(1x,i4),1p,4e16.8,2e12.4)') '2:',
      .       ii,jj,x2,y2,psi2,pas,abs(psi2-pas),psimin
           end if
 cc>>>

@@ -74,7 +74,7 @@ c======================================================================
 #ifdef DBG
       write(0,*) '=== Entering argsep. npx,racord=',npx,racord
       write(0,*) 'nbdef,inddef: ',nbdef,inddef
-      write(0,*) 'nptot : ',nptot
+      write(0,'(1x,a,8i5)') 'nptot : ',nptot
       write(0,*)
       write(0,'(1x,a16,1p,4e12.4)') 'separx(i,1)',
      ,                     (separx(nptot(i,1),i,1),i=1,4)
@@ -107,7 +107,7 @@ c======================================================================
     1 CONTINUE
 #ifdef DBG
       write(0,*) '** after 1 continue'
-      write(0,*) 'nptot : ',nptot
+      write(0,'(a13,8i5)') ' nptot : ',nptot
       write(0,'(a13,8i5)') ' indplq in : ',indplq
 #endif
 
@@ -176,7 +176,7 @@ cc>>>
    10 CONTINUE
 #ifdef DBG
       write(0,*) '** After 10 continue. npx = ',npx
-      write(0,*) 'ptsep: ',ptsep
+      write(0,'(1x,a7,5x,8i5)') 'ptsep: ',ptsep
 #endif
 *..First case: ONE X-point
       IF (npx .EQ. 1) then
@@ -230,7 +230,7 @@ c----------------------------------------------------------------------
          IF (racord) then
 c----------------------------------------------------------------------
 #ifdef DBG
-        write(0,*) '-- Connected double null'
+            write(0,*) '-- Connected double null'
 #endif
 *..Identification of each curve which does not go to a plate
             k0 = 0
@@ -286,9 +286,9 @@ c----------------------------------------------------------------------
 *..If the X-points are not connected...
          else if (.NOT.(racord)) then
 c----------------------------------------------------------------------
-cc<<<
-c        write(0,*) '-- Disconnected double null'
-cc>>>
+#ifdef DBG
+            write(0,*) '-- Disconnected double null'
+#endif
 *..Determine the X-point which is inner to the other.
 *  Inner X-point is that which has the value of the psi closer to
 *  that of psi on the axis
@@ -459,7 +459,7 @@ c----------------------------------------------------------------------
          end if
       end if
 #ifdef DBG
-      write(0,*) 'Leaving argsep. ptsep : ',ptsep
+      write(0,'(1x,a,8i5)') 'Leaving argsep. ptsep :',ptsep
 #endif
       RETURN
 c======================================================================

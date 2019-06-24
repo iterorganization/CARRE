@@ -110,8 +110,8 @@ c<<<
 c>>>
 c*** Order the plates 2 by 2 in x
 c<<<
-      write(0,'(1x,a3,a4,a6,2a9,3x,a1,17x,a2,16x,a1,17x,a2)') 'i',
-     ,  'ipx','xy','pty','aire',':','wx',':','wy'
+      write(0,'(1x,a3,a4,a6,a10,a11,3x,a1,19x,a2,18x,a1,19x,a2)')
+     , 'i','ipx','xy','pty','aire',':','wx',':','wy'
 c>>>
       do i=1,nbdef-1,2 !{
         ipx=(i+1)/2
@@ -125,7 +125,7 @@ c>>>
         wy(4)=wy(1)
 c<<<
         u_hlp=aire(wx,wy,4)
-        write(0,'(1x,2i3,1p,1x,11e9.2)') i,ipx,
+        write(0,'(1x,2i3,1p,1x,11e10.2)') i,ipx,
      ,    xy(ipx),pty(npx+1),u_hlp,wx,wy
 c>>>
         if((xy(ipx)-pty(npx+1))*aire(wx,wy,4).lt.zero) then !{

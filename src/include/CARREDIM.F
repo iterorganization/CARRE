@@ -7,7 +7,7 @@ c
      .           gradmx=100, npmamx=500 , nrmamx=200, nregmx=6)
 c
 c======================================================================
-c***  gradmx      : max. number of points whith zero gradients (x/o)
+c***  gradmx      : max. number of points with zero gradients (x/o)
 c***  nxmax, nymax: max. grid dimensions for equilibrium data (psi)
 c***  npstmx      : max. number of points in a structure
 c***  strumx      : max. number of structures

@@ -74,7 +74,7 @@ c* 2.3  print B2 input data
           write(nfin,103)crx(ix,iy,0),cry(ix,iy,0),
      .      crx(ix,iy,1),cry(ix,iy,1)
  103      format(
-     .      t30,'(',1pe17.10,',',1pe17.10,')',
+     .      t32,'(',1pe17.10,',',1pe17.10,')',
      .      6x,'(',1pe17.10,',',1pe17.10,')')
           write(nfin,105)
  105      format(3x,'------------------------------------------------',

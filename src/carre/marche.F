@@ -262,8 +262,8 @@ c***
          pas = SQRT((x1-x2)**2 + (y1-y2)**2)
 
 #ifdef DBG
-         write(0,'(a,i3,1p,5e12.5)') 'ind3, x1, y1, x2, y2, pas =',
-     .                                ind3, x1, y1, x2, y2, pas
+         write(0,'(1x,a,i3,1p,5e13.5)') 'ind3, x1, y1, x2, y2, pas =',
+     .                                   ind3, x1, y1, x2, y2, pas
 #endif
       ENDIF
 
@@ -493,8 +493,8 @@ c***
       ENDIF
 
 #ifdef DBG
-      write(0,'(a,l1,1p,2e12.5)') 'At end of marche : ',
-     .                             coin, pas, pastmp
+      write(0,'(1x,a,l1,1p,2e12.5)') 'At end of marche : ',
+     .                                coin, pas, pastmp
 #endif
 
       GO TO 10
