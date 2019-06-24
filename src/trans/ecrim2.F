@@ -51,11 +51,12 @@ c* print B2.5
      &     fpsi(ix,iy,0)-delpsi,fpsi(ix,iy,1)-delpsi,
      &     fpsi(ix,iy,2)-delpsi,fpsi(ix,iy,3)-delpsi,
      &     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
+          write (*,*) 'ffbz(ix,iy,0) = ',ffbz(ix,iy,0)
         enddo
       enddo
 
  10   continue
- 117  FORMAT(I4,1X,I4,1X,12(F12.8,1X))
+ 117  FORMAT(I4,1X,I4,1X,12(F13.8,1X))
       return
 c======================================================================
       end
