@@ -51,7 +51,6 @@ c* print B2.5
      &     fpsi(ix,iy,0)-delpsi,fpsi(ix,iy,1)-delpsi,
      &     fpsi(ix,iy,2)-delpsi,fpsi(ix,iy,3)-delpsi,
      &     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
-          write (*,*) 'ffbz(ix,iy,0) = ',ffbz(ix,iy,0)
         enddo
       enddo
 
