@@ -17,7 +17,7 @@
       parameter(zero=0.0_R8,un=1.0_R8)
 
 c=========================
-c.. vx,vy: tableaux des coordonees des points de la courbe.
+c.. vx,vy: tableaux des coordonnees des points de la courbe.
 c.. n  : nombre de points de la courbe.
 c.. x1,y1,x2,y2: coordonnees des 2 points formant le segment.
 c.. determ: determinant de la matrice des deux equations.

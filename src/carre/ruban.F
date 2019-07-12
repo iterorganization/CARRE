@@ -24,7 +24,7 @@
       EXTERNAL indcrb, long
 
 c=========================
-c.. xn,yn: tableaux des coordonees des points de la courbe.
+c.. xn,yn: tableaux des coordonnees des points de la courbe.
 c.. n  : nombre de points de la courbe.
 c.. x1,y1: coordonnees du point.
 c=========================

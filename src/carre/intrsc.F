@@ -21,7 +21,7 @@ c  procedures
       external tourne
 
 c=========================
-c.. vx,vy: tableaux des coordonees des points de la courbe.
+c.. vx,vy: tableaux des coordonnees des points de la courbe.
 c.. n  : nombre de point de la courbe.
 c.. x1,y1,x2,y2: coordonnees des 2 points formant le segment.
 c   x,y: tableaux de coordonnees des points d'intersection

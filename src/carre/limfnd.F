@@ -39,7 +39,7 @@ c  local variables
 c
 c  ind0: indice du point du limiteur qui est le plus rapproche de la
 c        separatrice
-c  x0, y0: coordonees du point d'indice ind0
+c  x0, y0: coordonnees du point d'indice ind0
 
 c
 c  procedures
