@@ -525,7 +525,7 @@ contains
 !!$          iCoreSg = gridFindSubGridByName(itmgrid, "Outer core boundary")          
 !!$      end if
 !!$      if (iCoreSg == GRID_UNDEFINED) stop "fillInSubGridDescription: &
-!!$          & didn't find core boundary subgrid for assembling outer midplane subgrid"
+!!$          & did not find core boundary subgrid for assembling outer midplane subgrid"
 !!$
 !!$      ! Figure out starting points for inner and outer midplane on core boundary
 !!$      call findMidplaneCells(itmgrid%subgrids(iCoreSg), gmap, crx, xIn, yIn, xOut, yOut)
@@ -688,7 +688,7 @@ contains
 !!$
 !!$    ! Figure out how many indices to expect. A simple count of the form
 !!$    ! nInd = count( region(:,:,iRegionType) == iRegion )
-!!$    ! won't do, because we have to account for removed objects (ghost cells/faces).
+!!$    ! will not do, because we have to account for removed objects (ghost cells/faces).
 !!$
 !!$    ! search the relevant objects and count them
 !!$    nInd = 0
@@ -870,7 +870,7 @@ contains
 !!$
 !!$    ! Figure out how many indices to expect. A simple count of the form
 !!$    ! nInd = count( region(:,:,iRegionType) == iRegion )
-!!$    ! won't do, because we have to account for removed objects (ghost cells/faces).
+!!$    ! will not do, because we have to account for removed objects (ghost cells/faces).
 !!$
 !!$    ! search the relevant objects and count them
 !!$    nInd = 0

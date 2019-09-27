@@ -68,7 +68,7 @@ contains
     double precision :: segx, segy, conx, cony, cp
 
     if ( struct%internalSide(iStruct) == GRID_UNDEFINED ) then
-        stop "onInternalSideOfStructure: don't know internal side for this structure"
+        stop "onInternalSideOfStructure: do not know internal side for this structure"
     end if
 
     isInternal = (onWhichSideOfStructure(x, y, struct, iStruct) == struct%internalSide(iStruct))

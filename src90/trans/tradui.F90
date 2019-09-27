@@ -179,7 +179,7 @@ program tradui
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
-      ! We don't create guard cells, but b2agfz still places
+      ! We do not create guard cells, but b2agfz still places
       ! the real cells starting at (0,0) (i.e. the x/y=-1 slots are empty).
       ! So here, the grid is actually stored in x=0:nx-1, y=0:ny-1, and
       ! this is what is written out to file in ecrim2

@@ -212,7 +212,7 @@ contains
            ! If no virtual targets are to be created, exit loop and go directly to grid generation                 
            exit
        elseif ( par%nVirtualStructs > 0 ) then
-           ! virtual structures were supplied (only possible in CARRE_EXTENDED mode, don't create them
+           ! virtual structures were supplied (only possible in CARRE_EXTENDED mode), do not create them
            exit
        else
           ! If we arrive here the second time, the virtual targets have been created and the

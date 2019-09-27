@@ -2387,7 +2387,7 @@ contains
 #ifdef CARRE_NONINTERACTIVE 
     ! For non-interactive use the code parameters are initialized 
     ! at the entry into the ITMCARRE main subroutine.
-    ! Don't read from file or user.
+    ! Do not read from file or user.
     return
 #else
 

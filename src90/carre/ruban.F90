@@ -22,7 +22,7 @@
       EXTERNAL indcrb, long
 
 !=========================
-!.. xn,yn: tableaux des coordonees des points de la courbe.
+!.. xn,yn: tableaux des coordonnees des points de la courbe.
 !.. n  : nombre de points de la courbe.
 !.. x1,y1: coordonnees du point.
 !=========================

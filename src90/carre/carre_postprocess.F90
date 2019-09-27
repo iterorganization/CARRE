@@ -109,6 +109,7 @@ contains
 
         action = GRID_UNDEFINED
         lPasMin = pasmin
+        npDiff = 0
 
         do iPostProcess = 1, 42
             call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess))            
@@ -1239,7 +1240,7 @@ contains
                     ! of this face with the structure. Note that the
                     ! intersection point known at this point 
                     ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
-                    !   grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg)) 
+                    !  grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg))
                     ! is inaccurate and will be recomputed 
                     sepSegUpdated(:) = .false.
                     call addRadialLine( equ, struct, grid, &
@@ -1255,7 +1256,7 @@ contains
                     ! update grid index map to account for radial line
                     ! We added a radial grid line between poloidal points ip and ip + 1
                     ! Shift all indices bigger than that up by one
-                    ! TODO: check we don't run out of space...
+                    ! TODO: check we do not run out of space...
                     ipMap(ip + 1 : npPolOriginal(iReg), iReg) = ipMap(ip + 1 : npPolOriginal(iReg), iReg) + 1
                 end if
 
@@ -1364,7 +1365,7 @@ contains
     end if
 
     ! Add space for new grid points. Shift liFcP + 1 : end up by one
-    ! TODO: test that we don't run out of space   
+    ! TODO: test that we do not run out of space
     grid%xmail(liFcP + 2 : grid%np1(iReg) + 1, :, iReg) = &
          & grid%xmail(liFcP + 1 : grid%np1(iReg), :, iReg)
     grid%ymail(liFcP + 2 : grid%np1(iReg) + 1, :, iReg) = &
@@ -1594,8 +1595,8 @@ contains
     ! for all other points we compute the distance
     curDist = 0d0
     do ipol = 2, size(refx) - 1
-        ! Giving curDist as a parameter is a safety check that we don't get a 
-        ! point postioned "before", i.e. closer to the start point than the previous one
+        ! Giving curDist as a parameter is a safety check that we do not get a
+        ! point positioned "before", i.e. closer to the start point than the previous one
         lRef(iPol) = ruban(nivRefX(1:npNivRef), nivRefY(1:npNivRef), npNivRef,&
              & refx(ipol), refy(ipol), curDist)       
         curDist = lRef(iPol)

@@ -21,7 +21,7 @@
 !======================================================================
 ! a faire:
 !  Definition of xmail, ymail before and after a call to doubld.
-!  Don't forget the guard!
+!  Do not forget the guard!
 
 !  N.B. Here, the attempt to work with the relaxation scheme (everything
 !       starting and ending with c---) has been abandoned. The approach

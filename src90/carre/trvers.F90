@@ -16,7 +16,7 @@
       parameter(zero=0.,un=1.)
 
 !=========================
-!.. vx,vy: tableaux des coordonees des points de la courbe.
+!.. vx,vy: tableaux des coordonnees des points de la courbe.
 !.. n  : nombre de points de la courbe.
 !.. x1,y1,x2,y2: coordonnees des 2 points formant le segment.
 !.. determ: determinant de la matrice des deux equations.

@@ -186,7 +186,7 @@ contains
 
     ! Build the level line segment by segment
     do 
-       ! Check that we don't run out of storage for the level line
+       ! Check that we do not run out of storage for the level line
        if ( k == npnimx ) then
           ! Cannot store more points. Warn and return.
           call logmsg(LOGWARNING, "crbniv: too many points in level line, returning incomplete line.")
@@ -279,7 +279,7 @@ contains
                 ! and try next face
                 k=k-1
              ELSE
-                ! Didn't intersect a limiting curve.
+                ! Did not intersect a limiting curve.
                 ! Move to next cell, update search direction, jump down to further processing.
                 j=j+1
                 dir=2

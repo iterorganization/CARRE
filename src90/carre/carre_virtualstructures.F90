@@ -92,7 +92,7 @@ contains
 
        enddo ! structure point loop
 
-       write(0,*) 'virtualtargets Structure:', istru, ', psi range:', & 
+       write(0,*) 'virtualtargets Structure:', istru, ', psi range:', &
             &        minpsi(istru),  maxpsi(istru)
 
     enddo ! structure loop
@@ -443,7 +443,7 @@ contains
              tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
                   &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
                   &              tx, ty )
-             !write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of X-point", equ%fctpx(ipx)
+             ! write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of X-point", equ%fctpx(ipx)
 
              ! TODO: if psi not moving in the right direction,
              ! decrease step size and try again
@@ -455,7 +455,8 @@ contains
           enddo ! separatrix projection loop
        enddo ! structure point loop
 
-       write(0,*) 'virtualtargets Structure:', istru, ', psi range:', & 
+       write(0,"(a,i3,a,2e16.8)") &
+            &       'virtualtargets Structure:', istru, ', psi range:', &
             &        minpsi(istru),  maxpsi(istru)
 
     enddo ! structure loop
@@ -495,8 +496,9 @@ contains
           end do         
           if (.not. doTarget) cycle
 
-          write (0,*) 'X-point : ', ipx, ', separatrix segment: ', & 
-               &           isep, ', creating virtual structure taking the role of structure no. ', itarget
+          write (0,"(a,i2,a,i2,a,i2)") &
+               &          'X-point : ', ipx, ', separatrix segment: ', isep, &
+               &          ', creating virtual structure taking the role of structure no. ', itarget
 
           nvtarget = nvtarget + 1
           ! vtargetipx stores index of X-point associated with this target
@@ -682,7 +684,16 @@ contains
              ty = ty + dir * dx * gy
 
              ! did we step outside the equilibrium grid?
-             if (.not. insideEquGrid(equ, tx, ty)) exit
+             if (.not. insideEquGrid(equ, tx, ty)) then
+               write(0,*) 'Virtual target extends outside equilibrium!'
+               write(0,*) "tx ", tx, "ty ", ty
+               write(0,'(a)') ' Consider expanding the equilibrium'// &
+                            & ' using equExtensionMode in carre.dat'
+               write(0,*) "Current limits are :"
+               write(0,"(a,1p,4e16.8)") "x(1),x(nx),y(1),y(nx) :", &
+                        & equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny)
+               exit
+             endif
 
              tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
                   & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 

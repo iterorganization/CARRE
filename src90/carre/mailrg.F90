@@ -353,7 +353,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
             if ( extended_grid_limiter ) then 
 
                ! Special treatment for limiter cases with extended grids. The limiter structure is just a line
-               ! (i.e. infinitesimal thin). Don't do any of the tests to check whether we are on the "inside" of it,
+               ! (i.e. infinitesimal thin). Do not do any of the tests to check whether we are on the "inside" of it,
                ! but just turn around.
 
                IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) then

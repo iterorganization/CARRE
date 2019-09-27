@@ -39,7 +39,7 @@ CONTAINS
     
     !..Check whether all the data have been read from the file
     IF (ifail .EQ. 1) THEN
-       ! In this routine we don't care whether some parameters are broken
+       ! In this routine we do not care whether some parameters are broken
        call logmsg( LOGWARNING, "Input values read from carre.dat are inconsistent")
     ENDIF
 #endif

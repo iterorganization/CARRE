@@ -21,7 +21,7 @@
       INTRINSIC SQRT
 
 !=========================
-!.. vx,vy: tableaux des coordonees des points de la courbe.
+!.. vx,vy: tableaux des coordonnees des points de la courbe.
 !.. k  : nombre de points de la courbe.
 !.. px,py: coordonnees du point X.
 !.. dist1,dist2: distance entre un point de coordonnee et le point X.
