@@ -1,0 +1,35 @@
+# check if necessary variables are correctly defined
+NCARG_ROOT ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG
+MSCL_ROOT ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/mscl
+LD_NCARG ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm
+LD_MSCL ?= -L${MSCL_ROOT} -lmscl
+
+DEFINES =
+ifndef SOLPS_CPP
+DEFINES += -DGFORTRAN
+endif
+
+FC      = gfortran
+CPP     = /lib/cpp -traditional
+
+FFLAGS  = -J${OBJDIR} -ffree-line-length-none -fno-second-underscore 
+ifdef SOLPS_DEBUG
+FFLAGS += -g -C -Wall -fbounds-check -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
+LDFLAGS	= -Wall
+else
+FFLAGS += -O
+endif
+
+DBLPAD  =
+
+COMPILE = ${FC} -c ${FFLAGS}
+MOD     = mod
+
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS =
+LDEXTRA =
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

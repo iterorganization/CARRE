@@ -1,0 +1,28 @@
+# check if necessary variables are correctly defined
+LD_MSCL  ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/mscl -lmscl
+LD_NCARG ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lxcb
+
+FC      = g95
+CPP     = /lib/cpp -C -traditional -ffreestanding
+
+FFLAGS  = -ffree-line-length-huge -fno-second-underscore -fmod=${OBJDIR}/
+ifdef SOLPS_DEBUG
+FFLAGS += -g -C -fbounds-check -ftrace=full -Wall -Wno=unused-vars
+LDFLAGS = -Wall
+else
+FFLAGS += -O
+endif
+
+DBLPAD  = -r8
+
+COMPILE = ${FC} -c ${FFLAGS}
+MOD     = mod
+
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
+LDEXTRA = 
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

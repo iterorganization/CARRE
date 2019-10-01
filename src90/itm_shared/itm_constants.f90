@@ -15,7 +15,7 @@
 module itm_constants
 
 
-	use itm_types
+	use KindDefinitions, R8 => rKind
 
 	real(kind=R8), parameter :: ITM_PI	 = 3.141592653589793238462643383280_R8 
 	real(kind=R8), parameter :: ITM_C	 = 2.99792458e8_R8   ! speed of light [m/s]

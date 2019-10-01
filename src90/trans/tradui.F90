@@ -8,12 +8,6 @@ program tradui
   !*** This program translates the grid created with carre into other
   !*** grid formats
   !======================================================================
-#ifdef USE_ITMCARRE
-  use b2itm_grid_io
-  use b2mod_ual
-  use euITM_schemas  
-  use euITM_routines
-#endif
   use b2mod_connectivity
   use b2mod_grid_mapping
   use b2ag_ghostcells

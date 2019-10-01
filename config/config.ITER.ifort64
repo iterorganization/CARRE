@@ -1,0 +1,38 @@
+#  VERSION : 18.03.2015
+
+# check if necessary variables are correctly defined
+LD_MSCL  ?= `pkg-config mscl --libs` -lgfortran
+LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lm -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
+
+DEFINES   = 
+
+FC        = ifort
+CPP       = /lib/cpp -C -traditional -ffreestanding
+FC_VERSION = $(shell echo `ifort --version | head -1 | awk '{printf "%s ",$$3,"\n"}'`)
+
+FFLAGS    = -module ${OBJDIR}/
+ifdef SOLPS_DEBUG
+FFLAGS   += -g -C -debug all -traceback -check all -warn all -check noarg_temp_created -warn notruncated_source -warn nounused -p -gen-interfaces -warn interfaces
+LDFLAGS   = -check all -warn all -debug all # -gen-interfaces -warn interfaces
+else
+FFLAGS   += -O
+LDFLAGS   =
+endif
+ifeq (${FC_VERSION},12.0.2)
+FFLAGS   += -vec_report0
+LDFLAGS  += -i_dynamic
+endif
+
+DBLPAD    =
+
+COMPILE   = ${FC} -c ${FFLAGS}
+MOD       = mod
+
+LDLIBS    = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS   =
+LDEXTRA   =
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

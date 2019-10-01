@@ -9,13 +9,15 @@ module SiloIO
   use KindDefinitions , only: iKind, rKind
 
   implicit none
- 
+
   !private
   !public siloSetDisabled, siloGetDisabled, siloOpen, siloClose, siloWriteLineSegmentGrid
 
-  include 'silo.inc'
+#ifdef USE_SILO
+  include 'silo.inc'  ! IGNORE
+#endif
 
-  logical :: SILOIO_DISABLED = .false.
+  logical :: SILOIO_DISABLED = .true.
 
 
 contains
@@ -39,13 +41,17 @@ contains
 
     if ( SILOIO_DISABLED ) return
 
-    ierr = dbcreate( filename, len(filename), DB_CLOBBER, DB_LOCAL,&
+#ifdef USE_SILO
+    ierr = dbcreate( filename, len(filename), DB_CLOBBER, DB_LOCAL, &
          & 'Comment about the data', 22, DB_HDF5, dbfile)
 
     if(dbfile.eq.-1) then
             call logmsg(LOGFATAL, 'Could not create Silo file '//filename//'\n')
             stop
     endif
+#else
+    dbfile = 0
+#endif
 
   end subroutine siloOpen
 
@@ -57,13 +63,15 @@ contains
 
     if ( SILOIO_DISABLED ) return
 
+#ifdef USE_SILO
     ierr = dbclose(dbfile)
+#endif
 
   end subroutine siloClose
 
 
   !> Write a line segment grid
-  !> Segments: dim. 1: segment index, dim. 2: 1 = start point, 2 = end point, dim. 3: 1 = x coordinate, 2 = y coordinate  
+  !> Segments: dim. 1: segment index, dim. 2: 1 = start point, 2 = end point, dim. 3: 1 = x coordinate, 2 = y coordinate
   subroutine siloWriteLineSegmentGrid( dbfile, name, nSeg, segments )
     integer, intent(in) :: dbfile
     character(*), intent(in) :: name
@@ -81,20 +89,21 @@ contains
 
     if ( siloGetDisabled() ) return
 
+#ifdef USE_SILO
     ! build shapelists
     shapetype(1) = DB_ZONETYPE_BEAM
     shapesize(1) = 2
     shapecount(1) = nSeg
-    
+
     zonelist = (/ (i, i = 1, nSeg * 2) /)
 
     ! Write out connectivity information.
     err = dbputzl2(dbfile, name//"_zonelist", &
-         & len(name) + len("_zonelist"), & ! length of name 
+         & len(name) + len("_zonelist"), & ! length of name
          & nSeg, & ! nzones
          & 2, & ! ndims
          & zonelist, &
-         & nseg * 2, & ! LNODELIST 
+         & nseg * 2, & ! LNODELIST
          & 1, & ! base of nodelist (zero or one)
          & 0, & ! no. of ghost zones at beginning of nodelist
          & 0, & ! no. of ghost zones at end of nodelist
@@ -104,7 +113,7 @@ contains
          & 1, & ! nshapetypes - only one type
          & DB_F77NULL, & ! Options
          & ierr)
-    
+
     if ( err == -1 ) then
             call logmsg( LOGFATAL, "siloWriteLineSegmentGrid: error at dbputzl: ", err )
             stop "siloWriteLineSegmentGrid: error at dbputzl"
@@ -130,15 +139,16 @@ contains
          !& DB_DOUBLE, &  ! according to silo.book, belongs here?
          & DB_F77NULL, & ! optlist_id
          & ierr)
-    
+
     if ( err == -1 ) then
             call logmsg( LOGFATAL, "siloWriteLineSegmentGrid: error at dbputum: ", err )
             stop "siloWriteLineSegmentGrid: error at dbputum"
-    end if                    
+    end if
+#endif
 
   end subroutine siloWriteLineSegmentGrid
 
-  
+
   !> Write a line segment grid, starting with a list of points (x,y)
   subroutine siloWriteLineSegmentGridFromPoints( dbfile, name, x, y )
     integer, intent(in) :: dbfile
@@ -166,19 +176,19 @@ contains
     call siloWriteLineSegmentGrid( dbfile, name, size(x) - 1, segments )
 
   end subroutine siloWriteLineSegmentGridFromPoints
-  
-  
-  !> Expand data given on individual points to be plotted 
-  !> on an unstructured grid where these points have been 
+
+
+  !> Expand data given on individual points to be plotted
+  !> on an unstructured grid where these points have been
   !> assembled into segments.
-  function siloExpandSegmentData( data ) result (segdata) 
+  function siloExpandSegmentData( data ) result (segdata)
     real(rKind), intent(in), dimension(:) :: data
     real(rKind),  dimension( ( size(data) - 1 ) * 2 ) :: segdata
-    
+
     ! internal
     integer :: ip
 
-    do ip = 1, size(data) - 1 
+    do ip = 1, size(data) - 1
             segdata( (ip-1)*2 + 1 ) = data(ip)
             segdata( (ip-1)*2 + 2 ) = data(ip + 1)
     end do
@@ -198,6 +208,7 @@ contains
 
     if ( siloGetDisabled() ) return
 
+#ifdef USE_SILO
     select case (mode)
     case (DB_ZONECENT, DB_NODECENT)
             ! all is good
@@ -217,6 +228,7 @@ contains
          & ierr)
 
     if ( err == -1 ) stop "g2deSilo_writeCvScalar: error at dbputuv1"
+#endif
 
   end subroutine siloWriteUMData
 
@@ -232,6 +244,7 @@ contains
 
     if ( siloGetDisabled() ) return
 
+#ifdef USE_SILO
     if (size(x) == 0) then
        call logmsg(LOGDEBUG, "siloWritePointGrid: not writing empty grid, name "//name)
        return
@@ -239,7 +252,8 @@ contains
 
     err = dbputpm(dbfile, name, len(name), 2, x, y, DB_F77NULL, &
          & size(x), DB_DOUBLE, DB_F77NULL, ierr)
-      
+#endif
+
   end subroutine siloWritePointGrid
 
 
@@ -261,7 +275,7 @@ contains
     do i = 1, ny
        fx(:, i) = x
     end do
-    
+
     do i = 1, nx
        fy(i, :) = y
     end do
@@ -273,7 +287,7 @@ contains
 
   !> Write a logically rectangular, structured quadrilateral (non-rectilinear) grid
   !> Segments: dim. 1: segment index, dim. 2: 1 = start point, 2 = end point, dim. 3: 1 = x coordinate, 2 = y coordinate
-  !> 
+  !>
   !> If logicalPlot == .true., the node positions given in x,y are ignored and substituted with the node indices
   !> (i.e., the cartesian geometry of the grid is used)
 
@@ -295,7 +309,7 @@ contains
 
     if (present(logicalPlot)) then
        if (logicalPlot) then
-          ! Substitute coordinate data          
+          ! Substitute coordinate data
           do i = 1, nx
              lx(i,:) = i
           end do
@@ -308,6 +322,7 @@ contains
     dims(1) = nx
     dims(2) = ny
 
+#ifdef USE_SILO
 !!$    err = dbputqm ( dbfile, &
 !!$         & name, len(name), &
 !!$         & "x", 1, &
@@ -333,6 +348,7 @@ contains
 !!$    dims(2) = NNY
 !!$    err = dbputqm (dbfile, "quadmesh", 8, "xc", 2, "yc", 2, "zc", 2, xx, yy, DB_F77NULL, &
 !!$         & dims, ndims, DB_FLOAT, DB_NONCOLLINEAR, DB_F77NULL, ierr)
+#endif
 
   end subroutine siloWriteQuadGrid
 
@@ -348,6 +364,7 @@ contains
 
     if ( siloGetDisabled() ) return
 
+#ifdef USE_SILO
     select case (mode)
     case (DB_ZONECENT, DB_NODECENT)
             ! all is good
@@ -355,7 +372,7 @@ contains
             call logmsg( LOGFATAL, "siloWriteQuadData: given mode not supported:", mode )
             stop "'siloWriteQuadData:1"
     end select
-     
+
     err = dbputqv1(dbfile, name, len(name), gridname, len(gridname), &
          data, shape(data), 2, DB_F77NULL, 0, DB_DOUBLE, mode, DB_F77NULL, ierr)
 
@@ -363,6 +380,7 @@ contains
             call logmsg( LOGFATAL, "siloWriteQuadData: error writing data" )
             stop "'siloWriteQuadData:2"
     end if
+#endif
 
   end subroutine siloWriteQuadData
 

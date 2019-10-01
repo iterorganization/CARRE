@@ -4,8 +4,8 @@ module itm_assert
 
   !> @author 
 
-  use itm_types , ITM_R8 => R8, ITM_R4 => R4
-  use itm_string
+  use KindDefinitions
+  use Helper
 
   implicit none
 
@@ -132,7 +132,7 @@ contains
             call assert( failCount == 0, failmsg, lDoStop )
     else
             ! ...or substitute generic message
-            call assert( failCount == 0, itmInt2Str( failCount )//' assertions failed', lDoStop )
+            call assert( failCount == 0, Int2Str( failCount )//' assertions failed', lDoStop )
     end if
     failCount = 0
 
@@ -178,7 +178,7 @@ contains
   !> @see assert
 
   subroutine assertEqual( x1, x2, failmsg, doStop )
-    real(ITM_R8), intent(in) :: x1, x2
+    real(rKind), intent(in) :: x1, x2
     character(*), intent(in), optional :: failmsg
     logical, intent(in), optional :: doStop
 

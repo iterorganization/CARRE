@@ -1,0 +1,37 @@
+# check if necessary variables are correctly defined
+ifndef MSCL_ROOT
+  $(error MSCL_ROOT not defined)
+endif
+ifndef NCARG_ROOT
+  $(error NCARG_ROOT not defined)
+endif
+LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
+LD_NCARG  ?= -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lm
+
+DEFINES = 
+ifndef SOLPS_CPP
+DEFINES  += -DPGF90
+endif
+
+FC      = pgf90
+CPP     = /lib/cpp -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS  = -g -C 
+else
+FFLAGS  = -O
+endif
+
+DBLPAD  = -r8 -i4
+
+COMPILE = ${FC} -c ${FFLAGS}
+MOD     = mod
+
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS = 
+
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

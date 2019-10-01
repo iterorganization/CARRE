@@ -1,0 +1,32 @@
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+  $(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+  $(error LD_NCARG not defined)
+endif
+
+FC      = g95
+CPP     = /lib/cpp -C -traditional
+
+FFLAGS  = -ffree-line-length-huge -fno-second-underscore -fmod=${OBJDIR}/
+ifdef SOLPS_DEBUG
+FFLAGS += -g -C -fbounds-check -ftrace=full -Wall -Wno=unused-vars
+LDFLAGS = -Wall
+else
+FFLAGS += -O
+endif
+
+DBLPAD  = -r8
+
+COMPILE = ${FC} -c ${FFLAGS}
+MOD     = mod
+
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS =
+LDEXTRA =
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

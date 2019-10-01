@@ -1,0 +1,36 @@
+# check if necessary variables are correctly defined
+ifndef LD_MSCL
+  $(error LD_MSCL not defined)
+endif
+ifndef LD_NCARG
+  $(error LD_NCARG not defined)
+endif
+
+ifdef SOLPS_CPP
+DEFINES   = ${SOLPS_CPP}
+else
+DEFINES   = -DNAGFOR
+endif
+
+FC        = nagfor
+CPP       = /lib/cpp -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS    = -g -C 
+else
+FFLAGS    = -O
+endif
+
+DBLPAD    = -r8 -i4
+
+COMPILE   = ${FC} -c ${FFLAGS}
+MOD       = mod
+
+LDLIBS    = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS   = 
+LDEXTRA   = 
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+
