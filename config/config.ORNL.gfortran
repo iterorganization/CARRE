@@ -27,7 +27,8 @@ DBLPAD  = -fdefault-real-8
 COMPILE = ${FC} -c ${FFLAGS}
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS = 
+LDFLAGS =
+LDEXTRA =
 
 
 #!!!Local Variables:

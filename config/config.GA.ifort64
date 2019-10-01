@@ -18,10 +18,10 @@ else
 FFLAGS  = -O
 endif
 
-DBLPAD  = 
+DBLPAD  =
 
 COMPILE = ${FC} -c ${FFLAGS}
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS = 
-LDEXTRA = 
+LDFLAGS =
+LDEXTRA =

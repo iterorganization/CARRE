@@ -1,4 +1,4 @@
-#  VERSION : 27.07.97 22:41
+# VERSION : 27.07.97 22:41
 
 PROG      = carre.exe
 PROG_TRA  = traduit.exe
@@ -69,16 +69,26 @@ ifdef SOLPS_DEBUG
 DEFINES  += -DDBG
 endif
 
+# Source form: src is old fixed form source (used by Carre), src90 is current free form source (used by Carre2)
+SRCDIR = src
+
 VHEAD   =
 ifeq ($(shell [ -d ${SRCLOCAL} ] && echo yes || echo no ),yes)
 VHEAD   =${SRCLOCAL}:
 endif
-FPATH = ${VHEAD}src/carre:src/trans:src/fcrr:src/dummy
-EXCLUDELIS = carre.o tradui.o bidon.o fcrr.o fcrblkd.o
-GPATH   = src/cntour:src/graphe
-VPATH   = ${VHEAD}src/carre:src/cntour:src/trans:src/fcrr:src/dummy:src/graphe
+FPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy
+GPATH   = ${SRCDIR}/cntour:${SRCDIR}/graphe
+VPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/cntour:${SRCDIR}/dummy:${SRCDIR}/graphe
 
-INCLUDE = -Isrc/include
+ALLTARGETS = ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
+# We can only build the dg-to-Carre converter fcrr when we have the SOLPS environment available
+ifdef SOLPS_CPP
+ALLTARGETS += ${OBJDIR}/${PROG_FCRR}
+endif
+
+EXCLUDELIS = carre.o tradui.o fcrr.o bidon.o fcrblkd.o
+
+INCLUDE = -I${SRCDIR}/include
 
 include ${OBJDIR}/LISTOBJ
 
@@ -91,7 +101,7 @@ $(OBJDIR)/%.o : %.F
 	- /bin/rm -f ${OBJDIR}/$*.f
 	${CPP} ${SOLPS_CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
-		src/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
@@ -105,6 +115,8 @@ endif
 .PHONY: VERSION clean neat standalone all local depend listobj force
 
 standalone: ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
+
+all: ${ALLTARGETS}
 
 ifdef LD_NCARG
 ${OBJDIR}/${PROG} ${OBJDIR}/.x: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a $(MAKES)
@@ -131,12 +143,12 @@ ${OBJDIR}/libcarre.a: ${DEST} ${MAKES}
 	@ar rucv $@ ${DEST}
 	ranlib $@
 
-${OBJDIR}/libgcarre.a: ${GDEST}
+${OBJDIR}/libgcarre.a: ${GDEST} ${MAKES}
 	@ar rucv $@ ${GDEST}
 	ranlib $@
 
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} src/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
 
 neat:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
@@ -148,18 +160,19 @@ local:
 TAGS:	tags
 
 tags:
-	rm -f TAGS ; etags src/*/*.F || touch TAGS
+	rm -f TAGS ; etags ${SRCDIR}/*/*.F || touch TAGS
 
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${EXCLUDELIS:.o=.F}
 	@makedepend -f- ${INCLUDE} $^ | \
-	sed -e 's|src/[^ ]*/|${OBJDIR}/|' | \
+	sed -e 's|${SRCDIR}/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
 	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
 
 listobj:
-	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; l="OBJS ="; \
-	for d in `echo "$(FPATH)" | tr : \ `; do \
-		l="$$l `(cd $$d > /dev/null; echo *.F)`"; \
+	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
+	l="OBJS ="; \
+	for d in `echo "${FPATH}" | tr : \ `; do \
+		l="$$l `find $$d -name '*.F' -printf "%f "`"; \
 	done; \
 	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
@@ -167,7 +180,7 @@ listobj:
 	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ
 	@ll="GOBJS ="; \
 	for d in `echo "$(GPATH)" | tr : \ `; do \
-		ll="$$ll `(cd $$d > /dev/null; echo *.F)`"; \
+		ll="$$ll `find $$d -name '*.F' -printf "%f "`"; \
 	done; \
 	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
@@ -176,12 +189,12 @@ listobj:
 
 ${OBJDIR}/LISTOBJ: listobj
 
-VERSION: src/include/git_version_Carre.h
+VERSION: ${SRCDIR}/include/git_version_Carre.h
 
-src/include/git_version_Carre.h: force
-	@echo "      character*33 ::" > src/include/git_version_new.h
-	@echo "     . git_version_Carre = '`git describe --dirty --always`'" >> src/include/git_version_new.h
-	@if cmp -s src/include/git_version_new.h src/include/git_version_Carre.h; then rm src/include/git_version_new.h; else mv src/include/git_version_new.h src/include/git_version_Carre.h; fi
+${SRCDIR}/include/git_version_Carre.h: force
+	@echo "      character*33 ::" > ${SRCDIR}/include/git_version_new.h
+	@echo "     . git_version_Carre = '`git describe --dirty --always`'" >> ${SRCDIR}/include/git_version_new.h
+	@if cmp -s ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; then rm ${SRCDIR}/include/git_version_new.h; else mv ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; fi
 
 ${OBJDIR}/dependencies.${COMPILER}:
 	-mkdir -p ${OBJDIR}
@@ -194,5 +207,7 @@ ${OBJDIR}/dependencies.${COMPILER}:
 include ${OBJDIR}/dependencies.${COMPILER}
 
 echo:
+	@echo INCLUDE=${INCLUDE}
+	@echo DEFINES=${DEFINES}
 	@echo GOBJS=${GOBJS}
 	@echo DEST =${DEST}
