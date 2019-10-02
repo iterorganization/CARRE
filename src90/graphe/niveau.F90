@@ -6,6 +6,7 @@
 !======================================================================
 !  ROUTINE POUR TRACER DES LIGNES DE NIVEAU SUR UNE MAILLE RECTANGULAIRE
 !  UNIFORME.
+      use KindDefinitions
       IMPLICIT NONE
 !
 !  DONNEES:

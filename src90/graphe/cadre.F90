@@ -3,6 +3,7 @@
 !  version : 05.04.97 15:53
 !
 !======================================================================
+      use KindDefinitions
       implicit none
 !  on definit les dimensions du cadre dans lequel qui sert a tracer les
 !  graphiques.

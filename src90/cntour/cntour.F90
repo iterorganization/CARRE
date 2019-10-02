@@ -21,7 +21,8 @@
 !
 !  variables locales
       integer iwrk(1000),i1,i2,ll
-      real(Single) :: y(nxmax,nymax),rwrk(5000),x1min,x1max,x2min,x2max, &
+      real(rKind) :: x1min,x1max,x2min,x2max
+      real(Single) :: y(nxmax,nymax),rwrk(5000), &
      &     x1minp,x1maxp,x2minp,x2maxp,x1ap,x1bp,x2ap,x2bp
       character sclx*3,scly*3
 !
@@ -41,10 +42,10 @@
 !
 !  1.2  on trace les lignes de niveau
 !
-      x1min=real(xmin,Single)
-      x1max=real(xmax,Single)
-      x2min=real(ymin,Single)
-      x2max=real(ymax,Single)
+      x1min=xmin
+      x1max=xmax
+      x2min=ymin
+      x2max=ymax
       sclx='LIN'
       scly='LIN'
       write(*,*) 'Starting'
