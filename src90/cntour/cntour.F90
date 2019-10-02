@@ -54,22 +54,22 @@
       write(*,*) 'newpag OK'
       call getset(x1a,x1b,x2a,x2b,x1minp,x1maxp,x2minp,x2maxp,ll)
       if(ll.eq.1 .or. ll.eq.2) then
-        x1ap=x1a+(x1min-x1minp)/(x1maxp-x1minp)*(x1b-x1a)
-        x1bp=x1a+(x1max-x1minp)/(x1maxp-x1minp)*(x1b-x1a)
+        x1ap=real(x1a+(x1min-x1minp)/(x1maxp-x1minp)*(x1b-x1a),Single)
+        x1bp=real(x1a+(x1max-x1minp)/(x1maxp-x1minp)*(x1b-x1a),Single)
       else
-        x1ap=x1a+(log10(x1min)-log10(x1minp))/ &
-     &    (log10(x1maxp)-log10(x1minp))*(x1b-x1a)
-        x1bp=x1a+(log10(x1max)-log10(x1minp))/ &
-     &    (log10(x1maxp)-log10(x1minp))*(x1b-x1a)
+        x1ap=real(x1a+(log10(x1min)-log10(x1minp))/ &
+     &    (log10(x1maxp)-log10(x1minp))*(x1b-x1a),Single)
+        x1bp=real(x1a+(log10(x1max)-log10(x1minp))/ &
+     &    (log10(x1maxp)-log10(x1minp))*(x1b-x1a),Single)
       endif
       if(ll.eq.1 .or. ll.eq.3) then
-        x2ap=x2a+(x2min-x2minp)/(x2maxp-x2minp)*(x2b-x2a)
-        x2bp=x2a+(x2max-x2minp)/(x2maxp-x2minp)*(x2b-x2a)
+        x2ap=real(x2a+(x2min-x2minp)/(x2maxp-x2minp)*(x2b-x2a),Single)
+        x2bp=real(x2a+(x2max-x2minp)/(x2maxp-x2minp)*(x2b-x2a),Single)
       else
-        x2ap=x2a+(log10(x2min)-log10(x2minp))/ &
-     &    (log10(x2maxp)-log10(x2minp))*(x2b-x2a)
-        x2bp=x2a+(log10(x2max)-log10(x2minp))/ &
-     &    (log10(x2maxp)-log10(x2minp))*(x2b-x2a)
+        x2ap=real(x2a+(log10(x2min)-log10(x2minp))/ &
+     &    (log10(x2maxp)-log10(x2minp))*(x2b-x2a),Single)
+        x2bp=real(x2a+(log10(x2max)-log10(x2minp))/ &
+     &    (log10(x2maxp)-log10(x2minp))*(x2b-x2a),Single)
       endif
 !
       call cpseti('SET',1)
