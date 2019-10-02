@@ -5,6 +5,7 @@
 !======================================================================
 !*** Input of target data for Carre
 !======================================================================
+      use KindDefinitions
       implicit none
 #include <FCRCOM.F>
       character*(8) nam
@@ -12,7 +13,7 @@
 !
       integer nnms
       parameter (nnms=8)
-      integer i
+      integer(Short) i,j
       character*8 unm(nnms), uline*80
 !
 !*** List of the valid input keywords
@@ -21,93 +22,96 @@
      &    'dltpn   ','pntrat  ','clstruct'/
 !======================================================================
 !
-      do i=1,nnms
-          if(nam.eq.unm(i)) go to (10,20,30,40,50,60,70,80),i
+      do j=1,nnms
+          if(nam.eq.unm(j)) exit
       end do
-      call scipit
-      return
 !----------------------------------------------------------------------
- 10   call rearri(npr,nrgnx,i)
-      if(i.gt.0) then
-       if(nrgn.gt.0) then
-        if(nrgn.ne.i) then
+      select case (j)
+      case (1)
+       call rearri(npr,nrgnx,i)
+       if(i.gt.0) then
+        if(nrgn.gt.0) then
+         if(nrgn.ne.i) then
           write(0,*) 'Inconsistent number of regions found for npr:', & 
      &               i,'  instead of ',nrgn
+         end if
+         nrgn=max(nrgn,i)
+        else
+         nrgn=i
         end if
-        nrgn=max(nrgn,i)
-      else
-        nrgn=i
-      end if
-      end if
-      return
- 20   call rearri(nptseg,nsgmx,i)
-      if(i.gt.0) then
-       if(nsgm.gt.0) then
-        if(nsgm.ne.i) then
+       end if
+      case (2)
+       call rearri(nptseg,nsgmx,i)
+       if(i.gt.0) then
+        if(nsgm.gt.0) then
+         if(nsgm.ne.i) then
           write(0,*) 'Inconsistent number of sections found for ', & 
      &               'nptseg:',i,'  instead of ',nsgm
+         end if
+         nsgm=max(nsgm,i)
+        else
+         nsgm=i
         end if
-        nsgm=max(nsgm,i)
-      else
-        nsgm=i
-      end if
-      end if
-      return
- 30   call rearre(deltr1,nrgnx,i)
-      if(i.gt.0) then
-       if(nrgn.gt.0) then
-        if(nrgn.ne.i) then
+       end if
+      case (3)
+       call rearre(deltr1,nrgnx,i)
+       if(i.gt.0) then
+        if(nrgn.gt.0) then
+         if(nrgn.ne.i) then
           write(0,*) 'Inconsistent number of regions found for ', & 
      &               'deltr1:',i,'  instead of ',nrgn
+         end if
+         nrgn=max(nrgn,i)
+        else
+         nrgn=i
         end if
-        nrgn=max(nrgn,i)
-      else
-        nrgn=i
-      end if
-      end if
-       return
- 40   call rearre(deltrn,nrgnx,i)
-      if(i.gt.0) then
-       if(nrgn.gt.0) then
-        if(nrgn.ne.i) then
+       end if
+      case (4)
+       call rearre(deltrn,nrgnx,i)
+       if(i.gt.0) then
+        if(nrgn.gt.0) then
+         if(nrgn.ne.i) then
           write(0,*) 'Inconsistent number of regions found for ', & 
      &               'deltrn:',i,'  instead of ',nrgn
+         end if
+         nrgn=max(nrgn,i)
+        else
+         nrgn=i
         end if
-        nrgn=max(nrgn,i)
-      else
-        nrgn=i
-      end if
-      end if
-      return
- 50   call rearre(deltp1,nsgmx,i)
-      if(i.gt.0) then
-       if(nsgm.gt.0) then
-        if(nsgm.ne.i) then
+       end if
+      case (5)
+       call rearre(deltp1,nsgmx,i)
+       if(i.gt.0) then
+        if(nsgm.gt.0) then
+         if(nsgm.ne.i) then
           write(0,*) 'Inconsistent number of sections found for ', & 
      &               'deltp1:',i,'  instead of ',nsgm
+         end if
+         nsgm=max(nsgm,i)
+        else
+         nsgm=i
         end if
-        nsgm=max(nsgm,i)
-      else
-        nsgm=i
-      end if
-      end if
-      return
- 60   call rearre(deltpn,nsgmx,i)
-      if(i.gt.0) then
-       if(nsgm.gt.0) then
-        if(nsgm.ne.i) then
+       end if
+      case (6)
+       call rearre(deltpn,nsgmx,i)
+       if(i.gt.0) then
+        if(nsgm.gt.0) then
+         if(nsgm.ne.i) then
           write(0,*) 'Inconsistent number of sections found for ', & 
      &               'deltpn:',i,'  instead of ',nsgm
+         end if
+         nsgm=max(nsgm,i)
+        else
+         nsgm=i
         end if
-        nsgm=max(nsgm,i)
-      else
-        nsgm=i
-      end if
-      end if
-      return
- 70   call resime(pntrat)
-      return
- 80   call resimi(nclstr)
+       end if
+      case (7)
+       call resime(pntrat)
+      case (8)
+       call resimi(nclstr)
+      case default
+       call scipit
+      end select
       return
 
 !======================================================================

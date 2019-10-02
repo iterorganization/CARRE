@@ -4,9 +4,12 @@
 !
 !======================================================================
 !
+      IMPLICIT NONE
+      INTEGER IFLG, LNNO
       CHARACTER*(*) LBNM
 !  variables en common
 #include <COMQUA.F>
+      INTEGER ICAR
 !======================================================================
 ! The routine AGCHIL is called by AGLBLS just before and just after each
 ! informational-label line of text is drawn.  The default version does

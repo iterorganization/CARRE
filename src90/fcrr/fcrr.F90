@@ -7,11 +7,10 @@
 !======================================================================
 
 #ifdef USE_ITMCARRE
-      use euITM_schemas  
-      use euITM_routines
+      use euITM_schemas  ! IGNORE
+      use euITM_routines ! IGNORE
       use b2mod_ual
 #endif
-
 
       implicit none
 #include <impcon.inc>

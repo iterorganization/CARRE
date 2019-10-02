@@ -44,14 +44,14 @@ contains
 #ifdef USE_SILO
     ierr = dbcreate( filename, len(filename), DB_CLOBBER, DB_LOCAL, &
          & 'Comment about the data', 22, DB_HDF5, dbfile)
-
+#else
+    ierr = 0
+    dbfile = 0
+#endif
     if(dbfile.eq.-1) then
             call logmsg(LOGFATAL, 'Could not create Silo file '//filename//'\n')
             stop
     endif
-#else
-    dbfile = 0
-#endif
 
   end subroutine siloOpen
 
@@ -65,6 +65,8 @@ contains
 
 #ifdef USE_SILO
     ierr = dbclose(dbfile)
+#else
+    ierr = 0
 #endif
 
   end subroutine siloClose
@@ -80,12 +82,13 @@ contains
 
     ! internal
     integer :: err, ierr
-
+#ifdef USE_SILO
     integer, dimension(1) :: shapetype, shapesize, shapecount
     integer, dimension(nSeg*2) :: zonelist
     integer :: i
 
     real(rKind), dimension(nSeg*2) :: x, y
+#endif
 
     if ( siloGetDisabled() ) return
 
@@ -139,12 +142,15 @@ contains
          !& DB_DOUBLE, &  ! according to silo.book, belongs here?
          & DB_F77NULL, & ! optlist_id
          & ierr)
+#else
+    err = 0
+    ierr = 0
+#endif
 
     if ( err == -1 ) then
             call logmsg( LOGFATAL, "siloWriteLineSegmentGrid: error at dbputum: ", err )
             stop "siloWriteLineSegmentGrid: error at dbputum"
     end if
-#endif
 
   end subroutine siloWriteLineSegmentGrid
 
@@ -226,9 +232,11 @@ contains
          & mode, &
          & DB_F77NULL, &
          & ierr)
+#else
+    err = 0
+#endif
 
     if ( err == -1 ) stop "g2deSilo_writeCvScalar: error at dbputuv1"
-#endif
 
   end subroutine siloWriteUMData
 
@@ -252,6 +260,9 @@ contains
 
     err = dbputpm(dbfile, name, len(name), 2, x, y, DB_F77NULL, &
          & size(x), DB_DOUBLE, DB_F77NULL, ierr)
+#else
+    err = 0
+    ierr = 0
 #endif
 
   end subroutine siloWritePointGrid
@@ -286,9 +297,12 @@ contains
 
 
   !> Write a logically rectangular, structured quadrilateral (non-rectilinear) grid
-  !> Segments: dim. 1: segment index, dim. 2: 1 = start point, 2 = end point, dim. 3: 1 = x coordinate, 2 = y coordinate
+  !> Segments: dim. 1: segment index,
+  !>           dim. 2: 1 = start point, 2 = end point,
+  !>           dim. 3: 1 = x coordinate, 2 = y coordinate
   !>
-  !> If logicalPlot == .true., the node positions given in x,y are ignored and substituted with the node indices
+  !> If logicalPlot == .true., the node positions given in x,y are ignored and
+  !> substituted with the node indices
   !> (i.e., the cartesian geometry of the grid is used)
 
   subroutine siloWriteQuadGrid( dbfile, name, nx, ny, x, y, logicalPlot )
@@ -348,6 +362,9 @@ contains
 !!$    dims(2) = NNY
 !!$    err = dbputqm (dbfile, "quadmesh", 8, "xc", 2, "yc", 2, "zc", 2, xx, yy, DB_F77NULL, &
 !!$         & dims, ndims, DB_FLOAT, DB_NONCOLLINEAR, DB_F77NULL, ierr)
+#else
+   err = 0
+   ierr = 0
 #endif
 
   end subroutine siloWriteQuadGrid
@@ -375,12 +392,15 @@ contains
 
     err = dbputqv1(dbfile, name, len(name), gridname, len(gridname), &
          data, shape(data), 2, DB_F77NULL, 0, DB_DOUBLE, mode, DB_F77NULL, ierr)
+#else
+   err = 0
+   ierr = 0
+#endif
 
     if ( err == -1 ) then
             call logmsg( LOGFATAL, "siloWriteQuadData: error writing data" )
             stop "'siloWriteQuadData:2"
     end if
-#endif
 
   end subroutine siloWriteQuadData
 

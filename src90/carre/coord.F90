@@ -2,6 +2,7 @@
 
 !  version : 21.07.2000 16:18
 !=======================================================================
+      use KindDefinitions
       implicit none
 
 !*** Calculate the x and y coordinates of a point located on a curve v
@@ -9,11 +10,11 @@
 
 !  arguments
       integer n
-      real*8 vx(n),vy(n),d,x,y
+      real(rKind) :: vx(n),vy(n),d,x,y
 
 !  variables locales
       integer i
-      real*8 dist,distot,eps
+      real(rKind) :: dist,distot,eps
       parameter (eps=1.e-06)
 
 !  procedures

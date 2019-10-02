@@ -1,19 +1,20 @@
-      SUBROUTINE MAILCN(mailx,maily,xn1,yn1,nn1,pntrat,pas,nppol,nprad, & 
-     &               x2,y2,xfin,yfin,fctini,nx,ny,x,y,psi, & 
-     &               nstruc,npstru,xstruc,ystruc, & 
-     &               a00,a10,a01,a11,repart,xptxo,yptxo,xpto,ypto, & 
+      SUBROUTINE MAILCN(mailx,maily,xn1,yn1,nn1,pntrat,pas,nppol,nprad, &
+     &               x2,y2,xfin,yfin,fctini,nx,ny,x,y,psi, &
+     &               nstruc,npstru,xstruc,ystruc, &
+     &               a00,a10,a01,a11,repart,xptxo,yptxo,xpto,ypto, &
      &               nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
 !
 !  version : 07.07.97 18:47
 !
 !======================================================================
+      use KindDefinitions, only : rKind
 #ifdef USE_SILO
       use SiloIO
 #endif
-      use CarreDiagnostics
-      use CarreSiloIO
-      use carre_niveau
-      use carre_criteria
+      use CarreDiagnostics, only : CarreDiag, cdClearRegion
+      use CarreSiloIO, only : csIOSetSurface, csIOSetRelax
+      use carre_niveau, only : crbniv
+      use carre_criteria, only : clort
 
       IMPLICIT NONE
 
@@ -33,50 +34,50 @@
 #include <COMRLX.F>
 
 !  arguments
-      INTEGER nx,ny,nstruc,npstru(nstruc), & 
+      INTEGER nx,ny,nstruc,npstru(nstruc), &
      &  nn1,nppol,nprad,repart,nivtot(nivmx),nbniv,ireg
 
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), & 
-     &  ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), & 
-     &  maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2, & 
-     &  xfin,yfin,fctini,a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
-     &  xptxo,yptxo,xpto,ypto,nivx(npnimx,nivmx), & 
+      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), &
+     &  ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), &
+     &  maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2, &
+     &  xfin,yfin,fctini,a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
+     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3), &
+     &  xptxo,yptxo,xpto,ypto,nivx(npnimx,nivmx), &
      &  nivy(npnimx,nivmx),pntrat,distxo
 
       type(CarreDiag), intent(inout) :: diag
 
 !  variables locales
-      INTEGER ipas,indstr,ianc,inouv,ii,jj,ir,dir,ipol,i,nn(2),nt,sens & 
+      INTEGER ipas,indstr,ianc,inouv,ii,jj,ir,dir,ipol,i,nn(2),nt,sens &
      &        ,npcrb(2),plaque
-      REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,xn(npnimx,2), & 
+      REAL(rKind) :: ll,zero,pasini,epsmai,dist,dernie,valfct,xn(npnimx,2), &
      &       yn(npnimx,2),fctnew,xt(3),yt(3)
       PARAMETER(zero=0.,epsmai=1.e-6)
-      REAL*8 xcrb(npnimx,2),ycrb(npnimx,2)
+      REAL(rKind) :: xcrb(npnimx,2),ycrb(npnimx,2)
       CHARACTER*1 reponse
 
       ! ort1,2: for current radial surface
       ! ort1: grid optimization function for first distribution of points
       ! ort2: grid optimization function for current distribution of points
-      REAL*8 :: ort1(npmamx), ort2(npmamx)
+      REAL(rKind) :: ort1(npmamx), ort2(npmamx)
       ! individual contributions to the grid optimization function for current
       ! radial surface (i.e. individual components of ort1,2)
       ! ortpur: orthogonality function,
       ! propo: proportional distribution w.r.t. separatrix,
       ! varr: minimal distance between points
-      REAL*8 :: ortpur(npmamx),propo(npmamx),varr(npmamx)
+      REAL(rKind) :: ortpur(npmamx),propo(npmamx),varr(npmamx)
 
       ! cort,cortpur/propo/varr: optimization function + individual contributions for final
       ! grid point distribution for all grid nodes placed up to now
-      REAL*8 :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx),cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
+      REAL(rKind) :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx),cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
 
       integer :: ntt
-      REAL*8 :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
+      REAL(rKind) :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
 
 !  procedures
       INTEGER ifind
-      REAL*8 aazero,long,nulort,ruban
-      INTRINSIC MOD,int,abs
+      REAL(rKind) :: aazero,long,nulort,ruban
+      INTRINSIC MOD,abs
       EXTERNAL aazero,long,COORD1,ifind,nulort,UNTANG,ruban
 !
 !  remarque: cette routine doit etre appelee apres frtier ou, dans le
@@ -131,7 +132,7 @@
 
       ii = ifind(xpto,x,nx,1)
       jj = ifind(ypto,y,ny,1)
-      fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto + & 
+      fctxo= a00(ii,jj,1) + a10(ii,jj,1)*xpto + a01(ii,jj,1)*ypto + &
      &       a11(ii,jj,1)*xpto*ypto
       xtt(1)= xpto-0.1
       ytt(1)= ypto
@@ -141,7 +142,7 @@
       ytt(3)= ytt(1)
       ntt=3
       sens=1
-      CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sens, & 
+      CALL SAUTE(xtt,ytt,ntt,xpto,ypto,fctxo,x22,y22,fctini,sens, &
      &            2,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
 !..Calcul des longueurs
@@ -185,7 +186,7 @@
             fctnew=valfct + pas(ir-1)
             sens=1
 
-            CALL SAUTE(xt,yt,nt,x1,y1,valfct,x2,y2,fctnew,sens, & 
+            CALL SAUTE(xt,yt,nt,x1,y1,valfct,x2,y2,fctnew,sens, &
      &               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
           ENDIF
@@ -200,7 +201,7 @@
           ii=ifind(x2,x,nx,1)
           jj=ifind(y2,y,ny,1)
 
-          valfct=a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+          valfct=a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &           a11(ii,jj,1)*x2*y2
 
 !..Definition de la courbe a ne pas traverser.
@@ -220,17 +221,17 @@
 !***
 !         print*,'call crbniv1 - mailcn'
 !***
-          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
-     &            valfct,xn(1,inouv),yn(1,inouv), & 
-     &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
+          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, &
+     &            valfct,xn(1,inouv),yn(1,inouv), &
+     &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, &
      &            plaque,x2,y2)
 
 !..Il faut s'assurer que la ligne de niveau part dans la bonne
 !  direction.
 
 !0195     IF (xn(2,inouv) .LT. xn(1,inouv)) THEN
-          if((xn(2,inouv)-xn(1,inouv))*(xn(2,ianc)-xn(1,ianc))+ & 
-     &       (yn(2,inouv)-yn(1,inouv))*(yn(2,ianc)-yn(1,ianc)) & 
+          if((xn(2,inouv)-xn(1,inouv))*(xn(2,ianc)-xn(1,ianc))+ &
+     &       (yn(2,inouv)-yn(1,inouv))*(yn(2,ianc)-yn(1,ianc)) &
      &          .lt.zero) then
             nn(inouv)=1
             dir=MOD(dir+1,4) + 1
@@ -243,9 +244,9 @@
 !         print*,'call crbniv2 - mailcn'
 !***
 
-          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
-     &            valfct,xn(1,inouv),yn(1,inouv), & 
-     &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, & 
+          CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, &
+     &            valfct,xn(1,inouv),yn(1,inouv), &
+     &            nstruc,npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb,1, &
      &            plaque,x2,y2)
 
 !.. Calcul de grand psi
@@ -255,7 +256,7 @@
           sens=2
           x1 = diag%gdr(ir-1,ireg)
           y1 = ypto
-          CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens, & 
+          CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens, &
      &               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
 !..Calcul des longueurs
@@ -297,11 +298,11 @@
 !  1.   on dispose d'abord les points proportionellement a ceux de la
 !       ligne precedente
             do ipol=1,ipoln
-              d1=ruban(xn(1,ianc),yn(1,ianc),nn(ianc),mailx(ipol,ir-1), & 
+              d1=ruban(xn(1,ianc),yn(1,ianc),nn(ianc),mailx(ipol,ir-1), &
      &           maily(ipol,ir-1),d1)
               if(ir.eq.2) l0(ipol)=d1
               l1(ipol)=(l0(ipol)/l0(nppol))*ll
-              call coord1(xn(1,inouv),yn(1,inouv),nn(inouv), & 
+              call coord1(xn(1,inouv),yn(1,inouv),nn(inouv), &
      &          l1(ipol),mailx(ipol,ir),maily(ipol,ir),period)
             enddo
             if(nrelax.gt.0) then
@@ -317,8 +318,8 @@
 !
 !  2.   initialisation de la fonction qui doit s'annuler pour une
 !       distribution orthogonale
-              call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-     &          maily(1,ir),ort1,nppol+1,pasmin,zero,zero,l0,l1, & 
+              call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), &
+     &          maily(1,ir),ort1,nppol+1,pasmin,zero,zero,l0,l1, &
      &          ortpur,propo,varr)
 
               ! collect optimization function for all surfaces
@@ -342,7 +343,7 @@
                 else
                   l2(ipol)=0.9*l1(ipol)+0.1*l1(ipol-1)
                 endif
-                call coord1(xn(1,inouv),yn(1,inouv),nn(inouv), & 
+                call coord1(xn(1,inouv),yn(1,inouv),nn(inouv), &
      &            l2(ipol),mailx(ipol,ir),maily(ipol,ir),period)
 
                 diag%somort(ir,ireg)= diag%somort(ir,ireg)+(ort1(ipol)/nppol)
@@ -359,8 +360,8 @@
               do i=1,nrelax
                 call csioSetRelax( i )
 
-                call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), & 
-     &            maily(1,ir),ort2,nppol+1,pasmin,zero,zero,l0,l2, & 
+                call clort(mailx(1,ir-1),maily(1,ir-1),mailx(1,ir), &
+     &            maily(1,ir),ort2,nppol+1,pasmin,zero,zero,l0,l2, &
      &            ortpur,propo,varr)
 
                 ! collect optimization function for all surfaces
@@ -372,7 +373,7 @@
                 ortmax=zero
                 do ipol=ipol1,ipoln
                   if(abs(ort2(ipol)).gt.rlcept) then
-                    del=-ort2(ipol)*(l2(ipol)-l1(ipol)) & 
+                    del=-ort2(ipol)*(l2(ipol)-l1(ipol)) &
      &                             /(ort2(ipol)-ort1(ipol))
                     if(del.gt.zero) then
                       del=min(del,relax*(l2(ipol+1)-l2(ipol)))
@@ -384,7 +385,7 @@
                       ort1(ipol)=ort2(ipol)
                       l2(ipol)=l1(ipol)+del
                     endif
-                    call coord1(xn(1,inouv),yn(1,inouv),nn(inouv), & 
+                    call coord1(xn(1,inouv),yn(1,inouv),nn(inouv), &
      &               l2(ipol),mailx(ipol,ir),maily(ipol,ir),period)
                   endif
                   ortmax=max(ortmax,abs(ort2(ipol)))
@@ -393,11 +394,11 @@
 #ifdef USE_SILO
                 ! TODO: maybe move this into a subroutine in CarreSiloIO
                 ! write out current grid status
-                
+
                 ! entire grid created so far
                 if (DEBUGFILES_MAILCN) then
                 call csioOpenFile()
-                
+
                 call siloWriteQuadGrid( csioDbfile, "region", &
                      & nppol, ir, &
                      & mailx(1:nppol, 1:ir), maily(1:nppol, 1:ir) )
@@ -422,7 +423,7 @@
                 call siloWriteUMData( csioDbfile,  "currentsurface", "varr", &
                      & siloExpandSegmentData( varr(1:nppol) ), DB_NODECENT )
                 end if
-#endif                
+#endif
 
                 if(ortmax.le.rlcept) go to 19
 !***
@@ -441,44 +442,44 @@
               enddo
 !***
               if(sellan(1:8).eq.'francais') then
-                print*, & 
-     &           'L''algorithme adaptatif d''optimisation de '// & 
+                print*, &
+     &           'L''algorithme adaptatif d''optimisation de '// &
      &           'l''orthogonalite de la maille n''a pas converge !'
                 print*,'ortmax=',ortmax
                 print*,'Pensez a relancer le programme avec: '
-                print*, & 
-     &           '1) Un plus grand nombre d''iterations, '// & 
+                print*, &
+     &           '1) Un plus grand nombre d''iterations, '// &
      &            'actuellement nrelax = ',nrelax
-                print*, & 
-     &           '2) Un autre facteur de relaxation, '// & 
+                print*, &
+     &           '2) Un autre facteur de relaxation, '// &
      &            'actuellement relax = ',relax
-                print*, & 
-     &           '3) Un espacement minimal plus petit, '// & 
+                print*, &
+     &           '3) Un espacement minimal plus petit, '// &
      &            'actuellement pasmin = ',pasmin
-                print*, & 
-     &           '4) Un critere d''orthogonalite moins strict, '// & 
+                print*, &
+     &           '4) Un critere d''orthogonalite moins strict, '// &
      &            'actuellement rlcept = ',rlcept
-                print*, & 
+                print*, &
      &           'Voulez-vous continuer (o/n) ?'
               elseif(sellan(1:7).eq.'english') then
-                print*, & 
-     &           'Mesh adaptation algorithm to optimize orthogonality'// & 
+                print*, &
+     &           'Mesh adaptation algorithm to optimize orthogonality'// &
      &           ' did not converge !'
                 print*,'ortmax=',ortmax
                 print*,'Consider re-running with: '
-                print*, & 
-     &           '1) A larger number of iterations, '// & 
+                print*, &
+     &           '1) A larger number of iterations, '// &
      &            'currently nrelax = ',nrelax
-                print*, & 
-     &           '2) Changing the relaxation factor, '// & 
+                print*, &
+     &           '2) Changing the relaxation factor, '// &
      &            'currently relax = ',relax
-                print*, & 
-     &           '3) A smaller minimal spacing, '// & 
+                print*, &
+     &           '3) A smaller minimal spacing, '// &
      &            'currently pasmin = ',pasmin
-                print*, & 
-     &           '4) A less stringent orthogonality criterion, '// & 
+                print*, &
+     &           '4) A less stringent orthogonality criterion, '// &
      &            'currently rlcept = ',rlcept
-                print*, & 
+                print*, &
      &           'Do you wish to continue (y/n) ?'
               endif
               if ( .not. AUTOCONTINUE ) then
@@ -489,12 +490,12 @@
                  endif
               endif
               if(sellan(1:8).eq.'francais') then
-                print*, & 
-     &           'Verifiez attentivement la qualite de la maille '// & 
+                print*, &
+     &           'Verifiez attentivement la qualite de la maille '// &
      &           'a la sortie du programme !'
               elseif(sellan(1:7).eq.'english') then
-                print*, & 
-     &           'Please check the quality of the mesh '// & 
+                print*, &
+     &           'Please check the quality of the mesh '// &
      &           'carefully upon completion !'
               endif
 !***
@@ -520,13 +521,13 @@
               x1=mailx(ipol, ir-1)
               y1=maily(ipol, ir-1)
 
-              CALL UNTANG(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,ux1,uy1, & 
+              CALL UNTANG(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,ux1,uy1, &
      &                   dernie,period)
 
               pasini=0.3*ll
               dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie,ll,50)
               dernie=dist
-              CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),dist, & 
+              CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),dist, &
      &               mailx(ipol,ir),maily(ipol,ir))
 
    20       CONTINUE

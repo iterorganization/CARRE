@@ -5,10 +5,11 @@
 !======================================================================
 !*** Create the equilibrium file for Carre
 !======================================================================
+      use KindDefinitions
       implicit none
       character ofile*(*)
 #include <FCRCOM.F>
-      integer i
+      integer(Short) :: i
 !======================================================================
 !
       open(2,file=ofile)

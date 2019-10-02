@@ -1,12 +1,13 @@
 module carre_types
 
+  use KindDefinitions
   use Logging
   use Helper
   use carre_constants
 
   implicit none
 
-  private 
+  private
 
 #include <CARREDIM.F>
 
@@ -20,9 +21,9 @@ module carre_types
 
   ! Carre operation modes
   ! classical carre algorithm, possibly with equilibrium extension
-  integer, parameter, public :: CARRE_STANDARD = 0 
+  integer, parameter, public :: CARRE_STANDARD = 0
   ! classical + output of virtual structures (preprocessing for CARRE_EXTENDED)
-  integer, parameter, public :: CARRE_STANDARD_VIRTUALSTRUCTS = 1 
+  integer, parameter, public :: CARRE_STANDARD_VIRTUALSTRUCTS = 1
   ! extended grid mode
   integer, parameter, public :: CARRE_EXTENDED = 2
 
@@ -99,13 +100,13 @@ module carre_types
       !.. deltr1,deltrn: values of the first and last intervals for each reg.
 
       INTEGER :: nptseg(nsepsegmx),repart,npr(nregmx)
-      REAL*8 deltp1(nsepsegmx),deltpn(nsepsegmx),&
-           & deltr1(nsepsegmx),deltrn(nsepsegmx),pntrat, & 
+      REAL(rKind) :: deltp1(nsepsegmx),deltpn(nsepsegmx),&
+           & deltr1(nsepsegmx),deltrn(nsepsegmx),pntrat, &
            & tgarde(4)
 
       !.. cstlin: a linear constant added along y to artificially disconnect
       !           the X-points. Set to 0 for connected double-nulls
-      real*8 :: cstlin = 0.00
+      real(rKind) :: cstlin = 0.00
 
       ! Predefined X- and O-point locations
       ! If xPointNum > 0, the values in xPointX/Y and oPointX/Y are assumed to be valid
@@ -167,14 +168,14 @@ module carre_types
       !.. pointx,pointy: coordinates of the points where the gradient
       !                  vanishes
       !.. ii,jj : x and y indices of the cells where the gradient vanishes
-      ! Note on the following arrays: the convention is 
+      ! Note on the following arrays: the convention is
       !  -npx is number of X-points. In limiter configuration npx=1, the single
       !   X-point being the limiter contact point.
       !  -data for the O-point is stored in the same arrays at index npx+1
       !.. npx   : number of the X-points
       !.. ptx,pty: X-point co-ordinates
       !.. iptx,jptx: x and y indices of the cells containing the X-points
-      !.. xpto,ypto: coordinates of the O-point      
+      !.. xpto,ypto: coordinates of the O-point
       !.. racord: determines whether the X-points are connected
       !.. fctpx: the psi values at each X- or O-point
       !.. separx,separy: coordinates of the points of the parametrised
@@ -195,15 +196,15 @@ module carre_types
       !           depending on equilibrium resolution)
       !   distxo  The distance between the active X-point and the O-point
       !.. nsep  : number of the separatrices per the configuration
-      integer :: nx, ny, iptx(npxmx), jptx(npxmx), npx, npxtot,ptsep(4,npxmx), & 
+      integer :: nx, ny, iptx(npxmx), jptx(npxmx), npx, npxtot,ptsep(4,npxmx), &
            &   nptot(4,npxmx), ii(gradmx), jj(gradmx),ptxint, limcfg, nsep
 
-      REAL*8 :: &
+      REAL(rKind) :: &
            & x(nxmax), y(nymax), psi(nxmax,nymax), &
            & psidx(nxmax,nymax), psidy(nxmax,nymax), &
            & a00(nxmax,nymax,3), a10(nxmax,nymax,3),&
            & a01(nxmax,nymax,3), a11(nxmax,nymax,3), &
-           & ptx(npxmx), pty(npxmx), xpto, ypto, fctpx(npxmx), & 
+           & ptx(npxmx), pty(npxmx), xpto, ypto, fctpx(npxmx), &
            & separx(npnimx,4,npxmx), separy(npnimx,4,npxmx), &
            & pointx(gradmx), pointy(gradmx), &
            & eps_Xpt, distxo
@@ -213,10 +214,10 @@ module carre_types
       ! Intersections of faces of the equilibrium grid with the vessel structures
       ! For every node, store intersection for the face towards the top or the
       ! right of it. Third dimension is FACE_EQU_RADIAL or FACE_EQU_VERTICAL
-      logical :: faceISec(1:nxmax, 1:nymax, 2)     
+      logical :: faceISec(1:nxmax, 1:nymax, 2)
       ! categorization of points of the equilibrium grid:
       !  set to GRID_EXTERNAL or GRID_INTERNAL
-      integer :: pointFlag(1:nxmax, 1:nymax)      
+      integer :: pointFlag(1:nxmax, 1:nymax)
 
   end type CarreEquilibrium
 
@@ -240,13 +241,13 @@ module carre_types
 
       integer :: nreg, np1(nregmx), nr(nregmx)
       INTEGER :: nptseg(nsepsegmx)
-      REAL*8  & 
-           & xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), & 
+      REAL(rKind) ::  &
+           & xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx), &
            & ymail(npmamx,nrmamx,nregmx), &
-           & psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
+           & psim(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), &
            & psidym(npmamx,nrmamx,nregmx)
 
-      REAL*8, dimension(npmamx-1,nrmamx-1,nregmx) :: hx, hy
+      REAL(rKind), dimension(npmamx-1,nrmamx-1,nregmx) :: hx, hy
 
       ! For every radial line in every region, store from which
       ! separatrix segment this radial line emanates
@@ -275,8 +276,8 @@ module carre_types
       integer :: cellFaceIStruct(1:4,npmamx-1,nrmamx-1,nregmx)
 
       ! Point flags and point structure indices.
-      ! pointFlagFinalCheck is for a sanity check to test the explicit knowledge 
-      ! about the boundary points at the finalization step 
+      ! pointFlagFinalCheck is for a sanity check to test the explicit knowledge
+      ! about the boundary points at the finalization step
       ! against the implicit knowledge gained by the object categorization.
       integer, dimension(npmamx,nrmamx,nregmx) :: pointFlag, pointStructIndex, &
            & pointFlagFinalCheck
@@ -313,27 +314,27 @@ module carre_types
       !           (distance selector [1=real, 2=psi], curve index)
       !.. nomstr Name of structure
       !.. closed: indicates whether the structure is closed or not
-      integer ::  nstruc = 0, npstru(strumx), & 
-           &    indplq(4,npxmx),inddef(nbdmx), & 
+      integer ::  nstruc = 0, npstru(strumx), &
+           &    indplq(4,npxmx),inddef(nbdmx), &
            &   nbdef, nivtot(nivmx), nbniv
-      REAL*8  & 
-           &   xstruc(npstmx,strumx), ystruc(npstmx,strumx), & 
+      REAL(rKind) ::  &
+           &   xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
            &   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx)
       logical :: closed(strumx)
 
-      ! arrays to hold specific subsets of structures 
+      ! arrays to hold specific subsets of structures
 
       ! r for "real", i.e. the actual device geometry structures
       integer :: rnstruc = 0, rnpstru(strumx)
-      REAL*8 :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
+      REAL(rKind) :: rxstruc(npstmx,strumx), rystruc(npstmx,strumx)
       logical :: rclosed(strumx)
 
       ! v for "virtual", i.e. the virtual structures (either automatically generated or given
       ! as part of the structure.dat input file
       integer :: vnstruc = 0, vnpstru(strumx)
-      REAL*8 :: vxstruc(npstmx,strumx), vystruc(npstmx,strumx)
+      REAL(rKind) :: vxstruc(npstmx,strumx), vystruc(npstmx,strumx)
       logical :: vclosed(strumx)
-      
+
       ! Internal side of a structure (i.e. which side is facing the inside
       ! of the plasma vessel): going along the structure segments, either STRUCT_RIGHT
       ! (clockwise) or STRUCT_LEFT (counterclockwise).

@@ -1,4 +1,4 @@
-      SUBROUTINE ARGSEP(npx,ptx,pty,fctpx,separx,separy,indplq,nptot, & 
+      SUBROUTINE ARGSEP(npx,ptx,pty,fctpx,separx,separy,indplq,nptot, &
      &                 npnimx,ptsep,racord,ptxint,ypto,nbdef,inddef,eps_Xpt)
 !
 !  version : 23.06.98 20:28
@@ -12,26 +12,27 @@
 !..  Cette sous-routine arrange les separatrices de la facon demandee
 !  et les ordonnes selon un ordre precis.
 !======================================================================
+      use KindDefinitions
       IMPLICIT NONE
 
 !  arguments
-      INTEGER npnimx,npx,indplq(4,npx),nptot(4,npx),ptsep(4,npx), & 
+      INTEGER npnimx,npx,indplq(4,npx),nptot(4,npx),ptsep(4,npx), &
      &                                       ptxint,nbdef,inddef(nbdef)
-      REAL*8 ptx(npx),pty(npx),separx(npnimx,4,npx), & 
+      REAL(rKind) :: ptx(npx),pty(npx),separx(npnimx,4,npx), &
      &       separy(npnimx,4,npx),fctpx(npx+1),ypto,eps_Xpt
       LOGICAL racord
 
 !  variables locales
       INTEGER kkmax
       PARAMETER (kkmax=10)
-      real*8 wx(4),wy(4),zero
+      real(rKind) :: wx(4),wy(4),zero
       parameter(zero=0.)
-      INTEGER ipx, ipx2, j, i, k0, kk(kkmax), kkp, k, ind, & 
+      INTEGER ipx, ipx2, j, i, k0, kk(kkmax), kkp, k, ind, &
      &        i1, i2, ipi, j1, j2, k1, k2, l1, l2
 
 !  procedures
       INTEGER coinci
-      real*8 aire
+      real(rKind) :: aire
       LOGICAL tsplaq
       INTRINSIC MOD, ABS
       EXTERNAL coinci,tsplaq,aire
@@ -114,7 +115,7 @@
 !c>>>
         IF (npx .EQ. 1) then
           do 14 j=1, 4
-            IF (.NOT.(tsplaq(separx(1,j,ipx),separy(1,j,ipx), & 
+            IF (.NOT.(tsplaq(separx(1,j,ipx),separy(1,j,ipx), &
      &           nptot(j,ipx),npx,ptx(ipx),pty(ipx),eps_Xpt))) then
               indplq(j,ipx) = 0
             end if
@@ -122,7 +123,7 @@
         else
           ipx2 = MOD(ipx,2) + 1
           do 15 j=1, 4
-            IF (.NOT.(tsplaq(separx(1,j,ipx),separy(1,j,ipx), & 
+            IF (.NOT.(tsplaq(separx(1,j,ipx),separy(1,j,ipx), &
      &          nptot(j,ipx),npx,ptx(ipx2),pty(ipx2),eps_Xpt))) then
               indplq(j,ipx) = 0
             end if
@@ -207,8 +208,8 @@
            kkp = kk(1)
          end if
 !..Parametrise the third separatrix (which meets itself)
-         k = coinci(separx(1,ptsep(3,ipx),ipx),separy(1,ptsep(3,ipx), & 
-     &              ipx),nptot(ptsep(3,ipx),ipx),separx(2,kkp,ipx), & 
+         k = coinci(separx(1,ptsep(3,ipx),ipx),separy(1,ptsep(3,ipx), &
+     &              ipx),nptot(ptsep(3,ipx),ipx),separx(2,kkp,ipx), &
      &              separy(2,kkp,ipx)) + 1
          nptot(ptsep(3,ipx),ipx) = k
          separx(k,ptsep(3,ipx),ipx) = separx(1,1,ipx)
@@ -260,10 +261,10 @@
 !..Connect the end of the separatrices to the other X-point
             ipx = 1
             do 50 ind=3, 4
-               k = coinci(separx(1,ptsep(ind,ipx),ipx), & 
-     &                    separy(1,ptsep(ind,ipx),ipx), & 
-     &                    nptot(ptsep(ind,ipx),ipx), & 
-     &                    separx(2,ptsep(ind,ipx+1),ipx+1), & 
+               k = coinci(separx(1,ptsep(ind,ipx),ipx), &
+     &                    separy(1,ptsep(ind,ipx),ipx), &
+     &                    nptot(ptsep(ind,ipx),ipx), &
+     &                    separx(2,ptsep(ind,ipx+1),ipx+1), &
      &                    separy(2,ptsep(ind,ipx+1),ipx+1)) + 1
                nptot(ptsep(ind,ipx),ipx) = k
                separx(k,ptsep(ind,ipx),ipx) = separx(1,1,ipx+1)
@@ -288,16 +289,16 @@
 !..Determine the X-point which is inner to the other.
 !  Inner X-point is that which has the value of the psi closer to
 !  that of psi on the axis
-            IF (abs(fctpx(1)-fctpx(npx+1)) .lt. & 
+            IF (abs(fctpx(1)-fctpx(npx+1)) .lt. &
      &          abs(fctpx(2)-fctpx(npx+1))) then
                ptxint = 1
                ipx = ptxint
-            else if (abs(fctpx(1)-fctpx(npx+1)) .gt. & 
+            else if (abs(fctpx(1)-fctpx(npx+1)) .gt. &
      &          abs(fctpx(2)-fctpx(npx+1))) then
                ptxint = 2
                ipx = ptxint
             else
-               WRITE(0,*) 'Equal psi values at both X-points for the ', & 
+               WRITE(0,*) 'Equal psi values at both X-points for the ', &
      &                                       'disconnected double null'
 !  100          FORMAT('Double nul deconnecte mais valeur de fonction',
 !     .                ' egale'/'pour chaque point X. PROBLEME !!')
@@ -340,8 +341,8 @@
               kkp = kk(1)
             end if
 !..Parametrise the inner separatrix
-            k = coinci(separx(1,ptsep(3,ipx),ipx),separy(1,ptsep(3,ipx), & 
-     &              ipx),nptot(ptsep(3,ipx),ipx),separx(2,kkp,ipx), & 
+            k = coinci(separx(1,ptsep(3,ipx),ipx),separy(1,ptsep(3,ipx), &
+     &              ipx),nptot(ptsep(3,ipx),ipx),separx(2,kkp,ipx), &
      &              separy(2,kkp,ipx)) + 1
             nptot(ptsep(3,ipx),ipx) = k
             separx(k,ptsep(3,ipx),ipx) = separx(1,1,ipx)
@@ -375,7 +376,7 @@
               else if(i2.eq.0) then
                 i2=k
               else
-                write(0,*) 'Error detected in argsep: more than two ', & 
+                write(0,*) 'Error detected in argsep: more than two ', &
      &                  'targets not intersecting the inner separatrix'
                 call pltend
                 STOP
@@ -383,7 +384,7 @@
             end if
           end do
           if(i2.eq.0) then
-            write(0,*) 'Error detected in argsep: less than two (',i1, & 
+            write(0,*) 'Error detected in argsep: less than two (',i1, &
      &               ' ) targets not intersecting the inner separatrix'
             call pltend
             STOP
@@ -396,7 +397,7 @@
             if(i2.eq.indplq(i,ipx)) j2=i
           end do
           if(j1.eq.0 .or. j2.eq.0) then
-            write(0,*) 'Error detected in argsep: primary targets for', & 
+            write(0,*) 'Error detected in argsep: primary targets for', &
      &                                ' the outer separatrix not found'
             write(0,*) 'i1,i2,inddef: ',i1,i2,' ',inddef
             write(0,*) 'indplq :',indplq

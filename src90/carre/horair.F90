@@ -2,6 +2,7 @@
 !***********************************************************************
       integer function horair(xpto,ypto,x0,y0,xstruc,ystruc,npst,sens)
 !***********************************************************************
+      use KindDefinitions
       use carre_target
 
       implicit none
@@ -13,11 +14,11 @@
 !
 !  arguments
       integer npst,sens
-      real*8 xpto,ypto,x0,y0,xstruc(npst),ystruc(npst)
+      real(rKind) :: xpto,ypto,x0,y0,xstruc(npst),ystruc(npst)
 !
 !  variables locales
       integer ind,im,ip
-      real*8 v0x,v0y,norm,vmx,vmy,vpx,vpy
+      real(rKind) :: v0x,v0y,norm,vmx,vmy,vpx,vpy
 !
 !  procedures
       intrinsic sqrt

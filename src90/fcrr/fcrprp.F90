@@ -5,9 +5,10 @@
 !======================================================================
 !*** Data transformation from DG to Carre
 !======================================================================
+      use KindDefinitions
       implicit none
 #include <FCRCOM.F>
-      integer i, j
+      integer(Short) :: i, j
       logical ex,uex
       real u, dpi
       parameter (dpi=2.*3.141592653589793238462643383280)

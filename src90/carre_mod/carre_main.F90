@@ -1,5 +1,6 @@
 module carre_main
 
+  use KindDefinitions
   use carre_types
   use CarreDiagnostics
   use Helper
@@ -48,7 +49,7 @@ contains
     integer :: iSetupStruct, nEquSteps, iEquStep
 
 
-    REAL*8, PARAMETER :: stp0=0.01, stpmin=0.001
+    REAL(rKind), PARAMETER :: stp0=0.01, stpmin=0.001
     !
     !..4.0  Calculate the first partial derivatives in x and y and store
     !       them in arrays psidx and psidy
@@ -68,7 +69,7 @@ contains
     !
     !..7.0  Select the X-points of interest from the original equilibrium data
     !
-    CALL SELPTX(equ%npxtot,equ%npx,equ%pointx,equ%pointy,equ%ii,equ%jj,equ%ptx, & 
+    CALL SELPTX(equ%npxtot,equ%npx,equ%pointx,equ%pointy,equ%ii,equ%jj,equ%ptx, &
          & equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg,&
          & par)
 
@@ -85,26 +86,26 @@ contains
 
     if (par%nVirtualStructs > 0 .and. par%carreMode == CARRE_EXTENDED) then
         ! set up virtual structures for first pass
-        struct%nstruc = struct%vnstruc 
+        struct%nstruc = struct%vnstruc
         struct%npstru(1:struct%vnstruc) = struct%vnpstru(1:struct%vnstruc)
         struct%xstruc(:,1:struct%vnstruc) = struct%vxstruc(:,1:struct%vnstruc)
-        struct%ystruc(:,1:struct%vnstruc) = struct%vystruc(:,1:struct%vnstruc)    
+        struct%ystruc(:,1:struct%vnstruc) = struct%vystruc(:,1:struct%vnstruc)
         struct%closed(1:struct%vnstruc) = struct%vclosed(1:struct%vnstruc)
     end if
 
-    ! When asked to create virtual targets, needs two passes through the analysis steps that 
+    ! When asked to create virtual targets, needs two passes through the analysis steps that
     ! find and arrange the separatrix pieces and targets
     ! First pass - with real structures: identify target plates, limiting level lines, create virtual structures (if required)
     ! Second pass pass - with virtual structures: identify target plates, limiting level lines
     do iSetupStruct = ORIGINAL_STRUCT_STEP, VIRTUAL_STRUCT_STEP
 
        ! When using equilibrium extension, on the first pass through the structure loop
-       ! we do the geometry analysis twice: first for the original equilibrium, then 
+       ! we do the geometry analysis twice: first for the original equilibrium, then
        ! the psi data is modified, then a second pass is done to update the data.
        ! This allows modifications to the equilibrium data that change psi inside the vessel
        ! (in case you want to do that, at your own risk).
 
-       if (par%equExtensionMode == EQU_EXTENSION_OFF) then 
+       if (par%equExtensionMode == EQU_EXTENSION_OFF) then
           ! Use default equlibrium data
           nEquSteps = GIVEN_EQU_STEP
        else
@@ -134,17 +135,17 @@ contains
 
              ! Configuration with X-points
 
-             CALL SPTRIS(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, & 
-                  &      equ%iptx,equ%jptx,equ%fctpx,equ%separx,equ%separy,equ%nptot, & 
+             CALL SPTRIS(equ%nx,equ%ny,equ%x,equ%y,equ%psi,equ%npx,equ%ptx,equ%pty, &
+                  &      equ%iptx,equ%jptx,equ%fctpx,equ%separx,equ%separy,equ%nptot, &
                   &      struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
-                  &      struct%indplq,struct%inddef,struct%nbdef, & 
+                  &      struct%indplq,struct%inddef,struct%nbdef, &
                   &      equ%a00,equ%a10,equ%a01,equ%a11, struct)
 
              !
              !..9.0  Arrange the separatrices
              !
              CALL ARGSEP(equ%npx,equ%ptx,equ%pty,equ%fctpx,equ%separx,equ%separy,&
-                  & struct%indplq,equ%nptot,npnimx, & 
+                  & struct%indplq,equ%nptot,npnimx, &
                   & equ%ptsep,equ%racord,equ%ptxint,equ%ypto,struct%nbdef,struct%inddef,&
                   & equ%eps_Xpt)
 
@@ -155,11 +156,11 @@ contains
              !  13.   Identify the limiter
              !
              call limfnd(equ%xpto,equ%ypto,struct%nivx,struct%nivy,stp0,stpmin,&
-                  & struct%distnv,struct%nivtot, & 
+                  & struct%distnv,struct%nivtot, &
                   & struct%nbniv,equ%nx,equ%ny,equ%x,equ%y,equ%psi,&
-                  & equ%npx,equ%ptx,equ%pty,equ%fctpx, & 
+                  & equ%npx,equ%ptx,equ%pty,equ%fctpx, &
                   & struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,&
-                  & struct%indplq,struct%inddef,struct%nbdef, & 
+                  & struct%indplq,struct%inddef,struct%nbdef, &
                   & equ%a00,equ%a10,equ%a01,equ%a11,struct,equ, iSetupStruct==VIRTUAL_STRUCT_STEP)
 
              do itmp=1,4
@@ -173,34 +174,34 @@ contains
              !
              !<<<
              write(0,*) '=== carre *..10.0 - before frtier'
-             write(0,'(5h ptx:,1p,8e12.4/(5x,8e12.4))') equ%ptx(1:equ%npx)
-             write(0,'(5h pty:,1p,8e12.4/(5x,8e12.4))') equ%pty(1:equ%npx)
+             write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' ptx:',equ%ptx(1:equ%npx)
+             write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' pty:',equ%pty(1:equ%npx)
              if(equ%limcfg.eq.0) then
                 write(0,*) 'nptot(4,nxpoints)'
                 write(0,'(1x,16i5)') ((equ%nptot(i,j),i=1,4),j=1,equ%npx)
                 write(0,*) 'Strike points (presumably)'
-                write(0,'(3h x:,1p,8e12.4/(3x,8e12.4))') & 
+                write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' x:',&
                      &     ((equ%separx(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
-                write(0,'(3h y:,1p,8e12.4/(3x,8e12.4))') & 
+                write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' y:',&
                      &     ((equ%separy(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
                 !>>>
                 call trc_stk_in('carre','*..10.0')
 
                 call writeGridStateToSiloFile('carreFrtierA000', equ, struct)
 
-                CALL FRTIER(equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc, & 
+                CALL FRTIER(equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc, &
                      &      struct%npstru,struct%xstruc,struct%ystruc,struct%inddef,&
-                     &      struct%nbdef,equ%npx,equ%separx, & 
+                     &      struct%nbdef,equ%npx,equ%separx, &
                      &      equ%separy,equ%nptot,equ%ptsep,equ%racord,struct%nivx,&
-                     &      struct%nivy,struct%nivtot, & 
-                     &      struct%nbniv,stp0,stpmin, & 
+                     &      struct%nivy,struct%nivtot, &
+                     &      struct%nbniv,stp0,stpmin, &
                      &      struct%distnv,equ%ptxint,equ%a00,equ%a10,equ%a01,equ%a11)
                 call trc_stk_out
              endif
 
-             call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, & 
-                  &        equ%ptsep,equ%npx,equ%nptot, & 
-                  &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
+             call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, &
+                  &        equ%ptsep,equ%npx,equ%nptot, &
+                  &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
                   &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
 
           end if
@@ -209,7 +210,7 @@ contains
 
        ! At this point the equilibrium and topology data is in the final form.
        if ( par%carreMode == CARRE_STANDARD ) then
-           ! If no virtual targets are to be created, exit loop and go directly to grid generation                 
+           ! If no virtual targets are to be created, exit loop and go directly to grid generation
            exit
        elseif ( par%nVirtualStructs > 0 ) then
            ! virtual structures were supplied (only possible in CARRE_EXTENDED mode), do not create them
@@ -219,8 +220,8 @@ contains
           ! setup for the grid generation was done for them. Exit here and go directly to grid generation.
           if ( iSetupStruct == VIRTUAL_STRUCT_STEP ) exit
 
-          if (equ%limcfg /= 0) then 
-             call setupVirtualLimiterGeometry(par, equ, struct)           
+          if (equ%limcfg /= 0) then
+             call setupVirtualLimiterGeometry(par, equ, struct)
           else if (equ%npx > .0) then
              ! if we have a case with X-points, set up virtual geometry
              !..   10.1  Set up virtual targets/structures
@@ -233,7 +234,7 @@ contains
           end if
 
           ! They are only actually used in extended grid mode
-          if ( par%carreMode == CARRE_EXTENDED ) then              
+          if ( par%carreMode == CARRE_EXTENDED ) then
              struct%nstruc = struct%vnstruc
              struct%npstru = struct%vnpstru
              struct%xstruc = struct%vxstruc

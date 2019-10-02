@@ -14,7 +14,7 @@ DEFINES += -DGFORTRAN
 endif
 
 FC      = gfortran
-CPP     = /lib/cpp -traditional
+CPP     = /lib/cpp -traditional -ffreestanding
 
 FFLAGS  = -J${OBJDIR} -ffree-line-length-none -fno-second-underscore 
 ifdef SOLPS_DEBUG

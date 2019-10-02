@@ -8,6 +8,7 @@ program tradui
   !*** This program translates the grid created with carre into other
   !*** grid formats
   !======================================================================
+  use KindDefinitions
   use b2mod_connectivity
   use b2mod_grid_mapping
   use b2ag_ghostcells
@@ -16,7 +17,6 @@ program tradui
   use carre_parameter_io
   use tradui_constants
   use carre_b2ag
-  use b2mod_silo
 
   implicit none
 
@@ -27,22 +27,24 @@ program tradui
   !  variables locales
   integer :: nxmx, nymx, ncutmx
   parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4)
-  integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), & 
-      & ifail,nx,ny, nnx, nny, & 
+  integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), &
+      & ifail,nx,ny, nnx, nny, &
       & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
       & cflag(npmamx,nrmamx,nregmx,CARREOUT_NCELLFLAGS)
   integer b2cflag(-1:nxmx,-1:nymx,CARREOUT_NCELLFLAGS)
-  real*8 r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx), & 
-      &  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), & 
+  real(rKind) :: r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx), &
+      &  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), &
       &  psidym(npmamx,nrmamx,nregmx),distxo
-  real*8 crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), & 
-      &  bb(-1:nxmx,-1:nymx,0:3),b0r0, & 
-      &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), & 
+  real(rKind) :: crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), &
+      &  bb(-1:nxmx,-1:nymx,0:3),b0r0, &
+      &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), &
       &  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3),&
       &  psi_tmp(-1:nxmx,-1:nymx,0:4,0:2),&
-      &  crx_tmp(-1:nxmx,-1:nymx,0:4),cry_tmp(-1:nxmx,-1:nymx,0:4), &
-      &  silo_tmp(-1:nxmx,-1:nymx)
-  
+      &  crx_tmp(-1:nxmx,-1:nymx,0:4),cry_tmp(-1:nxmx,-1:nymx,0:4)
+#ifdef USE_SILO
+   real(rKind) :: silo_tmp(-1:nxmx,-1:nymx)
+#endif
+
   character nom*80
 
   ! connectivity and cut arrays
@@ -53,12 +55,13 @@ program tradui
 
   type(CarreParameters) :: par
 
-  type(B2ITMGridMap) :: b2gd
+  type(B2GridMap) :: b2gd
   integer :: inseltop, inselbot, nnreg(0:2)
   integer, allocatable :: region(:,:,:), resignore(:,:,:)
   integer, parameter :: istyle = -1 ! hard-wired to DG format
-  
+
   logical, parameter :: ITM_OUTPUT_GHOSTCELLS = .false.
+  real(rKind), parameter :: geom_match_dist = 1.0e-6_rKind
 
 
   ! variables for UAL I/O
@@ -73,7 +76,7 @@ program tradui
 
 
   !  procedures
-  external limail, ecrim1, b2agfz, ecrim2, ecrim3, & 
+  external limail, ecrim1, b2agfz, ecrim2, ecrim3, &
       &        ecrim4
   !======================================================================
   !*** nregmx: maximum number of regions
@@ -116,7 +119,7 @@ program tradui
 
   !* 3.   Read the grid
 
-  call limail(nin,nreg,nppol,nprad,r,z,psi,psidxm,psidym, & 
+  call limail(nin,nreg,nppol,nprad,r,z,psi,psidxm,psidym, &
       &  cflag,npmamx,nrmamx,nregmx,par%carre_format)
   if(nreg.eq.2) then
     periodic_bc = 1
@@ -133,10 +136,10 @@ program tradui
   write(6,*) '4: format DG-SONNET-B2-EIRENE'
   write(6,*) '5: revised DIVIMP with grid parameters and PSI values'
 #ifdef USE_ITMCARRE
-  write(6,*) '6: Write ITM CPO' 
+  write(6,*) '6: Write ITM CPO'
 #endif
 #ifdef USE_SILO
-  write(6,*) '7: Write SILO file' 
+  write(6,*) '7: Write SILO file'
 #endif
   write(6,*) '8: format B2.5 (old style)'
   write(6,*) '9: format SONNET-DIVIMP, only internal cells'
@@ -148,14 +151,14 @@ program tradui
       !
       ! Mailtri format
       !
-      call ecrim1(nout,nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, & 
+      call ecrim1(nout,nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, &
           &  nrmamx)
    elseif(isel.eq.8) then
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
            r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
            par%nptseg,psidx,psidy,psi,psidxm,psidym,cflag,b0r0, &
            ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
            &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
 !!$        call b2agbb (nx,ny,fpsi,ffbz,bb, &
 !!$          crx,cry,psidx,psidy,nxmx,nymx)
@@ -166,12 +169,12 @@ program tradui
       !
       ! B2.5 Format (Carre script default)
       !
-      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
+      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
           & par%nptseg,psidx,psidy,&
-          & psi,psidxm,psidym,cflag,b0r0, & 
+          & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! We do not create guard cells, but b2agfz still places
       ! the real cells starting at (0,0) (i.e. the x/y=-1 slots are empty).
@@ -191,12 +194,12 @@ program tradui
       !
       ! Original SONNET/DIVIMP format
       !
-      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
+      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
           & par%nptseg,psidx,psidy,&
-          & psi,psidxm,psidym,cflag,b0r0, & 
+          & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
       call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
@@ -204,49 +207,49 @@ program tradui
       !
       ! Original SONNET/DIVIMP format, only internal cells
       !
-      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
+      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
           & par%nptseg,psidx,psidy,&
-          & psi,psidxm,psidym,cflag,b0r0, & 
+          & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
   elseif(isel.eq.4) then
       !
       !*** B2-Sonnet-DG format
       !
-      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
+      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
           & par%nptseg,psidx,psidy,&
-          & psi,psidxm,psidym,cflag,b0r0, & 
+          & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
-      call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmx,nymx, & 
+      call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmx,nymx, &
           &                                ncut,nxcut,nycut,niso,nxiso)
   elseif(isel.eq.5) then
       !
       ! Revised DIVIMP format with additional grid information and PSI values
       !
-      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
+      call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
           & par%nptseg,psidx,psidy,&
-          & psi,psidxm,psidym,cflag,b0r0, & 
+          & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), & 
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! jdemod - added fpsi to call to ecrim5
       call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
   elseif(isel >= 6 .and. isel <= 7) then
 
       ! assemble the crx, cry arrays
-      ! the same applies here as in case 2 w.r.t. grid extent: no ghost cells, 
+      ! the same applies here as in case 2 w.r.t. grid extent: no ghost cells,
       ! storage is in 0:nx-1, 0:ny-1
-      call b2agfz(nnx,nny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, & 
-          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, & 
+      call b2agfz(nnx,nny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
+          & r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
           & par%nptseg,psidx,psidy,&
-          & psi,psidxm,psidym,cflag,b0r0, & 
+          & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,&
           & ITM_DO_CLASSICAL_GHOSTCELLS)
       ! This gives crx, cry, fpsi, ffbz, psidx, psidy, b2cflag
@@ -304,7 +307,7 @@ program tradui
 
       end if
 
-      ! allocate connectivity arrays 
+      ! allocate connectivity arrays
       allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
           & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
 
@@ -315,26 +318,25 @@ program tradui
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, &
           & leftcut,rightcut,bottomcut,topcut, &
-          & periodic_bc,nncut,ncutmx,inseltop, inselbot, & 
+          & periodic_bc,nncut,ncutmx,inseltop, inselbot, &
           & geom_match_dist,istyle)
 
       ! compute the region arrays
       allocate( region(-1:nx, -1:ny, 0:2) )
       allocate( resignore(-1:nx, -1:ny, 1:2) )
-      
+
       nncut = 0
 
       call init_region(nx,ny,nncut,ncutmx, &
           & leftcut,rightcut,topcut,bottomcut, &
-          & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
+          & leftix,rightix,rightiy,topix,topiy,bottomiy, &
           & region,nnreg,resignore, &
-          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),periodic_bc, &
-          & b2cflag(-1:nx,-1:ny,:) )
+          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),periodic_bc)
 
 !      region(:,:,0)=1
 
       ! set up the B2<->CPO mappings
-      call b2ITMCreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
+      call b2CreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
           & b2cflag(-1:nx,-1:ny,:),&
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, ITM_OUTPUT_GHOSTCELLS, b2gd)
@@ -374,7 +376,7 @@ program tradui
 
          call close_ual(idx)
 #endif
-      else if (isel == 7) then 
+      else if (isel == 7) then
 #ifdef USE_SILO
          call b2silo_open("traduitAAA")
          call b2silo_writeGrid( "grid", b2gd, nx, ny, &

@@ -1,9 +1,11 @@
-      REAL*8 FUNCTION nulort(d)
+      FUNCTION nulort(d)
 !
 !  version : 07.07.97 18:37
 !
 !======================================================================
+      use KindDefinitions
       IMPLICIT NONE
+      REAl(rKind) :: nulort
 
 !..  Cette fonction
 
@@ -12,14 +14,14 @@
 #include <CARREDIM.F>
 
 ! arguments
-      REAL*8 d
+      REAL(rKind) :: d
 
 !  variables en common
 
 #include <COMORT.F>
 
 !  variables locales
-      REAL*8 x2,y2,ux2,uy2,x12,y12,zlong,dd
+      REAL(rKind) :: x2,y2,ux2,uy2,x12,y12,zlong,dd
 
 !  procedures
       INTRINSIC SQRT,INT

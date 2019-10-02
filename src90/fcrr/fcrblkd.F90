@@ -3,6 +3,7 @@
 !  version : 27.07.99 23:28
 !
 !======================================================================
+      use KindDefinitions
       implicit none
       integer n
 #include <FCRCOM.F>

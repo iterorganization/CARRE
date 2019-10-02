@@ -52,7 +52,7 @@ contains
 
     ! internal
     integer :: iReg, iPostProcess, nCellsToRefine, nCellsToRefineFix, nCellsToCoarsen
-    integer :: iBnd, iRad, iPol, iStruc
+    integer :: iStruc
     logical :: doesIntersect
     integer :: npReg(nregmx), npDiff, action
     integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
@@ -773,7 +773,7 @@ contains
     logical, intent(in) :: finalized
 
     ! internal
-    integer :: iReg, xip, xir, iPol, nBndPoints, ip, ir, ipMin, irMin, iRegMin
+    integer :: iReg, iPol, nBndPoints, ip, ir, ipMin, irMin, iRegMin
     logical :: setBoundary 
     double precision :: dmin, d
 
@@ -1320,7 +1320,10 @@ contains
     integer :: iOtherFcP, iOtherFcR
 
     double precision :: llx(npnimx), lly(npnimx)
-    integer :: llNp, iRegOther, i
+    integer :: llNp, iRegOther
+#ifdef USE_SILO
+    integer :: i
+#endif
 
     logical :: doesIntersect, alignment, regionHasFace
     double precision :: newPx, newPy
@@ -1563,8 +1566,10 @@ contains
     ! Criteria values
     double precision, dimension(size(refx)) :: critNew, critModified
 
+#ifdef USE_SILO
     ! debug plotting
     double precision :: tmpMailx(size(refx),2), tmpMaily(size(refy),2)
+#endif
 
     ! externals
     double precision :: long, ruban
@@ -1818,9 +1823,8 @@ contains
       logical, intent(in) :: force
 
       ! internal
-      integer :: iContinue, iRegOther, ipOther, irOther, i
+      integer :: i
       integer :: ipRegions(grid%nreg)
-      double precision :: xBnd, yBnd
       logical :: updateSegSegs(nsepsegmx)
 
 
@@ -1967,7 +1971,7 @@ contains
     integer :: iReg, ir, ip, iFace, ip2, ir2
     integer :: nExt
 
-    integer :: iPass, dx, dy, nInt, ipl, irl, ipFix, irFix, ipNb, irNb
+    integer :: iPass, dx, dy, nInt, ipFix, irFix, ipNb, irNb
     integer :: ipFace, irFace
     integer :: ipPolFace, irPolFace,  ipRadFace, irRadFace
     integer :: ipNbRad, irNbRad, ipNbPol, irNbPol

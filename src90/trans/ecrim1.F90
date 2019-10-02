@@ -1,6 +1,7 @@
 !=======================================================================
       subroutine ecrim1(nout,nfin,rm,zm,nptseg,nreg,nppol,nprad, & 
      &  npmamx,nrmamx)
+      use KindDefinitions
       implicit none
 !  cette sousroutine ecrit une maille curviligne orthogonale produite
 !  par le programme carre, sous un format particulier.
@@ -8,14 +9,14 @@
 !  arguments
       integer npmamx,nrmamx,nout,nfin,nreg,nppol(*),nprad(*), & 
      &  nptseg(*)
-      real*8 rm(npmamx,nrmamx,*),zm(npmamx,nrmamx,*)
+      real(rKind) :: rm(npmamx,nrmamx,*),zm(npmamx,nrmamx,*)
 !
 !  variables locales
       integer ntrmax
       parameter(ntrmax=3000)
       integer ncoord,nelem,ielem,iplq(4),iflx(5),ir,ipol,ireg,i,j, & 
      &  e(3,ntrmax),v(3,ntrmax),icoord,itrop,iremp,cotali(ntrmax),t,r
-      real*8 xmail(ntrmax/2),ymail(ntrmax/2)
+      real(rKind) :: xmail(ntrmax/2),ymail(ntrmax/2)
 !
 !  iplq(i): indice de frontiere associe a la plaque i
 !  iflx(i): indice de frontiere associe a la surface de flux i

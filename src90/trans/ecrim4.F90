@@ -1,4 +1,4 @@
-      subroutine ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmax,nymax, & 
+      subroutine ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmax,nymax, &
      &                                    ncut,nxcut,nycut,niso,nxiso)
 !
 !  version : 11.01.99 22:40
@@ -10,17 +10,18 @@
 !xpb-20070424: removed the abs() of brat so the helicity information
 !              is kept !
 !======================================================================
+      use KindDefinitions
       implicit none
 !
 !  arguments
-      integer i,nfin,nx,ny,nxmax,nymax,ncut,nxcut(ncut),nycut(ncut), & 
+      integer i,nfin,nx,ny,nxmax,nymax,ncut,nxcut(ncut),nycut(ncut), &
      &       niso,nxiso(niso+1)
-      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
+      real(rKind) :: crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), &
      &  bb(-1:nxmax,-1:nymax,0:3),b0r0
 !
 !  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real*8 x0,y0,brat
+      real(rKind) :: x0,y0,brat
 !
 !  procedures
 !======================================================================
@@ -42,7 +43,7 @@
       if(niso.gt.0) then
         write(nfin,*) '   nxiso  =',(nxiso(i),i=1,niso)
       end if
-      write(nfin,'(/3x,2a)') '======================================', & 
+      write(nfin,'(/3x,2a)') '======================================', &
      &             '=================================================='
 
        icell=0
@@ -60,21 +61,21 @@
 
 !* 2.3  print B2 input data
 
-          write(nfin,101) icell,ix+1,iy+1,crx(ix,iy,2),cry(ix,iy,2), & 
+          write(nfin,101) icell,ix+1,iy+1,crx(ix,iy,2),cry(ix,iy,2), &
      &      crx(ix,iy,3),cry(ix,iy,3)
- 101      format(3x,'Element',i5,' = (',i3,',',i3,'): (', & 
-     &      1pe17.10,',',1pe17.10,')', & 
+ 101      format(3x,'Element',i5,' = (',i3,',',i3,'): (', &
+     &      1pe17.10,',',1pe17.10,')', &
      &      6x,'(',1pe17.10,',',1pe17.10,')')
           write(nfin,102)brat,x0,y0
- 102      format(3x,'Field ratio  = ',1pe17.10,13x, & 
+ 102      format(3x,'Field ratio  = ',1pe17.10,13x, &
      &      '(',1pe17.10,',',1pe17.10,')')
-          write(nfin,103)crx(ix,iy,0),cry(ix,iy,0), & 
+          write(nfin,103)crx(ix,iy,0),cry(ix,iy,0), &
      &      crx(ix,iy,1),cry(ix,iy,1)
- 103      format( & 
-     &      t30,'(',1pe17.10,',',1pe17.10,')', & 
+ 103      format( &
+     &      t30,'(',1pe17.10,',',1pe17.10,')', &
      &      6x,'(',1pe17.10,',',1pe17.10,')')
           write(nfin,105)
- 105      format(3x,'------------------------------------------------', & 
+ 105      format(3x,'------------------------------------------------', &
      &                      '----------------------------------------')
           icell=icell+1
         enddo
@@ -87,7 +88,7 @@
       cut2=0
       do iy=ny-1,0,-1
       do ix=0,nx-2
-        if(crx(ix,iy,1).ne.crx(ix+1,iy,0) .or. & 
+        if(crx(ix,iy,1).ne.crx(ix+1,iy,0) .or. &
      &     cry(ix,iy,1).ne.cry(ix+1,iy,0)) then
           if(cut1.eq.0) then
             cut1=ix+1

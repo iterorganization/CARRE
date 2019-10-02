@@ -1,15 +1,16 @@
 !***********************************************************************
       LOGICAL FUNCTION chgdir(nivox,nivoy,nivxtm,nivytm)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette fonction verifie si 2 vecteurs sont de sens inverse ou non.
 
 !  arguments
-      REAL*8 nivox(*),nivoy(*),nivxtm(*),nivytm(*)
+      REAL(rKind) :: nivox(*),nivoy(*),nivxtm(*),nivytm(*)
 
 !  variables locales
-      REAL*8 x1,x2,y1,y2,scal
+      REAL(rKind) :: x1,x2,y1,y2,scal
 
 !=========================
 !.. nivox,nivoy: tableaux contenant les coordonnees des points du

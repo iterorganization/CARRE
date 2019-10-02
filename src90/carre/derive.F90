@@ -8,7 +8,8 @@
 !  derivee selon x et la derivee selon y.
 !======================================================================
 
-        use carre_types
+      use KindDefinitions
+      use carre_types
 
       IMPLICIT NONE
 
@@ -19,13 +20,13 @@
 !  arguments
       type(CarreEquilibrium), intent(inout) :: equ
 !!$      INTEGER nx, ny
-!!$      REAL*8 psi(nxmax,nymax), psidx(nxmax,nymax), psidy(nxmax,nymax), & 
+!!$      REAL(rKind) :: psi(nxmax,nymax), psidx(nxmax,nymax), psidy(nxmax,nymax), &
 !!$     &  x(nx),y(ny)
 
 !  variables locales
       INTEGER i, j, nxymax
       parameter (nxymax=nymax)
-      REAL*8 tmp(nxymax), tmpp(nxymax)
+      REAL(rKind) :: tmp(nxymax), tmpp(nxymax)
 
 !  procedures
       EXTERNAL DERIV

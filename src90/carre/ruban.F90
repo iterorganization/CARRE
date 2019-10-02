@@ -1,23 +1,25 @@
 
 !***********************************************************************
-      REAL*8 FUNCTION ruban(xn,yn,n,x1,y1,d)
+      FUNCTION ruban(xn,yn,n,x1,y1,d)
 !***********************************************************************
+      use KindDefinitions, only : rKind
       IMPLICIT NONE
+      REAL(rKind) :: ruban
 
 !..  Cette fonction retourne la distance entre le debut de la courbe et
 !  le point x1,y1.
 
 !  arguments
       INTEGER n
-      REAL*8 x1,y1,xn(n),yn(n),d
+      REAL(rKind) :: x1,y1,xn(n),yn(n),d
 
 !  variables locales
       INTEGER ind
-      REAL*8 dist
+      REAL(rKind) :: dist
 
 !  procedures
       INTEGER indcrb
-      REAL*8 long
+      REAL(rKind) :: long
       INTRINSIC SQRT
       EXTERNAL indcrb, long
 

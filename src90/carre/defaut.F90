@@ -3,6 +3,7 @@
 !  version : 22.06.98 14:45
 !
 !======================================================================
+      use KindDefinitions
       implicit none
 !..  Definition de certaines variables par defaut
 !

@@ -1,6 +1,6 @@
-      SUBROUTINE MARCHE(x0,y0,plaque,fraplq,sens,nivox,nivoy,nvotot, & 
-     &        nbcrb,xt,yt,nt,stp0,stpmin,nx,ny,x,y,psi, & 
-     &        nstruc,npstru,xstruc,ystruc,a00,a10, & 
+      SUBROUTINE MARCHE(x0,y0,plaque,fraplq,sens,nivox,nivoy,nvotot, &
+     &        nbcrb,xt,yt,nt,stp0,stpmin,nx,ny,x,y,psi, &
+     &        nstruc,npstru,xstruc,ystruc,a00,a10, &
      &        a01,a11,indlim)
 
 !======================================================================
@@ -23,20 +23,20 @@
 #include <CARREDIM.F>
 
 !  arguments
-      INTEGER nx,ny,nstruc,npstru(strumx),indlim, & 
+      INTEGER nx,ny,nstruc,npstru(strumx),indlim, &
      &        nvotot,plaque,fraplq,sens,nbcrb,nt(2)
 
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx), & 
-     &     ystruc(npstmx,strumx),x0,y0,stp0,stpmin,nivox(npnimx), & 
-     &     nivoy(npnimx),a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-     &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
+      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx), &
+     &     ystruc(npstmx,strumx),x0,y0,stp0,stpmin,nivox(npnimx), &
+     &     nivoy(npnimx),a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
+     &     a01(nxmax,nymax,3),a11(nxmax,nymax,3), &
      &     xt(npnimx,2),yt(npnimx,2)
 
 !  variables locales
       INTEGER ii,jj,dir,k,j,repart,ind1,ind2,ind3,indstr
-      REAL*8 const1
+      REAL(rKind) :: const1
       PARAMETER (const1=1.E-08)
-      REAL*8 pas,x1,y1,x2,y2,psi1,psi2,pastmp,ecart1,ecart2, & 
+      REAL(rKind) :: pas,x1,y1,x2,y2,psi1,psi2,pastmp,ecart1,ecart2, &
      &       niv1x(npnimx),niv1y(npnimx)
       LOGICAL echec,coin,ouvert, crbnivFailed
 
@@ -123,18 +123,18 @@
       x2 = x0
       y2 = y0
 
-      ouvert=xstruc(1,plaque).ne.xstruc(npstru(plaque),plaque) & 
+      ouvert=xstruc(1,plaque).ne.xstruc(npstru(plaque),plaque) &
      &  .or. ystruc(1,plaque).ne.ystruc(npstru(plaque),plaque)
-      
+
       !..Calcul de la valeur de la fonction au premier point / Calculate psi value at first point.
 
       ii = ifind(x2,x,nx,1)
       jj = ifind(y2,y,ny,1)
 
-      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &       a11(ii,jj,1)*x2*y2
 
-      ind2 = indsgm(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
+      ind2 = indsgm(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), &
      &              x2,y2)
 
 !..Initialisation.
@@ -166,9 +166,9 @@
       coin = .FALSE.
 
 !..On recherche le prochain point / Look for the next point.
-      
-      CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
-           & x1,y1,psi1,x2,y2,pas,sens,repart,nx,ny,x,y, & 
+
+      CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), &
+           & x1,y1,psi1,x2,y2,pas,sens,repart,nx,ny,x,y, &
            & a00,a10,a01,a11,nxmax,nymax)
 
       ! TODO: check that we are inside the given psi range
@@ -177,7 +177,7 @@
 
       IF ((x2 .LT. x(1)) .OR. (x2 .GT. x(nx)) &
            & .OR. (y2 .LT. y(1)) .OR.(y2 .GT. y(ny))) THEN
-          
+
          pastmp = pastmp/2.
          pas = pastmp
          x2 = x1
@@ -193,9 +193,9 @@
 
       ind2 = indsgm(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque),x2,y2)
 
-      ! If we stepped onto the next structure segment, 
+      ! If we stepped onto the next structure segment,
       ! set the current stepping point to the node connecting
-      ! the two segments. 
+      ! the two segments.
       IF (ind1 .NE. ind2) THEN
 
          COIN = .TRUE.
@@ -239,9 +239,9 @@
       echec = .FALSE.
       dir = 0
       k = 1
-      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-     &            niv1x,niv1y, & 
-     &            nstruc,npstru,xstruc,ystruc, & 
+      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, &
+     &            niv1x,niv1y, &
+     &            nstruc,npstru,xstruc,ystruc, &
      &            indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
 
 !..Si on est rendu a l'extremite du segment, on verifie si ce point est
@@ -260,13 +260,13 @@
 !  just taken.  If not, one continues, preserving the point just obtained,
 !  the direction, and the coordinate cross section.
 
-      IF ((ABS(x2-x(nx)).LT.const1) .OR. (ABS(y2-y(ny)).LT.const1) & 
-     &  .OR. (ABS(x2-x(1)).LT.const1) .OR. (ABS(y2-y(1)).LT.const1)) & 
+      IF ((ABS(x2-x(nx)).LT.const1) .OR. (ABS(y2-y(ny)).LT.const1) &
+     &  .OR. (ABS(x2-x(1)).LT.const1) .OR. (ABS(y2-y(1)).LT.const1)) &
      &                                                         THEN
 
-         IF (((dir .EQ. 1) .AND. (ii .EQ. nx)) & 
-     &       .OR. ((dir .EQ. 2) .AND. (jj .EQ. ny)) & 
-     &       .OR. ((dir .EQ. 3) .AND. (ii .EQ. 1)) & 
+         IF (((dir .EQ. 1) .AND. (ii .EQ. nx)) &
+     &       .OR. ((dir .EQ. 2) .AND. (jj .EQ. ny)) &
+     &       .OR. ((dir .EQ. 3) .AND. (ii .EQ. 1)) &
      &       .OR. ((dir .EQ. 4) .AND. (jj .EQ. 1))) THEN
 
             k = 1
@@ -274,13 +274,13 @@
             ii = ii - MOD(dir-2,2)
             jj = jj - MOD(dir-3,2)
 
-            CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-     &             niv1x,niv1y,nstruc,npstru, & 
+            CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, &
+     &             niv1x,niv1y,nstruc,npstru, &
      &             xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2)
 
             if(indstr.ne.0 .and. indstr.ne.fraplq) indlim=indstr
 
-            IF (cross(ind2,niv1x,niv1y,xstruc(1,plaque), & 
+            IF (cross(ind2,niv1x,niv1y,xstruc(1,plaque), &
      &                         ystruc(1,plaque),npstru(plaque)))   THEN
 
                echec = .TRUE.
@@ -304,10 +304,10 @@
 
          IF (chgdir(niv1x,niv1y,nivox,nivoy))     THEN
 
-            IF ((inStruct(niv1x(2),niv1y(2),xstruc(1,plaque), & 
-     &                         ystruc(1,plaque),npstru(plaque))) & 
-     &         .OR. (cross(ind2,niv1x,niv1y,xstruc(1,plaque), & 
-     &                         ystruc(1,plaque),npstru(plaque))) & 
+            IF ((inStruct(niv1x(2),niv1y(2),xstruc(1,plaque), &
+     &                         ystruc(1,plaque),npstru(plaque))) &
+     &         .OR. (cross(ind2,niv1x,niv1y,xstruc(1,plaque), &
+     &                         ystruc(1,plaque),npstru(plaque))) &
      &         .OR. ouvert)   THEN
 
                k = 1
@@ -322,9 +322,9 @@
          ELSE
 
            if(.not. ouvert) then
-            IF ((inStruct(niv1x(2),niv1y(2),xstruc(1,plaque), & 
-     &                           ystruc(1,plaque),npstru(plaque))) & 
-     &        .OR. (cross(ind2,niv1x,niv1y,xstruc(1,plaque), & 
+            IF ((inStruct(niv1x(2),niv1y(2),xstruc(1,plaque), &
+     &                           ystruc(1,plaque),npstru(plaque))) &
+     &        .OR. (cross(ind2,niv1x,niv1y,xstruc(1,plaque), &
      &                          ystruc(1,plaque),npstru(plaque)))) THEN
 
                echec = .TRUE.
@@ -336,15 +336,15 @@
       !..Pour les points successifs, on poursuit jusqu'a ce qu'on frappe une
       !  structure.
       !  For subsequent points, continue until one strikes a structure.
-      
+
       IF (.NOT.(echec)) THEN
 
-         CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-              &          niv1x,niv1y,nstruc,npstru,xstruc, & 
+         CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, &
+              &          niv1x,niv1y,nstruc,npstru,xstruc, &
               &          ystruc,indstr,xt,yt,nt,nbcrb,plaque,x2,y2, &
               &          allowFail = .true., failed = crbnivFailed)
-         
-         if (crbnivFailed) then 
+
+         if (crbnivFailed) then
             ! finding the level line failed, try error handling
             echec = .true.
          else
@@ -359,19 +359,19 @@
 !  our starting plate.  If not, advance one step and start over.
 
       IF ((indstr .EQ. fraplq) .AND. (.NOT.(echec))) THEN
-          
+
           DO j=1, k
               nivox(j) = niv1x(j)
               nivoy(j) = niv1y(j)
           end do
-       
+
           nvotot = k
 
           IF (pastmp .LT. stp0) THEN
               pastmp = pastmp/2.
-              pas = pastmp              
+              pas = pastmp
           ELSE
-              pas = pastmp             
+              pas = pastmp
           ENDIF
 
       ELSE

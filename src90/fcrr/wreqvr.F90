@@ -3,7 +3,7 @@
 !  version : 29.04.97 21:55
 !
 !======================================================================
-!*** Wrighting the CARRE equilibrium file
+!*** Writing the CARRE equilibrium file
 !***
 !*** Input:
 !***  lun     the logical unit number for the output
@@ -17,9 +17,10 @@
 !*** Output:
 !***  iret    return code (0 means OK)
 !======================================================================
+      use KindDefinitions
       implicit none
-      integer lun,ngpr,iret,nr,nz
-      real*8 pfm(ngpr,*),rgr(ngpr),zgr(*)
+      integer(Short) lun,ngpr,iret,nr,nz
+      real(rKind) :: pfm(ngpr,*),rgr(ngpr),zgr(*)
 !
       integer i,j
 !======================================================================

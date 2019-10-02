@@ -2,16 +2,17 @@
 !***********************************************************************
       subroutine rotate(x1, x2, phi)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 ! rotate a vector (x1,x2) by angle phi. Note that the rotation
 ! is in the counterclocwise direction
 
 !  arguments
-      REAL*8 x1, x2, phi
+      REAL(rKind) :: x1, x2, phi
 
 !  internal variables
-      REAL*8 tx1, tx2
+      REAL(rKind) :: tx1, tx2
 
       tx1 = x1
       tx2 = x2

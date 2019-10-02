@@ -1,8 +1,10 @@
 
 !***********************************************************************
-      REAL*8 FUNCTION aazero(fcn,x0,dx0,dxmin,fmin,xmin,xmax,itmax)
+      FUNCTION aazero(fcn,x0,dx0,dxmin,fmin,xmin,xmax,itmax)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
+      real(rKind) :: aazero
 !
 !  Purpose: find the zero of a REAL function fcn by the secant method.
 !
@@ -15,7 +17,7 @@
 !
 !  Input/output variables:
       INTEGER itmax
-      REAL*8 x0,dx0,dxmin,fmin,xmin,xmax
+      REAL(rKind) :: x0,dx0,dxmin,fmin,xmin,xmax
 !  x0: initial guess
 !  dx0: initial step
 !  dxmin: minimum acceptable step: aazero is accepted if dx.le.dxmin
@@ -30,16 +32,16 @@
 !
 !  Local variables:
       INTEGER it
-      REAL*8 dxmax,x1,f1,x2,f2,zfmin,dx,dxinv,one,xl,xr,sgl,sgr,sg
+      REAL(rKind) :: dxmax,x1,f1,x2,f2,zfmin,dx,dxinv,one,xl,xr,sgl,sgr,sg
       save one
 !
 !  Procedures:
-      REAL*8 fcn
+      REAL(rKind) :: fcn
       external fcn
       intrinsic abs,sign,min,max
 !
 !  Data:
-      data one/1./
+      data one/1._rKind/
 !
 !  Computation:
 !

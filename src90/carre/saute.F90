@@ -1,4 +1,4 @@
-SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, & 
+SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
      & nx,ny,x,y,a00,a10,a01,a11,nm1,nm2)
 
   !*** This subroutine finds the next point on the structure for a
@@ -11,7 +11,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
 
   !  arguments
   INTEGER npst,sens,repart,nx,ny,nm1,nm2
-  REAL*8 x1,y1,psi1,x2,y2,pas,xst(npst),yst(npst),x(nx),y(ny), & 
+  REAL(rKind) :: x1,y1,psi1,x2,y2,pas,xst(npst),yst(npst),x(nx),y(ny), &
        &       a00(nm1,nm2,3),a10(nm1,nm2,3),a01(nm1,nm2,3),a11(nm1,nm2,3)
 
   !  variables en common
@@ -19,19 +19,18 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
 #include <COMLAN.F>
 
   !  variables locales
-  INTEGER n,ind1,ind2,ii,jj, compt
-  REAL*8 zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
-  REAL*8 fracx,fracy
+  INTEGER ind1,ind2,ii,jj, compt
+  REAL(rKind) :: zpas,dist,x0,y0,psi0,psi2,psi3,x3,y3,psimin,psimi2
+  REAL(rKind) :: fracx,fracy
   double precision :: bestX, bestY, bestPsi
   PARAMETER (psimin=1.E-08,psimi2=1.E-07)
-  logical l_dbg, closed
+  logical closed
   integer n_call
-  data l_dbg /.false./
   data n_call /0/
 
   !  procedures
   INTEGER ifind
-  INTRINSIC MOD,SQRT,MAX,MIN
+  INTRINSIC SQRT,MAX,MIN
   EXTERNAL ifind
   intrinsic abs
 
@@ -63,13 +62,10 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
 
   closed =  xst(1) == xst(npst) .and. yst(1) == yst(npst)
 
-  !n=npst-1
-
-  !..Determine the segment index 
+  !..Determine the segment index
   ind1=indsgm(xst,yst,npst,x1,y1)
   ! Determine next node on structure in stepping direction
   IF (sens .EQ. 1) then
-      !ind2 = MOD(ind1,n)+sens
       ind2 = ind1 + sens
       if (closed .and. ind2 == npst) ind2 = 1
   else
@@ -88,7 +84,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
 
       zpas=pas
       !---------------------------------------------------------------------{
-      do 
+      do
 
           dist = SQRT((xst(ind2)-x0)**2+(yst(ind2)-y0)**2)
 
@@ -103,7 +99,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
               ind1=ind2
               ind2 = ind1 + sens
               ! handle wraparound
-              if (closed) then 
+              if (closed) then
                   if (ind2 == 0) ind2 = npst - 1
                   if (ind2 == npst) ind2 = 1
               else
@@ -219,7 +215,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
           ii = ifind(x3,x,nx,1)
           jj = ifind(y3,y,ny,1)
 
-          psi3 = a00(ii,jj,1) + a10(ii,jj,1)*x3 + a01(ii,jj,1)*y3 + & 
+          psi3 = a00(ii,jj,1) + a10(ii,jj,1)*x3 + a01(ii,jj,1)*y3 + &
                &         a11(ii,jj,1)*x3*y3
 
           IF (ABS(psi3 - pas) .LT. psimi2) then
@@ -233,7 +229,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
 
           ! Note point closest to requested psi value found so far
           ! x3, y3, psi3
-          
+
           if ( abs(psi3 - pas) < abs(bestPsi - pas)) then
               bestX = x3
               bestY = y3
@@ -253,12 +249,12 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
                   ii = ifind(x2,x,nx,1)
                   jj = ifind(y2,y,ny,1)
 
-                  psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+                  psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
                        &           a11(ii,jj,1)*x2*y2
 
                   IF (ABS(psi2-pas) .LT. psimin) then
                       RETURN
-                  else if ((MIN(psi0,psi2).LE.pas) .AND. & 
+                  else if ((MIN(psi0,psi2).LE.pas) .AND. &
                        &             (MAX(psi0,psi2).GE.pas)) then
                       x3 = x2
                       y3 = y2
@@ -281,12 +277,12 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
                   return ! FIXME: re-enable below error condition for non-extended grid
 
                   if(sellan(1:8).eq.'francais') then
-                      write(*,*) 'On a fait le tour de la structure sans trouver' & 
+                      write(*,*) 'On a fait le tour de la structure sans trouver' &
                            &                ,' la fonction dans SAUTE'
                   else
-                      write(*,*) 'Error in saute: the psi value not found ', & 
+                      write(*,*) 'Error in saute: the psi value not found ', &
                            &                                  'on the structure.  pas = ',pas
-                      write(*,*) '==> Check whether all four targets ', & 
+                      write(*,*) '==> Check whether all four targets ', &
                            &                                 'intersect the outer separatrix'
                   endif
                   call trc_stk
@@ -301,7 +297,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
               ind1=ind2
               ind2 = ind1 + sens
               ! handle wraparound
-              if (closed) then 
+              if (closed) then
                   if (ind2 == 0) ind2 = npst - 1
                   if (ind2 == npst) ind2 = 1
               else

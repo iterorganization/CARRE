@@ -2,6 +2,7 @@ module carre_target
 
   ! Helper functions for handling target structures.
 
+  use KindDefinitions
   use carre_types
 
   implicit none
@@ -63,10 +64,6 @@ contains
     type(CarreStructures), intent(in) :: struct
     integer, intent(in) :: iStruct
 
-    ! internal
-    integer :: ind
-    double precision :: segx, segy, conx, cony, cp
-
     if ( struct%internalSide(iStruct) == GRID_UNDEFINED ) then
         stop "onInternalSideOfStructure: do not know internal side for this structure"
     end if
@@ -82,11 +79,11 @@ contains
 
     !  arguments
     INTEGER n
-    REAL*8 x, y, xstr(abs(n)), ystr(abs(n))
+    REAL(rKind) :: x, y, xstr(abs(n)), ystr(abs(n))
 
     !  variables locales
     INTEGER i
-    REAL*8 angtot,theta,prdvec,a
+    REAL(rKind) :: angtot,theta,prdvec,a
     logical :: ouvert
 
     !  procedures
@@ -152,13 +149,13 @@ contains
 
     !  arguments
     INTEGER npst
-    REAL*8 xst(npst),yst(npst),x1,y1
+    REAL(rKind) :: xst(npst),yst(npst),x1,y1
     double precision, intent(in) :: x2, y2
     CHARACTER*(*) doug
 
     !  variables locales
     INTEGER ind,nrot,irot
-    REAL*8 sg,delta,xin,yin,xin1,yin1,zero,norm,pi,cs,sn
+    REAL(rKind) :: sg,delta,xin,yin,xin1,yin1,zero,norm,pi,cs,sn
     parameter(delta=1.e-4,zero=0.,nrot=10,pi=3.141592654)
     logical :: found
 
@@ -166,8 +163,7 @@ contains
     intrinsic sqrt,sin,cos
 
     integer n_call
-    logical l_dbg
-    data n_call /0/, l_dbg /.false./
+    data n_call /0/
 
     !=========================
     !.. xst,yst: tableaux des coordonnees des points de la structure.
@@ -175,7 +171,7 @@ contains
     !.. x1,y1: point de depart sur la structure.
     !.. x2,y2: additional point outside the structure to interpret the 
     !.. points away from the structure
-    !.. doug: drote ou gauche
+    !.. doug: droite ou gauche
     !.. ind: indice du segment de structure.
     !=========================
     !  calculs
@@ -219,8 +215,8 @@ contains
                 write(0,*) 'Interior point not found in drctio ', & 
                      &                                  '- an internal error in Carre?'
                 write(0,*) '*2: n_call,x1,y1=',n_call,x1,y1
-                write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
-                write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
+                write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' xst:',xst
+                write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' yst:',yst
                 call trc_stk
                 write(0,*) '==> Check whether the structures representing ', & 
                      &                                         'the targets are closed'
@@ -266,8 +262,8 @@ contains
                 write(0,*) 'Interior point not found in drctio ', & 
                      &                                  '- an internal error in Carre?'
                 write(0,*) '*6: n_call,x1,y1=',n_call,x1,y1
-                write(0,'(5h xst:,1p,7e12.4/(5x,7e12.4))') xst
-                write(0,'(5h yst:,1p,7e12.4/(5x,7e12.4))') yst
+                write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' xst:',xst
+                write(0,'(a5,1p,7e12.4/(5x,7e12.4))') ' yst:',yst
                 call trc_stk
                 write(0,*) '==> Check whether the structures representing ', & 
                      &                                         'the targets are closed'
@@ -311,19 +307,20 @@ contains
 
 
 
-  REAL*8 FUNCTION plqdst(x0,y0,x2,y2,xst,yst,npst,doug)
+  FUNCTION plqdst(x0,y0,x2,y2,xst,yst,npst,doug)
 
     !..Cette sous-routine calcule la distance entre deux points sur une meme
     !  structure, en longeant les segments de structure.
+    REAL(rKind) :: plqdst
 
     !  arguments
     INTEGER npst
-    REAL*8 x0,y0,x2,y2,xst(npst),yst(npst)
+    REAL(rKind) :: x0,y0,x2,y2,xst(npst),yst(npst)
     CHARACTER*(*) doug
 
     !  variables locales
     INTEGER ind,ind1,ind2,sens
-    REAL*8 x1,y1,x3,y3,dist
+    REAL(rKind) :: x1,y1,x3,y3,dist
 
     !  procedures
     INTRINSIC MOD,SQRT
@@ -444,13 +441,13 @@ contains
 
     !  arguments
     INTEGER n
-    REAL*8 xst(n), yst(n), xx, yy
+    REAL(rKind) :: xst(n), yst(n), xx, yy
     integer, intent(in), optional :: mode
 
 
     !  variables locales
     INTEGER i
-    REAL*8 mumin, mu, ax, ay, bx, by, eps, dist, distToSeg
+    REAL(rKind) :: mumin, mu, ax, ay, bx, by, eps, dist, distToSeg
     PARAMETER (eps=1.E-6)
     integer :: lMode = INDSGM_MODE_ANGLE
 

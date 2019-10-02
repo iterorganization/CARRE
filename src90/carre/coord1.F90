@@ -2,6 +2,7 @@
 !***********************************************************************
       SUBROUTINE COORD1(vx,vy,n,d,x,y,period)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..Cette sous-routine renvoit les coordonnees x et y d'un point situe
@@ -9,11 +10,11 @@
 
 !  arguments
       INTEGER n
-      REAL*8 vx(n),vy(n),d,x,y,period
+      REAL(rKind) :: vx(n),vy(n),d,x,y,period
 
 !  variables locales
       INTEGER i
-      REAL*8 dist,distot,eps,zero,dd
+      REAL(rKind) :: dist,distot,eps,zero,dd
       PARAMETER (eps=1.E-06,zero=0.)
 
 !  procedures

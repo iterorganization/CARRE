@@ -20,20 +20,20 @@
 !*** Output:
 !***  The function value gives the index of the point found
 
+      use KindDefinitions
       implicit none
 
 !  arguments
       integer n
-      real*8 vx(n), vy(n), rx, ry
+      real(rKind) vx(n), vy(n), rx, ry
 
 !  variables locales
       integer i, imn, irp
-      real*8 const, rmn, tol, r
+      real(rKind) :: const, rmn, tol, r
       parameter (const=0.001, tol=const*const)
+#ifndef CARRE_NONINTERACTIVE
       character c
-
-!  procedures
-      intrinsic abs
+#endif
 
       data irp /0/
 !=======================================================================

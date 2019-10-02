@@ -4,17 +4,18 @@ module carre_b2ag
 
 contains
 
-  subroutine carre_b2agbb (nx,ny,fpsi,ffbz,bb, & 
+  subroutine carre_b2agbb (nx,ny,fpsi,ffbz,bb, &
        &  crx,cry,psidx,psidy)
 
+    use KindDefinitions
     !======================================================================
     !   ..input arguments (unchanged on exit)
     integer nx, ny
-    real*8 fpsi(-1:nx,-1:ny,0:3), ffbz(-1:nx,-1:ny,0:3)
-    real*8 crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3), & 
+    real(rKind) fpsi(-1:nx,-1:ny,0:3), ffbz(-1:nx,-1:ny,0:3)
+    real(rKind) crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3), &
          &  psidx(-1:nx,-1:ny,0:3),psidy(-1:nx,-1:ny,0:3)
     !   ..output arguments (unspecified on entry)
-    real*8, intent(out) :: bb(-1:nx,-1:ny,0:3)
+    real(rKind), intent(out) :: bb(-1:nx,-1:ny,0:3)
 
     !-----------------------------------------------------------------------
     !.documentation
@@ -69,7 +70,7 @@ contains
 
     !   ..local variables
     integer ix, iy
-    real*8 t0,psdx,psdy,babs,pi,r0,b0
+    real(rKind) :: t0,psdx,psdy,babs,pi,r0,b0
     !   ..procedures
     intrinsic sqrt,sign
     !-----------------------------------------------------------------------
@@ -87,12 +88,12 @@ contains
     do iy = -1, ny
         do ix = -1, nx
             !     ..compute magnetic field at cell center
-            t0=0.5*pi*(crx(ix,iy,0)+crx(ix,iy,1)+crx(ix,iy,2) & 
+            t0=0.5*pi*(crx(ix,iy,0)+crx(ix,iy,1)+crx(ix,iy,2) &
                  &     +crx(ix,iy,3))
 
             if (t0 == 0.0) cycle
 
-            bb(ix,iy,0) = & 
+            bb(ix,iy,0) = &
                  &     (fpsi(ix,iy,2)-fpsi(ix,iy,0)+fpsi(ix,iy,3)-fpsi(ix,iy,1))
 
             !       psdx=0.25*(psidx(ix,iy,0)+psidx(ix,iy,1)+psidx(ix,iy,2)
@@ -100,17 +101,17 @@ contains
             !       psdy=0.25*(psidy(ix,iy,0)+psidy(ix,iy,1)+psidy(ix,iy,2)
             !    .    +psidy(ix,iy,3))
             !       babs=sqrt(psdx*psdx+psdy*psdy)/t0
-            babs=0.25* & 
-                 &     (sqrt(psidx(ix,iy,0)**2+psidy(ix,iy,0)**2) & 
-                 &     +sqrt(psidx(ix,iy,1)**2+psidy(ix,iy,1)**2) & 
-                 &     +sqrt(psidx(ix,iy,2)**2+psidy(ix,iy,2)**2) & 
+            babs=0.25* &
+                 &     (sqrt(psidx(ix,iy,0)**2+psidy(ix,iy,0)**2) &
+                 &     +sqrt(psidx(ix,iy,1)**2+psidy(ix,iy,1)**2) &
+                 &     +sqrt(psidx(ix,iy,2)**2+psidy(ix,iy,2)**2) &
                  &     +sqrt(psidx(ix,iy,3)**2+psidy(ix,iy,3)**2) )/t0
             bb(ix,iy,0)=sign(babs,bb(ix,iy,0))
 
             bb(ix,iy,1) = 0.0e0
-            bb(ix,iy,2) = (ffbz(ix,iy,0)+ffbz(ix,iy,1)+ffbz(ix,iy,2)+ & 
+            bb(ix,iy,2) = (ffbz(ix,iy,0)+ffbz(ix,iy,1)+ffbz(ix,iy,2)+ &
                  &     ffbz(ix,iy,3))/(4*t0)
-            bb(ix,iy,3) = & 
+            bb(ix,iy,3) = &
                  &     sqrt(bb(ix,iy,0)**2+bb(ix,iy,1)**2+bb(ix,iy,2)**2)
         enddo
     enddo

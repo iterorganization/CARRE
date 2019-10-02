@@ -9,10 +9,11 @@
 !*** the right and 2 is the left.
 !***  	NB: the O-point coordinates are in ptx(npx+1), pty(npx+1).
 !=======================================================================
+      use KindDefinitions
       implicit none
 !  arguments
       integer nbdef, inddef(nbdef),npx
-      real*8 xst(*),yst(*),ptx(npx+1),pty(npx+1)
+      real(rKind) :: xst(*),yst(*),ptx(npx+1),pty(npx+1)
 
 !  variables en common
 
@@ -20,14 +21,14 @@
 
 !  variables locales
       integer n
-      real*8 tt,xx(2),xy(2),zero
+      real(rKind) :: tt,xx(2),xy(2),zero
       parameter (n=4, zero=0.)
       integer i, j, itt, ipx
-      real*8 xt(n), yt(n),wx(4),wy(4)
-      real*8 u_hlp
+      real(rKind) :: xt(n), yt(n),wx(4),wy(4)
+      real(rKind) :: u_hlp
 
 !  procedures
-      real*8 aire
+      real(rKind) :: aire
       external aire
 !=======================================================================
 !.. i,j: indices
@@ -40,12 +41,12 @@
 !=======================================================================
 !<<<
       write(0,*) 'Entering orddef: npx,nbdef= ',npx,nbdef
-      write(0,'(9h inddef: ,20i4/(9x,20i4))') inddef
-      write(0,'(6h xst: ,1p,10e10.2/(6x,10e10.2))') (xst(i),i=1,nbdef)
-      write(0,'(6h yst: ,1p,10e10.2/(6x,10e10.2))') (yst(i),i=1,nbdef)
+      write(0,'(a9,20i4/(9x,20i4))') ' inddef: ',inddef
+      write(0,'(a6,1p,10e10.2/(6x,10e10.2))') ' xst: ',(xst(i),i=1,nbdef)
+      write(0,'(a6,1p,10e10.2/(6x,10e10.2))') ' yst: ',(yst(i),i=1,nbdef)
       if(npx.gt.0) then !{
-       write(0,'(6h ptx: ,1p,10e10.2/(6x,10e10.2))') (ptx(i),i=1,npx)
-       write(0,'(6h pty: ,1p,10e10.2/(6x,10e10.2))') (pty(i),i=1,npx)
+       write(0,'(a6,1p,10e10.2/(6x,10e10.2))') ' ptx: ',(ptx(i),i=1,npx)
+       write(0,'(a6,1p,10e10.2/(6x,10e10.2))') ' pty: ',(pty(i),i=1,npx)
       end if !}
 !>>>
 !*** Order the X-points from top to bottom if necessary
@@ -101,12 +102,12 @@
       end do !}
 !<<<
       write(0,*) 'After ordering in y'
-      write(0,'(9h inddef: ,20i4/(9x,20i4))') inddef
+      write(0,'(a9,20i4/(9x,20i4))') ' inddef: ',inddef
 !>>>
 !*** Order the plates 2 by 2 in x
 !<<<
-      write(0,'(1x,a3,a4,a6,2a9,2x,1h:,18x,a2,16x,1h:,18x,a2)') 'i', & 
-     & 'ipx','xy','pty','aire','wx','wy'
+      write(0,'(1x,a3,a4,a6,2a9,2x,a1,18x,a2,16x,a1,18x,a2)') 'i', &
+     & 'ipx','xy','pty','aire',':','wx',':','wy'
 !>>>
       do i=1,nbdef-1,2 !{
         ipx=(i+1)/2
@@ -120,7 +121,7 @@
         wy(4)=wy(1)
 !<<<
       u_hlp=aire(wx,wy,4)
-      write(0,'(1x,2i3,1p,1x,11e9.2)') i,ipx, & 
+      write(0,'(1x,2i3,1p,1x,11e9.2)') i,ipx, &
      &   xy(ipx),pty(npx+1),u_hlp,wx,wy
 !>>>
         if((xy(ipx)-pty(npx+1))*aire(wx,wy,4).lt.zero) then !{
@@ -131,7 +132,7 @@
       end do !}
 !<<<
       write(0,*) 'After ordering in x'
-      write(0,'(9h inddef: ,20i4/(9x,20i4))') inddef
+      write(0,'(a9,20i4/(9x,20i4))') ' inddef: ',inddef
 !>>>
 !=======================================================================
       end

@@ -9,18 +9,18 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !*** various possible magnetic configurations (single null,
 !*** connected double null, disconnected double null, or limiter)
 !======================================================================
-    
-      use CarreSiloIO
-      use CarreDiagnostics
-      use carre_types
-      use carre_parameter_io
-      use carre_target
-      use carre_equilibrium
+
+      use KindDefinitions, only : rKind
+      use CarreDiagnostics, only : CarreDiag
+      use carre_target, only : CarreEquilibrium, CarreParameters, CarreGrid, CarreStructures, &
+                          &    Carre_Extended, Grid_Extension_Off, drctio, plqdst
+      use carre_equilibrium, only : compute_psi_on_grid
+      use CarreSiloIO, only : csIOSetRegion
       use Logging
       use Helper
-  
+
       IMPLICIT NONE
-      
+
       !  dimensions
 #include <CARREDIM.F>
 
@@ -36,29 +36,26 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 #include <COMRLX.F>
 
       !  variables locales
-      INTEGER isep,ipas,ireg,ipx,sens,nn,idef, & 
-     &  ii,jj,ient,isor,ifail,nbcrb,npcrb2 & 
-     &  ,ptxext,i,j,nbcl(2),nnlast,npr1,nmail,imail, xpind
-      REAL*8 dist,x2,y2,lg(10), & 
-     &  xx,yy,fctini,fctfin,difpsi,dpmin(10), & 
-     &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, & 
-     &  gardd2,xptxo,yptxo,xint,yint,xext,yext,xextOffset,yextOffset,psiint, & 
-     &  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old
-      REAL*8  sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10), & 
-     &  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx) & 
-     &  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx), & 
+      INTEGER isep,ipas,ireg,ipx,sens,nn,idef, &
+     &  ii,jj,nbcrb,npcrb2 &
+     &  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail, xpind
+      REAL(rKind) :: dist,x2,y2,lg(10), &
+     &  xx,yy,fctini,fctfin,difpsi,dpmin(10), &
+     &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, &
+     &  gardd2,xptxo,yptxo,xint,yint,xext,yext,xextOffset,yextOffset,psiint, &
+     &  psiext,xptxex,yptxex,bouclx,boucly,ll
+      REAL(rKind) :: sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10), &
+     &  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx) &
+     &  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx), &
      &  ynlast(npnimx)
-      CHARACTER*3 rep
       LOGICAL nuldec, correct, extended_grid
-      integer :: nn1
 
       !  procedures
       INTEGER horair,ifind
-      REAL*8 long,ruban
-      EXTERNAL long,COORD,horair,ifind,LECCLE,lecclf,DOUBLD, & 
-     &         ruban,trace3 & 
+      REAL(rKind) :: long,ruban
+      EXTERNAL long,COORD,horair,ifind,LECCLE,lecclf,DOUBLD, &
+     &         ruban,trace3 &
      &        ,trc_stk_in,trc_stk_out
-      intrinsic max
 
 
 !=========================
@@ -149,8 +146,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          DO 1 isep = 1, 3
 
-            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
 
     1    CONTINUE
@@ -171,7 +168,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                  ii = ifind(xfin,equ%x,equ%nx,1)
                  jj = ifind(yfin,equ%y,equ%ny,1)
 
-                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + &
                       & equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                  difpsi = fctfin - fctini
@@ -182,31 +179,31 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
              !..Along the separatrices
 
-             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), &
                  &               dpmin(1),dpmax(1))
 
-             CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), & 
+             CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), &
                  &               dpmin(2),dpmax(2))
 
-             CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), & 
+             CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), &
                  &               dpmin(3),dpmax(3))
 
              !..Radial direction
 
-             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), &
                  &               spacer(1,1),drmin(1),drmax(1))
 
-             CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+             CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), &
                  &               spacer(1,2),drmin(2),drmax(2))
 
              IF (par%repart .EQ. 1) THEN
 
-                 CALL NUNIFO(par%npr(3),par%pntrat,par%deltr1(3),par%deltrn(3), & 
+                 CALL NUNIFO(par%npr(3),par%pntrat,par%deltr1(3),par%deltrn(3), &
                      &                  spacer(1,3),drmin(3),drmax(3))
 
              ELSE IF (par%repart .EQ. 2) THEN
 
-                 CALL NUNIFO(par%npr(3),difpsi,par%deltr1(3),par%deltrn(3), & 
+                 CALL NUNIFO(par%npr(3),difpsi,par%deltr1(3),par%deltrn(3), &
                      &                  spacer(1,3),drmin(3),drmax(3))
 
              ENDIF
@@ -225,15 +222,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
            DO 5 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
      &          equ%separy(1,equ%ptsep(isep,ipx),ipx),&
-     &          equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+     &          equ%nptot(equ%ptsep(isep,ipx),ipx), &
      &          dist,sepmax(ipas,isep),sepmay(ipas,isep))
     5      CONTINUE
 
-           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), &
      &       equ%ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), &
      &       equ%ptsep(isep,ipx),ipx)
     6    CONTINUE
 
@@ -307,7 +304,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*17')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2,&
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
               & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
@@ -325,11 +322,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-     &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-     &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-     &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-     &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+     &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+     &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+     &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+     &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
      &              ynlast,nnlast,nuldec,&
      &              xpind,xptxex,yptxex,&
      &              .true.,diag,ireg, struct, .false.)
@@ -389,7 +386,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*25 ')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),&
               & x2,y2,&
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
@@ -406,11 +403,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Call the routine which grids this region
 
          print*, 'ireg=', ireg
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &              ynlast,nnlast,nuldec,&
               &              xpind,xptxex,yptxex,&
               &.false.,diag,ireg, struct, .false.)
@@ -457,10 +454,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
-     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-     &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
+     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
+     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+     &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
      &       xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 !----------------------------------------------------------------------
 
@@ -495,22 +492,22 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ii = ifind(xx,equ%x,equ%nx,1)
          jj = ifind(yy,equ%y,equ%ny,1)
 
-         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + & 
+         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + &
      &            equ%a11(ii,jj,1)*xx*yy
 
 !..Calculate the length of each separatrix
 
          ipx = 1
          DO 38 isep = 1, 4
-            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
    38    CONTINUE
 
          ipx = 2
          DO 39 isep = 1, 2
-            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                   equ%nptot(equ%ptsep(isep,ipx),ipx))
    39    CONTINUE
 
@@ -531,7 +528,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                  ii = ifind(xfin,equ%x,equ%nx,1)
                  jj = ifind(yfin,equ%y,equ%ny,1)
 
-                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + &
                      &               equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                  difpsi = fctfin - fctini
@@ -542,46 +539,46 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
              !..Along the separatrices
 
-             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), &
                  &               dpmin(1),dpmax(1))
 
-             CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), & 
+             CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), &
                  &               dpmin(2),dpmax(2))
 
-             CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), & 
+             CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), &
                  &               dpmin(3),dpmax(3))
 
-             CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), & 
+             CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), &
                  &               dpmin(4),dpmax(4))
 
-             CALL NUNIFO(par%nptseg(5),lg(5),par%deltp1(5),par%deltpn(5),spacep(1,5), & 
+             CALL NUNIFO(par%nptseg(5),lg(5),par%deltp1(5),par%deltpn(5),spacep(1,5), &
                  &               dpmin(5),dpmax(5))
 
-             CALL NUNIFO(par%nptseg(6),lg(6),par%deltp1(6),par%deltpn(6),spacep(1,6), & 
+             CALL NUNIFO(par%nptseg(6),lg(6),par%deltp1(6),par%deltpn(6),spacep(1,6), &
                  &               dpmin(6),dpmax(6))
 
              !..Radial direction
 
-             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), &
                  &               spacer(1,1),drmin(1),drmax(1))
 
-             CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+             CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), &
                  &               spacer(1,2),drmin(2),drmax(2))
 
-             CALL NUNIFO(par%npr(3),struct%distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+             CALL NUNIFO(par%npr(3),struct%distnv(par%repart,3),par%deltr1(3),par%deltrn(3), &
                  &               spacer(1,3),drmin(3),drmax(3))
 
-             CALL NUNIFO(par%npr(4),struct%distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+             CALL NUNIFO(par%npr(4),struct%distnv(par%repart,4),par%deltr1(4),par%deltrn(4), &
                  &               spacer(1,4),drmin(4),drmax(4))
 
              IF (par%repart .EQ. 1) THEN
 
-                 CALL NUNIFO(par%npr(5),par%pntrat,par%deltr1(5),par%deltrn(5), & 
+                 CALL NUNIFO(par%npr(5),par%pntrat,par%deltr1(5),par%deltrn(5), &
                      &                  spacer(1,5),drmin(5),drmax(5))
 
              ELSE IF (par%repart .EQ. 2) THEN
 
-                 CALL NUNIFO(par%npr(5),difpsi,par%deltr1(5),par%deltrn(5), & 
+                 CALL NUNIFO(par%npr(5),difpsi,par%deltr1(5),par%deltrn(5), &
                      &                  spacer(1,5),drmin(5),drmax(5))
 
              ENDIF
@@ -601,14 +598,14 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
            DO 45 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, &
      &                   sepmax(ipas,isep),sepmay(ipas,isep))
    45      CONTINUE
-           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), &
      &       equ%ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), &
      &       equ%ptsep(isep,ipx),ipx)
    44    CONTINUE
 
@@ -621,15 +618,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
            DO 47 ipas=2, par%nptseg(isep+4)-1
               dist=dist + spacep(ipas-1,isep+4)
-              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, &
      &                   sepmax(ipas,isep+4),sepmay(ipas,isep+4))
 
    47      CONTINUE
-           sepmax(par%nptseg(isep+4),isep+4)=equ%separx(equ%nptot(equ%ptsep(isep,ipx), & 
+           sepmax(par%nptseg(isep+4),isep+4)=equ%separx(equ%nptot(equ%ptsep(isep,ipx), &
      &       ipx),equ%ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep+4),isep+4)=equ%separy(equ%nptot(equ%ptsep(isep,ipx), & 
+           sepmay(par%nptseg(isep+4),isep+4)=equ%separy(equ%nptot(equ%ptsep(isep,ipx), &
      &       ipx),equ%ptsep(isep,ipx),ipx)
    46    CONTINUE
 
@@ -705,7 +702,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*57')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -723,11 +720,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-     &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-     &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-     &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+     &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+     &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+     &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+     &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
      &               ynlast,nnlast,nuldec,&
      &               xpind,xptxex,yptxex,&
      &               .true.,diag,ireg, struct, .false.)
@@ -787,7 +784,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*67')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -805,11 +802,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
               &.false.,diag,ireg, struct, .false.)
@@ -884,7 +881,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*77')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(2,ipx),ipx)-1,equ%ptsep(2,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(2,ipx),ipx)-1,equ%ptsep(2,ipx),ipx), &
@@ -902,11 +899,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
               &.true.,diag,ireg, struct, .false.)
@@ -966,7 +963,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*87')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -985,11 +982,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
               &.false.,diag,ireg, struct, .false.)
@@ -1049,10 +1046,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
-     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-     &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
+     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
+     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+     &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
      &       xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 !----------------------------------------------------------------------
 
@@ -1088,33 +1085,33 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Calculate the distance between the inner and outer separatrices, if
 !  they are both present, along the target
 
-         xint = equ%separx(equ%nptot(equ%ptsep(1,equ%ptxint),equ%ptxint),equ%ptsep(1,equ%ptxint), & 
+         xint = equ%separx(equ%nptot(equ%ptsep(1,equ%ptxint),equ%ptxint),equ%ptsep(1,equ%ptxint), &
      &                 equ%ptxint)
-         yint = equ%separy(equ%nptot(equ%ptsep(1,equ%ptxint),equ%ptxint),equ%ptsep(1,equ%ptxint), & 
+         yint = equ%separy(equ%nptot(equ%ptsep(1,equ%ptxint),equ%ptxint),equ%ptsep(1,equ%ptxint), &
      &                 equ%ptxint)
-         xext = equ%separx(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), & 
+         xext = equ%separx(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), &
      &                 ptxext)
-         yext = equ%separy(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), & 
+         yext = equ%separy(equ%nptot(equ%ptsep(3,ptxext),ptxext),equ%ptsep(3,ptxext), &
      &                 ptxext)
-         xextOffset = equ%separx(equ%nptot(equ%ptsep(3,ptxext),ptxext)-1,equ%ptsep(3,ptxext), & 
+         xextOffset = equ%separx(equ%nptot(equ%ptsep(3,ptxext),ptxext)-1,equ%ptsep(3,ptxext), &
      &                 ptxext)
-         yextOffset = equ%separy(equ%nptot(equ%ptsep(3,ptxext),ptxext)-1,equ%ptsep(3,ptxext), & 
+         yextOffset = equ%separy(equ%nptot(equ%ptsep(3,ptxext),ptxext)-1,equ%ptsep(3,ptxext), &
      &                 ptxext)
 
-         struct%distnv(1,1) = plqdst(xint,yint,xext,yext,struct%xstruc(1,struct%inddef(idef)) & 
+         struct%distnv(1,1) = plqdst(xint,yint,xext,yext,struct%xstruc(1,struct%inddef(idef)) &
      &            ,struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),'droite')
 
 
          ii = ifind(xint,equ%x,equ%nx,1)
          jj = ifind(yint,equ%y,equ%ny,1)
 
-         psiint = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xint + equ%a01(ii,jj,1)*yint & 
+         psiint = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xint + equ%a01(ii,jj,1)*yint &
      &          + equ%a11(ii,jj,1)*xint*yint
 
          ii = ifind(xext,equ%x,equ%nx,1)
          jj = ifind(yext,equ%y,equ%ny,1)
 
-         psiext = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xext + equ%a01(ii,jj,1)*yext & 
+         psiext = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xext + equ%a01(ii,jj,1)*yext &
      &          + equ%a11(ii,jj,1)*xext*yext
 
          struct%distnv(2,1) = psiext - psiint
@@ -1141,27 +1138,27 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ii = ifind(xx,equ%x,equ%nx,1)
          jj = ifind(yy,equ%y,equ%ny,1)
 
-         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + & 
+         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + &
      &            equ%a11(ii,jj,1)*xx*yy
 
 !..Calculate the length of each separatrix
 
          ipx = 1
          DO 102 isep = 1, 2
-            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
   102    CONTINUE
 
          ipx = 2
          DO 103 isep = 1, 2
-            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
+            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                   equ%nptot(equ%ptsep(isep,ipx),ipx))
   103    CONTINUE
 
             !..3.1  Read all the necessary data from the file
-            
+
             !.. Read initial set of code parameters
             call read_code_parameters(par, equ%distxo)
 
@@ -1178,7 +1175,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                     ii = ifind(xfin,equ%x,equ%nx,1)
                     jj = ifind(yfin,equ%y,equ%ny,1)
 
-                    fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                    fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + &
                         &               equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                     difpsi = fctfin - fctini
@@ -1187,44 +1184,44 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
                 !..Calculate the intervals, dmin and dmax, along the separatrices
 
-                CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+                CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), &
                     &               dpmin(1),dpmax(1))
 
-                CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), & 
+                CALL NUNIFO(par%nptseg(2),lg(2),par%deltp1(2),par%deltpn(2),spacep(1,2), &
                     &               dpmin(2),dpmax(2))
 
-                CALL NUNIFO(par%nptseg(5),lg(5),par%deltp1(5),par%deltpn(5),spacep(1,5), & 
+                CALL NUNIFO(par%nptseg(5),lg(5),par%deltp1(5),par%deltpn(5),spacep(1,5), &
                     &               dpmin(5),dpmax(5))
 
-                CALL NUNIFO(par%nptseg(6),lg(6),par%deltp1(6),par%deltpn(6),spacep(1,6), & 
+                CALL NUNIFO(par%nptseg(6),lg(6),par%deltp1(6),par%deltpn(6),spacep(1,6), &
                     &               dpmin(6),dpmax(6))
 
 
                 !..Calculate the intervals, dmin and dmax, in the radial direction
 
-                CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+                CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), &
                     &               spacer(1,1),drmin(1),drmax(1))
 
-                CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), & 
+                CALL NUNIFO(par%npr(2),struct%distnv(par%repart,2),par%deltr1(2),par%deltrn(2), &
                     &               spacer(1,2),drmin(2),drmax(2))
 
-                CALL NUNIFO(par%npr(3),struct%distnv(par%repart,3),par%deltr1(3),par%deltrn(3), & 
+                CALL NUNIFO(par%npr(3),struct%distnv(par%repart,3),par%deltr1(3),par%deltrn(3), &
                     &               spacer(1,3),drmin(3),drmax(3))
 
-                CALL NUNIFO(par%npr(4),struct%distnv(par%repart,4),par%deltr1(4),par%deltrn(4), & 
+                CALL NUNIFO(par%npr(4),struct%distnv(par%repart,4),par%deltr1(4),par%deltrn(4), &
                     &               spacer(1,4),drmin(4),drmax(4))
 
-                CALL NUNIFO(par%npr(5),struct%distnv(par%repart,5),par%deltr1(5),par%deltrn(5), & 
+                CALL NUNIFO(par%npr(5),struct%distnv(par%repart,5),par%deltr1(5),par%deltrn(5), &
                     &               spacer(1,5),drmin(5),drmax(5))
 
                 IF (par%repart .EQ. 1) THEN
 
-                    CALL NUNIFO(par%npr(6),par%pntrat,par%deltr1(6),par%deltrn(6), & 
+                    CALL NUNIFO(par%npr(6),par%pntrat,par%deltr1(6),par%deltrn(6), &
                         &                  spacer(1,6),drmin(6),drmax(6))
 
                 ELSE IF (par%repart .EQ. 2) THEN
 
-                    CALL NUNIFO(par%npr(6),difpsi,par%deltr1(6),par%deltrn(6), & 
+                    CALL NUNIFO(par%npr(6),difpsi,par%deltr1(6),par%deltrn(6), &
                         &                  spacer(1,6),drmin(6),drmax(6))
 
                 ENDIF
@@ -1267,34 +1264,34 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                         ireg=1
                         nmail=min(41,nn/5)
                         nmail=nmail+mod(nmail+1,2)
-                        ll=long(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
-                            &                equ%separy(1,equ%ptsep(3,ipx),ipx), & 
+                        ll=long(equ%separx(1,equ%ptsep(3,ipx),ipx), &
+                            &                equ%separy(1,equ%ptsep(3,ipx),ipx), &
                             &                equ%nptot(equ%ptsep(3,ipx),ipx))
-                        grid%xmail(1,1,ireg)=equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx), & 
+                        grid%xmail(1,1,ireg)=equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx), &
                             &          equ%ptsep(3,ipx),ipx)
-                        grid%ymail(1,1,ireg)=equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx), & 
+                        grid%ymail(1,1,ireg)=equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx), &
                             &          equ%ptsep(3,ipx),ipx)
                         do imail=nmail/2,2,-1
                             dist=ll*(nmail/2-imail+1.)/(nmail/2)
-                            CALL COORD(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
-                                &            equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx), & 
+                            CALL COORD(equ%separx(1,equ%ptsep(3,ipx),ipx), &
+                                &            equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx), &
                                 &            dist,grid%xmail(imail,1,ireg),grid%ymail(imail,1,ireg))
                         enddo
                         grid%xmail(nmail/2+1,1,ireg)=xptxex
                         grid%ymail(nmail/2+1,1,ireg)=yptxex
 
-                        ll=long(equ%separx(1,equ%ptsep(4,ipx),ipx), & 
-                            &                equ%separy(1,equ%ptsep(4,ipx),ipx), & 
+                        ll=long(equ%separx(1,equ%ptsep(4,ipx),ipx), &
+                            &                equ%separy(1,equ%ptsep(4,ipx),ipx), &
                             &                equ%nptot(equ%ptsep(4,ipx),ipx))
-                        grid%xmail(nmail,1,ireg)=equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx), & 
+                        grid%xmail(nmail,1,ireg)=equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx), &
                             &          equ%ptsep(4,ipx),ipx)
-                        grid%ymail(nmail,1,ireg)=equ%separy(equ%nptot(equ%ptsep(4,ipx),ipx), & 
+                        grid%ymail(nmail,1,ireg)=equ%separy(equ%nptot(equ%ptsep(4,ipx),ipx), &
                             &          equ%ptsep(4,ipx),ipx)
                         do imail=2,nmail/2
                             dist=ll*(imail-1.)/(nmail/2)
-                            CALL COORD(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
-                                &            equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx), & 
-                                &            dist,grid%xmail(nmail/2+imail,1,ireg), & 
+                            CALL COORD(equ%separx(1,equ%ptsep(3,ipx),ipx), &
+                                &            equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx), &
+                                &            dist,grid%xmail(nmail/2+imail,1,ireg), &
                                 &            grid%ymail(nmail/2+imail,1,ireg))
                         enddo
                     endif
@@ -1323,11 +1320,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                     end DO
 
                     call trc_stk_in('maille','*114')
-                    CALL DOUBLD(bouclx,boucly,grid%xn,grid%yn,nn,spacer(1,1), & 
+                    CALL DOUBLD(bouclx,boucly,grid%xn,grid%yn,nn,spacer(1,1), &
                         &        par%npr(1),struct%inddef(idef),xext,yext,xextOffset,yextOffset,&
-                        &        xptxex,yptxex,equ%xpto, & 
-                        &        equ%ypto,equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc, & 
-                        &        struct%ystruc,equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+                        &        xptxex,yptxex,equ%xpto, &
+                        &        equ%ypto,equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc, &
+                        &        struct%ystruc,equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
                         &        xcrb2,ycrb2,npcrb2)
                     call trc_stk_out
                 endif
@@ -1335,15 +1332,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                 ipx = equ%ptxint
                 dist=0.0
 
-                lg(3) = ruban(equ%separx(1,equ%ptsep(3,ipx),ipx), & 
-                    &                equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx) & 
+                lg(3) = ruban(equ%separx(1,equ%ptsep(3,ipx),ipx), &
+                    &                equ%separy(1,equ%ptsep(3,ipx),ipx),equ%nptot(equ%ptsep(3,ipx),ipx) &
                     &                ,bouclx,boucly,dist)
-                CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), & 
+                CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), &
                     &               dpmin(3),dpmax(3))
 
-                lg(4) = long(equ%separx(1,equ%ptsep(3,ipx),ipx),equ%separy(1,equ%ptsep(3,ipx) & 
+                lg(4) = long(equ%separx(1,equ%ptsep(3,ipx),ipx),equ%separy(1,equ%ptsep(3,ipx) &
                     &              ,ipx),equ%nptot(equ%ptsep(3,ipx),ipx)) - lg(3)
-                CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), & 
+                CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), &
                     &               dpmin(4),dpmax(4))
 
 
@@ -1392,9 +1389,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
   121    CONTINUE
 
          nbcl(2) = nbcl(2) + 1
-         xbcl(nbcl(2),2) = equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx) - nbcl(2) + 1, & 
+         xbcl(nbcl(2),2) = equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx) - nbcl(2) + 1, &
      &                     equ%ptsep(3,ipx),ipx)
-         ybcl(nbcl(2),2) = equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx) - nbcl(2) + 1, & 
+         ybcl(nbcl(2),2) = equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx) - nbcl(2) + 1, &
      &                     equ%ptsep(3,ipx),ipx)
 
          lbcl = long(xbcl(1,2),ybcl(1,2),nbcl(2))
@@ -1411,21 +1408,21 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          ipx = 1
          DO 122 isep=1, 2
-             
+
            sepmax(1,isep) = equ%separx(1,equ%ptsep(isep,ipx),ipx)
            sepmay(1,isep) = equ%separy(1,equ%ptsep(isep,ipx),ipx)
            dist=0.
 
            DO 123 ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, &
      &                   sepmax(ipas,isep),sepmay(ipas,isep))
   123      CONTINUE
-           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+           sepmax(par%nptseg(isep),isep)=equ%separx(equ%nptot(equ%ptsep(isep,ipx),ipx), &
      &       equ%ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), & 
+           sepmay(par%nptseg(isep),isep)=equ%separy(equ%nptot(equ%ptsep(isep,ipx),ipx), &
      &       equ%ptsep(isep,ipx),ipx)
   122    CONTINUE
 
@@ -1437,7 +1434,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
            DO 125 ipas=2, par%nptseg(isep+2)-1
               dist=dist + spacep(ipas-1,isep+2)
-              CALL COORD(xbcl(1,isep),ybcl(1,isep),nbcl(isep),dist, & 
+              CALL COORD(xbcl(1,isep),ybcl(1,isep),nbcl(isep),dist, &
      &                   sepmax(ipas,isep+2),sepmay(ipas,isep+2))
   125      CONTINUE
            sepmax(par%nptseg(isep+2),isep+2)=xbcl(nbcl(isep),isep)
@@ -1453,14 +1450,14 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
            DO 127 ipas=2, par%nptseg(isep+4)-1
               dist=dist + spacep(ipas-1,isep+4)
-              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), & 
-     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, & 
+              CALL COORD(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
+     &                   equ%nptot(equ%ptsep(isep,ipx),ipx),dist, &
      &                   sepmax(ipas,isep+4),sepmay(ipas,isep+4))
   127      CONTINUE
-           sepmax(par%nptseg(isep+4),isep+4)=equ%separx(equ%nptot(equ%ptsep(isep,ipx), & 
+           sepmax(par%nptseg(isep+4),isep+4)=equ%separx(equ%nptot(equ%ptsep(isep,ipx), &
      &       ipx),equ%ptsep(isep,ipx),ipx)
-           sepmay(par%nptseg(isep+4),isep+4)=equ%separy(equ%nptot(equ%ptsep(isep,ipx), & 
+           sepmay(par%nptseg(isep+4),isep+4)=equ%separy(equ%nptot(equ%ptsep(isep,ipx), &
      &       ipx),equ%ptsep(isep,ipx),ipx)
   126    CONTINUE
 
@@ -1547,7 +1544,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
   137       CONTINUE
 
          ENDIF
-         
+
 !..Initialise the guard indices and starting target
 
          IF (equ%ptxint .EQ. 1) THEN
@@ -1590,7 +1587,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*145')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -1633,17 +1630,17 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Call the routine which grids this region
 
          print*, 'ireg=', ireg
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast(1:nnlast), & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast(1:nnlast), &
               &               ynlast(1:nnlast),nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
               &               .true.,diag,ireg,struct, .false.)
 
 !..Arangement of the mesh point which must coinside with outer X-point
-         
+
          grid%xmail(xpind,par%npr(1),1) = xptxex
          grid%ymail(xpind,par%npr(1),1) = yptxex
 
@@ -1658,7 +1655,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !!$         call siloWriteLineSegmentGridFromPoints( csioDbfile, 'firstgridline', &
 !!$              &  grid%xmail(1:grid%np1(ireg),1,ireg), &
 !!$              &  grid%ymail(1:grid%np1(ireg),1,ireg) )
-!!$         call csioCloseFile()                                     
+!!$         call csioCloseFile()
 !!$         stop
 
 
@@ -1741,7 +1738,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*157')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx)-1,equ%ptsep(3,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx)-1,equ%ptsep(3,ipx),ipx), &
@@ -1759,13 +1756,13 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &               ynlast,nnlast,nuldec,&
-              &               xpind,xptxex,yptxex,&     
+              &               xpind,xptxex,yptxex,&
               &.true.,diag,ireg, struct, .false.)
 
 !..3.3.3 Region 3: top PFR
@@ -1823,7 +1820,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*167')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -1841,11 +1838,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
               &.false.,diag,ireg, struct, .false.)
@@ -1862,7 +1859,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          IF (equ%ptxint .EQ. 1) THEN
 
-            DO 170 ipas=par%nptseg(1)+par%nptseg(2)+par%nptseg(3)+par%nptseg(4)-3, & 
+            DO 170 ipas=par%nptseg(1)+par%nptseg(2)+par%nptseg(3)+par%nptseg(4)-3, &
      &                             par%nptseg(1)+par%nptseg(3), -1
                grid%np1(ireg) = grid%np1(ireg)+1
                grid%xmail(grid%np1(ireg),1,ireg) = grid%xmail(ipas,par%npr(1),1)
@@ -1873,13 +1870,13 @@ subroutine MAILLE(equ,struct,grid,diag,par)
             DO 171 ipas=1, par%nptseg(6)
                grid%np1(ireg) = grid%np1(ireg)+1
                grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
-               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6) 
+               grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
                grid%radLineSepSeg(grid%np1(ireg), ireg) = 6
   171       CONTINUE
 
          ELSE IF (equ%ptxint .EQ. 2) THEN
 
-            DO 172 ipas=par%nptseg(5)+par%nptseg(6)+par%nptseg(3)+par%nptseg(4)-3, & 
+            DO 172 ipas=par%nptseg(5)+par%nptseg(6)+par%nptseg(3)+par%nptseg(4)-3, &
      &                             par%nptseg(5)+par%nptseg(3), -1
                grid%np1(ireg) = grid%np1(ireg)+1
                grid%xmail(grid%np1(ireg),1,ireg) = grid%xmail(ipas,par%npr(1),1)
@@ -1932,7 +1929,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*177')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx)-1,equ%ptsep(4,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(4,ipx),ipx)-1,equ%ptsep(4,ipx),ipx), &
@@ -1950,11 +1947,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
               &.true.,diag,ireg, struct, .false.)
@@ -1979,7 +1976,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
             grid%np1(ireg) = grid%np1(ireg)+1
             grid%xmail(grid%np1(ireg),1,ireg) = sepmax(ipas,6)
             grid%ymail(grid%np1(ireg),1,ireg) = sepmay(ipas,6)
-            grid%radLineSepSeg(grid%np1(ireg), ireg) = 6               
+            grid%radLineSepSeg(grid%np1(ireg), ireg) = 6
   181    CONTINUE
 
 !..Initialise the guard indices and starting target
@@ -2013,7 +2010,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !..Relate the desirable sweeping direction to the structure orientation
 
          call trc_stk_in('maille','*187')
-         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), & 
+         sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2,&
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
               & equ%separy(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -2031,11 +2028,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &               grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &               equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &               equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &               gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &               ynlast,nnlast,nuldec,&
               &               xpind,xptxex,yptxex,&
               &.false.,diag,ireg, struct, .false.)
@@ -2089,10 +2086,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
-     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-     &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
+     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
+     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+     &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
      &      xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 
 
@@ -2139,16 +2136,16 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ii = ifind(xx,equ%x,equ%nx,1)
          jj = ifind(yy,equ%y,equ%ny,1)
 
-         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + & 
+         fctini = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xx + equ%a01(ii,jj,1)*yy + &
      &            equ%a11(ii,jj,1)*xx*yy
 
 
 !..Calculate the length of each separatrix
 
          lg(isep) = long(struct%nivx(1,1),struct%nivy(1,1),struct%nivtot(1))
-         
+
          !..4.1  Read all the necessary data from the file
-         
+
          !.. Read initial set of code parameters
          call read_code_parameters(par, equ%distxo)
 
@@ -2165,7 +2162,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                  ii = ifind(xfin,equ%x,equ%nx,1)
                  jj = ifind(yfin,equ%y,equ%ny,1)
 
-                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + & 
+                 fctfin = equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xfin + &
                      &               equ%a01(ii,jj,1)*yfin + equ%a11(ii,jj,1)*xfin*yfin
 
                  difpsi = fctfin - fctini
@@ -2176,23 +2173,23 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
              !..Along the separatrices
 
-             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), & 
+             CALL NUNIFO(par%nptseg(1),lg(1),par%deltp1(1),par%deltpn(1),spacep(1,1), &
                  &               dpmin(1),dpmax(1))
 
 
              !..Radial direction
 
-             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), & 
+             CALL NUNIFO(par%npr(1),struct%distnv(par%repart,1),par%deltr1(1),par%deltrn(1), &
                  &               spacer(1,1),drmin(1),drmax(1))
 
              IF (par%repart .EQ. 1) THEN
 
-                 CALL NUNIFO(par%npr(2),par%pntrat,par%deltr1(2),par%deltrn(2), & 
+                 CALL NUNIFO(par%npr(2),par%pntrat,par%deltr1(2),par%deltrn(2), &
                      &                  spacer(1,2),drmin(2),drmax(2))
 
              ELSE IF (par%repart .EQ. 2) THEN
 
-                 CALL NUNIFO(par%npr(2),difpsi,par%deltr1(2),par%deltrn(2), & 
+                 CALL NUNIFO(par%npr(2),difpsi,par%deltr1(2),par%deltrn(2), &
                      &                  spacer(1,2),drmin(2),drmax(2))
 
              ENDIF
@@ -2212,7 +2209,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
            DO ipas=2, par%nptseg(isep)-1
               dist=dist + spacep(ipas-1,isep)
-              CALL COORD(struct%nivx(1,1),struct%nivy(1,1),struct%nivtot(1), & 
+              CALL COORD(struct%nivx(1,1),struct%nivy(1,1),struct%nivtot(1), &
      &          dist,sepmax(ipas,isep),sepmay(ipas,isep))
            ENDDO
 
@@ -2269,8 +2266,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          sens=1
          if (.not. extended_grid ) then
-            sens=horair(equ%xpto,equ%ypto,x2,y2,struct%xstruc(1,struct%inddef(idef)), & 
-                 &     struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),sens)            
+            sens=horair(equ%xpto,equ%ypto,x2,y2,struct%xstruc(1,struct%inddef(idef)), &
+                 &     struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),sens)
          end if
 
 !***
@@ -2293,11 +2290,11 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, & 
-              &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, & 
-              &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-              &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
-              &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, & 
+         CALL MAILRG(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,sens,pas, &
+              &              grid%np1(ireg),par%npr(ireg),struct%inddef(idef),x2,y2,equ%nx,equ%ny, &
+              &              equ%x,equ%y,equ%psi,equ%xpto,equ%ypto,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+              &              equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+              &              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast, &
               &              ynlast,nnlast,nuldec,&
               &              xpind,xptxex,yptxex,&
               &.false.,diag,ireg, struct, extended_grid)
@@ -2345,10 +2342,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, & 
-     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, & 
-     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-     &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, & 
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
+     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
+     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+     &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
      &      xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
 
 !       ...
@@ -2373,26 +2370,28 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 contains
 
   !> Read code parameters from carre.dat and allow user to change them.
-  !> TODO: move this to carre_parameter_io module 
+  !> TODO: move this to carre_parameter_io module
   subroutine read_code_parameters(par, distxo)
     implicit none
     type(CarreParameters), intent(inout) :: par
-    real*8, intent(inout) :: distxo
+    real(rKind), intent(inout) :: distxo
 
+#ifndef CARRE_NONINTERACTIVE
     ! internal
     integer :: ient,isor,ifail
+#endif
     integer :: iseg
 
 
-#ifdef CARRE_NONINTERACTIVE 
-    ! For non-interactive use the code parameters are initialized 
+#ifdef CARRE_NONINTERACTIVE
+    ! For non-interactive use the code parameters are initialized
     ! at the entry into the ITMCARRE main subroutine.
     ! Do not read from file or user.
     return
 #else
 
     par%tgarde=0
-    
+
 !..1.1  Read all the necessary data from the file
 
          ient = 9
@@ -2405,19 +2404,19 @@ contains
 
            if(sellan(1:8).eq.'francais') then
              CALL LECCLF(par%nptseg,par%npr,lg,&
-                 & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, & 
+                 & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, &
                  & par%deltrn,par%repart,par%pntrat,par%tgarde,&
-                 & struct%distnv,xptxo,yptxo, & 
+                 & struct%distnv,xptxo,yptxo, &
                  & distxo,xx,yy,fctini,difpsi, &
-                 & equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
+                 & equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, &
                  & equ%npx,equ%racord,equ%x,equ%y,equ%nx,equ%ny)
            elseif(sellan(1:7).eq.'english') then
              CALL LECCLE(par%nptseg,par%npr,lg,&
-                 & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, & 
+                 & par%deltp1,par%deltpn,par%deltr1,equ%limcfg, &
                  & par%deltrn,par%repart,par%pntrat,par%tgarde,&
-                 & struct%distnv,xptxo,yptxo, & 
+                 & struct%distnv,xptxo,yptxo, &
                  & distxo,xx,yy,fctini,difpsi, &
-                 & equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, & 
+                 & equ%a00,equ%a10,equ%a01,equ%a11,nxmax,nymax, &
                  & equ%npx,equ%racord,equ%x,equ%y,equ%nx,equ%ny)
            endif
 
@@ -2426,7 +2425,7 @@ contains
 
     ! If we do an extended grid, modify the code parameters before starting the gridding
     if (par%gridExtensionMode /= GRID_EXTENSION_OFF) then
-       
+
         call logmsg(LOGINFO, "read_code_parameters: adjusting deltp1, deltpn for &
              &use with extended grid algorithm")
 
@@ -2446,6 +2445,11 @@ contains
     implicit none
     type(CarreParameters), intent(inout) :: par
     logical, intent(out) :: correct
+#ifndef CARRE_NONINTERACTIVE
+    integer nn1
+    real(rKind) :: pntrat_old
+    character*3 rep
+#endif
 
 #ifdef CARRE_NONINTERACTIVE
     ! For ITMCARRE, the code parameters cannot be modified by the user
@@ -2455,7 +2459,7 @@ contains
 !!$    CALL SORTIE(equ, grid, diag, par, 1)
 
     return
-#else  
+#else
 
     CALL RAPPEL(par,&
          & lg,difpsi,struct%distnv,grid%nreg,equ%nsep,equ%npx,&
@@ -2474,12 +2478,12 @@ contains
     ! on colle la dernière ligne de niveau sur trace2 pour avoir
     ! la pénétration.
 
-    call trace3(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, & 
-         &        equ%ptsep,equ%npx,equ%nptot, & 
-         &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-         &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, & 
-         &         par%pntrat,equ%distxo,grid%xn,grid%yn,nn1, & 
-         &         par%repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, & 
+    call trace3(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, &
+         &        equ%ptsep,equ%npx,equ%nptot, &
+         &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+         &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, &
+         &         par%pntrat,equ%distxo,grid%xn,grid%yn,nn1, &
+         &         par%repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, &
          &         equ%a00,equ%a01,equ%a10,equ%a11,equ%psi,equ%nx,equ%ny,equ%x,equ%y)
 
     if (correct) then
@@ -2501,9 +2505,9 @@ contains
 
             call endpag
 
-            call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), & 
-                 &     equ%separx,equ%separy,equ%ptsep,equ%npx,equ%nptot, & 
-                 &         struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,struct%nivx,struct%nivy, & 
+            call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), &
+                 &     equ%separx,equ%separy,equ%ptsep,equ%npx,equ%nptot, &
+                 &         struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,struct%nivx,struct%nivy, &
                  &         struct%nivtot,struct%nbniv)
 
         endif
@@ -2524,13 +2528,13 @@ contains
 
   end subroutine check_and_modify_code_parameters
 
-!!$  ! Modify code parameters in order to match 
+!!$  ! Modify code parameters in order to match
 !!$  subroutine setupCodeParametersForExtendedGrid(par, equ)
 !!$    type(CarreParameters), intent(inout) :: par
 !!$    type(CarreEquilibrium), intent(inout) :: equ
 !!$
 !!$    integer :: isep
-!!$    double precision :: 
+!!$    double precision ::
 !!$
 !!$    do isep = 1, 4
 !!$        lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
@@ -2541,3 +2545,21 @@ contains
 !!$  end subroutine setupCodeParametersForExtendedGrid
 
 END subroutine
+
+      integer function lnblnk(string)
+      implicit none
+      integer i
+      intrinsic len
+!
+! returns the position of the last non-blank character in "string"
+!
+      character*(*) string
+      do i=len(string),1,-1
+        if(string(i:i).ne.' ') then
+          lnblnk=i
+          return
+        endif
+      enddo
+      lnblnk=1
+      return
+      end function lnblnk

@@ -2,6 +2,7 @@
            & fpsi,psidx,psidy,bb,ffbz,b2cflag,&
            & nxmax,nymax,&
            & niso,nxiso,nisomx)
+        use KindDefinitions
         use carre_constants
         use tradui_constants , only: GRID_N_CELLFLAGS
 !
@@ -15,7 +16,7 @@
 !
 !  arguments
       integer nfin,nx,ny,nxmax,nymax,niso,nisomx,nxiso(nisomx+1)
-      real*8 crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), & 
+      real(rKind) :: crx(0:nxmax,0:nymax,0:3),cry(0:nxmax,0:nymax,0:3), &
      & bb(0:nxmax,0:nymax,0:3),ffbz(0:nxmax,0:nymax,0:3),&
      & fpsi(0:nxmax,0:nymax,0:3),&
      & psidx(0:nxmax,0:nymax,0:3),psidy(0:nxmax,0:nymax,0:3)
@@ -23,7 +24,7 @@
 
 !  local variables
       integer ix,iy,i
-      real*8 x0,y0,fpsi0
+      real(rKind) :: x0,y0,fpsi0
       character(len=35) :: hlp_format
 !
 !  procedures

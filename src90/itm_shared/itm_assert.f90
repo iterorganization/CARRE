@@ -145,7 +145,9 @@ contains
   !> print the fail message and possibly stop execution.
   !> 
   !> @param test The logical expression to test.
-  !> @param failmsg The message to print on fail. If omitted, a generic message is printed. Can be modified with a prefix (see assertSetMsgPrefix)
+  !> @param failmsg The message to print on fail.
+  !> If omitted, a generic message is printed.
+  !> Can be modified with a prefix (see assertSetMsgPrefix)
   !> @param doStop Controls whether to stop execution. If doStop .true., 
   !> the program is stopped. If .false., only the fail message is printed
   !> and bookkeeping is done for delayed stopping (see assertStopOnFailed).

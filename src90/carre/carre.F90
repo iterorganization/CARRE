@@ -18,6 +18,7 @@ PROGRAM CARRE
   !*** parametrises the separatrices passing through them, and traces
   !*** them together with the real structures.
   !======================================================================
+  use KindDefinitions
   use CarreDiagnostics
   use CarreSiloIO
   use carre_types
@@ -109,7 +110,7 @@ contains
     type(CarreStructures), intent(out) :: struct
 
     ! internal
-    REAL*8 zero,rmax,zmax
+    REAL(rKind) :: zero,rmax,zmax
     PARAMETER ( zero=0.)
     INTEGER i, j, ierror, iflag           
     character lign80*80

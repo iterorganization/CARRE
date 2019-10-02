@@ -118,8 +118,8 @@
 
 
 !     ON TROUVE LE MINIMUM DES VALEURS DE Z
-      DO 102 I=1,NX
-      DO 102 J=1,NY
+      DO I=1,NX
+       DO J=1,NY
         IF((I.EQ.1).AND.(J.EQ.1)) THEN
           ZMIN=Z(I,J)
           ZMAX=Z(I,J)
@@ -127,7 +127,8 @@
           ZMIN=MIN(ZMIN,Z(I,J))
           ZMAX=MAX(ZMAX,Z(I,J))
         ENDIF
-102   CONTINUE
+       ENDDO
+      ENDDO
 
 !  ON DIVISE L'INTERVALLE ENTRE LE MAX. ET LE MIN. PAR LE NOMBRE DE LIGNES
 !  DE NIVEAU.

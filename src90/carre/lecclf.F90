@@ -1,11 +1,12 @@
-      SUBROUTINE LECCLF(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, & 
-     &              deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, & 
-     &              distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nm1,nm2, & 
+      SUBROUTINE LECCLF(nptseg,npr,lg,deltp1,deltpn,deltr1,limcfg, &
+     &              deltrn,repart,pntrat,tgarde,distnv,xptxo,yptxo, &
+     &              distxo,xx,yy,fctini,difpsi,a00,a10,a01,a11,nm1,nm2, &
      &              npx,racord,x,y,nx,ny)
 !
 !  version : 04.04.97 21:00
 !
 !======================================================================
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette sous-routine permet a l'utilisateur d'entrer tous les parame-
@@ -14,15 +15,15 @@
 !  arguments
       INTEGER nx,ny,npx,nptseg(*),npr(*),repart,nm1,nm2,limcfg
       LOGICAL racord
-      REAL*8 x(nx),y(ny),xx,yy,distnv(5,*),lg(*),pntrat, & 
-     &       deltp1(10),deltpn(10),deltr1(10),deltrn(10),fctini,difpsi, & 
-     &       a00(nm1,nm2,3),a10(nm1,nm2,3), & 
-     &       a01(nm1,nm2,3),a11(nm1,nm2,3), & 
+      REAL(rKind) :: x(nx),y(ny),xx,yy,distnv(5,*),lg(*),pntrat, &
+     &       deltp1(10),deltpn(10),deltr1(10),deltrn(10),fctini,difpsi, &
+     &       a00(nm1,nm2,3),a10(nm1,nm2,3), &
+     &       a01(nm1,nm2,3),a11(nm1,nm2,3), &
      &       tgarde(4),xptxo,yptxo,distxo
 
 !  variables locales
       INTEGER ii,jj
-      REAL*8 fctfin,xfin,yfin
+      REAL(rKind) :: fctfin,xfin,yfin
 
 !  procedures
       INTEGER ifind
@@ -45,7 +46,7 @@
 !       trice.
 
          WRITE(6,105)lg(1)
-  105    FORMAT(/'Configuration limiteur.'// & 
+  105    FORMAT(/'Configuration limiteur.'// &
      &   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
 !$   .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
          READ(5,*)nptseg(1)
@@ -75,7 +76,7 @@
          READ(5,*)deltrn(1)
 
          WRITE(6,122)distxo
-  122    FORMAT(/'Nombre de points dans la region 2 (interieure) et' & 
+  122    FORMAT(/'Nombre de points dans la region 2 (interieure) et' &
      &     ,' penetration:'/'penetration maximale =',F11.8)
          READ(5,*)npr(2),pntrat
 
@@ -89,7 +90,7 @@
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + &
      &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini
@@ -118,8 +119,8 @@
 !       trice.
 
          WRITE(6,100)lg(1)
-  100    FORMAT(/'Vous avez un simple nul'// & 
-     &   'Nombre de points sur le segment qui va du point X a la', & 
+  100    FORMAT(/'Vous avez un simple nul'// &
+     &   'Nombre de points sur le segment qui va du point X a la', &
      &   ' plaque de droite:'/'longueur = ',F8.5)
          READ(5,*)nptseg(1)
 
@@ -132,7 +133,7 @@
          READ(5,*)deltpn(1)
 
          WRITE(6,103)lg(2)
-  103    FORMAT(/'Nombre de points sur le segment qui va a la plaque', & 
+  103    FORMAT(/'Nombre de points sur le segment qui va a la plaque', &
      &   ' de gauche:'/'longeur = ',F8.5)
          READ(5,*)nptseg(2)
 
@@ -156,16 +157,16 @@
 !..1.2  Determination de la facon de repartir les points radialement.
 
          WRITE(6,109)
-  109    FORMAT(/'Repartition des points sur les plaques:'/ & 
-     &     '1 pour une distribution selon le deplacement sur les', & 
-     &     ' plaques'/ & 
+  109    FORMAT(/'Repartition des points sur les plaques:'/ &
+     &     '1 pour une distribution selon le deplacement sur les', &
+     &     ' plaques'/ &
      &     '2 pour une distribution selon psi (recommande)')
          READ(5,*)repart
 
 !..1.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,110)
-  110    FORMAT(//'Nombre de points dans la direction radiale pour la ', & 
+  110    FORMAT(//'Nombre de points dans la direction radiale pour la ', &
      &    'region 1 (SOL):')
          WRITE(6,111)distnv(1,1)
   111    FORMAT('Distance totale =',F9.6)
@@ -195,7 +196,7 @@
          READ(5,*)deltrn(2)
 
          WRITE(6,120)distxo
-  120    FORMAT(/'Nombre de points dans la region 3 (interieure) et' & 
+  120    FORMAT(/'Nombre de points dans la region 3 (interieure) et' &
      &     ,' penetration:'/'penetration maximale =',F11.8)
          READ(5,*)npr(3),pntrat
 
@@ -209,7 +210,7 @@
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + &
      &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini
@@ -246,8 +247,8 @@
 !       trice.
 
          WRITE(6,130)lg(1)
-  130    FORMAT(/'Vous avez un double nul connecte'// & 
-     &   'Nombre de points sur le segment qui va du point X superieur', & 
+  130    FORMAT(/'Vous avez un double nul connecte'// &
+     &   'Nombre de points sur le segment qui va du point X superieur', &
      &   ' a la plaque en haut a droite:'/'longueur = ',F8.5)
          READ(5,*)nptseg(1)
 
@@ -258,8 +259,8 @@
          READ(5,*)deltpn(1)
 
          WRITE(6,131)lg(2)
-  131    FORMAT(/'Vous avez un double nul connecte'// & 
-     &   'Nombre de points sur le segment qui va du point X superieur', & 
+  131    FORMAT(/'Vous avez un double nul connecte'// &
+     &   'Nombre de points sur le segment qui va du point X superieur', &
      &   ' a la plaque en haut a gauche:'/'longueur = ',F8.5)
          READ(5,*)nptseg(2)
 
@@ -270,7 +271,7 @@
          READ(5,*)deltpn(2)
 
          WRITE(6,133)lg(3)
-  133    FORMAT(/'Nombre de points sur le segment qui relie les points', & 
+  133    FORMAT(/'Nombre de points sur le segment qui relie les points', &
      &   ' X par la droite'/'longueur = ',F8.5)
          READ(5,*)nptseg(3)
 
@@ -281,7 +282,7 @@
          READ(5,*)deltpn(3)
 
          WRITE(6,136)lg(4)
-  136    FORMAT(/'Nombre de points sur la boucle qui relie les points X' & 
+  136    FORMAT(/'Nombre de points sur la boucle qui relie les points X' &
      &   ,' par la gauche'/'longueur = ',F8.5)
          READ(5,*)nptseg(4)
 
@@ -292,8 +293,8 @@
          READ(5,*)deltpn(4)
 
          WRITE(6,140)lg(5)
-  140    FORMAT(/'Nombre de points sur le segment qui va du', & 
-     &   ' point X inferieur a la plaque en bas a droite:'/ & 
+  140    FORMAT(/'Nombre de points sur le segment qui va du', &
+     &   ' point X inferieur a la plaque en bas a droite:'/ &
      &   'longueur = ',F8.5)
          READ(5,*)nptseg(5)
 
@@ -304,8 +305,8 @@
          READ(5,*)deltpn(5)
 
          WRITE(6,144)lg(6)
-  144    FORMAT(/'Nombre de points sur le segment qui va du', & 
-     &   ' point X inferieur a la plaque en bas a gauche:'/ & 
+  144    FORMAT(/'Nombre de points sur le segment qui va du', &
+     &   ' point X inferieur a la plaque en bas a gauche:'/ &
      &   'longueur = ',F8.5)
          READ(5,*)nptseg(6)
 
@@ -323,7 +324,7 @@
 !..2.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,150)
-  150    FORMAT(//'Nombre de points dans la direction radiale pour la ', & 
+  150    FORMAT(//'Nombre de points dans la direction radiale pour la ', &
      &    'region 1 (SOL de droite):')
          WRITE(6,111)distnv(1,1)
          WRITE(6,112)distnv(2,1)
@@ -372,7 +373,7 @@
          READ(5,*)deltrn(4)
 
          WRITE(6,164)distxo
-  164    FORMAT(/'Nombre de points dans la region 5 (interieure) et' & 
+  164    FORMAT(/'Nombre de points dans la region 5 (interieure) et' &
      &     ,' penetration:'/'penetration totale =',F11.8)
          READ(5,*)npr(5),pntrat
 
@@ -386,7 +387,7 @@
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + &
      &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini
@@ -423,8 +424,8 @@
 !       trice.
 
          WRITE(6,170)lg(1)
-  170    FORMAT(/'Vous avez un double nul deconnecte'// & 
-     &   'Nombre de points sur le segment qui va du point X du haut'/ & 
+  170    FORMAT(/'Vous avez un double nul deconnecte'// &
+     &   'Nombre de points sur le segment qui va du point X du haut'/ &
      &   'a la plaque droite du haut:'/'longueur = ',F8.5)
          READ(5,*)nptseg(1)
 
@@ -462,7 +463,7 @@
          READ(5,*)deltpn(6)
 
          WRITE(6,173)
-  173    FORMAT(/'Nombre de points sur la partie de la boucle de la', & 
+  173    FORMAT(/'Nombre de points sur la partie de la boucle de la', &
      &    ' separatrice'/ ' interieure qui part de la droite.')
          READ(5,*)nptseg(3)
 
@@ -473,7 +474,7 @@
          READ(5,*)deltpn(3)
 
          WRITE(6,174)
-  174    FORMAT(/'Nombre de points sur la partie de la boucle de la', & 
+  174    FORMAT(/'Nombre de points sur la partie de la boucle de la', &
      &    ' separatrice'/ ' interieure qui part de la gauche.')
          READ(5,*)nptseg(4)
 
@@ -491,7 +492,7 @@
 !..3.3  Determination du nombre de points dans la direction "radiale"
 
          WRITE(6,180)
-  180    FORMAT(//'Nombre de points dans la direction radiale pour la '/ & 
+  180    FORMAT(//'Nombre de points dans la direction radiale pour la '/ &
      &   'region 1 (entre les deux separatrices):')
          WRITE(6,111)distnv(1,1)
          WRITE(6,112)distnv(2,1)
@@ -552,7 +553,7 @@
          READ(5,*)deltrn(5)
 
          WRITE(6,189)distxo
-  189    FORMAT(/'Nombre de points dans la region 6 (interieure) et' & 
+  189    FORMAT(/'Nombre de points dans la region 6 (interieure) et' &
      &     ,' penetration:'/'penetration totale =',F11.8)
          READ(5,*)npr(6),pntrat
 
@@ -566,7 +567,7 @@
             ii = ifind(xfin,x,nx,1)
             jj = ifind(yfin,y,ny,1)
 
-            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + & 
+            fctfin = a00(ii,jj,1) + a10(ii,jj,1)*xfin + &
      &               a01(ii,jj,1)*yfin + a11(ii,jj,1)*xfin*yfin
 
             difpsi = fctfin - fctini

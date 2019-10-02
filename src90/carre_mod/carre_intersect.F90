@@ -1,5 +1,6 @@
 module carre_intersect
 
+  use KindDefinitions
   use carre_types
   use itm_assert
   use Logging
@@ -87,10 +88,10 @@ contains
       integer :: iFace, iAlign, ipfc, irfc
 
       ! mark all faces connected to this point that are not yet intersected as intersected
-      
+
       do iFace = 1, 4 ! left, bottom, right, top
 
-          ipfc = ipol 
+          ipfc = ipol
           irfc = irad
           select case (iFace)
           case(FACE_LEFT)
@@ -136,7 +137,7 @@ contains
       xx(1) = grid%xmail(ix(1), iy(1), iReg)
       yy(1) = grid%ymail(ix(1), iy(1), iReg)
       xx(2) = grid%xmail(ix(2), iy(2), iReg)
-      yy(2) = grid%ymail(ix(2), iy(2), iReg)              
+      yy(2) = grid%ymail(ix(2), iy(2), iReg)
     end subroutine getFace
 
   end subroutine computeFaceStructureIntersections
@@ -149,19 +150,19 @@ contains
   subroutine intersect_all_structures(xx, yy, struct, doesIntersect, iStruct, &
       & iSegment, ipx, ipy, oldipx, oldipy)
 
-    REAL*8, intent(in) :: xx(:),yy(:)     
+    REAL(rKind), intent(in) :: xx(:),yy(:)
     type(CarreStructures), intent(in) :: struct
     logical, intent(out) :: doesIntersect
     integer, intent(out), optional :: iSegment, iStruct
-    REAL*8, intent(out), optional :: ipx, ipy
-    REAL*8, intent(in), optional :: oldipx, oldipy
+    REAL(rKind), intent(out), optional :: ipx, ipy
+    REAL(rKind), intent(in), optional :: oldipx, oldipy
 
-    ! internal      
+    ! internal
     integer :: iSeg, is
     integer :: closestISegment, tmpISegment, closestIStruct
     double precision :: closestDist, tmpIpx, tmpIpy, closestIpx, closestIpY
     logical :: tmpDoesIntersect
-    
+
 
     double precision :: dist
     external :: dist
@@ -196,8 +197,8 @@ contains
               end if
           end if
 
-       end do       
-       
+       end do
+
        if (.not. present(oldipx) .and. (closestIStruct /= GRID_UNDEFINED)) then
            ! fast exit if only first found intersection required
            exit
@@ -228,27 +229,23 @@ contains
        & testEndPoints, oldipx, oldipy)
 
     !  arguments
-    REAL*8, intent(in) :: xx(2),yy(2),xst(:),yst(:)
+    REAL(rKind), intent(in) :: xx(2),yy(2),xst(:),yst(:)
 
     logical, intent(out) :: doesIntersect
     integer, intent(out), optional :: iSegment
-    REAL*8, intent(out), optional :: ipx, ipy
+    REAL(rKind), intent(out), optional :: ipx, ipy
     logical, intent(in), optional :: testEndPoints
-    REAL*8, intent(in), optional :: oldipx, oldipy
+    REAL(rKind), intent(in), optional :: oldipx, oldipy
 
     !  variables locales
-    INTEGER i, j, k
-    !.. determ: determinant de la matrice des deux equations.
-    !.. mult1: facteur multiplicatif du segment de courbe.
-    !.. mult2: facteur multiplicatif du segment de structure.
-    REAL*8 mult1,mult2,determ
+    INTEGER i
     double precision :: tmpIpx, tmpIpy, closestIpx, closestIpy, closestDist
     integer :: closestSegment
 
     double precision :: dist
     external :: dist
 
-    logical :: doesIntersectCheck, tmpDoesIntersect
+    logical :: tmpDoesIntersect
 
     closestDist = huge(closestDist)
     closestSegment = GRID_UNDEFINED
@@ -294,10 +291,10 @@ contains
   subroutine intersection(xx, yy, xst, yst, doesIntersect, ipx, ipy, testEndPoints)
 
     !  arguments
-    REAL*8, intent(in) :: xx(2),yy(2),xst(2),yst(2)
+    REAL(rKind), intent(in) :: xx(2),yy(2),xst(2),yst(2)
 
     logical, intent(out) :: doesIntersect
-    REAL*8, intent(out), optional :: ipx, ipy
+    REAL(rKind), intent(out), optional :: ipx, ipy
     logical, intent(in), optional :: testEndPoints
 
     !  variables locales
@@ -305,7 +302,7 @@ contains
     !.. determ: determinant de la matrice des deux equations.
     !.. mult1: facteur multiplicatif du segment de courbe.
     !.. mult2: facteur multiplicatif du segment de structure.
-    REAL*8 mult1,mult2,determ
+    REAL(rKind) :: mult1,mult2,determ
 
     logical :: doesIntersectCramer, doesIntersectRobust
 
@@ -335,19 +332,19 @@ contains
     !end if
 
     !..Calcul du determinant de la matrice.
-    determ = (-(xx(2) - xx(1))) * (yst(2) - yst(1)) + & 
+    determ = (-(xx(2) - xx(1))) * (yst(2) - yst(1)) + &
          &                   (yy(2) - yy(1)) * (xst(2) - xst(1))
 
     !..Si determinant non nul, alors il y a solution.
     IF (determ .NE. 0.) THEN
 
         !..Facteur multiplicatif du segment de courbe avec la methode de Cramer.
-        mult1 = ((-(xst(1)-xx(1))) * (yst(2)-yst(1)) + & 
+        mult1 = ((-(xst(1)-xx(1))) * (yst(2)-yst(1)) + &
              &              (yst(1)-yy(1)) * (xst(2)-xst(1)))/determ
         !..Fact. mult. du segment de structure.
-        mult2= ((xx(2)-xx(1)) * (yst(1)-yy(1)) - & 
+        mult2= ((xx(2)-xx(1)) * (yst(1)-yy(1)) - &
              &                (yy(2)-yy(1)) * (xst(1)-xx(1)))/determ
-        
+
 
         !..Pour avoir intersection, il faut que mult1 soit entre 0 et 1
         IF ((mult1 >= 0.0d0).AND.(mult1 <= 1.0d0)) THEN
@@ -366,10 +363,10 @@ contains
                 ipx = xst(1) + mult2 * (xst(2) - xst(1))
                 ipy = yst(1) + mult2 * (yst(2) - yst(1))
         end if
-                
-        return        
+
+        return
     ELSE
-        ! Zero determinant means colinear. The line segments can still 
+        ! Zero determinant means colinear. The line segments can still
         ! coincide/overlap. In this case we declare the lines to not intersect.
         doesIntersect = .FALSE.
         ! We also do NOT check against the robust intersection test result
@@ -382,17 +379,14 @@ contains
   !> Test whether a point is on one of the real structures
   subroutine isPointOnStructure(x, y, struct, onStructure, iStruct )
 
-    REAL*8, intent(in) :: x, y
+    REAL(rKind), intent(in) :: x, y
     type(CarreStructures), intent(in) :: struct
     logical, intent(out) :: onStructure
     integer, intent(out), optional :: iStruct
 
-    ! internal      
+    ! internal
     integer :: iSeg, is
-    integer :: closestISegment, tmpISegment, closestIStruct
-    double precision :: closestDist, tmpIpx, tmpIpy, closestIpx, closestIpY
-    logical :: tmpDoesIntersect
-    
+
     ! This tolerance parameter is basically used for floating point
     ! equivalence tests. Increase it will increase the tolerance at
     ! which the point is accepted to be on a structure segment.
@@ -423,14 +417,14 @@ contains
 
     ! internal
     double precision :: d1, d2, d3, d4
-    
+
     d1 = direction(p3x, p3y, p4x, p4y, p1x, p1y)
     d2 = direction(p3x, p3y, p4x, p4y, p2x, p2y)
     d3 = direction(p1x, p1y, p2x, p2y, p3x, p3y)
     d4 = direction(p1x, p1y, p2x, p2y, p4x, p4y)
 
     segments_intersect = .true.
-    
+
     if (   ((d1 > 0.0d0 .and. d2 < 0.0d0) .or. (d1 < 0.0d0 .and. d2 > 0.0d0)) .and. &
          & ((d3 > 0.0d0 .and. d4 < 0.0d0) .or. (d3 < 0.0d0 .and. d4 > 0.0d0))  ) return
 
@@ -438,33 +432,33 @@ contains
     if ( d2 == 0.0d0 .and. in_rectangle(p3x, p3y, p4x, p4y, p2x, p2y ) ) return
     if ( d3 == 0.0d0 .and. in_rectangle(p1x, p1y, p2x, p2y, p3x, p3y ) ) return
     if ( d4 == 0.0d0 .and. in_rectangle(p1x, p1y, p2x, p2y, p4x, p4y ) ) return
-   
+
     segments_intersect = .false.
   END function segments_intersect
 
-  ! Compute cross product between vectors i->j and i->k 
+  ! Compute cross product between vectors i->j and i->k
   double precision function direction( pix, piy, pjx, pjy, pkx, pky )
     double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
-    
-    direction = (pkx - pix) * (pjy - piy) - (pjx - pix) * (pky - piy) 
-    
+
+    direction = (pkx - pix) * (pjy - piy) - (pjx - pix) * (pky - piy)
+
   end function direction
-  
+
   ! Check whether point k is in a rectangle with the diagonal
   ! given by the points i, j
   logical function in_rectangle( pix, piy, pjx, pjy, pkx, pky, atol)
     double precision, intent(in) :: pix, piy, pjx, pjy, pkx, pky
     double precision, intent(in), optional :: atol
-    
+
     ! internal
-    double precision :: d, latol
+    double precision :: latol
 
     latol = 0.0d0
     if (present(atol)) latol = atol
 
     in_rectangle = (min(pix, pjx)-latol <= pkx) .and. (pkx <= max(pix, pjx)+latol) &
          & .and. (min(piy, pjy)-latol <= pky) .and. (pky <= max(piy, pjy)+latol)
-    
+
   end function in_rectangle
 
   ! Check whether point k is on the segment defined by points i, j
@@ -477,9 +471,9 @@ contains
 
     latol = 0.0d0
     if (present(atol)) latol = atol
-    
+
     d = direction( pix, piy, pjx, pjy, pkx, pky )
-    on_segment = (abs(d) < latol .and. in_rectangle(pix, piy, pjx, pjy, pkx, pky))    
+    on_segment = (abs(d) < latol .and. in_rectangle(pix, piy, pjx, pjy, pkx, pky))
   end function on_segment
 
 

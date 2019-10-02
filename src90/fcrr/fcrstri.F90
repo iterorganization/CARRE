@@ -5,10 +5,11 @@
 !======================================================================
 !*** Read the structure file from dg
 !======================================================================
+      use KindDefinitions
       implicit none
       integer lun
 #include <FCRCOM.F>
-      integer i,j,k,l,n
+      integer(Short) :: i,j,k,l,n
 !======================================================================
 !
       rewind(lun)
@@ -18,12 +19,12 @@
       do i=1,n
         read(lun,*,err=900) k
         do j=1,k
-          l=l+1
+          l=l+1_Short
           read(lun,*,err=900) xstr(l),ystr(l)
           xstr(l)=1.e-3*xstr(l)
           ystr(l)=1.e-3*ystr(l)
         end do
-        nstr=nstr+1
+        nstr=nstr+1_Short
         lstr(nstr)=k
       end do
       return

@@ -1,9 +1,10 @@
-      SUBROUTINE RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, & 
+      SUBROUTINE RAPPEL(par,lg,difpsi,distnv,nreg,nsep,npx, &
      &             dpmin,dpmax,drmin,drmax,distxo,iusor,correct)
 !
 !  version : 07.07.97 18:37
 !
 !======================================================================
+      use KindDefinitions
       use carre_types
 
       IMPLICIT NONE
@@ -19,8 +20,8 @@
 !  arguments
       type(CarreParameters), intent(in) :: par
       INTEGER nreg,nsep,npx,iusor
-      REAL*8 lg(*), & 
-     &       distnv(5,*),difpsi,dpmin(*),dpmax(*),drmin(*),drmax(*), & 
+      REAL(rKind) :: lg(*), &
+     &       distnv(5,*),difpsi,dpmin(*),dpmax(*),drmin(*),drmax(*), &
      &       distxo
       LOGICAL correct
 
@@ -41,12 +42,12 @@
         write(iusor,205) 'SEPARATRIX SEGMENTS:'
  205    FORMAT(//T10,A)
       endif
-        write(iusor,110)'#','nptseg(i)','lg(i)','deltp1(i)','deltpn(i)', & 
+        write(iusor,110)'#','nptseg(i)','lg(i)','deltp1(i)','deltpn(i)', &
      &          'dpmin','dpmax'
   110 FORMAT(/T2,A1,T6,A9,T18,A5,T29,A9,T41,A9,T54,A6,T66,A6/75('='))
 
       DO 12 i=1, nsep
-         write(iusor,114)i,par%nptseg(i),lg(i),par%deltp1(i),par%deltpn(i),dpmin(i), & 
+         write(iusor,114)i,par%nptseg(i),lg(i),par%deltp1(i),par%deltpn(i),dpmin(i), &
      &             dpmax(i)
   114    FORMAT(T2,I1,T8,I3,T15,1p5E12.4)
    12 CONTINUE
@@ -63,36 +64,36 @@
 
       IF (par%repart .EQ. 1) THEN
         if(sellan(1:8).eq.'francais') then
-         write(iusor,121) 'Repartition selon la distance:', & 
+         write(iusor,121) 'Repartition selon la distance:', &
      &     ' repart=',par%repart
         elseif(sellan(1:7).eq.'english') then
-         write(iusor,221) 'Distribution in displacement along plates:', & 
+         write(iusor,221) 'Distribution in displacement along plates:', &
      &     ' repart=',par%repart
         endif
   121    FORMAT(T14,A,i5)
   221    FORMAT(T14,2A,i5)
 
-         write(iusor,122)'region','npr(i)','distance','deltr1(i)', & 
+         write(iusor,122)'region','npr(i)','distance','deltr1(i)', &
      &     'deltrn(i)','drmin','drmax'
-  122    FORMAT(/T2,A6,T9,A6,T17,A8,T29,A9,T41,A9,T54,A6,T66,A6/ & 
+  122    FORMAT(/T2,A6,T9,A6,T17,A8,T29,A9,T41,A9,T54,A6,T66,A6/ &
      &            75('='))
 
       ELSE IF (par%repart .EQ. 2) THEN
         if(sellan(1:8).eq.'francais') then
           write(iusor,121) 'Repartition selon psi: repart=',par%repart
-          write(iusor,124)'region','npr(i)','difference','deltr1(i)', & 
+          write(iusor,124)'region','npr(i)','difference','deltr1(i)', &
      &      'deltrn(i)','drmin','drmax'
-  124     FORMAT(/T2,A6,T9,A6,T17,A10,T29,A9,T41,A9,T54,A6,T66,A6/ & 
+  124     FORMAT(/T2,A6,T9,A6,T17,A10,T29,A9,T41,A9,T54,A6,T66,A6/ &
      &            75('='))
         elseif(sellan(1:7).eq.'english') then
           write(iusor,121) 'Distribution in psi: repart=',par%repart
-          write(iusor,124)'region','npr(i)','  width   ','deltr1(i)', & 
+          write(iusor,124)'region','npr(i)','  width   ','deltr1(i)', &
      &      'deltrn(i)','drmin','drmax'
         endif
       ENDIF
 
       DO 26 i=1, nreg-1
-         write(iusor,128)i,par%npr(i),distnv(par%repart,i),par%deltr1(i),par%deltrn(i), & 
+         write(iusor,128)i,par%npr(i),distnv(par%repart,i),par%deltr1(i),par%deltrn(i), &
      &            drmin(i),drmax(i)
   128    FORMAT(T2,I1,T8,I3,T15,1p5E12.4)
    26 CONTINUE
@@ -101,36 +102,36 @@
 
       if(sellan(1:8).eq.'francais') then
         write(iusor,134) nreg,distxo
-  134   FORMAT(//T10,'REGION CENTRALE: region i=',T37,I1,T43, & 
+  134   FORMAT(//T10,'REGION CENTRALE: region i=',T37,I1,T43, &
      &       'pntrat max.=',F11.8)
       elseif(sellan(1:7).eq.'english') then
         write(iusor,234) nreg,distxo
-  234   FORMAT(//T10,'CENTRAL REGION: region i=',T37,I1,T43, & 
+  234   FORMAT(//T10,'CENTRAL REGION: region i=',T37,I1,T43, &
      &       'pntrat max.=',F11.8)
       endif
 
       IF (par%repart .EQ. 1) THEN
-         write(iusor,138)'pntrat','npr(i)','deltr1(i)','deltrn(i)', & 
+         write(iusor,138)'pntrat','npr(i)','deltr1(i)','deltrn(i)', &
      &            'drmin','drmax'
   138    FORMAT(/T2,A6,T9,A6,T17,A9,T29,A9,T41,A6,T54,A6/75('='))
 
-         write(iusor,140)par%pntrat,par%npr(nreg),par%deltr1(i),par%deltrn(i),drmin(i), & 
+         write(iusor,140)par%pntrat,par%npr(nreg),par%deltr1(i),par%deltrn(i),drmin(i), &
      &            drmax(i)
   140    FORMAT(/T2,F6.3,T9,I3,T15,1p4E12.4)
 
       ELSE IF (par%repart .EQ. 2) THEN
 
          if(sellan(1:8).eq.'francais') then
-           write(iusor,148)'pntrat','npr(i)','difference','deltr1(i)', & 
+           write(iusor,148)'pntrat','npr(i)','difference','deltr1(i)', &
      &       'deltrn(i)','drmin','drmax'
          elseif(sellan(1:7).eq.'english') then
-           write(iusor,148)'pntrat','npr(i)','  width','deltr1(i)', & 
+           write(iusor,148)'pntrat','npr(i)','  width','deltr1(i)', &
      &       'deltrn(i)','drmin','drmax'
          endif
-  148    FORMAT(/T2,A6,T9,A6,T17,A,T29,A9,T41,A9,T54,A6,T66,A6/ & 
+  148    FORMAT(/T2,A6,T9,A6,T17,A,T29,A9,T41,A9,T54,A6,T66,A6/ &
      &            75('='))
 
-         write(iusor,150)par%pntrat,par%npr(nreg),difpsi,par%deltr1(nreg), & 
+         write(iusor,150)par%pntrat,par%npr(nreg),difpsi,par%deltr1(nreg), &
      &      par%deltrn(nreg),drmin(nreg),drmax(nreg)
   150    FORMAT(T2,F6.3,T9,I3,T15,1p5E12.4)
 
@@ -140,7 +141,7 @@
 !   chaque plaque de deflecteur.
 
       if(sellan(1:8).eq.'francais') then
-        write(iusor,152) & 
+        write(iusor,152) &
      &  'LONGUEUR DE GARDE DE CHAQUE PLAQUE DE DEFLECTEUR:'
   152   FORMAT(//T10,A)
       elseif(sellan(1:7).eq.'english') then
@@ -168,15 +169,15 @@
 !  par relaxation
       if(sellan(1:8).eq.'francais') then
         write(iusor,162)
- 162    format(//t10, & 
-     &    'PARAMETRES SERVANT AU CALCUL DE LA MAILLE PAR RELAXATION:'// & 
-     &    75('=')/ & 
+ 162    format(//t10, &
+     &    'PARAMETRES SERVANT AU CALCUL DE LA MAILLE PAR RELAXATION:'// &
+     &    75('=')/ &
      &    'nrelax',t15,'relax',t30,'pasmin',t45,'rlcept')
       elseif(sellan(1:7).eq.'english') then
         write(iusor,262)
- 262    format(//t10, & 
-     &    'RELAXATION PARAMETERS USED TO CONSTRUCT THE MESH:'// & 
-     &    75('=')/ & 
+ 262    format(//t10, &
+     &    'RELAXATION PARAMETERS USED TO CONSTRUCT THE MESH:'// &
+     &    75('=')/ &
      &    'nrelax',t15,'relax',t30,'pasmin',t45,'rlcept')
       endif
       write(iusor,164)nrelax,relax,pasmin,rlcept
@@ -186,22 +187,22 @@
 
       correct = .true.
       do i = 1, nsep
-        if (dpmin(i)*dpmax(i).le.0.0 .or. & 
-     &      dpmin(i)*lg(i).le.0.0 .or. & 
+        if (dpmin(i)*dpmax(i).le.0.0 .or. &
+     &      dpmin(i)*lg(i).le.0.0 .or. &
      &      dpmax(i)*lg(i).le.0.0) then
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,281) i, dpmin(i), dpmax(i), lg(i)
-  281       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'// & 
-     &   T2, & 
-     &   'Les nombres dpmin, dpmax et lg doivent avoir le meme signe.'// & 
-     &   T2,'Modifiez deltp1 et deltpn en consequence.'// & 
+  281       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'// &
+     &   T2, &
+     &   'Les nombres dpmin, dpmax et lg doivent avoir le meme signe.'// &
+     &   T2,'Modifiez deltp1 et deltpn en consequence.'// &
      &   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,280) i, dpmin(i), dpmax(i), lg(i)
-  280       FORMAT(//T2,'Invalid data for segment',i2,'!'// & 
-     &   T2,'The numbers dpmin, dpmax and lg must have the same sign.'// & 
-     &   T2,'Modify deltp1 and deltpn accordingly.'// & 
+  280       FORMAT(//T2,'Invalid data for segment',i2,'!'// &
+     &   T2,'The numbers dpmin, dpmax and lg must have the same sign.'// &
+     &   T2,'Modify deltp1 and deltpn accordingly.'// &
      &   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
           endif
         endif
@@ -209,75 +210,75 @@
           correct=.false.
           if(sellan(1:8).eq.'francais') then
             write(6,2811) i
- 2811       format(//T2,'Donnees invalides pour le segment',i2,'!'// & 
+ 2811       format(//T2,'Donnees invalides pour le segment',i2,'!'// &
      &        T2,'Il faut plus de deux points sur ce segment!')
           elseif(sellan(1:7).eq.'english') then
             write(6,2810) i
- 2810       format(//T2,'Invalid data for segment',i2,'!'// & 
+ 2810       format(//T2,'Invalid data for segment',i2,'!'// &
      &        T2,'You need more than 2 points on this segment!')
           endif
         endif
-        if (abs(dpmin(i)).lt.pasmin .or. & 
+        if (abs(dpmin(i)).lt.pasmin .or. &
      &      abs(dpmax(i)).lt.pasmin) then
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,2821) i, dpmin(i), dpmax(i), pasmin
- 2821       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'// & 
-     &   T2, & 
-     &   'Les nombres dpmin et dpmax doivent etre superieurs a pasmin'// & 
-     &   ' en valeur absolue.'// & 
-     &   T2,'Modifiez deltp1, deltpn or pasmin en consequence.'// & 
+ 2821       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'// &
+     &   T2, &
+     &   'Les nombres dpmin et dpmax doivent etre superieurs a pasmin'// &
+     &   ' en valeur absolue.'// &
+     &   T2,'Modifiez deltp1, deltpn or pasmin en consequence.'// &
      &   T2,'dpmin,dpmax,pasmin = ',1p,3(1e11.4,1x))
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,2820) i, dpmin(i), dpmax(i), pasmin
- 2820       FORMAT(//T2,'Invalid data for segment',i2,'!'// & 
-     &   T2,'The numbers dpmin and dpmax must be larger than pasmin'// & 
-     &      ' in absolute value.'// & 
-     &   T2,'Modify deltp1, deltpn or pasmin accordingly.'// & 
+ 2820       FORMAT(//T2,'Invalid data for segment',i2,'!'// &
+     &   T2,'The numbers dpmin and dpmax must be larger than pasmin'// &
+     &      ' in absolute value.'// &
+     &   T2,'Modify deltp1, deltpn or pasmin accordingly.'// &
      &   T2,'dpmin,dpmax,pasmin = ',1p,3(1e11.4,1x))
           endif
         endif
       enddo
       do i = 1, nreg-1
-        if (drmin(i)*drmax(i).le.0.0 .or. & 
-     &      drmin(i)*distnv(par%repart,i).le.0.0 .or. & 
+        if (drmin(i)*drmax(i).le.0.0 .or. &
+     &      drmin(i)*distnv(par%repart,i).le.0.0 .or. &
      &      drmax(i)*distnv(par%repart,i).le.0.0) then
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,291) i, drmin(i), drmax(i), distnv(par%repart,i)
-  291       FORMAT(//T2,'Donnees invalides pour la region',i2,'!'// & 
-     &   T2,'Les nombres drmin, drmax et difference doivent ', & 
-     &   'avoir le meme signe.'// & 
-     &   T2,'Modifiez deltr1 et deltrn en consequence.'// & 
+  291       FORMAT(//T2,'Donnees invalides pour la region',i2,'!'// &
+     &   T2,'Les nombres drmin, drmax et difference doivent ', &
+     &   'avoir le meme signe.'// &
+     &   T2,'Modifiez deltr1 et deltrn en consequence.'// &
      &   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,290) i, drmin(i), drmax(i), distnv(par%repart,i)
-  290       FORMAT(//T2,'Invalid data for region',i2,'!'// & 
-     &   T2, & 
-     &   'The numbers drmin, drmax and width must have the same sign.'// & 
-     &   T2,'Modify deltr1 and deltrn accordingly.'// & 
+  290       FORMAT(//T2,'Invalid data for region',i2,'!'// &
+     &   T2, &
+     &   'The numbers drmin, drmax and width must have the same sign.'// &
+     &   T2,'Modify deltr1 and deltrn accordingly.'// &
      &   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
           endif
         endif
       enddo
       i = nreg
-      if (drmin(i)*drmax(i).le.0.0 .or. & 
-     &    drmin(i)*difpsi.le.0.0 .or. & 
+      if (drmin(i)*drmax(i).le.0.0 .or. &
+     &    drmin(i)*difpsi.le.0.0 .or. &
      &    drmax(i)*difpsi.le.0.0) then
         correct = .false.
         if(sellan(1:8).eq.'francais') then
           WRITE(6,2911) i, drmin(i), drmax(i), difpsi
- 2911     FORMAT(//T2,'Donnees invalides pour la region',i2,'!'// & 
-     &   T2,'Les nombres drmin, drmax et difference doivent ', & 
-     &   'avoir le meme signe.'// & 
-     &   T2,'Modifiez deltr1 et deltrn en consequence.'// & 
+ 2911     FORMAT(//T2,'Donnees invalides pour la region',i2,'!'// &
+     &   T2,'Les nombres drmin, drmax et difference doivent ', &
+     &   'avoir le meme signe.'// &
+     &   T2,'Modifiez deltr1 et deltrn en consequence.'// &
      &   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
         elseif(sellan(1:7).eq.'english') then
           WRITE(6,2900) i, drmin(i), drmax(i), difpsi
- 2900     FORMAT(//'Invalid data for region',i2,'!'// & 
-     &   T2, & 
-     &   'The numbers drmin, drmax and width must have the same sign.'// & 
-     &   T2,'Modify deltr1 and deltrn accordingly.'// & 
+ 2900     FORMAT(//'Invalid data for region',i2,'!'// &
+     &   T2, &
+     &   'The numbers drmin, drmax and width must have the same sign.'// &
+     &   T2,'Modify deltr1 and deltrn accordingly.'// &
      &   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
         endif
       endif
@@ -286,57 +287,57 @@
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,3011) i, par%tgarde(i)
- 3011       FORMAT(//T2,'Donnees invalides pour la plaque',i2,'!'// & 
-     &     T2,'La longueur tgarde doit etre positive ou nulle.'// & 
-     &     T2,'Modifiez tgarde en consequence.'// & 
+ 3011       FORMAT(//T2,'Donnees invalides pour la plaque',i2,'!'// &
+     &     T2,'La longueur tgarde doit etre positive ou nulle.'// &
+     &     T2,'Modifiez tgarde en consequence.'// &
      &     T2,'tgarde = ',1pe11.4)
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,3000) i, par%tgarde(i)
- 3000       FORMAT(//'Invalid data for plate',i2,'!'// & 
-     &     T2,'The length tgarde must be positive or zero.'// & 
-     &     T2,'Modify tgarde accordingly.'// & 
+ 3000       FORMAT(//'Invalid data for plate',i2,'!'// &
+     &     T2,'The length tgarde must be positive or zero.'// &
+     &     T2,'Modify tgarde accordingly.'// &
      &     T2,'tgarde = ',1pe11.4)
           endif
         endif
       enddo
-      if (nrelax.lt.1 .or. relax.le.0.0 .or. relax.gt.1.0 .or. & 
+      if (nrelax.lt.1 .or. relax.le.0.0 .or. relax.gt.1.0 .or. &
      &    pasmin.le.0.0 .or. rlcept.le.0.0) then
         correct = .false.
         if(sellan(1:8).eq.'francais') then
           WRITE(6,3111) nrelax, relax, pasmin, rlcept
- 3111     FORMAT(// & 
-     &   T2,'Donnees invalides pour l''algorithme de relaxation!'// & 
-     &   T2,'Il faut au moins une iteration.'// & 
-     &   T2,'Les parametres relax, pasmin, et rlcept ', & 
-     &      'doivent etre positifs.'// & 
-     &   T2,'Le parametre relax ne doit pas exceder 1.'// & 
-     &   T2,'Modifiez-les en consequence.'// & 
+ 3111     FORMAT(// &
+     &   T2,'Donnees invalides pour l''algorithme de relaxation!'// &
+     &   T2,'Il faut au moins une iteration.'// &
+     &   T2,'Les parametres relax, pasmin, et rlcept ', &
+     &      'doivent etre positifs.'// &
+     &   T2,'Le parametre relax ne doit pas exceder 1.'// &
+     &   T2,'Modifiez-les en consequence.'// &
      &   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
         elseif(sellan(1:7).eq.'english') then
           WRITE(6,3100) nrelax, relax, pasmin, rlcept
- 3100     FORMAT(//T2,'Invalid data for relaxation algorithm!'// & 
-     &   T2,'The length tgarde must be positive or zero.'// & 
-     &   T2,'At least one iteration is needed.'// & 
-     &   T2,'The relax, pasmin, and rlcept parameters ', & 
-     &      'must be positive.'// & 
-     &   T2,'The relax parameter must not exceed 1.'// & 
-     &   T2,'Modify these accordingly.'// & 
+ 3100     FORMAT(//T2,'Invalid data for relaxation algorithm!'// &
+     &   T2,'The length tgarde must be positive or zero.'// &
+     &   T2,'At least one iteration is needed.'// &
+     &   T2,'The relax, pasmin, and rlcept parameters ', &
+     &      'must be positive.'// &
+     &   T2,'The relax parameter must not exceed 1.'// &
+     &   T2,'Modify these accordingly.'// &
      &   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
         endif
       endif
-      ! Test pntrat against distxo 
+      ! Test pntrat against distxo
       if ( par%pntrat > distxo ) then
         correct = .false.
         if(sellan(1:8).eq.'francais') then
           WRITE(6,3211) nrelax, relax, pasmin, rlcept
- 3211     FORMAT(// & 
-     &   T2,'Largeur de penetration trop grande!'// & 
+ 3211     FORMAT(// &
+     &   T2,'Largeur de penetration trop grande!'// &
      &   T2,'pntrat doit etre inferieur a disxto.'// &
      &   T2,'pntrat, distxo = ',1p,2(1e11.4,1x))
         elseif(sellan(1:7).eq.'english') then
           WRITE(6,3200) nrelax, relax, pasmin, rlcept
- 3200     FORMAT(//T2,'Invalid data for penetration depth!'// & 
-     &   T2,'pntrat must be smaller than distxo.'// & 
+ 3200     FORMAT(//T2,'Invalid data for penetration depth!'// &
+     &   T2,'pntrat must be smaller than distxo.'// &
      &   T2,'pntrat, distxo = ',1p,2(1e11.4,1x))
         endif
       end if

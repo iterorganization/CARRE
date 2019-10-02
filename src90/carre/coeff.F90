@@ -1,6 +1,7 @@
 !***********************************************************************
       SUBROUTINE COEFF(n1max,n2max,nx,ny,x,y,f,a00,a10,a01,a11)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..   Cette sous-routine calcule les coefficients a00, a10, a01 et a11
@@ -9,12 +10,13 @@
 
 !  arguments
       INTEGER n1max, n2max, nx, ny
-      REAL*8 x(nx),y(ny),f(n1max,ny),a00(n1max,n2max),a10(n1max,n2max), & 
+      REAL(rKind) :: x(nx),y(ny),f(n1max,ny), &
+     &     a00(n1max,n2max), a10(n1max,n2max), &
      &     a01(n1max,n2max), a11(n1max,n2max)
 
 !  variables locales
       INTEGER i,j
-      REAL*8 deltxy
+      REAL(rKind) :: deltxy
 
 !=========================
 !.. i,j: indices
@@ -30,16 +32,16 @@
          DO 21 i=1, nx-1
             deltxy=(x(i+1)-x(i))*(y(j+1)-y(j))
 
-            a00(i,j) = (f(i,j)*x(i+1)*y(j+1) - f(i+1,j)*x(i)*y(j+1) & 
+            a00(i,j) = (f(i,j)*x(i+1)*y(j+1) - f(i+1,j)*x(i)*y(j+1) &
      &         - f(i,j+1)*x(i+1)*y(j) + f(i+1,j+1)*x(i)*y(j))/deltxy
 
-            a10(i,j) = (-f(i,j)*(y(j+1)) + f(i+1,j)*y(j+1) + & 
+            a10(i,j) = (-f(i,j)*(y(j+1)) + f(i+1,j)*y(j+1) + &
      &                f(i,j+1)*(y(j)) - f(i+1,j+1)*y(j))/deltxy
 
-            a01(i,j) = (-f(i,j)*(x(i+1)) + f(i+1,j)*x(i) + & 
+            a01(i,j) = (-f(i,j)*(x(i+1)) + f(i+1,j)*x(i) + &
      &                f(i,j+1)*(x(i+1)) - f(i+1,j+1)*(x(i)))/deltxy
 
-            a11(i,j) = (f(i,j) - f(i+1,j) - f(i,j+1) + & 
+            a11(i,j) = (f(i,j) - f(i+1,j) - f(i,j+1) + &
      &                f(i+1,j+1))/deltxy
 
    21    CONTINUE

@@ -2,6 +2,7 @@
 !***********************************************************************
       SUBROUTINE DERIV(nmax, r, f, fp, n)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..   Cette sous-routine calcule la derivee fp en chaque point r d'un
@@ -9,11 +10,11 @@
 
 !  arguments
       INTEGER nmax, n
-      REAL*8 r(n), f(nmax), fp(nmax)
+      REAL(rKind) :: r(n), f(nmax), fp(nmax)
 
 !  variables locales
       INTEGER i
-      REAL*8 r2,r3,f2,f3
+      REAL(rKind) :: r2,r3,f2,f3
 
 !=========================
 !.. r  : tableau de la coordonnee des points.

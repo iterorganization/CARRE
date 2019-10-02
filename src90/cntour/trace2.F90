@@ -1,43 +1,35 @@
-      subroutine trace2(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+      subroutine trace2(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot, &
+     &        nstruc,npstru,xstruc,ystruc,nivx,nivy, &
      &        nivtot,nbniv)
 !======================================================================
 !
 !  version : 07.07.97 20:15
 !
+      use KindDefinitions
       implicit none
 
 !ank-970707: dimensions from the file
 !  dimensions
-#include <CARREDIM.F>    
+#include <CARREDIM.F>
 
 !
 !  arguments
-      integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, & 
-     &      nivtot(nbniv),ptsep(4,npx),nreg, nn1, & 
-     &      repart,nx,ny
+      integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
+     &      nivtot(nbniv),ptsep(4,npx)
 
 
-      real*8 x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), & 
-     &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), & 
-     &       nivx(npnimx,nbniv),nivy(npnimx,nbniv), & 
-     &       xptxo,yptxo,fctini,xfin,yfin, & 
-     &       a00(nxmax,nymax,3),a01(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-     &       a11(nxmax,nymax,3),psi(nxmax,nymax)
+      real(rKind) :: x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
+     &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
+     &       nivx(npnimx,nbniv),nivy(npnimx,nbniv)
 
 
 !
 !  variables locales
-      integer i,j,k,nin,nn(2),inouv,sens,npcrb(2),nt,ii,jj,dir,indstr, & 
-     &  plaque
-      real*8 valfct,fctnew,xt(3),yt(3),zero
-      parameter(zero=0.)
-      real*8 xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2)
-      real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
+      integer i,j,k,nin
+      real(rKind) :: x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
       character echx*3,echy*3
 !
 !  procedures
-      integer ifind
       external agcurv,newpag,endpag
 !
 !  calculs
@@ -72,7 +64,7 @@
 !   4    CONTINUE
 !   2 CONTINUE
 !***
-      CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ', & 
+      CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ', &
      &     echx, echy)
 
       CALL struct(x1,x2,y1,y2,nstruc,xstruc,ystruc,npstru)
@@ -86,7 +78,7 @@
                y(k)=separy(k,ptsep(j,i),i)
 
    30       CONTINUE
-            if(nptot(ptsep(j,i),i).gt.0) & 
+            if(nptot(ptsep(j,i),i).gt.0) &
      &                CALL agcurv(x,1,y,1,nptot(ptsep(j,i),i),nin)
 !***
 !     write(26,*)'separatrix',i,j

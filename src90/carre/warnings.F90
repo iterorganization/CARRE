@@ -1,5 +1,5 @@
 
-      SUBROUTINE WARNINGS(separx,separy,nivx,nivy, & 
+      SUBROUTINE WARNINGS(separx,separy,nivx,nivy, &
      &  distnv,xpto,ypto)
 !****************************************************************
 ! written by Heimo Buerbaumer December 1998
@@ -7,10 +7,12 @@
 ! in the SOL-region and output on the file 'warnings.dat'
 ! for the use in the automatic grid generator AGG
 !****************************************************************
+      use KindDefinitions
+      IMPLICIT NONE
 #include <CARREDIM.F>
       INTEGER i, j
-      REAL*8 nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo,rn
-      REAL*8 separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto, & 
+      REAL(rKind) :: nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo,rn
+      REAL(rKind) :: separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto, &
      & distnv,sxu,syu,sxo,syo,z,dz,adz,adzu,adzo,bdzu,bdzo,rs,distsn
 
       open (33,file='warnings.dat')

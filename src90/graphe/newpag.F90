@@ -5,6 +5,7 @@
 !  version : 04.07.97 19:39
 !
 ! Start a new plot
+      use KindDefinitions
       implicit none
 !
 !  donnees
@@ -15,7 +16,7 @@
 !  title:      titre du graphique
 !  echx, echy: echelles des axes x et y respectivement.
 !
-      real xmin,xmax,ymin,ymax
+      real(rKind) :: xmin,xmax,ymin,ymax
       character*(*) xlab,ylab,title,echx,echy
 !
 !  variables en common
@@ -27,7 +28,6 @@
       real zx(2),zy(2),xmi,xma,ymi,yma,etalx,etaly
 !
 !  procedures
-      REAL ABS,MAX
       INTRINSIC ABS,MAX
       EXTERNAL AGSETF,AGSETI,AGSETC,AGSTUP,WTSTR,AGBACK & 
      &  ,EZXY,FRAME,AGCURV,getset,cadre

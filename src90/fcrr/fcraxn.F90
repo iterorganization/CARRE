@@ -5,6 +5,7 @@
 !======================================================================
 !*** Input of auxiliary data for Carre
 !======================================================================
+      use KindDefinitions
       implicit none
 #include <FCRCOM.F>
       character*8 nam
@@ -19,24 +20,26 @@
 !======================================================================
 !
       do i=1,nnm
-        if(nam.eq.nms(i)) go to (10,20,30,40,50,60,70),i
+        if(nam.eq.nms(i)) exit
       end do
-      call fcrtrn(nam)
-      return
-!
- 10   call resimi(repart)
-      return
- 20   call resimi(nrelax)
-      return
- 30   call resime(relax)
-      return
- 40   call resime(pasmin)
-      return
- 50   call resime(rlcept)
-      return
- 60   call rearre(tgarde,ntrgx,ntrg)
-      return
- 70   call resime(xpttol)
+      select case (i)
+      case (1)
+        call resimi(repart)
+      case (2)
+        call resimi(nrelax)
+      case (3)
+        call resime(relax)
+      case (4)
+        call resime(pasmin)
+      case (5)
+        call resime(rlcept)
+      case (6)
+        call rearre(tgarde,ntrgx,ntrg)
+      case (7)
+        call resime(xpttol)
+      case default
+        call fcrtrn(nam)
+      end select
       return
 !======================================================================
       end

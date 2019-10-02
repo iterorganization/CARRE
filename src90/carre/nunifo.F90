@@ -2,6 +2,7 @@
 !***********************************************************************
       SUBROUTINE NUNIFO(npoint,l,d1,dn,interv,dmin,dmax)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette sous-routine repartit les points de facon non uniforme sur
@@ -11,11 +12,11 @@
 
 !  arguments
       INTEGER npoint
-      REAL*8 l,d1,dn,interv(npoint-1),dmin,dmax
+      REAL(rKind) :: l,d1,dn,interv(npoint-1),dmin,dmax
 
 !  variables locales
       INTEGER i,n
-      REAL*8 denom,aa,bb,cc
+      REAL(rKind) :: denom,aa,bb,cc
 
 !  procedures
       INTRINSIC MIN,MAX

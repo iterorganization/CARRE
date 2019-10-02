@@ -3,8 +3,11 @@
 !  version : 05.04.97 15:49
 !
 !======================================================================
+      implicit none
+      integer iflg, kdsh
 !  variables en common
 #include <COMQUA.F>
+      integer icar
 !======================================================================
 ! The routine AGCHCU is called by AGCURV just before and just after each
 ! curve is drawn.  The default version does nothing.  A user may supply

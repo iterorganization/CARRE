@@ -12,7 +12,7 @@ DEFINES  += -DPGF90
 endif
 
 FC        = pgf90
-CPP       = /lib/cpp -traditional
+CPP       = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG
 FFLAGS    = -g -C 
@@ -22,7 +22,7 @@ endif
 
 DBLPAD    = -r8 -i4
 
-COMPILE   = ${FC} -c ${FFLAGS}
+COMPILE   = ${FC} -c ${FFLAGS} -module ${OBJDIR}
 MOD       = mod
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG}

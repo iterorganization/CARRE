@@ -7,9 +7,10 @@
 !*** and the value of the toroidal field, btf, measured at radius rtf -
 !*** provided that this information is present in the equilibrium file.
 !
+      use KindDefinitions
       implicit none
-      integer lun,nr,nz
-      real btf,rtf
+      integer(Short) :: lun,nr,nz
+      real(rKind) :: btf,rtf
       integer i,j,k,l
       character ss*80, s(80), hh*80, h(80), utb
       equivalence (s,ss),(h,hh)
@@ -65,15 +66,18 @@
         end if !}
       end do !}
 
- 30   go to (31,32,33,34),j
+ 30   continue
 !-----------------------------------------------------------------------
- 31   read(hh,'(bn,i4)') nr
-      go to 10
- 32   read(hh,'(bn,i4)') nz
-      go to 10
- 33   read(hh,'(bn,e12.0)') btf
-      go to 10
- 34   read(hh,'(bn,e12.0)') rtf
+      select case (j)
+      case (1)
+      read(hh,'(bn,i4)') nr
+      case (2)
+      read(hh,'(bn,i4)') nz
+      case (3)
+      read(hh,'(bn,e12.0)') btf
+      case (4)
+      read(hh,'(bn,e12.0)') rtf
+      end select
       go to 10
 !=======================================================================
 !*** Error encountered

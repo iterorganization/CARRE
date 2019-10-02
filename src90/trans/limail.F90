@@ -1,6 +1,7 @@
 !=======================================================================
-      subroutine limail(nrid,nreg,nppol,nprad,r,z,psi,psidxm,psidym, & 
+      subroutine limail(nrid,nreg,nppol,nprad,r,z,psi,psidxm,psidym, &
      &  cflag,npomax,nramax,nregmx,carre_format)
+      use KindDefinitions, only : rKind
       use carre_constants
 
       implicit none
@@ -21,7 +22,7 @@
 !  arguments
       integer nrid,nreg,nppol(*),nprad(*),npomax,nramax,nregmx,&
            & cflag(npomax,nramax,nregmx,CARREOUT_NCELLFLAGS)
-      real*8 r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*), & 
+      real(rKind) :: r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*), &
      &     psidxm(npomax,nramax,*),psidym(npomax,nramax,*)
       character*8 carre_format
 

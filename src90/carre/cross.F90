@@ -2,6 +2,7 @@
 !***********************************************************************
       LOGICAL FUNCTION cross(ind,xx,yy,xst,yst,n)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette fonction verifie si un segment traverse un segment de
@@ -9,11 +10,11 @@
 
 !  arguments
       INTEGER ind, n
-      REAL*8 xx(*),yy(*),xst(n),yst(n)
+      REAL(rKind) :: xx(*),yy(*),xst(n),yst(n)
 
 !  variables locales
       INTEGER i
-      REAL*8 mult1,mult2,determ
+      REAL(rKind) :: mult1,mult2,determ
 
 !=========================
 !.. xst,yst: tableaux des coordonnees des points de la structure.

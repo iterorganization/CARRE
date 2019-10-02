@@ -1,10 +1,11 @@
-      subroutine trace(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot, & 
-     &        nstruc,npstru,xstruc,ystruc,nivx,nivy, & 
+      subroutine trace(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot, &
+     &        nstruc,npstru,xstruc,ystruc,nivx,nivy, &
      &        nivtot,nbniv,np1,npr,xmail,ymail,nreg)
 !======================================================================
 !
 !  version : 07.07.97 20:15
 !
+      use KindDefinitions
       implicit none
 
 !ank-970707: dimensions from the file
@@ -13,19 +14,19 @@
 
 !
 !  arguments
-      integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, & 
-     &        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg 
+      integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
+     &        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg
 
-      real*8 x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), & 
-     &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), & 
-     &       nivx(npnimx,nbniv),nivy(npnimx,nbniv), & 
+      real(rKind) :: x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
+     &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
+     &       nivx(npnimx,nbniv),nivy(npnimx,nbniv), &
      &       xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*)
 
 !
 !  variables locales
       integer i,j,k,nin
-      real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
-      real deltax,deltay
+      real(rKind) :: x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
+      real(rKind) :: deltax,deltay
       character echx*3,echy*3
 !
 !  procedures
@@ -65,7 +66,7 @@
 !   4    CONTINUE
 !   2 CONTINUE
 !***
-      CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ', & 
+      CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ', &
      &     echx, echy)
 
       CALL struct(x1,x2,y1,y2,nstruc,xstruc,ystruc,npstru)
@@ -79,7 +80,7 @@
                y(k)=separy(k,ptsep(j,i),i)
 
    30       CONTINUE
-            if(nptot(ptsep(j,i),i).gt.0) & 
+            if(nptot(ptsep(j,i),i).gt.0) &
      &                CALL agcurv(x,1,y,1,nptot(ptsep(j,i),i),nin)
 !***
 !     write(26,*)'separatrix',i,j
@@ -131,7 +132,7 @@
 
       CALL endpag
 
-      CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ', & 
+      CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ', &
      &     echx, echy)
 
 

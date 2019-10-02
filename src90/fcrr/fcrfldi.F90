@@ -6,11 +6,12 @@
 !*** Read the field data from dg equilibrium file or from a separate
 !*** file 'field.dg'
 !======================================================================
+      use KindDefinitions
       implicit none
-      integer lun
+      integer(Short) :: lun
 #include <FCRCOM.F>
-      integer i
-      real*8 btf,rtf
+      integer(Short) :: i
+      real(rKind) :: btf,rtf
       logical ex
 !======================================================================
 !
@@ -28,7 +29,7 @@
         stop
       end if
       if(ex) close(lun+2)
-      rbtor=rtf*btf
+      rbtor=real(rtf*btf,Single)
       if(rbtor.ne.0.) return                                           ! DPC
 !======================================================================
       write(*,*) 'fcrfldi: no data on the toroidal field found.'

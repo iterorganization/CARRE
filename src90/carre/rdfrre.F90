@@ -1,11 +1,12 @@
       subroutine rdfrre(iunit,vari,rr,ierror)
 !  version : 03.07.2000 23:01
+      use KindDefinitions
       implicit none
 !  read a real number from a chain of characters vari
 !
 !  arguments
       integer iunit,ierror
-      real*8 rr
+      real(rKind) :: rr
       character vari*(*)
 !  iunit: unit of temporary file
 !  vari: chain of characters from which to read

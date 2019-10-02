@@ -6,6 +6,7 @@
 !*** Write the co-ordinates of the X- and O-points for Carre
 !*** At present, always a single-null configuration
 !======================================================================
+      use KindDefinitions
       implicit none
       integer i
       character ofile*(*)

@@ -1,6 +1,6 @@
-      subroutine limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot, & 
-     &    nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx, & 
-     &    nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
+      subroutine limfnd(xpto,ypto,nivx,nivy,stp0,stpmin,distnv,nivtot, &
+     &    nbniv,nx,ny,x,y,psi,npx,ptx,pty,fctpx, &
+     &    nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, &
      &    a00,a10,a01,a11,struct,equ,virtualGeometry)
 !
 !  version : 07.07.97 20:10
@@ -21,14 +21,14 @@
 #include <CARREDIM.F>
 
 !  arguments
-      INTEGER nivtot(*),nbniv, & 
-     &  nx,ny,npx, & 
-     &  nstruc,npstru(strumx), & 
+      INTEGER nivtot(*),nbniv, &
+     &  nx,ny,npx, &
+     &  nstruc,npstru(strumx), &
      &  indplq(4,npxmx),inddef(nbdmx),nbdef
-      REAL*8 xpto,ypto,nivx(npnimx,*),nivy(npnimx,*),stp0,stpmin, & 
-     &  distnv(5,*),a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
-     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
-     &  x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx), & 
+      REAL(rKind) :: xpto,ypto,nivx(npnimx,*),nivy(npnimx,*),stp0,stpmin, &
+     &  distnv(5,*),a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
+     &  a01(nxmax,nymax,3),a11(nxmax,nymax,3), &
+     &  x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx), &
      &  fctpx(npxmx),xstruc(npstmx,strumx),ystruc(npstmx,strumx)
       type(CarreStructures), intent(inout) :: struct
       type(CarreEquilibrium), intent(inout) :: equ
@@ -36,11 +36,11 @@
 
 !
 !  local variables
-      real*8 zero
+      real(rKind) :: zero
       parameter(zero=0.)
-      integer dir,sens,nt(2),nbcrb,ind0,i,ii,jj,k,plaque,nstrp1, & 
+      integer dir,sens,nt(2),nbcrb,ind0,i,ii,jj,k,plaque,nstrp1, &
      &  idef,idniv,indlim,ipx
-      real*8 xt(npnimx,2),yt(npnimx,2),x0,y0,psi0,x2,y2,psi2,norm,&
+      real(rKind) :: xt(npnimx,2),yt(npnimx,2),x0,y0,psi0,x2,y2,psi2,norm,&
            & xin, yin
 !
 !  ind0: indice du point du limiteur qui est le plus rapproche de la
@@ -50,7 +50,7 @@
 !
 !  procedures
       integer ifind,horair
-      real*8 aire
+      real(rKind) :: aire
       external aire,horair,ifind
       intrinsic sqrt
 
@@ -94,17 +94,17 @@
          nt(2)=0
          xt(1,nbcrb)=xpto
          yt(1,nbcrb)=ypto
-         norm=sqrt((xstruc(2,nstrp1)-xstruc(1,nstrp1))**2+ & 
+         norm=sqrt((xstruc(2,nstrp1)-xstruc(1,nstrp1))**2+ &
               &  (ystruc(2,nstrp1)-ystruc(1,nstrp1))**2)
-         xt(2,nbcrb)=xpto-1.e-2*stpmin*(ystruc(2,nstrp1)-ystruc(1,nstrp1)) & 
+         xt(2,nbcrb)=xpto-1.e-2*stpmin*(ystruc(2,nstrp1)-ystruc(1,nstrp1)) &
               &  /norm
-         yt(2,nbcrb)=ypto+1.e-2*stpmin*(xstruc(2,nstrp1)-xstruc(1,nstrp1)) & 
+         yt(2,nbcrb)=ypto+1.e-2*stpmin*(xstruc(2,nstrp1)-xstruc(1,nstrp1)) &
               &  /norm
 
-         CALL MARCHE(xpto,ypto,nstrp1,nstrp1,sens,nivx(1,idniv), & 
-              &      nivy(1,idniv), & 
-              &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-              &      nx,ny,x,y,psi,nstrp1,npstru,xstruc, & 
+         CALL MARCHE(xpto,ypto,nstrp1,nstrp1,sens,nivx(1,idniv), &
+              &      nivy(1,idniv), &
+              &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+              &      nx,ny,x,y,psi,nstrp1,npstru,xstruc, &
               &      ystruc,a00,a10,a01,a11,indlim)
       end if
 
@@ -127,10 +127,10 @@
       !
       !  3.   On trouve le point du limiteur qui est le plus rapproche de la
       !       derniere surface de flux parametrisee.
-      call plurap(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
+      call plurap(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), &
            &  nivx(1,idniv),nivy(1,idniv),nivtot(idniv),x0,y0,ind0)
       !
-      !  4.   parametrisation de la separatrice.      
+      !  4.   parametrisation de la separatrice.
 
       ! Fill X-point arrays as done in selptx
       ! "X-point" (limiter point)
@@ -149,7 +149,7 @@
       nbcrb=1
       nt(1)=0
 
-      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
            &       a11(ii,jj,1)*x0*y0
 
       ipx = 1
@@ -159,25 +159,25 @@
 
       nivx(k,idniv)=x0
       nivy(k,idniv)=y0
-      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-           &  nivx(1,idniv),nivy(1,idniv), & 
+      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, &
+           &  nivx(1,idniv),nivy(1,idniv), &
            &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
       call insert(indlim,inddef,nbdef,ipx)
       indplq(idniv,ipx) = indlim
-      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, & 
-           &  nivx(1,idniv),nivy(1,idniv), & 
+      CALL CRBNIV(ii,jj,k,dir,nx,ny,x,y,psi,psi2, &
+           &  nivx(1,idniv),nivy(1,idniv), &
            &  nstruc,npstru,xstruc,ystruc,indlim,xt,yt,nt,nbcrb,plaque,x0,y0)
       nivtot(idniv)=k
       call insert(indlim,inddef,nbdef,ipx)
       indplq(idniv,ipx) = indlim
 
-      if((nivx(1,idniv)-nivx(nivtot(idniv),idniv))**2 & 
-           &  +(nivy(1,idniv)-nivy(nivtot(idniv),idniv))**2 .gt. & 
+      if((nivx(1,idniv)-nivx(nivtot(idniv),idniv))**2 &
+           &  +(nivy(1,idniv)-nivy(nivtot(idniv),idniv))**2 .gt. &
            &  2.*(x(2)-x(1))**2) then
          write(6,*)'attention: la courbe parametrisee est mal fermee.'
          print*,'nivtot=',nivtot(idniv)
          print*,'nivx/y(1)=',nivx(1,idniv),nivy(1,idniv)
-         print*,'nivx/y(f)=',nivx(nivtot(idniv),idniv), & 
+         print*,'nivx/y(f)=',nivx(nivtot(idniv),idniv), &
               &    nivy(nivtot(idniv),idniv)
       endif
       nivx(nivtot(idniv),idniv)=nivx(1,idniv)
@@ -197,16 +197,16 @@
       !  5.   Recherche de la frontiere exterieure
 
       idniv=2
-      if ( virtualGeometry ) then         
+      if ( virtualGeometry ) then
          nivx(:, idniv) = 0
 
          call findClosedLevelLine( equ, &
               & xstruc(1,idniv), ystruc(1,idniv), &
-              & nivx(:, idniv), nivy(:, idniv), nivtot(idniv) )            
+              & nivx(:, idniv), nivy(:, idniv), nivtot(idniv) )
       else
 
          sens=1
-         sens=horair(xpto,ypto,x0,y0,xstruc(1,plaque),ystruc(1,plaque), & 
+         sens=horair(xpto,ypto,x0,y0,xstruc(1,plaque),ystruc(1,plaque), &
               &  npstru(plaque),sens)
          nbcrb=2
          nt(nbcrb)=nivtot(1)
@@ -214,10 +214,10 @@
             xt(i,nbcrb)=nivx(i,1)
             yt(i,nbcrb)=nivy(i,1)
          enddo
-         CALL MARCHE(nivx(1,1),nivy(1,1),plaque,plaque,sens,nivx(1,idniv), & 
-              &      nivy(1,idniv), & 
-              &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-              &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(nivx(1,1),nivy(1,1),plaque,plaque,sens,nivx(1,idniv), &
+              &      nivy(1,idniv), &
+              &      nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+              &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
               &      ystruc,a00,a10,a01,a11,indlim)
 
       end if
@@ -237,8 +237,8 @@
       x2 = nivx(1,2)
       y2 = nivy(1,2)
 
-      distnv(1,idef) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                   ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+      distnv(1,idef) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                   ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                   ,'droite')
 
 !..Calcul de la difference de psi entre ces 2 memes points.
@@ -246,13 +246,13 @@
       ii = ifind(x0,x,nx,1)
       jj = ifind(y0,y,ny,1)
 
-      psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+      psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &       a11(ii,jj,1)*x0*y0
 
       ii = ifind(x2,x,nx,1)
       jj = ifind(y2,y,ny,1)
 
-      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+      psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &       a11(ii,jj,1)*x2*y2
 
       distnv(2,idef) = psi2 - psi0
@@ -264,14 +264,14 @@
       ipx=npx
       ii=ifind(ptx(ipx),x,nx,1)
       jj=ifind(pty(ipx),y,ny,1)
-      fctpx(ipx) = a00(ii,jj,1) + a10(ii,jj,1)*ptx(ipx) & 
-     &           + a01(ii,jj,1)*pty(ipx) & 
+      fctpx(ipx) = a00(ii,jj,1) + a10(ii,jj,1)*ptx(ipx) &
+     &           + a01(ii,jj,1)*pty(ipx) &
      &           + a11(ii,jj,1)*ptx(ipx)*pty(ipx)
       ipx=npx+1
       ii=ifind(ptx(ipx),x,nx,1)
       jj=ifind(pty(ipx),y,ny,1)
-      fctpx(ipx) = a00(ii,jj,1) + a10(ii,jj,1)*ptx(ipx) & 
-     &           + a01(ii,jj,1)*pty(ipx) & 
+      fctpx(ipx) = a00(ii,jj,1) + a10(ii,jj,1)*ptx(ipx) &
+     &           + a01(ii,jj,1)*pty(ipx) &
      &           + a11(ii,jj,1)*ptx(ipx)*pty(ipx)
 
       return

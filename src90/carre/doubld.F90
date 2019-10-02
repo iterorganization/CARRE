@@ -1,6 +1,6 @@
-      SUBROUTINE DOUBLD(bouclx,boucly,xn1,yn1,nn1,pas, & 
-     &  nprad,plaque,xext,yext,xextOffset,yextOffset,xptxex,yptxex,xpto,ypto,nx,ny,x,y, & 
-     &  psi,nstruc,npstru,xstruc,ystruc,a00,a10,a01, & 
+      SUBROUTINE DOUBLD(bouclx,boucly,xn1,yn1,nn1,pas, &
+     &  nprad,plaque,xext,yext,xextOffset,yextOffset,xptxex,yptxex,xpto,ypto,nx,ny,x,y, &
+     &  psi,nstruc,npstru,xstruc,ystruc,a00,a10,a01, &
      &  a11,repart,xcrb2,ycrb2,npcrb2)
 !
 !  version : 08.07.98 21:05
@@ -13,8 +13,9 @@
 !*** split into two separatrices (thus forcing a mesh point to be at
 !*** the outer X-point)
 !======================================================================
-      use carre_niveau
-      use carre_target
+      use KindDefinitions, only : rKind
+      use carre_target, only : drctio, indsgm, inStruct
+      use carre_niveau, only : crbniv
 
       IMPLICIT NONE
 
@@ -34,14 +35,14 @@
 #include <CARREDIM.F>
 
 !  arguments
-      INTEGER nx,ny,nstruc,npstru(nstruc), & 
+      INTEGER nx,ny,nstruc,npstru(nstruc), &
      &        nn1,nprad,plaque,repart,npcrb2
 
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), & 
-     &     ystruc(npstmx,nstruc),bouclx,boucly,xptxex,yptxex,xn1(nn1), & 
-     &     yn1(nn1),pas(nrmamx),xext,yext,xextOffset,yextOffset,a00(nxmax,nymax,3), & 
-     &     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), & 
-     &     xcrb2(npcrb2),ycrb2(npcrb2), & 
+      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), &
+     &     ystruc(npstmx,nstruc),bouclx,boucly,xptxex,yptxex,xn1(nn1), &
+     &     yn1(nn1),pas(nrmamx),xext,yext,xextOffset,yextOffset,a00(nxmax,nymax,3), &
+     &     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), &
+     &     xcrb2(npcrb2),ycrb2(npcrb2), &
      &     xpto,ypto
 
 !  variables en common
@@ -50,13 +51,13 @@
 #include <COMRLX.F>
 
 !  variables locales
-      INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,i,nn(2),crbnmx, & 
+      INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,i,nn(2),crbnmx, &
      &        npcrb(2),nbcrb,nrmx,sens,iint(2),nint,sns
-      REAL*8 ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2, & 
+      REAL(rKind) :: ll,zero,pasini,epsmai,dist,dernie,valfct,ecart1,ecart2, &
      &       epsiln,xn(npnimx,2),yn(npnimx,2),fctini,fctnew,x2,y2
-      PARAMETER(zero=0.,epsmai=1.e-6,epsiln=1.E-08, & 
+      PARAMETER(zero=0.,epsmai=1.e-6,epsiln=1.E-08, &
      &                                       crbnmx=npnimx,nrmx=nrmamx)
-      REAL*8 xcrb(crbnmx,2),ycrb(crbnmx,2),xbcl(nrmx),ybcl(nrmx), & 
+      REAL(rKind) :: xcrb(crbnmx,2),ycrb(crbnmx,2),xbcl(nrmx),ybcl(nrmx), &
      &       xint(2),yint(2)
       logical lc,li,l_dbg
       integer n_call
@@ -65,11 +66,11 @@
 
 !  procedures
       INTEGER ifind
-      REAL*8 aazero,long,nulort,ruban
+      REAL(rKind) :: aazero,long,nulort,ruban
       LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,long,COORD,ifind,nulort, & 
-     &         UNTANG,SAUTE,chgdir,cross,ruban & 
+      EXTERNAL aazero,long,COORD,ifind,nulort, &
+     &         UNTANG,SAUTE,chgdir,cross,ruban &
      &        ,trc_stk_in,trc_stk_out,trc_stk
 !======================================================================
 !*** Input
@@ -128,7 +129,7 @@
 !..Direction of circulation
 
       call trc_stk_in('doubld','*5')
-      sens=drctio(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), & 
+      sens=drctio(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), &
      &       xext,yext,xextOffset,yextOffset,'gauche')
       call trc_stk_out
 !c<<<
@@ -164,7 +165,7 @@
       ii=ifind(xn(1,1),x,nx,1)
       jj=ifind(yn(1,1),y,ny,1)
 
-      fctini=a00(ii,jj,1) + a10(ii,jj,1)*xn(1,1) + & 
+      fctini=a00(ii,jj,1) + a10(ii,jj,1)*xn(1,1) + &
      &       a01(ii,jj,1)*yn(1,1) + a11(ii,jj,1)*xn(1,1)*yn(1,1)
 
       valfct=fctini
@@ -222,8 +223,8 @@
          end if
 
          call trc_stk_in('doubld','*12')
-         CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque), & 
-     &                npstru(plaque),x1,y1,valfct,x2,y2,fctnew,sens, & 
+         CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque), &
+     &                npstru(plaque),x1,y1,valfct,x2,y2,fctnew,sens, &
      &                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
          call trc_stk_out
 
@@ -231,7 +232,7 @@
          yn(1,inouv)=y2
          nn(inouv)=1
 
-         ind=indsgm(xstruc(1,plaque),ystruc(1,plaque), & 
+         ind=indsgm(xstruc(1,plaque),ystruc(1,plaque), &
      &                                            npstru(plaque),x2,y2)
 !c<<<
 !         if(l_dbg) then
@@ -246,7 +247,7 @@
          ii=ifind(x2,x,nx,1)
          jj=ifind(y2,y,ny,1)
 
-         valfct=a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         valfct=a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
 !..Define the first boundary curve
@@ -262,16 +263,16 @@
 
          dir=0
 
-         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
-     &             valfct,xn(1,inouv),yn(1,inouv),nstruc, & 
-     &             npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, & 
+         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, &
+     &             valfct,xn(1,inouv),yn(1,inouv),nstruc, &
+     &             npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, &
      &             nbcrb,plaque,x2,y2)
 
 !..Make sure that the level line departs in the right direction
 
-         ecart1=SQRT((x2 - xstruc(ind,plaque))**2 + & 
+         ecart1=SQRT((x2 - xstruc(ind,plaque))**2 + &
      &               (y2 - ystruc(ind,plaque))**2)
-         ecart2=SQRT((x2 - xstruc(ind+1,plaque))**2 + & 
+         ecart2=SQRT((x2 - xstruc(ind+1,plaque))**2 + &
      &               (y2 - ystruc(ind+1,plaque))**2)
 !c<<<
 !         if(l_dbg) then
@@ -288,13 +289,13 @@
 !         end if
 !c>>>
 
-         IF ((ABS(x2-x(nx)).LT.epsiln) .OR. (ABS(y2-y(ny)).LT.epsiln) & 
-     &     .OR. (ABS(x2-x(1)).LT.epsiln) .OR. (ABS(y2-y(1)).LT.epsiln)) & 
+         IF ((ABS(x2-x(nx)).LT.epsiln) .OR. (ABS(y2-y(ny)).LT.epsiln) &
+     &     .OR. (ABS(x2-x(1)).LT.epsiln) .OR. (ABS(y2-y(1)).LT.epsiln)) &
      &                                                         then
 
-            IF (((dir .EQ. 1) .AND. (ii .EQ. nx)) & 
-     &       .OR. ((dir .EQ. 2) .AND. (jj .EQ. ny)) & 
-     &       .OR. ((dir .EQ. 3) .AND. (ii .EQ. 1)) & 
+            IF (((dir .EQ. 1) .AND. (ii .EQ. nx)) &
+     &       .OR. ((dir .EQ. 2) .AND. (jj .EQ. ny)) &
+     &       .OR. ((dir .EQ. 3) .AND. (ii .EQ. 1)) &
      &       .OR. ((dir .EQ. 4) .AND. (jj .EQ. 1))) then
 
                nn(inouv)=1
@@ -306,7 +307,7 @@
 
          else if ((ecart1 .LT. epsiln) .OR. (ecart2 .LT. epsiln)) then
 
-            IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) & 
+            IF (chgdir(xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc))) &
      &                                                          then
 
                nn(inouv)=1
@@ -329,10 +330,10 @@
 !     ,         inouv,ianc,xn(1,inouv),yn(1,inouv),xn(1,ianc),yn(1,ianc)
 !c>>>
           if(lc) then
-            li=inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+            li=inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), &
      &                  ystruc(1,plaque),npstru(plaque))
-            lc=cross(ind,xn(1,inouv),yn(1,inouv), & 
-     &                    xstruc(1,plaque),ystruc(1,plaque), & 
+            lc=cross(ind,xn(1,inouv),yn(1,inouv), &
+     &                    xstruc(1,plaque),ystruc(1,plaque), &
      &                    npstru(plaque))
 !c<<<
 !               write(0,'(1x,7a7,4a12)') 'in','cross','ind',
@@ -356,17 +357,17 @@
 
                else
 
-                  write(*,*) 'Problem in doubld (n_call =',n_call,') ', & 
+                  write(*,*) 'Problem in doubld (n_call =',n_call,') ', &
      &                                '- may well be an internal error'
-                  write(*,*) 'The program cannot find the location of', & 
+                  write(*,*) 'The program cannot find the location of', &
      &                             ' the next flux surface on a target'
-                  write(*,*) '==> If a file "carre.dat" from an old ', & 
+                  write(*,*) '==> If a file "carre.dat" from an old ', &
      &              'case exists in this directory, try the following.'
-                  write(*,*) '    First, replace all assignments to ', & 
-     &              'npr(i) in the input part of the file, ', & 
+                  write(*,*) '    First, replace all assignments to ', &
+     &              'npr(i) in the input part of the file, ', &
      &              'after "$parameters,"'
                   write(*,*) '    by npr(i)=2  (here i means 1,2,...).'
-                  write(*,*) '    If this does not help, remove - or ', & 
+                  write(*,*) '    If this does not help, remove - or ', &
      &              'rename - the file "carre.dat" and try again'
 
                   call trc_stk
@@ -377,9 +378,9 @@
 
             else
 
-               li=inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), & 
+               li=inStruct(xn(2,inouv),yn(2,inouv),xstruc(1,plaque), &
      &                  ystruc(1,plaque),npstru(plaque))
-               lc=cross(ind,xn(1,inouv),yn(1,inouv),xstruc(1,plaque), & 
+               lc=cross(ind,xn(1,inouv),yn(1,inouv),xstruc(1,plaque), &
      &                               ystruc(1,plaque),npstru(plaque))
 !c<<<
 !               write(0,'(1x,7a7,4a12)') 'in','cross','ind',
@@ -396,8 +397,8 @@
 !     .                    npstru(plaque))))   THEN
 
                   write(*,*) 'Problem in doubld (n_call =',n_call,')'
-                  write(*,*) '==> If a file "carre.dat" from an old ', & 
-     &                 'case exists in this directory, try to remove ', & 
+                  write(*,*) '==> If a file "carre.dat" from an old ', &
+     &                 'case exists in this directory, try to remove ', &
      &                                                       'it first'
                   call trc_stk
                   call pltend
@@ -409,9 +410,9 @@
 
 !..Continue with successive points until striking a structure
 
-         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, & 
-     &             valfct,xn(1,inouv),yn(1,inouv),nstruc, & 
-     &             npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, & 
+         CALL CRBNIV(ii,jj,nn(inouv),dir,nx,ny,x,y,psi, &
+     &             valfct,xn(1,inouv),yn(1,inouv),nstruc, &
+     &             npstru,xstruc,ystruc,indstr,xcrb,ycrb,npcrb, &
      &             nbcrb,plaque,x2,y2)
 
 !..Definition de xn2 et yn2 pour le bloc common comort.
@@ -435,7 +436,7 @@
            x1=xbcl(ir+1)
            y1=ybcl(ir+1)
 
-           CALL UNTANG(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,ux1,uy1, & 
+           CALL UNTANG(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,ux1,uy1, &
      &                  d1,period)
 
            d1=ruban(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,d1)
@@ -444,15 +445,15 @@
 !  external X-point with the O-point and the innermost level line
 
            sns=1
-           call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), & 
+           call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), &
      &       nn(inouv),xint,yint,iint,nint,sns)
            if(nint.gt.0) then
              d1=zero
-             d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),xint(nint), & 
+             d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),xint(nint), &
      &          yint(nint),d1)
              dernie=0.75*d1
              pasini=min(ll,1.25*d1)-dernie
-             dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie, & 
+             dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie, &
      &         dernie+pasini,50)
            else
              dernie=0.55*ll
@@ -460,7 +461,7 @@
              dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie,ll,50)
            end if
 
-           CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),dist, & 
+           CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),dist, &
      &              xbcl(ir),ybcl(ir))
 
    25 CONTINUE
@@ -491,20 +492,20 @@
 
         x1=xbcl(2)
         y1=ybcl(2)
-        CALL UNTANG(xn(1,inouv),yn(1,inouv),nn(inouv),x1,y1,ux1,uy1, & 
+        CALL UNTANG(xn(1,inouv),yn(1,inouv),nn(inouv),x1,y1,ux1,uy1, &
      &                  d1,period)
         d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),x1,y1,d1)
 
         sns=1
-        call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), & 
+        call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), &
      &    nn(inouv),xint,yint,iint,nint,sns)
         if(nint.gt.0) then
           d1=zero
-          d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),xint(nint), & 
+          d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),xint(nint), &
      &       yint(nint),d1)
           dernie=0.75*d1
           pasini=min(ll,1.25*d1)-dernie
-          dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie, & 
+          dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie, &
      &      dernie+pasini,50)
         else
           dernie=0.45*ll

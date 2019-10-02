@@ -3,6 +3,7 @@
 !  version: 17.11.99 23:56
 !
 !=======================================================================
+      use KindDefinitions
       implicit none
 #include <CARREDIM.F>
 
@@ -10,7 +11,7 @@
 
 !  arguments
       integer indstr,nbdef,inddef(nbdmx),indxpt(nbdmx),ipx,npx
-      real*8 xst(nbdmx),yst(nbdmx),xtt(nbdmx),ytt(nbdmx)
+      real(rKind) :: xst(nbdmx),yst(nbdmx),xtt(nbdmx),ytt(nbdmx)
 
 !  variables locales
       integer npxmx4

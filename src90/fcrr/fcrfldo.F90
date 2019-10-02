@@ -5,6 +5,7 @@
 !======================================================================
 !*** Create the toroidal field file for Carre
 !======================================================================
+      use KindDefinitions
       implicit none
       character ofile*(*)
 #include <FCRCOM.F>

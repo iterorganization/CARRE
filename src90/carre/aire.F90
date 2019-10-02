@@ -1,4 +1,4 @@
-      real*8 function aire(x,y,n)
+      function aire(x,y,n)
 !
 !
 !  VERSION: 03.08.99 12:12
@@ -9,11 +9,13 @@
 !*** The area is calculated via decomposition of the polygon into a set
 !*** of triangles having a common node at the first node of the polygon.
 !=======================================================================
+      use KindDefinitions
       implicit none
+      real(rKind) :: aire
       integer n
-      real*8 x(n),y(n)
+      real(rKind) :: x(n),y(n)
       integer i,k
-      real*8 x1,y1,x2,y2
+      real(rKind) :: x1,y1,x2,y2
       logical hlp
       data hlp /.true./, k /0/
 !=======================================================================

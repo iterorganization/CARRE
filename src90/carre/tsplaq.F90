@@ -2,17 +2,18 @@
 !***********************************************************************
       LOGICAL FUNCTION tsplaq(vx,vy,k,npx,px,py,eps_Xpt)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette fonction verifie si l'accroissement d'une courbe est monotone
 
 !  arguments
       INTEGER k, npx
-      REAL*8 vx(k), vy(k), px,py,eps_Xpt
+      REAL(rKind) :: vx(k), vy(k), px,py,eps_Xpt
 
 !  variables locales
       INTEGER i
-      REAL*8 dist1,dist2
+      REAL(rKind) :: dist1,dist2
 !xpb      PARAMETER (eps=0.015)
 !!!!  attention a ce facteur de 0.05. Xavier a du l'augmenter dans
 !     certains cas.

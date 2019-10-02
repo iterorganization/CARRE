@@ -5,6 +5,7 @@ module carre_parameter_io
   ! TODO: The functions for this are still scattered throughout
   ! the code (maille, lecle, change, ...). Collect them here.
 
+  use KindDefinitions
   use carre_types
   use Logging
   use Helper
@@ -504,7 +505,8 @@ CONTAINS
       !  read an array of integer numbers from a chain of characters vari
       !
       !  arguments
-      integer iunit,ii(nii),nii,ierror
+      integer nii
+      integer iunit,ii(nii),ierror
       character vari*(*)
       !  iunit: unit of temporary file
       !  vari: chain of characters from which to read

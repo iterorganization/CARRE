@@ -1,15 +1,17 @@
 
 !***********************************************************************
-      REAL*8 FUNCTION interp(r1, r2, f1, f2, f)
+      FUNCTION interp(r1, r2, f1, f2, f)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
+      REAL(rKind) :: interp
 
 !    Cette fonction renvoie la valeur de l'interpolation lineaire entre
 !  les points r1 et r2 de la valeur de la fonction f, en connaissant la
 !  valeur de la fonction en chaque point.
 
 !  arguments
-      REAL*8 r1, r2, f1, f2, f
+      REAL(rKind) :: r1, r2, f1, f2, f
 
 !=========================
 !.. r1,r2: points de references.

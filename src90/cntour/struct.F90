@@ -3,6 +3,7 @@
 !  version : 07.07.97 20:18
 !
 !======================================================================
+      use KindDefinitions
       implicit none
 
 !ank-970707: dimensions from the file
@@ -11,7 +12,7 @@
 
 !  arguments
       integer nstruc,npstru(strumx)
-      real*8 x1,x2,y1,y2,xstruc(npstmx,strumx),ystruc(npstmx,strumx)
+      real(rKind) :: x1,x2,y1,y2,xstruc(npstmx,strumx),ystruc(npstmx,strumx)
 !
 !  variables locales
       integer i,nin,k,npmx,np

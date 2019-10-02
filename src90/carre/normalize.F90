@@ -2,15 +2,16 @@
 !***********************************************************************
       subroutine normalize(x1, x2)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 ! Normalize a vector so that || (x1, x2) || = 1
 
 !  arguments
-      REAL*8 x1, x2
+      REAL(rKind) :: x1, x2
 
 !  internal variables
-      REAL*8 l
+      REAL(rKind) :: l
 
       l = sqrt( x1**2 + x2**2 )
 

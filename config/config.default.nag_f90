@@ -13,7 +13,7 @@ DEFINES   = -DNAGFOR
 endif
 
 FC        = nagfor
-CPP       = /lib/cpp -traditional
+CPP       = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG
 FFLAGS    = -g -C 
@@ -23,12 +23,12 @@ endif
 
 DBLPAD    = -r8 -i4
 
-COMPILE   = ${FC} -c ${FFLAGS}
+COMPILE   = ${FC} -c ${FFLAGS} -mdir ${OBJDIR} -I${OBJDIR}
 MOD       = mod
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG}
 LDFLAGS   = 
-LDEXTRA   = 
+LDEXTRA   =
 
 #!!!Local Variables:
 #!!! mode: Makefile

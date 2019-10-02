@@ -1,5 +1,6 @@
 module carre_niveau
 
+  use KindDefinitions
   use carre_types
   use Helper
   use Logging
@@ -18,7 +19,9 @@ module carre_niveau
 
   logical, parameter :: DEBUGFILES_CRBNIV = .false.
 
+#ifdef USE_SILO
   integer, save :: CRBNIV_CALL = 0
+#endif
 
 contains
 
@@ -33,7 +36,7 @@ contains
   !> This version introduces optional arguments and additional features.
 
   ! Optional arguments
-  ! Optional groups: 
+  ! Optional groups:
   ! -starting point test (avoid adding starting point to level line): x0, y0
   ! -structure intersection: xstruc, ystruc, nstruc, npstru, plaque, indstr
   ! -limiting line intersection: xt, yt, nt, nbcrb
@@ -44,16 +47,16 @@ contains
   !  the failure status is returned in failed.
 
 
-!!$      SUBROUTINE CRBNIV(ii,jj,k,idir,nxmax,nymax,nx,ny,x,y,f,niv, & 
-!!$     &        crbx,crby,npnimx,strumx,npstmx,nstruc,npstru, & 
+!!$      SUBROUTINE CRBNIV(ii,jj,k,idir,nxmax,nymax,nx,ny,x,y,f,niv, &
+!!$     &        crbx,crby,npnimx,strumx,npstmx,nstruc,npstru, &
 !!$     &        xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque,x0,y0)
 
 
   SUBROUTINE CRBNIV( &
-       & ii,jj,k,idir,& 
-       & nx,ny,x,y,f,niv, & 
-       & crbx,crby,& 
-       & nstruc,npstru, & 
+       & ii,jj,k,idir,&
+       & nx,ny,x,y,f,niv, &
+       & crbx,crby,&
+       & nstruc,npstru, &
        & xstruc,ystruc,indstr,xt,yt,nt,nbcrb,plaque, &
        & x0,y0, &
        & xEnd, yEnd, foundEndPoint, &
@@ -63,29 +66,29 @@ contains
 
 
     !  arguments
-    INTEGER, intent(in) :: nx,ny 
+    INTEGER, intent(in) :: nx,ny
     INTEGER, intent(inout) :: ii, jj, idir, k
     !INTEGER, intent(out) ::
 
-    REAL*8, intent(in) :: x(nxmax),y(nymax),f(nxmax,nymax),niv
-    REAL*8, intent(inout) :: crbx(npnimx), crby(npnimx)
+    REAL(rKind), intent(in) :: x(nxmax),y(nymax),f(nxmax,nymax),niv
+    REAL(rKind), intent(inout) :: crbx(npnimx), crby(npnimx)
 
 
     ! structure test parameters
     INTEGER, intent(in), optional :: plaque, nstruc,npstru(:)
     INTEGER, intent(out), optional :: indstr
-    REAL*8, intent(in), optional :: xstruc(npstmx,strumx), ystruc(npstmx,strumx)
+    REAL(rKind), intent(in), optional :: xstruc(npstmx,strumx), ystruc(npstmx,strumx)
 
     ! limit curve parameters
     INTEGER, intent(in), optional :: nbcrb
     INTEGER, intent(out), optional ::  nt(2)
-    REAL*8, intent(in), optional :: xt(npnimx,2),yt(npnimx,2)
+    REAL(rKind), intent(in), optional :: xt(npnimx,2),yt(npnimx,2)
 
     ! start point
-    REAL*8, intent(in), optional :: x0,y0 
+    REAL(rKind), intent(in), optional :: x0,y0
 
     ! end point
-    REAL*8, intent(in), optional :: xEnd, yEnd
+    REAL(rKind), intent(in), optional :: xEnd, yEnd
     logical, intent(out), optional :: foundEndPoint
 
     ! Fail parameters
@@ -95,14 +98,14 @@ contains
     !  variables locales
     LOGICAL trvers2
     INTEGER i,j,dir,ist,jst,igrace,ngrace, iCrb
-    REAL*8 determ,mult1,mult2,dist,proxim
+    REAL(rKind) :: determ,mult1,mult2,dist,proxim
     parameter(proxim=1.e-8,ngrace=3)
     logical :: stepDone
     logical :: testEndPoint, testStartPoint, testStructures, testLimitingCurves
     integer :: iEnd, jEnd
     !  procedures
     LOGICAL milieu, trvers
-    REAL*8 interp
+    REAL(rKind) :: interp
     integer ifind
     INTRINSIC ABS,SQRT
     EXTERNAL interp,milieu,trvers,ifind
@@ -155,7 +158,7 @@ contains
     testStructures = present(plaque) .and. present(nstruc) .and. present(npstru) &
          & .and. present(indstr) .and. present(xstruc) .and. present(ystruc)
     testLimitingCurves = present(nbcrb) .and. present(nt) .and. present(xt) &
-         & .and. present(yt) 
+         & .and. present(yt)
     testEndPoint = present(xEnd) .and. present(yEnd) .and. present(foundEndPoint)
 
     if ( testEndPoint ) then
@@ -185,7 +188,7 @@ contains
     !  new segment formed by the last 2 points does not cross the curves T
 
     ! Build the level line segment by segment
-    do 
+    do
        ! Check that we do not run out of storage for the level line
        if ( k == npnimx ) then
           ! Cannot store more points. Warn and return.
@@ -195,15 +198,15 @@ contains
                 call csioOpenFile('carreCrbnivEndP')
                 !call csioOpenFile()
                 call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
-                     & crbx(1:k), crby(1:k) )    
+                     & crbx(1:k), crby(1:k) )
                 call csioCloseFile()
                 call csioRestoreCounters()
-             end if             
+             end if
 #endif
           return
        end if
 
-       
+
        ! If an end point is given, check whether it is in the current cell.
        ! If yes, close the level line.
        if (testEndPoint) then
@@ -217,10 +220,10 @@ contains
                 call csioOpenFile('carreCrbnivEndP')
                 !call csioOpenFile()
                 call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
-                     & crbx(1:k), crby(1:k) )    
+                     & crbx(1:k), crby(1:k) )
                 call csioCloseFile()
                 call csioRestoreCounters()
-             end if             
+             end if
 #endif
              return
           end if
@@ -239,7 +242,7 @@ contains
 
              trvers2=.false.
              if (testLimitingCurves) then
-                do iCrb = 1, nbcrb             
+                do iCrb = 1, nbcrb
                    trvers2 = trvers2 .or. &
                         & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
                         &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
@@ -267,7 +270,7 @@ contains
 
              trvers2=.false.
              if (testLimitingCurves) then
-             do iCrb = 1, nbcrb             
+             do iCrb = 1, nbcrb
                 trvers2 = trvers2 .or. &
                      & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
                      &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
@@ -299,7 +302,7 @@ contains
 
              trvers2=.false.
              if (testLimitingCurves) then
-             do iCrb = 1, nbcrb             
+             do iCrb = 1, nbcrb
                 trvers2 = trvers2 .or. &
                      & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
                      &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
@@ -326,7 +329,7 @@ contains
 
              trvers2=.false.
              if (testLimitingCurves) then
-             do iCrb = 1, nbcrb             
+             do iCrb = 1, nbcrb
                 trvers2 = trvers2 .or. &
                      & trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),  &
                      &  xt(1,iCrb),yt(1,iCrb),nt(iCrb))
@@ -335,7 +338,7 @@ contains
 
              IF (trvers2) THEN
                 k=k-1
-                write(6,*)'Erreur dans crbniv, travers.', & 
+                write(6,*)'Erreur dans crbniv, travers.', &
                      &            ' Pas cense traverser de courbe'
                 call pltend
                 STOP
@@ -348,17 +351,17 @@ contains
        ENDIF
 
        if (.not. stepDone) then
-          
+
           ! controlled failure handling?
           if (present(allowFail)) then
-             if ( allowFail ) then             
+             if ( allowFail ) then
                 if (present(failed)) failed = .true.
                 return
              end if
           end if
 
           print *,'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-          print *,'The grid you have specified seems to be too fine in ', & 
+          print *,'The grid you have specified seems to be too fine in ', &
                &                                               'radial direction'
           print *,'Try to increase the deltr[1n] values, or'
           print *,'    to reduce the number of the radial grid points, or'
@@ -378,7 +381,7 @@ contains
              end if
 
              call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
-                  & crbx(1:k), crby(1:k) )    
+                  & crbx(1:k), crby(1:k) )
              call csioCloseFile()
              call csioRestoreCounters()
           end if
@@ -419,12 +422,12 @@ contains
              !call csioOpenFile('carreCrbnivOneP')
              call csioOpenFile()
              call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
-                  & crbx(1:k), crby(1:k) )    
+                  & crbx(1:k), crby(1:k) )
              call csioCloseFile()
              call csioRestoreCounters()
           end if
 #endif
-          
+
           RETURN
 
        ENDIF
@@ -450,9 +453,9 @@ contains
 
              !..Calcul du determinant de la matrice.
 
-             determ = (-(crbx(k) - crbx(k-1))) * & 
-                  &               (ystruc(ist+1,jst) - ystruc(ist,jst)) + & 
-                  &               (crby(k) - crby(k-1)) * & 
+             determ = (-(crbx(k) - crbx(k-1))) * &
+                  &               (ystruc(ist+1,jst) - ystruc(ist,jst)) + &
+                  &               (crby(k) - crby(k-1)) * &
                   &               (xstruc(ist+1,jst) - xstruc(ist,jst))
 
              !..Si determinant non nul, alors il y a solution.
@@ -461,9 +464,9 @@ contains
 
                 !..Facteur multiplicatif du segment de courbe avec la methode de Cramer.
 
-                mult1 = ((-(xstruc(ist,jst)-crbx(k-1))) * & 
-                     &                 (ystruc(ist+1,jst)-ystruc(ist,jst)) + & 
-                     &                 (ystruc(ist,jst)-crby(k-1)) * & 
+                mult1 = ((-(xstruc(ist,jst)-crbx(k-1))) * &
+                     &                 (ystruc(ist+1,jst)-ystruc(ist,jst)) + &
+                     &                 (ystruc(ist,jst)-crby(k-1)) * &
                      &                 (xstruc(ist+1,jst)-xstruc(ist,jst)))/determ
 
                 !..mult1 is between 0 and 1 for an intersection
@@ -472,9 +475,9 @@ contains
 
                    !..Fact. mult. du segment de structure.
 
-                   mult2= ((crbx(k)-crbx(k-1)) * & 
-                        &                   (ystruc(ist,jst)-crby(k-1)) - & 
-                        &                   (crby(k)-crby(k-1)) * & 
+                   mult2= ((crbx(k)-crbx(k-1)) * &
+                        &                   (ystruc(ist,jst)-crby(k-1)) - &
+                        &                   (crby(k)-crby(k-1)) * &
                         &                   (xstruc(ist,jst)-crbx(k-1)))/determ
 
                    !..Intersection if mult2 between 0 and 1
@@ -504,7 +507,7 @@ contains
                 !call csioOpenFile('carreCrbnivStru')
                 call csioOpenFile()
                 call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
-                     & crbx(1:k), crby(1:k) )    
+                     & crbx(1:k), crby(1:k) )
                 call csioCloseFile()
                 call csioRestoreCounters()
              end if
@@ -526,11 +529,11 @@ contains
              !call csioOpenFile('carreCrbnivOuts')
              call csioOpenFile()
              call siloWriteLineSegmentGridFromPoints( csioDbfile, "brokenline", &
-                  & crbx(1:k), crby(1:k) )    
+                  & crbx(1:k), crby(1:k) )
              call csioCloseFile()
              call csioRestoreCounters()
           end if
-#endif          
+#endif
           return
        end if
 
@@ -540,7 +543,7 @@ contains
              if(dist.lt.proxim) then
                 !www
                 if(igrace.gt.2) then
-                   write(6,400)(i,crbx(i),crby(i),crbx(k+i-igrace), & 
+                   write(6,400)(i,crbx(i),crby(i),crbx(k+i-igrace), &
                         &               crby(k+i-igrace),i=1,igrace)
 400                format(i4,1p2e11.3,2x,1p2e11.3)
                 endif
@@ -556,7 +559,7 @@ contains
 
   !> High-level routine to fine a level line connecting two points.
   !> (xFrom, yFrom)->(xTo, yTo). It is assumed that both points
-  !> do lie on the same level line. If there are multiple possible 
+  !> do lie on the same level line. If there are multiple possible
   !> connection lines between the points, the shortest one is returned.
   subroutine findLevelLineForPoints( equ, &
          & xFrom, yFrom, xTo, yTo, &
@@ -578,13 +581,13 @@ contains
     external :: ifind, long
     logical :: foundLevelLine
 
-    ! Find the cell of the starting point    
+    ! Find the cell of the starting point
     ii = ifind(xFrom, equ%x(1:equ%nx), equ%nx, 1)
     jj = ifind(yFrom, equ%y(1:equ%ny), equ%ny, 1)
-        
+
     ! Compute psi value at this point
-    valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + & 
-         & equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom   
+    valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + &
+         & equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom
 
     lengthFace = sqrt( (xTo - xFrom) ** 2 + (yTo - yFrom) ** 2 )
 
@@ -601,16 +604,16 @@ contains
 
        iDir = iDirStart ! need to do this because iDir can be changed in crbniv...
        CALL CRBNIV(ii,jj,npNivTmp,iDir,&
-            & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
+            & equ%nx,equ%ny,equ%x,equ%y,equ%psi, &
             & valNiv,nivxTmp,nivyTmp, &
             & x0=xFrom,y0=yFrom,xEnd=xTo,yEnd=yTo,&
-            & foundEndPoint=foundEndPoint)     
+            & foundEndPoint=foundEndPoint)
 
        if (foundEndPoint) then
           ! For the resulting level line, compute length
           ! and do bookkeeping to find the shortest
           length = long(nivxTmp(1:npNivTmp), nivyTmp(1:npNivTmp), npNivTmp)
-          
+
           ! Heuristic: if the found level line is too large by an order of magnitude, reject it
           if ( (length/lengthFace) > 10d0 ) then
              call logmsg( LOGDEBUGBULK, 'findLevelLineForPoints: found level line (length: '&
@@ -620,7 +623,7 @@ contains
           end if
 
           foundLevelLine = .true.
-          
+
           if (length < maxLength) then
              maxLength = length
              npniv = npNivTmp
@@ -632,8 +635,8 @@ contains
     end do
 
     if (.not. foundLevelLine) then
-       ! This happens if the equilibrium data has issues. 
-       ! Usually happens for faces going ino the X-point. Fortunately there the 
+       ! This happens if the equilibrium data has issues.
+       ! Usually happens for faces going ino the X-point. Fortunately there the
        ! level lines are pretty straight anyway, so it is not a problem.
        call logmsg( LOGDEBUGBULK, 'findLevelLineForPoints: WARNING: unable to find connecting level line.&
             & Substituting direct connection line' )
@@ -642,7 +645,7 @@ contains
        nivy(1) = yFrom
        nivx(2) = xTo
        nivy(2) = yTo
-   else       
+   else
       call logmsg( LOGDEBUGBULK, 'findLevelLineForPoints: distance of points is: '//real2str(lengthFace)//&
            & ', found level line: length='//real2str(maxLength)//&
            & ' with '//int2str(npNiv)//' points' )
@@ -653,7 +656,7 @@ contains
 
   !> High-level routine to fine a level line connecting two points.
   !> (xFrom, yFrom)->(xTo, yTo). It is assumed that both points
-  !> do lie on the same level line. If there are multiple possible 
+  !> do lie on the same level line. If there are multiple possible
   !> connection lines between the points, the shortest one is returned.
   subroutine findClosedLevelLine( equ, &
        & xFrom, yFrom, &
@@ -664,24 +667,20 @@ contains
     integer, intent(out) :: npNiv
 
     ! internal
-    integer :: ii, jj, npNivTmp, iDir, iDirStart
-    double precision :: valNiv, length, maxLength, lengthFace
-    double precision :: nivxTmp(npnimx), nivyTmp(npnimx)
-    logical :: foundEndPoint
+    integer :: ii, jj, iDir
+    double precision :: valNiv
 
     ! external
     integer :: ifind
-    double precision :: long
-    external :: ifind, long
-    logical :: foundLevelLine
+    external :: ifind
 
-    ! Find the cell of the starting point    
+    ! Find the cell of the starting point
     ii = ifind(xFrom, equ%x(1:equ%nx), equ%nx, 1)
     jj = ifind(yFrom, equ%y(1:equ%ny), equ%ny, 1)
 
     ! Compute psi value at this point
-    valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + & 
-         & equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom   
+    valNiv=equ%a00(ii,jj,1) + equ%a10(ii,jj,1)*xFrom + &
+         & equ%a01(ii,jj,1)*yFrom + equ%a11(ii,jj,1)*xFrom*yFrom
 
     iDir = 1 ! need to do this because iDir can be changed in crbniv...
 
@@ -690,9 +689,9 @@ contains
     nivy(1) = yFrom
 
     CALL CRBNIV(ii,jj,npNiv,iDir,&
-         & equ%nx,equ%ny,equ%x,equ%y,equ%psi, & 
-         & valNiv,nivx,nivy)     
-   
+         & equ%nx,equ%ny,equ%x,equ%y,equ%psi, &
+         & valNiv,nivx,nivy)
+
   end subroutine findClosedLevelLine
 
 

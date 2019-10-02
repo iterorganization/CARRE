@@ -1,12 +1,13 @@
 !=======================================================================
       subroutine enlpnt(v,nelem,xmail,ymail,ncoord,i1,i2)
+      use KindDefinitions
       implicit none
 !  on retire un point i1 de la liste des noeuds et on le remplace par le
 !  point d'indice i2
 !
 !  arguments
       integer nelem,v(3,nelem),ncoord,i1,i2
-      real*8 xmail(ncoord),ymail(ncoord)
+      real(rKind) :: xmail(ncoord),ymail(ncoord)
 !
 !  variables locales
       integer i,j,ielem

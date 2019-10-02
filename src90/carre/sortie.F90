@@ -1,4 +1,5 @@
 SUBROUTINE SORTIE(equ, grid, diag, par, numero)
+  use KindDefinitions
   use CarreDiagnostics
   use carre_types
   
@@ -22,21 +23,14 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
 #include <COMLAN.F>
 
 !  variables locales
-      INTEGER i,j,isep,ireg,ii,jj
-      REAL*8 xx,yy,psimai,psidx,psidy
+      INTEGER i,j,isep,ireg
 
-!  procedures
-      INTEGER ifind
-      EXTERNAL ifind
 !======================================================================
 !.. i,j: indices
 !.. isep: indice de separatrice.
 !.. ireg: indice de region.
-!.. ii,jj: indices d'identification en x et y du carre.
 !.. numero: 1= impression des parametres pouvant servir a un essai
 !           ulterieur. 2= impression des donnees de la maille.
-!.. xx,yy: coordonnees du premier point d'une courbe de niveau.
-!.. psimai: valeur de la fonction pour cette courbe de niveau.
 !======================================================================
 !..Creation du nouveau fichier.
 

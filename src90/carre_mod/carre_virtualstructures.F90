@@ -1,6 +1,8 @@
 module carre_virtualstructures
 
+  use KindDefinitions
   use carre_types
+  use itm_assert
   use Logging
   use Helper
 #ifdef USE_SILO
@@ -21,7 +23,7 @@ contains
   ! Sets up a virtual limiter for creating an extended limiter grid.
   ! -set up an infinitely thin radial limiter line going from the X-point
   !  (point where the separatrix touches the wall) away from the plasma
-  ! -set up 
+  ! -set up
 
   subroutine setupVirtualLimiterGeometry(par, equ, struct)
     type(CarreParameters), intent(in) :: par
@@ -40,7 +42,7 @@ contains
     external feval2d, long
 
     ! First figure out min/max psi range to be covered by the grid
-    
+
     seppx = huge(seppx)
     seppy = huge(seppy)
 
@@ -58,8 +60,8 @@ contains
        ! track psi range of points for every structure
        minpsi(istru) = huge(minpsi)
        maxpsi(istru) = -huge(minpsi)
-       
-       write (0,*) 'virtualtargets: Structure ', istru, & 
+
+       write (0,*) 'virtualtargets: Structure ', istru, &
             &        ': ', struct%rnpstru(istru), ' points'
        ! loop over all points in structure
        do ip = 1, abs(struct%rnpstru(istru))
@@ -68,8 +70,8 @@ contains
           ty = struct%rystruc( ip, istru )
 
           ! compute psi at point
-          ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-               &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+          ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+               &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
                &           tx, ty )
 
           ! update min/max psi values
@@ -97,7 +99,7 @@ contains
 
     enddo ! structure loop
 
-    ! create limiter structure starting at the X-point (innermost wall contact point)        
+    ! create limiter structure starting at the X-point (innermost wall contact point)
 
     ! Structure number 1
     struct%vnstruc = 1
@@ -107,10 +109,10 @@ contains
     np = 1
     struct%vxstruc(np, 1) = x
     struct%vystruc(np, 1) = y
-    psi0 = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+    psi0 = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
          & x, y )
-    
+
     write (*,*) limpoint_min_psi, limpoint_max_psi
     write (*,*) np, x, y, psi0
 
@@ -122,10 +124,10 @@ contains
 
        np = np + 1
        struct%vxstruc(np, 1) = x
-       struct%vystruc(np, 1) = y       
+       struct%vystruc(np, 1) = y
 
-       psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+       psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
             & x, y )
 
        !write (*,*) np, x, y, psi
@@ -150,19 +152,19 @@ contains
        l = long( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2) )
        call coord( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2), &
             & l/2.0, x, y )
-       
-       call add_virtual_limiter(equ, struct, x, y)       
+
+       call add_virtual_limiter(equ, struct, x, y)
     else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
        ! Place limiter triangle at outside end of the virtual limiter structure
-       
+
        x = struct%vxstruc(np, 1) - &
             & ( struct%vxstruc(np, 1) - struct%vxstruc(np-1, 1) ) * 0.95
        y = struct%vystruc(np, 1) - &
             & ( struct%vystruc(np, 1) - struct%vystruc(np-1, 1) ) * 0.95
 
-       call add_virtual_limiter(equ, struct, x, y)              
+       call add_virtual_limiter(equ, struct, x, y)
     end if
-    
+
   end subroutine setupVirtualLimiterGeometry
 
 
@@ -176,8 +178,8 @@ contains
 
     if (par%gridExtensionMode == GRID_EXTENSION_OFF) then
         call logmsg( LOGINFO, "setupVirtualStructures: you want to create virtual structures, &
-             &but did not specify an extension mode (gridExtensionMode parameter)" )        
-        return        
+             &but did not specify an extension mode (gridExtensionMode parameter)" )
+        return
     end if
 
     select case(par%gridExtensionMode)
@@ -197,10 +199,10 @@ contains
     else if (par%gridExtensionMode == GRID_EXTENSION_MODE_VESSEL) then
         ! move the limiter points a bit further to the outside to make sure we really cover the vessel
         ! (especially when using only a single vessel countour / open targets)
-                
+
         call movePointAwayFromXOPoint( limpoint_min(1), limpoint_min(2), equ )
         call movePointAwayFromXOPoint( limpoint_max(1), limpoint_max(2), equ )
-        
+
         call add_virtual_limiter(equ, struct, limpoint_min(1), limpoint_min(2))
         call add_virtual_limiter(equ, struct, limpoint_max(1), limpoint_max(2))
     end if
@@ -209,12 +211,12 @@ contains
 #ifdef USE_SILO
     call csioGetStructureSegments( struct%vnstruc, struct%vnpstru, &
          & struct%vxstruc, struct%vystruc, csioVirtualStrucNSeg, csioVirtualStrucSegments )
-    
+
     call csioOpenFile('carreVirtualStr')
     call csioOpenFile()
-    call csioCloseFile()                         
+    call csioCloseFile()
 #endif
-    
+
   end subroutine setupVirtualStructures
 
 
@@ -224,27 +226,27 @@ contains
     logical, intent(in), optional :: onlyOPoint
 
     ! internal
-    double precision :: psi, psix, gx, gy, gsign, dpsiToX, delta, psio
+    double precision :: psi, gx, gy, gsign, dpsiToX, delta, psio
     integer :: ix, ixclosest
     logical :: onlyO
 
-    real*8 feval2d, norm
+    real(rKind) :: feval2d, norm
     external feval2d, norm
 
     onlyO = .false.
     if (present(onlyOPoint)) onlyO = onlyOPoint
 
     ! compute psi at point
-    psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+    psi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+         & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
          & x, y )
 
     ! compute grad psi at point
-    gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-         & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
+    gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+         & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), &
          & x, y )
-    gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-         & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
+    gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+         & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), &
          & x, y )
 
     ! find closest X- or O-point in psi
@@ -261,10 +263,10 @@ contains
           gsign = +1
        else
           gsign = -1
-       end if       
+       end if
     else
-       psio = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+       psio = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
             & equ%xpto, equ%ypto )
        !write (*,*) "O-point psi", psio
 
@@ -272,12 +274,12 @@ contains
           gsign = +1
        else
           gsign = -1
-       end if       
+       end if
     end if
 
 
     !delta = abs(equ%fctpx(ixClosest) - psi) * 0.1
-    !delta = 1.0 / norm(gx, gy) * (equ%x(2) - equ%x(1)) 
+    !delta = 1.0 / norm(gx, gy) * (equ%x(2) - equ%x(1))
     !delta = 1.0 / norm(gx, gy) * norm( equ%ptx(ixClosest) - x, equ%pty(ixClosest) - y ) * 0.1
     delta = 1.0 / norm(gx, gy) * norm( equ%xpto - x, equ%ypto - y ) * 0.05
 
@@ -296,20 +298,20 @@ contains
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(inout) :: struct
     double precision, intent(out) :: limpoint_min(2), limpoint_max(2)
-    
+
     !  variables locales
     integer :: ipx, ipxOther, isep, istru, i
     integer :: ip, itarget, istep, istepTot
-    real*8 :: &  ! minpsitot, maxpsitot, 
-         &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, vtaddpsi, & 
+    real(rKind) :: &  ! minpsitot, maxpsitot,
+         &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, vtaddpsi, &
          &     dir, tol
-    real*8 :: tx, ty, tpsi, gx, gy, dx, dxmax, pi, alpha, p
+    real(rKind) :: tx, ty, tpsi, gx, gy, dx, dxmax, pi, alpha, p
 
-    real*8 :: seppx(npstmx,struct%rnstruc), seppy(npstmx,struct%rnstruc)
-    real*8 :: vtstartx(struct%nbdef), vtstarty(struct%nbdef)
-    real*8 :: ppsi(npstmx,struct%rnstruc)
-    real*8 :: tmpx(npstmx,2), tmpy(npstmx,2)
-    real*8 :: vtmp1, vtmp2
+    real(rKind) :: seppx(npstmx,struct%rnstruc), seppy(npstmx,struct%rnstruc)
+    real(rKind) :: vtstartx(struct%nbdef), vtstarty(struct%nbdef)
+    real(rKind) :: ppsi(npstmx,struct%rnstruc)
+    real(rKInd) :: tmpx(npstmx,2), tmpy(npstmx,2)
+    real(rKind) :: vtmp1, vtmp2
     double precision :: limPsiMax, limPsiMin, limPsi, pointPsi
     double precision :: gnorm, structsize
     integer :: nvtarget, idir, vtargetipx(struct%nbdef), vtistruc(struct%nbdef)
@@ -320,18 +322,18 @@ contains
     logical :: doTarget
 
     !  procedures
-    real*8 feval2d, angle, dist, norm
+    real(rKind) :: feval2d, angle, dist, norm
     external feval2d, angle, dist, norm
 
 
-!!$    ! Figure out psi values for limiting curves 
+!!$    ! Figure out psi values for limiting curves
 !!$    limPsiMin = huge(limPsiMin)
 !!$    limPsiMax = -huge(limPsiMax)
 !!$
-!!$    do i = 1, struct%nbniv       
+!!$    do i = 1, struct%nbniv
 !!$       ! compute psi value for first point on the curve
-!!$       limPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-!!$            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+!!$       limPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+!!$            & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
 !!$            & struct%nivx(1,i), struct%nivy(1,i) )
 !!$
 !!$       limPsiMin = min(limPsiMin, limPsi)
@@ -374,8 +376,8 @@ contains
        ! track psi range of points for every structure
        minpsi(istru) = huge(minpsi)
        maxpsi(istru) = -huge(minpsi)
-       
-       write (0,*) 'virtualtargets: Structure ', istru, & 
+
+       write (0,*) 'virtualtargets: Structure ', istru, &
             &        ': ', struct%rnpstru(istru), ' points'
        ! loop over all points in structure
        do ip = 1, abs(struct%rnpstru(istru))
@@ -384,8 +386,8 @@ contains
           ty = struct%rystruc( ip, istru )
 
           ! compute psi at point
-          ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-               &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+          ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+               &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
                &           tx, ty )
 
           ! update min/max psi values
@@ -416,7 +418,7 @@ contains
              ! TODO: step towards psi value of closest separatrix,
              ! i.e. the X-point psi value closest to the current psi value
              ipx = 1
-             if ( abs( tpsi - equ%fctpx(ipx) ) & 
+             if ( abs( tpsi - equ%fctpx(ipx) ) &
                   &              / abs( equ%fctpx(ipx) ) < tol ) then
                 ! close enough: stop and store
                 seppx(ip,istru) = tx
@@ -426,22 +428,22 @@ contains
 
              ! not close enough: step along grad psi towards separatrix
              ! compute grad psi at current position
-             gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-                  &              equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
+             gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+                  &              equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), &
                   &              tx, ty )
-             gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-                  &              equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
+             gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+                  &              equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), &
                   &              tx, ty )
              ! take a step, including a security factor
              ! FIXME: choose step size in a better way
              ! was: 0.02, did not get to separatrix within 1000 steps in this case
-             dx = 0.1 * (tpsi - equ%fctpx(ipx)) & 
+             dx = 0.1 * (tpsi - equ%fctpx(ipx)) &
                   &              / sqrt( gx**2 + gy**2 );
              tx = tx - dx * gx
              ty = ty - dx * gy
              ! compute psi at new position
-             tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-                  &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+             tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+                  &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
                   &              tx, ty )
              ! write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of X-point", equ%fctpx(ipx)
 
@@ -480,7 +482,7 @@ contains
 
           ! for complex cases (disconnected double null), some targets
           ! will be listed for multiple X-points. We only want to treat every target once here.
-          ! Look at all other X-points, and only treat the target if it is not listed 
+          ! Look at all other X-points, and only treat the target if it is not listed
           ! for another X-point that has a lower total number of associated targets.
           doTarget = .true.
           do ipxOther = 1, equ%npx
@@ -493,7 +495,7 @@ contains
                   doTarget = .false.
                   exit
               end if
-          end do         
+          end do
           if (.not. doTarget) cycle
 
           write (0,"(a,i2,a,i2,a,i2)") &
@@ -514,7 +516,7 @@ contains
           do istru = 1, struct%rnstruc
 
              ! only look at targets
-             if ( ( par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET ) & 
+             if ( ( par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET ) &
                   &              .and. .not. ( istru == itarget ) ) cycle
 
              ! Figure out the psi range for this target.
@@ -532,8 +534,8 @@ contains
                 enddo
 
                 ! TODO: fix this
-!!$                ! Finally constrain the psi limits to match the 
-!!$                ! limiting curves 
+!!$                ! Finally constrain the psi limits to match the
+!!$                ! limiting curves
 !!$                vtminpsi = max( vtminpsi, limPsiMin )
 !!$                vtmaxpsi = min( vtmaxpsi, limPsiMax )
 
@@ -545,7 +547,7 @@ contains
              ! make the targets a little bit bigger in psi range
              ! to avoid trouble in frtier
              vtaddpsi = (vtmaxpsi - vtminpsi) * 0.1
-             vtminpsi = vtminpsi - vtaddpsi 
+             vtminpsi = vtminpsi - vtaddpsi
              vtmaxpsi = vtmaxpsi + vtaddpsi
 
              !write (0,*) 'Global psi range'
@@ -560,8 +562,8 @@ contains
              do ip = 1, abs(struct%rnpstru(istru))
 
                 ! check whether the point is in the psi range we actually want to have
-                pointPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-                     & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+                pointPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+                     & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
                      & struct%rxstruc( ip, istru ), struct%rystruc( ip, istru ) )
 
                 ! if not, skip this point
@@ -583,9 +585,9 @@ contains
 
                 if (tx == huge(seppx)) cycle
 
-                alpha = angle( equ%ptx(ipx), equ%pty(ipx), & 
-                     &                 equ%separx( equ%nptot( isep, ipx ), isep, ipx ), & 
-                     &                 equ%separy( equ%nptot( isep, ipx ), isep, ipx ), & 
+                alpha = angle( equ%ptx(ipx), equ%pty(ipx), &
+                     &                 equ%separx( equ%nptot( isep, ipx ), isep, ipx ), &
+                     &                 equ%separy( equ%nptot( isep, ipx ), isep, ipx ), &
                      &                 tx, ty )
 
                 !write (0,*) 'X/Strike point angle is ', alpha
@@ -621,14 +623,14 @@ contains
        ! compute grad psi at starting point (again)
        tx = vtstartx(itarget)
        ty = vtstarty(itarget)
-       gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-            &        equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
+       gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+            &        equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), &
             &        tx, ty )
-       gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-            &        equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
+       gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+            &        equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), &
             &        tx, ty )
        ! check in which direction the associated X-point is
-       p = gx * ( equ%pty( vtargetipx( itarget ) ) - ty ) & 
+       p = gx * ( equ%pty( vtargetipx( itarget ) ) - ty ) &
             &        - gy * ( equ%ptx( vtargetipx( itarget ) ) - tx )
 
        ! take a step along the separatrix away from the X-point
@@ -636,15 +638,15 @@ contains
 
        write (*,*) "tx, ty", tx, ty
        ! choose a stepsize
-       dx = 1 / norm( gx, gy ) * & 
-            &        norm( equ%ptx( vtargetipx( itarget ) ) - tx, & 
+       dx = 1 / norm( gx, gy ) * &
+            &        norm( equ%ptx( vtargetipx( itarget ) ) - tx, &
             &              equ%pty( vtargetipx( itarget ) ) - ty ) * 0.3
 
        if ( p == 0 ) stop 'Grad psi pointing towards X-point'
        if ( p > 0 ) then
           ! X-point to the left of grad psi
           ! step in clockwise right angle to grad psi
-          vtstartx(itarget) = vtstartx(itarget) + dx * gy 
+          vtstartx(itarget) = vtstartx(itarget) + dx * gy
           vtstarty(itarget) = vtstarty(itarget) - dx * gx
        else
           ! X-point to the right of grad psi
@@ -671,13 +673,13 @@ contains
 
           do
              ! compute grad psi
-             gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-                  & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), & 
+             gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+                  & equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), &
                   & tx, ty )
-             gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-                  & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), & 
+             gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+                  & equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), &
                   & tx, ty )
-             gnorm = norm(gx, gy)             
+             gnorm = norm(gx, gy)
 
              dx = 1/gnorm * (equ%x(2) - equ%x(1)) * 0.5 ;
              tx = tx + dir * dx * gx
@@ -695,8 +697,8 @@ contains
                exit
              endif
 
-             tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, & 
-                  & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), & 
+             tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
+                  & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
                   & tx, ty )
 
              nptmp(idir) = istep
@@ -749,11 +751,11 @@ contains
        enddo
 
        ! close target by wrapping it around
-       
+
        ! get current extent of new structure
        structsize =  maxval(struct%vxstruc(1:npvtmp, struct%vnstruc)) &
             &   - minval(struct%vxstruc(1:npvtmp, struct%vnstruc))
-       
+
        vtmp1 = struct%vxstruc(npvtmp, itarget) - struct%vxstruc(npvtmp - 1, itarget)
        vtmp2 = struct%vystruc(npvtmp, itarget) - struct%vystruc(npvtmp - 1, itarget)
        call rotate( vtmp1, vtmp2, pi * 1.25 )
@@ -801,11 +803,11 @@ contains
     type(CarreStructures), intent(inout) :: struct
 
     ! internal
-    real*8 :: l, x, y
+    real(rKind) :: l, x, y
     integer :: iniv
 
     !  procedures
-    real*8 :: long
+    real(rKind) :: long
     external long
 
     do iniv = 1, struct%nbniv
@@ -814,7 +816,7 @@ contains
        call coord( struct%nivx(:,iniv), struct%nivy(:,iniv), struct%nivtot(iniv), &
             & l/2.0, x, y )
 
-       call add_virtual_limiter(equ, struct, x, y)       
+       call add_virtual_limiter(equ, struct, x, y)
     enddo
 
   end subroutine virtualLimiters_targetMode
@@ -831,35 +833,35 @@ contains
     double precision, intent(in) :: x, y
 
     ! internal
-    real*8 :: ox, oy, length
+    real(rKind) :: ox, oy, length
     double precision, parameter :: pi=3.141592654
 
     double precision, parameter :: TRIANGLE_SIZE = 0.1
     double precision, parameter :: TRIANGLE_ANGLE = pi / 2.5
 
-    ox = ( x - equ%xpto ) 
-    oy = ( y - equ%ypto ) 
+    ox = ( x - equ%xpto )
+    oy = ( y - equ%ypto )
     length = sqrt( ox ** 2 + oy ** 2 )
     ox = ox / length
     oy = oy / length
-    
+
     struct%vnstruc = struct%vnstruc + 1
     struct%vnpstru(struct%vnstruc) = 4
     struct%vclosed(struct%vnstruc) = .false. ! not required
     struct%vxstruc(1,struct%vnstruc) = x
     struct%vystruc(1,struct%vnstruc) = y
-    
+
     call rotate( ox, oy, TRIANGLE_ANGLE / 2.0 )
     struct%vxstruc(2,struct%vnstruc) = x + ox * TRIANGLE_SIZE
     struct%vystruc(2,struct%vnstruc) = y + oy * TRIANGLE_SIZE
-    
+
     call rotate( ox, oy, - TRIANGLE_ANGLE )
     struct%vxstruc(3,struct%vnstruc) = x + ox * TRIANGLE_SIZE
     struct%vystruc(3,struct%vnstruc) = y + oy * TRIANGLE_SIZE
-    
+
     struct%vxstruc(4,struct%vnstruc) = x
     struct%vystruc(4,struct%vnstruc) = y
-    
+
   end subroutine add_virtual_limiter
 
 
@@ -872,7 +874,7 @@ contains
     open(UNIT=100,FILE='virtualstructure.out',STATUS='unknown')
     do is = 1, struct%vnstruc
         do ip = 1, abs(struct%vnpstru( is ))
-            write (100,*) struct%vxstruc(ip,is)*1000, & 
+            write (100,*) struct%vxstruc(ip,is)*1000, &
                  &             struct%vystruc(ip,is)*1000
         enddo
         write (100,*) ''

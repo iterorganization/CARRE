@@ -2,6 +2,7 @@
 !***********************************************************************
       subroutine plurap(tx1,ty1,n1,tx2,ty2,n2,x0,y0,ind0)
 !***********************************************************************
+      use KindDefinitions
       implicit none
 !  Determination des coordonnees (x0,y0) et de l'indice de segment ind0
 !  du point de la structure parametrisee par [tx1, ty1, n1], qui est
@@ -10,11 +11,11 @@
 !
 !  arguments
       integer n1,n2,ind0
-      real*8 tx1(n1),ty1(n1),tx2(n2),ty2(n2),x0,y0
+      real(rKind) :: tx1(n1),ty1(n1),tx2(n2),ty2(n2),x0,y0
 !
 !  variables locales
       integer i1,i2
-      real*8 h,hmin,x,y,x1,y1,x2,y2,base,zero,un
+      real(rKind) :: h,hmin,x,y,x1,y1,x2,y2,base,zero,un
       parameter(zero=0.,un=1.)
 !
 !  procedures

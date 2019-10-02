@@ -184,11 +184,8 @@ contains
     logical, intent(in), optional :: findAll
 
     ! internal
-    integer :: ipol, irad, nfound
+    integer :: ipol, irad
     logical :: lFindAll
-    double precision, parameter :: POINT_TOL = 1e-4    
-    real*8 :: dist
-    external dist
 
     lFindAll = .false.
     if (present(findAll)) lFindAll = findAll
@@ -234,9 +231,6 @@ contains
     ! internal
     integer :: ipx
     integer :: xipols(MAX_POINT_OCCUR), xirads(MAX_POINT_OCCUR), npoint
-    double precision, parameter :: XPOINT_TOL = 1e-6
-    real*8 :: dist
-    external dist
 
     ! check all X-points
     do ipx = 1, equ%npx
@@ -286,7 +280,7 @@ contains
     double precision, intent(in) :: x, y, xx(:), yy(:)
 
     ! internal
-    integer :: i, imin
+    integer :: i
     double precision :: dmin, d
     double precision :: dist
     external :: dist

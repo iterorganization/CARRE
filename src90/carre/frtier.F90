@@ -1,7 +1,7 @@
-      SUBROUTINE FRTIER(nx,ny,x,y,psi,nstruc, & 
-     &          npstru,xstruc,ystruc,inddef,nbdef,npx,separx, & 
-     &          separy,nptot,ptsep,racord,nivx,nivy,nivtot, & 
-     &          nbniv,stp0,stpmin, & 
+      SUBROUTINE FRTIER(nx,ny,x,y,psi,nstruc, &
+     &          npstru,xstruc,ystruc,inddef,nbdef,npx,separx, &
+     &          separy,nptot,ptsep,racord,nivx,nivy,nivtot, &
+     &          nbniv,stp0,stpmin, &
      &          distnv,ptxint,a00,a10,a01,a11)
 !
 !  version : 17.11.99 20:55
@@ -15,9 +15,9 @@
 !*** direction of the search along the target and then calls MARCHE to
 !*** find and parametrise the limiting level line.
 !======================================================================
-        use carre_target
-        use Logging
-        use Helper
+      use carre_target
+      use Logging
+      use Helper
 
       IMPLICIT NONE
 
@@ -26,25 +26,25 @@
 #include <CARREDIM.F>
 
 !  arguments
-      INTEGER nx,ny,nstruc,npstru(strumx), & 
-     &        nbdef,inddef(nbdef),npx,nptot(4,npx), & 
+      INTEGER nx,ny,nstruc,npstru(strumx), &
+     &        nbdef,inddef(nbdef),npx,nptot(4,npx), &
      &        ptsep(4,npx),nivtot(nivmx),nbniv,ptxint
-      REAL*8 x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx), & 
-     &     ystruc(npstmx,strumx),separx(npnimx,4,npxmx), & 
-     &     separy(npnimx,4,npxmx),nivx(npnimx,nivmx),nivy(npnimx,nivmx), & 
-     &     distnv(5,nivmx),a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
+      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx), &
+     &     ystruc(npstmx,strumx),separx(npnimx,4,npxmx), &
+     &     separy(npnimx,4,npxmx),nivx(npnimx,nivmx),nivy(npnimx,nivmx), &
+     &     distnv(5,nivmx),a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
      &     a01(nxmax,nymax,3),a11(nxmax,nymax,3),stp0,stpmin
       LOGICAL racord
 
 !  variables locales
-      INTEGER ipx,idniv,fraplq,i,j,idef,nbcrb,sens,nt(2),ii,jj, & 
+      INTEGER ipx,idniv,fraplq,i,j,idef,nbcrb,sens,nt(2),ii,jj, &
      &  ptxext,indlim
-      REAL*8 x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
+      REAL(rKind) :: x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
 
 !  procedures
       INTEGER ifind
       INTRINSIC MOD
-      EXTERNAL MARCHE,ifind & 
+      EXTERNAL MARCHE,ifind &
      &        ,trc_stk_in,trc_stk_out
 !======================================================================
 !.. distnv: distance along the target from the separatrix strike-point
@@ -142,7 +142,7 @@
 !..Direction of the sweep
 
          call trc_stk_in('frtier','*15')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
               & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -151,9 +151,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -167,8 +167,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'droite')
 
 !..Calculate the psi difference between these two points.
@@ -176,13 +176,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -223,7 +223,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*24')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
               & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -232,9 +232,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -248,8 +248,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'gauche')
 
 !..Calculate the psi difference between these two points.
@@ -257,13 +257,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -368,18 +368,18 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*35')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
-              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &              
+              & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
               & 'droite')
          call trc_stk_out
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -393,8 +393,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'droite')
 
 !..Calculate the psi difference between these two points.
@@ -402,13 +402,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -452,7 +452,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*44')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
               & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -461,9 +461,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -477,8 +477,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'gauche')
 
 !..Calculate the psi difference between these two points.
@@ -486,13 +486,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -545,7 +545,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*55')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(2,ipx),ipx)-1,ptsep(2,ipx),ipx), &
               & separy(nptot(ptsep(2,ipx),ipx)-1,ptsep(2,ipx),ipx), &
@@ -554,9 +554,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -570,8 +570,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'gauche')
 
 !..Calculate the psi difference between these two points.
@@ -579,13 +579,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -629,7 +629,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*64')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
               & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -638,9 +638,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -654,8 +654,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'gauche')
 
 !..Calculate the psi difference between these two points.
@@ -663,13 +663,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -773,7 +773,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*74')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(3,ptxext),ptxext)-1,ptsep(3,ptxext),ptxext), &
               & separy(nptot(ptsep(3,ptxext),ptxext)-1,ptsep(3,ptxext),ptxext), &
@@ -782,9 +782,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -798,8 +798,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'droite')
 
 !..Calculate the psi difference between these two points.
@@ -807,13 +807,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -855,7 +855,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*84')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
               & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -864,9 +864,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -880,8 +880,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'gauche')
 
 !..Calculate the psi difference between these two points.
@@ -889,13 +889,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -941,7 +941,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*94')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(4,ptxext),ptxext)-1,ptsep(4,ptxext),ptxext), &
               & separy(nptot(ptsep(4,ptxext),ptxext)-1,ptsep(4,ptxext),ptxext), &
@@ -950,9 +950,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -966,8 +966,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'gauche')
 
 !..Calculate the psi difference between these two points.
@@ -975,13 +975,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -1023,7 +1023,7 @@
 !..Direction of the sweep.
 
          call trc_stk_in('frtier','*98')
-         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), & 
+         sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
               & separy(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -1032,9 +1032,9 @@
 
 !..Call the subroutine to find the limiting level line
 
-         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) & 
-     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, & 
-     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, & 
+         CALL MARCHE(x0,y0,inddef(idef),fraplq,sens,nivx(1,idniv) &
+     &      ,nivy(1,idniv),nivtot(idniv),nbcrb,xt,yt,nt,stp0,stpmin, &
+     &      nx,ny,x,y,psi,nstruc,npstru,xstruc, &
      &      ystruc,a00,a10,a01,a11,indlim)
 
 !..Initialise the distances
@@ -1048,8 +1048,8 @@
          x2 = nivx(1,idniv)
          y2 = nivy(1,idniv)
 
-         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), & 
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) & 
+         distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
      &                      ,'gauche')
 
 !..Calculate the psi difference between these two points.
@@ -1057,13 +1057,13 @@
          ii = ifind(x0,x,nx,1)
          jj = ifind(y0,y,ny,1)
 
-         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + & 
+         psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
      &          a11(ii,jj,1)*x0*y0
 
          ii = ifind(x2,x,nx,1)
          jj = ifind(y2,y,ny,1)
 
-         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + & 
+         psi2 = a00(ii,jj,1) + a10(ii,jj,1)*x2 + a01(ii,jj,1)*y2 + &
      &          a11(ii,jj,1)*x2*y2
 
          distnv(2,idniv) = psi2 - psi0
@@ -1079,7 +1079,7 @@
           x0 = nivx(1,i)
           y0 = nivy(1,i)
           ii = ifind(x0,x,nx,1)
-          jj = ifind(y0,y,ny,1)          
+          jj = ifind(y0,y,ny,1)
           psi0 = a00(ii,jj,1) + a10(ii,jj,1)*x0 + a01(ii,jj,1)*y0 + &
                & a11(ii,jj,1)*x0*y0
           call logmsg(LOGDEBUG, "FRTIER: level line "//int2str(i)&

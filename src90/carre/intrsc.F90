@@ -2,6 +2,7 @@
 !***********************************************************************
       subroutine intrsc(x1,y1,x2,y2,vx,vy,n,x,y,iint,nint,sens)
 !***********************************************************************
+      use KindDefinitions
       implicit none
 
 !..  cette routine determine le point d'intersection entre un segment
@@ -9,11 +10,11 @@
 
 !  arguments
       integer n,iint(2),nint,sens
-      real*8 x1,y1,x2,y2,vx(n),vy(n),x(2),y(2)
+      real(rKind) :: x1,y1,x2,y2,vx(n),vy(n),x(2),y(2)
 
 !  variables locales
       integer i,i1,i2,ii
-      real*8 determ, mult1,mult2,zero,un,multmn,zx,zy
+      real(rKind) :: determ, mult1,mult2,zero,un,multmn,zx,zy
       parameter(zero=0.,un=1.)
 !  procedures
       integer tourne

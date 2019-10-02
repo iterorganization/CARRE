@@ -2,6 +2,7 @@
 !***********************************************************************
       INTEGER FUNCTION indcrb(vx,vy,n,x,y,d)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette fonction renvoie l'indice du point du debut du segment entre
@@ -18,11 +19,11 @@
 
 !  arguments
       INTEGER n
-      REAL*8 vx(n),vy(n),x,y,d
+      REAL(rKind) :: vx(n),vy(n),x,y,d
 
 !  variables locales
       INTEGER i
-      REAL*8 mumin, mu, ax, ay, bx, by, dist, eps,dd
+      REAL(rKind) :: mumin, mu, ax, ay, bx, by, dist, eps,dd
       PARAMETER (eps=1.E-6)
 
 !  procedures

@@ -1,6 +1,6 @@
-subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, & 
-     &           iptx,jptx,fctpx,separx,separy,nptot, & 
-     &           nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, & 
+subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
+     &           iptx,jptx,fctpx,separx,separy,nptot, &
+     &           nstruc,npstru,xstruc,ystruc,indplq,inddef,nbdef, &
      &           a00,a10,a01,a11,struct)
 
   !=======================================================================
@@ -23,22 +23,22 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
 #include <CARREDIM.F>
 
   !  arguments
-  integer nx,ny,npx,iptx(npx),jptx(npx), & 
-       &     nptot(4,npxmx),nstruc,npstru(strumx), & 
+  integer nx,ny,npx,iptx(npx),jptx(npx), &
+       &     nptot(4,npxmx),nstruc,npstru(strumx), &
        &     indplq(4,npxmx),inddef(nbdmx),nbdef
-  real*8 x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx), & 
-       &     fctpx(npxmx),separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), & 
-       &     xstruc(npstmx,strumx),ystruc(npstmx,strumx), & 
-       &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), & 
+  real(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),ptx(npxmx),pty(npxmx), &
+       &     fctpx(npxmx),separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
+       &     xstruc(npstmx,strumx),ystruc(npstmx,strumx), &
+       &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
        &     a01(nxmax,nymax,3),a11(nxmax,nymax,3)
   type(CarreStructures), intent(inout) :: struct
   ! FIXME/CLEANUP: remove/replace arguments also contained in struct
 
   !  variables locales
-  integer ipx,ix,jx,isep,i1,i2,j1,j2,iref,jref,k,idir, & 
+  integer ipx,ix,jx,isep,i1,i2,j1,j2,iref,jref,k,idir, &
        &  indstr,plaque,nbdfav,nt(2),ixp_hlp(nbdmx),idirloop
   double precision :: xin, yin, delta
-  real*8 xsttmp(nbdmx),ysttmp(nbdmx)
+  real(rKind) :: xsttmp(nbdmx),ysttmp(nbdmx)
   integer i,j     !!!
   integer incri(4),incrj(4),incrir(4),incrjr(4),ic
   data incri  /0, -1,  0,  1/,  incrj  / 1, 0, -1,  0/
@@ -46,8 +46,7 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
 
   !  procedures
   logical milieu
-  real*8 interp
-  intrinsic int,mod
+  real(rKind) :: interp
   external insert,interp,milieu,orddef
   !=======================================================================
 
@@ -164,11 +163,11 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
                       ysttmp(nbdef)=separy(k,isep,ipx)
                   endif !}
 
-                  ! If we hit a structure, 
+                  ! If we hit a structure,
                   ! from separatrix incidence direction derive "internal" and "external" side of target
                   ! (used for gridding with open target structures)
-                  
-                  ! compute an internal point by moving a small step from the strike point towards the X-point 
+
+                  ! compute an internal point by moving a small step from the strike point towards the X-point
                   if (indStr /= 0) then
                       delta = (x(2) - x(1)) * 0.1
                       xin = separx(k, isep, ipx) + (separx(k-1, isep, ipx) - separx(k, isep, ipx)) * delta
@@ -209,8 +208,8 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
   !  coordinates are at the end of ptx and pty (see routine SELPTX)
 
   ipx=npx+1
-  fctpx(ipx) = a00(ix,jx,1) + a10(ix,jx,1)*ptx(ipx) & 
-       &           + a01(ix,jx,1)*pty(ipx) & 
+  fctpx(ipx) = a00(ix,jx,1) + a10(ix,jx,1)*ptx(ipx) &
+       &           + a01(ix,jx,1)*pty(ipx) &
        &           + a11(ix,jx,1)*ptx(ipx)*pty(ipx)
 
   !*** Correct the actual number of targets and corresponding lists

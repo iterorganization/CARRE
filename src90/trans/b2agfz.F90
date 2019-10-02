@@ -24,6 +24,7 @@
 !***  - guard cells for disconnected double fixed
 !***  - data on grid size and cuts added to the grid header
 !======================================================================
+      use KindDefinitions
       use carre_constants
 
       implicit none
@@ -75,7 +76,7 @@
       integer ipol,irad,npol2g,npol2d, & 
      &  ireg,ix,iy,npol1,npol2,npol3,i
       integer :: cix, ciy
-      real*8 twopi,del,zero,one,tempo
+      real(rKind) :: twopi,del,zero,one,tempo
       parameter(del=1.e-2,zero=0.,one=1.)
       logical ex
       character equtype*20

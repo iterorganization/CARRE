@@ -1,5 +1,6 @@
 !=======================================================================
       subroutine ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmax,nymax)
+      use KindDefinitions
       implicit none
 !  cette routine ecrit la maille sous format DIVIMP. elle est identique
 !  a la routine mhdvmp de b2ag.F
@@ -13,15 +14,15 @@
 !
 !  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
+      real(rKind) :: crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), &
      &  bb(-1:nxmax,-1:nymax,0:3),b0r0
-      real*8 fpsi(-1:nxmax,-1:nymax,0:3)
+      real(rKind) :: fpsi(-1:nxmax,-1:nymax,0:3)
 !
 !  local variables
       integer ix,iy,cut1,cut2,cutrgn,icell
-      real*8 x0,y0,brat
-      real*8 psitarg
-      real*8 psimin_carre
+      real(rKind) :: x0,y0,brat
+      real(rKind) :: psitarg
+      real(rKind) :: psimin_carre
 !
 !     Read in the rzpsi.dat file to get the reference PSI values - in particular
 !     the minimum value of PSI on the grid.
@@ -38,7 +39,7 @@
       cut2=0
       do iy=ny-1,0,-1
       do ix=0,nx-2
-        if(crx(ix,iy,1).ne.crx(ix+1,iy,0) .or. & 
+        if(crx(ix,iy,1).ne.crx(ix+1,iy,0) .or. &
      &     cry(ix,iy,1).ne.cry(ix+1,iy,0)) then
           if(cut1.eq.0) then
             cut1=ix+1
@@ -65,10 +66,10 @@
 !jde  - past the cuts - thus add one to cut2
 !
       write(0,104)ny,nx,cutrgn,cut1,cut2+1
- 104  format('''DIV  - grid characteristics: Number of Rings     ''',i7/ & 
-     &       '''                             Number of Knots     ''',i7/ & 
-     &       '''                             Cut ring            ''',i7/ & 
-     &       '''                             Cut point 1         ''',i7/ & 
+ 104  format('''DIV  - grid characteristics: Number of Rings     ''',i7/ &
+     &       '''                             Number of Knots     ''',i7/ &
+     &       '''                             Cut ring            ''',i7/ &
+     &       '''                             Cut point 1         ''',i7/ &
      &       '''                             Cut point 2         ''',i7)
 
       write(nfin,106) ny,cutrgn,nx,cut1,cut2
@@ -79,8 +80,8 @@
 !  3.   print mesh parameters
       icell=0
       write(nfin,100)
- 100  format(3x,'Element output:'/// & 
-     &  3x,'==================================================' & 
+ 100  format(3x,'Element output:'/// &
+     &  3x,'==================================================' &
      &    ,'======================================')
 !jde  We wish to include boundary cells
 !jde  thus the indices run from -1 to nx and -1 to ny
@@ -93,21 +94,21 @@
 !  2.2  calculate magnetic field ratio
         brat=bb(ix,iy,0)/bb(ix,iy,3)
 !  2.3  print divimp input data
-        write(nfin,101)icell,ix,iy,crx(ix,iy,2),cry(ix,iy,2), & 
+        write(nfin,101)icell,ix,iy,crx(ix,iy,2),cry(ix,iy,2), &
      &    crx(ix,iy,3),cry(ix,iy,3)
- 101    format(3x,'Element',i5,' = (',i3,',',i3,'): (', & 
-     &    1pe17.10,',',1pe17.10,')', & 
+ 101    format(3x,'Element',i5,' = (',i3,',',i3,'): (', &
+     &    1pe17.10,',',1pe17.10,')', &
      &    6x,'(',1pe17.10,',',1pe17.10,')')
         write(nfin,102)abs(brat),x0,y0
- 102    format(3x,'Field ratio  = ',1pe17.10,13x, & 
+ 102    format(3x,'Field ratio  = ',1pe17.10,13x, &
      &    '(',1pe17.10,',',1pe17.10,')')
-        write(nfin,103)crx(ix,iy,0),cry(ix,iy,0), & 
+        write(nfin,103)crx(ix,iy,0),cry(ix,iy,0), &
      &    crx(ix,iy,1),cry(ix,iy,1)
- 103    format( & 
-     &    t30,'(',1pe17.10,',',1pe17.10,')', & 
+ 103    format( &
+     &    t30,'(',1pe17.10,',',1pe17.10,')', &
      &    6x,'(',1pe17.10,',',1pe17.10,')')
         write(nfin,105)
- 105    format(3x,'--------------------------------------------------' & 
+ 105    format(3x,'--------------------------------------------------' &
      &    ,'--------------------------------------')
 
       enddo
@@ -128,10 +129,10 @@
       ix =0
       do iy=0,ny-1
 
-         psitarg=((fpsi(ix,iy,0)+fpsi(ix,iy,2))/2.0)/ & 
+         psitarg=((fpsi(ix,iy,0)+fpsi(ix,iy,2))/2.0)/ &
      &            (-psimin_carre)+1.0
-         write(nfin,108) ix+1,iy+1,psitarg, & 
-     &          (crx(ix,iy,0)+crx(ix,iy,2))/2.0, & 
+         write(nfin,108) ix+1,iy+1,psitarg, &
+     &          (crx(ix,iy,0)+crx(ix,iy,2))/2.0, &
      &          (cry(ix,iy,0)+cry(ix,iy,2))/2.0
 
       end do
@@ -143,10 +144,10 @@
       ix =nx-1
       do iy=0,ny-1
 
-         psitarg=((fpsi(ix,iy,1)+fpsi(ix,iy,3))/2.0)/ & 
+         psitarg=((fpsi(ix,iy,1)+fpsi(ix,iy,3))/2.0)/ &
      &            (-psimin_carre)+1.0
-         write(nfin,108) ix+1,iy+1,psitarg, & 
-     &          (crx(ix,iy,0)+crx(ix,iy,2))/2.0, & 
+         write(nfin,108) ix+1,iy+1,psitarg, &
+     &          (crx(ix,iy,0)+crx(ix,iy,2))/2.0, &
      &          (cry(ix,iy,0)+cry(ix,iy,2))/2.0
 
       end do
@@ -162,12 +163,12 @@ contains
 
       subroutine get_psimin_carre(psimin_carre)
       implicit none
-      real*8 psimin_carre
+      real(rKind) :: psimin_carre
 
       character lign80*80
       integer nx,ny,i,j
       integer ierror,iflag
-      REAL*8 x(nxmax), y(nymax), psi(nxmax,nymax)
+      REAL(rKind) :: x(nxmax), y(nymax), psi(nxmax,nymax)
 
       ierror = 0
       iflag = 0
@@ -216,4 +217,4 @@ contains
     end subroutine get_psimin_carre
 
   end subroutine ecrim5
-      
+

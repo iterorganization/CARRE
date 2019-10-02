@@ -311,11 +311,6 @@ contains
     type(CarreEquilibrium), intent(inout) :: equ
     type(CarreStructures), intent(in) :: struct
     
-    ! internal
-    ! How many points to grow the vessel region
-    integer, parameter :: REGION_GROW_COUNT = 2
-    integer :: iGrow
-
     ! We do inside/outside detection on the cartesian psi grid. 
 
     ! First compute intersection of all faces in the psi grid with the structures

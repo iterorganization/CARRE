@@ -2,17 +2,18 @@
 !***********************************************************************
       LOGICAL FUNCTION trvers(x1,y1,x2,y2,vx,vy,n)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette fonction nous dit si le segment de 1 a 2 traverse la courbe v
 
 !  arguments
       INTEGER n
-      REAL*8 x1,y1,x2,y2,vx(n),vy(n)
+      REAL(rKind) :: x1,y1,x2,y2,vx(n),vy(n)
 
 !  variables locales
       INTEGER i
-      REAL*8 determ, mult1,mult2,zero,un
+      REAL(rKind) :: determ, mult1,mult2,zero,un
       parameter(zero=0.,un=1.)
 
 !=========================

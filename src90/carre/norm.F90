@@ -1,13 +1,15 @@
 
 !***********************************************************************
-      REAL*8 FUNCTION norm(x0,x1)
+      FUNCTION norm(x0,x1)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
+      REAL(rKind) :: norm
 
 ! Compute euclidean norm of vector
 
 !  arguments
-      REAL*8 x0,x1
+      REAL(rKind) :: x0,x1
 
 !  local variables
 

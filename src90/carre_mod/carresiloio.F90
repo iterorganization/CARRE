@@ -184,6 +184,7 @@ contains
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(in), optional :: grid       
 
+#ifdef USE_SILO
     ! internal
     integer :: iReg, iFace, iRad
 
@@ -193,7 +194,6 @@ contains
     integer :: ixpoint, ibranch
     integer :: is, np
 
-#ifdef USE_SILO
     call csioOpenFile(filename)
 
     ! write equilibrium data

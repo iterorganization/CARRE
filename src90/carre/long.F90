@@ -1,19 +1,21 @@
 
 !***********************************************************************
-      REAL*8 FUNCTION long(vx,vy,n)
+      FUNCTION long(vx,vy,n)
 !***********************************************************************
+      use KindDefinitions, only : rKind
       IMPLICIT NONE
+      REAL(rKind) :: long
 
 !..  Cette fonction calcule la distance totale que parcourt une courbe v
 !  de n points.
 
 !  arguments
       INTEGER n
-      REAL*8 vx(n),vy(n)
+      REAL(rKind) :: vx(n),vy(n)
 
 !  variables locales
       INTEGER i
-      REAL*8 dist
+      REAL(rKind) :: dist
 
 !  procedures
       INTRINSIC SQRT

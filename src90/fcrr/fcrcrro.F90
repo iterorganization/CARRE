@@ -5,16 +5,17 @@
 !======================================================================
 !*** Create the input file for Carre
 !======================================================================
+      use KindDefinitions
       implicit none
       character ofile*(*)
 #include <FCRCOM.F>
-      integer*4 niscl,nrscl
+      integer(Short) :: niscl,nrscl
       parameter (niscl=2, nrscl=4)
 !*** niscl : number of integer scalar parameters in the Carre input
 !*** nrscl : number of real scalar parameters in the Carre input
       integer i,j
-      integer iprmeq(niscl)
-      real rprmeq(nrscl)
+      integer(Short) ::  iprmeq(niscl)
+      real(Single) :: rprmeq(nrscl)
       equivalence (iprmeq,repart), (rprmeq,relax)
       character*8 chiprm(niscl),chrprm(nrscl)
       data chiprm / 'repart  ','nrelax  '/
@@ -46,9 +47,9 @@
       write(2,'(a)') '$end'
       close(2)
 !======================================================================
-  700 format(a,3h = ,i5)
+  700 format(a,' = ',i5)
   710 format(a,'(',i1,') = ',i5)
-  720 format(a,3h = ,1p,e15.7)
+  720 format(a,' = ',1p,e15.7)
   730 format(a,'(',i1,') = ',1p,e15.7)
 !======================================================================
       end

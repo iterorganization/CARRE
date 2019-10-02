@@ -48,7 +48,10 @@ EXT_DEBUG = .debug
 endif
 
 OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
+B2OBJ  = $(SOLPSTOP)/modules/B2.5/builds/couple_SOLPS-ITER.$(HOST_NAME).$(COMPILER)$(EXT_OPENMP)$(EXT_MPI)$(EXT_IMPGYRO)$(EXT_DEBUG)
+B2SRC  = $(SOLPSTOP)/modules/B2.5/src
 SRCLOCAL = $(PWD)/src.local
+B2INCLUDE = -I${B2SRC}/include.local -I${B2SRC}/include -I${B2SRC}/common
 
 CARRE_NONINTERACTIVE = -DCARRE_NONINTERACTIVE
 
@@ -80,7 +83,8 @@ VHEAD   =${SRCLOCAL}:
 endif
 FPATH   = ${VHEAD}${SRCDIR}/carre_mod:${SRCDIR}/carre:${SRCDIR}/dummy:${SRCDIR}/usol:${SRCDIR}/itm_shared
 GPATH   = ${SRCDIR}/cntour:${SRCDIR}/graphe
-VPATH   = ${VHEAD}${SRCDIR}/carre_mod:${SRCDIR}/carre:${SRCDIR}/dummy:${SRCDIR}/usol:${SRCDIR}/carre_shared:${SRCDIR}/itm_shared:${SRCDIR}/cntour:${SRCDIR}/graphe
+B2PATH  = ${SRCDIR}/b2_shared_itm:${SRCDIR}/carre_shared
+VPATH   = ${VHEAD}${FPATH}:${GPATH}:${B2PATH}
 
 ALLTARGETS = ${OBJDIR}/${PROG}
 EXCLUDELIS = carre.o bidon.o
@@ -92,9 +96,9 @@ ALLTARGETS += ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR}
 EXCLUDELIS += tradui.o fcrr.o fcrblkd.o
 endif
 
-MODLIST = ${SRCDIR}/carre_mod/*.F90 ${SRCDIR}/usol/*.f90
+MODLIST = ${SRCDIR}/carre_mod/*.F90 ${SRCDIR}/usol/*.f90 ${SRCDIR}/itm_shared/*.f90 ${SRCDIR}/b2_shared_itm/*.F90
 
-DEFINES = -DBUILDING_CARRE ${CARRE_NONINTERACTIVE}
+DEFINES += -DBUILDING_CARRE ${CARRE_NONINTERACTIVE}
 
 INCLUDE = -I ${SRCDIR}/include
 
@@ -102,6 +106,7 @@ include ${OBJDIR}/LISTOBJ
 
 DEST = $(OBJS:%.o=$(OBJDIR)/%.o) $(OBJSL90:%.o=$(OBJDIR)/%.o) $(OBJSU90:%.o=$(OBJDIR)/%.o)
 GDEST = $(GOBJS:%.o=$(OBJDIR)/%.o)
+B2DEST = $(B2OBJS:%.o=$(OBJDIR)/%.o)
 MAINLIST = $(EXCLUDELIS:.=\.)
 LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
@@ -176,9 +181,9 @@ ${OBJDIR}/${PROG} ${OBJDIR}/.nox: ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${OBJDI
 	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG} ${OBJDIR}/carre.o ${OBJDIR}/libcarre.a ${OBJDIR}/bidon.o ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS} && touch ${OBJDIR}/.nox
 endif
 
-${OBJDIR}/${PROG_TRA}: ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a $(MAKES)
+${OBJDIR}/${PROG_TRA}: ${OBJDIR}/tradui.o ${OBJDIR}/bidon.o ${OBJDIR}/libcarre.a ${OBJDIR}/libb25.a $(MAKES)
 	rm -f ${OBJDIR}/${PROG_TRA} 2> /dev/null; \
-	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_TRA} ${OBJDIR}/tradui.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
+	${FC} $(FFLAGS) -o ${OBJDIR}/${PROG_TRA} ${OBJDIR}/tradui.o ${OBJDIR}/bidon.o ${OBJDIR}/libb25.a ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA) ${USOLLIBS}
 
 ${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a $(MAKES)
 	rm -f ${OBJDIR}/${PROG_FCRR} 2> /dev/null; \
@@ -193,8 +198,12 @@ ${OBJDIR}/libgcarre.a: ${GDEST} ${MAKES}
 	@ar rucv $@ ${GDEST}
 	ranlib $@
 
+${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_ual.${MOD} ${OBJDIR}/b2agfs.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/ipmain.o ${OBJDIR}/lwimai.o ${OBJDIR}/lwmain.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/subsys.o ${OBJDIR}/xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+	@ar rucv $@ ${B2DEST} ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2agfs.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/ipmain.o ${OBJDIR}/lwimai.o ${OBJDIR}/lwmain.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/subsys.o ${OBJDIR}/xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+	ranlib $@
+
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/*.f90 ${OBJDIR}/*.mod ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/*.f90 ${OBJDIR}/*.mod ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ $SRCDIR}/b25_links/*.F90
 
 neat:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
@@ -211,7 +220,7 @@ TAGS:	tags
 tags:
 	rm -f TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` || touch TAGS
 
-depend: ${OBJS:.o=.F} ${GOBJS:.o=.F90} ${EXCLUDELIS:.o=.F90} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90} 
+depend: ${OBJS:.o=.F} ${GOBJS:.o=.F90} ${B2OBJS:.o=.F90} ${EXCLUDELIS:.o=.F90} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90}
 	@makedepend ${DEFINES} -f- ${INCLUDE} $^ | \
 	sed -e 's|${SRCDIR}/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
@@ -260,6 +269,14 @@ listobj:
 		E="$$E -e 's/ $$f//'"; \
 	done; \
 	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+	@lll="B2OBJS ="; \
+	for d in `echo "$(B2PATH)" | tr : \ `; do \
+		lll="$$lll `find $$d -name '*.F90' -printf "%f "`"; \
+	done; \
+	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
+		E="$$E -e 's/ $$f//'"; \
+	done; \
+	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
 
 ${OBJDIR}/LISTOBJ: listobj ${ITM_SRC_PREREQS}
 
@@ -277,6 +294,179 @@ ${OBJDIR}/dependencies.${COMPILER}:
 	${MAKE} tags
 	${MAKE} listobj
 	${MAKE} depend
+
+ifdef SOLPS_CPP
+${OBJDIR}/b2agfs.o: ${B2SRC}/preprocessing/b2agfs.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_indirect.${MOD}
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/preprocessing/b2agfs.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2agfs.F ${OBJDIR}/b2agfs.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2agfs.o ${OBJDIR}/b2agfs.f
+
+${OBJDIR}/b2xvsg.o: ${B2SRC}/b2aux/b2xvsg.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/b2aux/b2xvsg.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2xvsg.F ${OBJDIR}/b2xvsg.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2xvsg.o ${OBJDIR}/b2xvsg.f
+
+${OBJDIR}/chcase.o: ${B2SRC}/utility/chcase.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/chcase.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/chcase.F ${OBJDIR}/chcase.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/chcase.o ${OBJDIR}/chcase.f
+
+${OBJDIR}/ifill.o: ${B2SRC}/utility/ifill.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/ifill.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/ifill.F ${OBJDIR}/ifill.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/ifill.o ${OBJDIR}/ifill.f
+
+${OBJDIR}/ipgeti.o: ${B2SRC}/utility/ipgeti.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/ipgeti.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/ipgeti.F ${OBJDIR}/ipgeti.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgeti.f
+
+${OBJDIR}/ipgetr.o: ${B2SRC}/utility/ipgetr.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/ipgetr.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/ipgetr.F ${OBJDIR}/ipgetr.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/ipgetr.o ${OBJDIR}/ipgetr.f
+
+${OBJDIR}/ipmain.o: ${B2SRC}/utility/ipmain.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/ipmain.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/ipmain.F ${OBJDIR}/ipmain.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/ipmain.o ${OBJDIR}/ipmain.f
+
+${OBJDIR}/lwimai.o: ${B2SRC}/utility/lwimai.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/lwimai.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/lwimai.F ${OBJDIR}/lwimai.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/lwimai.o ${OBJDIR}/lwimai.f
+
+${OBJDIR}/lwmain.o: ${B2SRC}/utility/lwmain.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/lwmain.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/lwmain.F ${OBJDIR}/lwmain.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/lwmain.o ${OBJDIR}/lwmain.f
+
+${OBJDIR}/open_file.o: ${B2SRC}/utility/open_file.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/open_file.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/open_file.F ${OBJDIR}/open_file.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/open_file.o ${OBJDIR}/open_file.f
+
+${OBJDIR}/prvrt.o: ${B2SRC}/utility/prvrt.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/prvrt.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/prvrt.F ${OBJDIR}/prvrt.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrt.f
+
+${OBJDIR}/prvrti.o: ${B2SRC}/utility/prvrti.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/prvrti.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/prvrti.F ${OBJDIR}/prvrti.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/prvrti.o ${OBJDIR}/prvrti.f
+
+${OBJDIR}/sfill.o: ${B2SRC}/utility/sfill.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/sfill.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/sfill.F ${OBJDIR}/sfill.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/sfill.o ${OBJDIR}/sfill.f
+
+${OBJDIR}/smax.o: ${B2SRC}/utility/smax.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/smax.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/smax.F ${OBJDIR}/smax.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/smax.o ${OBJDIR}/smax.f
+
+${OBJDIR}/smin.o: ${B2SRC}/utility/smin.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/smin.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/smin.F ${OBJDIR}/smin.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/smin.o ${OBJDIR}/smin.f
+
+${OBJDIR}/streql.o: ${B2SRC}/utility/streql.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/streql.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/streql.F ${OBJDIR}/streql.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/streql.o ${OBJDIR}/streql.f
+
+${OBJDIR}/subsys.o: ${B2SRC}/utility/subsys.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/subsys.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/subsys.F ${OBJDIR}/subsys.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/subsys.o ${OBJDIR}/subsys.f
+
+${OBJDIR}/xerset.o: ${B2SRC}/utility/xerset.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/xerset.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/xerset.F ${OBJDIR}/xerset.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/xerset.o ${OBJDIR}/xerset.f
+
+${OBJDIR}/xertst.o: ${B2SRC}/utility/xertst.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/xertst.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/xertst.F ${OBJDIR}/xertst.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/xertst.o ${OBJDIR}/xertst.f
+
+${OBJDIR}/xerrab.o: ${B2SRC}/utility/xerrab.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/xerrab.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/xerrab.F ${OBJDIR}/xerrab.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/xerrab.o ${OBJDIR}/xerrab.f
+
+${OBJDIR}/b2mod_connectivity.${MOD}: ${B2SRC}/ids/b2mod_connectivity.F90 ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_types.${MOD}
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_connectivity.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_connectivity.F90 ${OBJDIR}/b2mod_connectivity.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_connectivity.f90
+
+${OBJDIR}/b2mod_grid_mapping.${MOD}: ${B2SRC}/ids/b2mod_grid_mapping.F90
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_grid_mapping.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_grid_mapping.F90 ${OBJDIR}/b2mod_grid_mapping.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
+
+${OBJDIR}/b2mod_ual_io_grid.${MOD}: ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD}
+	ln -sf ${B2OBJ}/b2mod_ual_io_grid.${MOD} ${OBJDIR}/
+
+${OBJDIR}/b2mod_constants.${MOD}:
+	ln -sf ${B2OBJ}/b2mod_constants.${MOD} ${OBJDIR}/
+
+${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_indirect.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_indirect.F ${OBJDIR}/b2mod_indirect.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_indirect.f
+
+${OBJDIR}/b2mod_b2cmfs.${MOD}: ${B2SRC}/modules/b2mod_b2cmfs.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_b2cmfs.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_b2cmfs.F ${OBJDIR}/b2mod_b2cmfs.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmfs.f
+
+${OBJDIR}/b2mod_silo.${MOD}:
+	ln -sf ${B2OBJ}/b2mod_silo.${MOD} ${OBJDIR}/
+
+${OBJDIR}/b2mod_cellhelper.${MOD}: ${B2SRC}/ids/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_types.${MOD}
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_cellhelper.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_cellhelper.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_cellhelper.f90
+
+${OBJDIR}/b2mod_types.${MOD}: ${B2SRC}/modules/b2mod_types.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_types.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_types.F ${OBJDIR}/b2mod_types.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_types.f
+
+${OBJDIR}/b2mod_ual.${MOD}: ${B2SRC}/ids/b2mod_ual.F90
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_ual.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_ual.F90 ${OBJDIR}/b2mod_ual.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2mod_ual.f90
+endif
 
 include ${OBJDIR}/dependencies.${COMPILER}
 

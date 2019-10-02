@@ -2,20 +2,21 @@
 !***********************************************************************
       SUBROUTINE GRAD0(equ,nxmax,nymax,gradmx)
 !***********************************************************************
-        use carre_types
-        IMPLICIT NONE
+      use KindDefinitions
+      use carre_types
+      IMPLICIT NONE
 
 !..  Cette sous-routine verifie pour chaque carre si il y a intersection
 !  entre les lignes de niveau psidx=0 et psidy=0 et si oui elle garde
 !  les coordonnees en memoire.
 
 !  arguments
-        type(CarreEquilibrium), intent(inout) :: equ
-        INTEGER nxmax,nymax,gradmx
+      type(CarreEquilibrium), intent(inout) :: equ
+      INTEGER nxmax,nymax,gradmx
 
 !  variables locales
       INTEGER i, j
-      REAL*8 aa,bb,cc,x1,x2,y1,y2
+      REAL(rKind) :: aa,bb,cc,x1,x2,y1,y2
 
 !  procedures
       INTRINSIC SQRT

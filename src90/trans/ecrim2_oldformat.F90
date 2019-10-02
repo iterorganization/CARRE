@@ -6,11 +6,12 @@
 !*** This routine writes the grid from carre directly in the B2.5 format
 ! by Heimo Buerbaumer
 !======================================================================
+      use KindDefinitions
       implicit none
 !
 !  arguments
       integer nfin,nx,ny,nxmax,nymax
-      real*8 crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), &
+      real(rKind) :: crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), &
            bb(-1:nxmax,-1:nymax,0:3)
 !
 !  local variables

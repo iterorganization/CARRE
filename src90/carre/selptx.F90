@@ -1,10 +1,10 @@
-SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, & 
+SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
     &                  pty,iptx,jptx,xpto,ypto,racord,limcfg,par)
   !
   !  version : 07.02.99 22:05
   !
   !======================================================================
-
+  use KindDefinitions
   use carre_types
 
   IMPLICIT NONE
@@ -21,9 +21,9 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
 #include <CARREDIM.F>
 
   !  arguments
-  INTEGER npxtot,npx,ii(gradmx),jj(gradmx),iptx(npxmx), & 
-      &        jptx(npxmx),limcfg,ios
-  REAL*8 pointx(gradmx),pointy(gradmx),ptx(npxmx),pty(npxmx), & 
+  INTEGER npxtot,npx,ii(gradmx),jj(gradmx),iptx(npxmx), &
+      &        jptx(npxmx),limcfg
+  REAL(rKind) :: pointx(gradmx),pointy(gradmx),ptx(npxmx),pty(npxmx), &
       &       xpto,ypto
   LOGICAL racord
   type(CarreParameters), intent(in) :: par
@@ -34,8 +34,8 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
 
   !  variables locales
   INTEGER i, j, k, ipx, ipo, iptxtm, jptxtm
-  REAL*8 ptxtmp,ptytmp,eps_hlp
-  CHARACTER rep*1, ch*2
+  REAL(rKind) :: ptxtmp,ptytmp,eps_hlp
+  CHARACTER rep*1
   !*** Tolerance for coinciding X-points
   parameter (eps_hlp=1.e-5)
   !ank-970701 <<<
@@ -67,11 +67,11 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
   integer nptxm,nptx,lun,lconn
   parameter (nptxm=2)
   integer kptx(nptxm)
-  real*8 xptxm(nptxm),yptxm(nptxm),xptom,yptom, & 
+  real(rKind) :: xptxm(nptxm),yptxm(nptxm),xptom,yptom, &
       &                         xpttol,xptdist(gradmx),rdist,x1,x2,y1,y2
   !      parameter (xpttol=5.e-2)
   logical ex,op
-  logical :: havePredefinedXPoints 
+  logical :: havePredefinedXPoints
   !ank>>>
   !======================================================================
   !.. npxtot: nombre de points ou le gradient est nul.
@@ -144,7 +144,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
               goto 11
           else
               write(*,*) 'Too many X-points specified in selptx.inf: ',nptx
-              write(*,*) 'Check the specification or the nptxm parameter ', & 
+              write(*,*) 'Check the specification or the nptxm parameter ', &
                   &                                                    'in selptx.F'
               ex=.false.
           end if
@@ -153,7 +153,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
           go to 20
 14        write(*,*) 'selptx: error reading the data from selptx.inf'
           ex=.false.
-11        continue ! Finished reading selptx.inf file          
+11        continue ! Finished reading selptx.inf file
           close(lun)
       end if ! selptx.inf file exists
   end if
@@ -178,13 +178,13 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
       !
       k=0
       do i=1,npxtot
-          if(abs(xptom-pointx(i)).le.xptdist(i) .and. & 
+          if(abs(xptom-pointx(i)).le.xptdist(i) .and. &
               &                         abs(yptom-pointy(i)).le.xptdist(i)) then
               if(k.eq.0) then
                   k=i
-              else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k)) & 
+              else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k)) &
                   &                                         .gt.eps_hlp) then
-                  write(*,*) 'Ambiguous definition of the O-point: ', & 
+                  write(*,*) 'Ambiguous definition of the O-point: ', &
                       &                         'points ',k,'  and ',i,'  are too close'
                   havePredefinedXPoints=.false.
                   go to 20
@@ -192,7 +192,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
           end if
       end do
       if(k.eq.0) then
-          write(*,*) 'No O-point identified - ', & 
+          write(*,*) 'No O-point identified - ', &
               &                                       'check the specification!'
           havePredefinedXPoints=.false.
           go to 20
@@ -201,13 +201,13 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
       do j=1,nptx
           k=0
           do i=1,npxtot
-              if(abs(xptxm(j)-pointx(i)).le.xptdist(i) .and. & 
+              if(abs(xptxm(j)-pointx(i)).le.xptdist(i) .and. &
                   &                      abs(yptxm(j)-pointy(i)).le.xptdist(i)) then
                   if(k.eq.0) then
                       k=i
-                  else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k)) & 
+                  else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k)) &
                       &                                         .gt.eps_hlp) then
-                      write(*,*) 'Ambiguous definition of the X-point', & 
+                      write(*,*) 'Ambiguous definition of the X-point', &
                           &                     j,': points ',k,'  and ',i,'  are too close'
                       havePredefinedXPoints=.false.
                       go to 20
@@ -215,20 +215,20 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
               end if
           end do
           if(k.eq.0) then
-              write(*,*) 'No X-point ',j,' identified - ', & 
+              write(*,*) 'No X-point ',j,' identified - ', &
                   &                                       'check the specification!'
               havePredefinedXPoints=.false.
               go to 20
           end if
           if(k.eq.ipo) then
-              write(*,*) 'Ambiguous definition of the X-point', & 
+              write(*,*) 'Ambiguous definition of the X-point', &
                   &                              j,': the same as the plasma center'
               havePredefinedXPoints=.false.
               go to 20
           end if
           do i=1,j-1
               if(k.eq.kptx(j)) then
-                  write(*,*) 'Ambiguous definition of the X-point', & 
+                  write(*,*) 'Ambiguous definition of the X-point', &
                       &                                  j,': the same as the X-point',i
                   havePredefinedXPoints=.false.
                   go to 20
@@ -241,10 +241,10 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
       !*** Ask for confirmation.
       !
       write(*,*) 'Pre-selected points are identified.'
-      write(*,'(1x,a9,1p,2e14.4)') & 
+      write(*,'(1x,a9,1p,2e14.4)') &
           &                            'O-point: ',pointx(ipo),pointy(ipo)
       if(nptx.gt.0) then
-          write(*,'(1x,a9,1p,2e14.4/(10x,2e14.4))') & 
+          write(*,'(1x,a9,1p,2e14.4/(10x,2e14.4))') &
               &           'X-point: ',(pointx(kptx(i)),pointy(kptx(i)),i=1,nptx)
           if(nptx.gt.1) then
               if(lconn.gt.0) then
@@ -297,21 +297,21 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
       !-langue
       if(sellan(1:8).eq.'francais') then
           WRITE(6,25) (i,pointx(i),pointy(i), i=1, npxtot)
-25        FORMAT ('     Voici la liste des points de gradient zero:'/ & 
-              &        '     -------------------------------------------'/ & 
-              &  '  #',T10,' R=',T25,' Z='/ & 
+25        FORMAT ('     Voici la liste des points de gradient zero:'/ &
+              &        '     -------------------------------------------'/ &
+              &  '  #',T10,' R=',T25,' Z='/ &
               &         (I3, T10, 1pe12.5, T25, 1pe12.5))
           write(6,*)'  0   pour terminer la selection'
           write(6,*)' -1   pour une configuration limiteur'
-          write(6,*)' Pour une configuration deflecteur, selectionnez', & 
+          write(6,*)' Pour une configuration deflecteur, selectionnez', &
               &    ' le ou les points X.'
 
           !       write(6,*)' Choisissez en donnant l''indice approprie.'
       elseif(sellan(1:7).eq.'english') then
           WRITE(6,225) (i,pointx(i),pointy(i), i=1, npxtot)
-225       FORMAT ('       List of points where grad-psi vanishes:'/ & 
-              &        '     -------------------------------------------'/ & 
-              &  '  #',T10,' R=',T25,' Z='/ & 
+225       FORMAT ('       List of points where grad-psi vanishes:'/ &
+              &        '     -------------------------------------------'/ &
+              &  '  #',T10,' R=',T25,' Z='/ &
               &         (I3, T10, 1pe12.5, T25, 1pe12.5))
           write(6,*)'  0   to stop selection'
           write(6,*)' -1   for a limiter configuration'
@@ -386,10 +386,10 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
           racord = lconn.gt.0
       else
           if(sellan(1:8).eq.'francais') then
-              write(6,*) & 
+              write(6,*) &
                   &       ' Voulez-vous que les points X soient raccordes? (o/n)'
           else if(sellan(1:7).eq.'english') then
-              write(6,*) 'Do you wish to force connection ', & 
+              write(6,*) 'Do you wish to force connection ', &
                   &                              'of the two X-points (y/n)?'
           end if
           read(5,35) rep

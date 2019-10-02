@@ -1,6 +1,7 @@
 !***********************************************************************
       INTEGER FUNCTION ifind(x,t,n,inc)
 !***********************************************************************
+      use KindDefinitions
       IMPLICIT NONE
 
 !..  Cette fonction retourne l'indice i tel que t(i)<=x<t(i+1) sur un
@@ -9,7 +10,7 @@
 
 !  arguments
       INTEGER n,inc
-      REAL*8 x, t(n)
+      REAL(rKind) :: x, t(n)
 
 !  variables locales
       INTEGER j, jp

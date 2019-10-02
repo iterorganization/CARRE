@@ -3,6 +3,7 @@
 !  version : 07.07.97 20:32
 !
 !======================================================================
+      use KindDefinitions
       implicit none
 !  lignes de niveau pour les deux fonctions f1=0 et f2=0
 !
@@ -13,7 +14,7 @@
 
 !  arguments
       integer n1,n2
-      real*8 f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
+      real(rKind) :: f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
 !
 !  variables en common
 #include <PERIM.F>
@@ -32,10 +33,11 @@
 !  1.   premier tableau
 !
 !  1.1  copie des variables double a simple precision
-      do 2 i1=1,n1
-      do 2 i2=1,n2
-      y(i1,i2)=f1(i1,i2)
-2     continue
+      do i1=1,n1
+        do i2=1,n2
+          y(i1,i2)=f1(i1,i2)
+        end do
+      end do
 !
 !  1.2  on trace les lignes de niveau
 !
@@ -90,10 +92,11 @@
 !
 !  2.   deuxieme tableau
 !  2.1  copie des variables double a simple precision
-      do 4 i1=1,n1
-      do 4 i2=1,n2
-      y(i1,i2)=f2(i1,i2)
-4     continue
+      do i1=1,n1
+        do i2=1,n2
+          y(i1,i2)=f2(i1,i2)
+        end do
+      end do
 !
 !  2.2  on trace les lignes de niveau
 !
