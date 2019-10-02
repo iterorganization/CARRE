@@ -25,7 +25,7 @@
 !
 !  variables locales
       integer ll
-      real zx(2),zy(2),xmi,xma,ymi,yma,etalx,etaly
+      real(Single) :: zx(2),zy(2),xmi,xma,ymi,yma,etalx,etaly
 !
 !  procedures
       INTRINSIC ABS,MAX
@@ -34,10 +34,10 @@
 !  preliminary definition of the frame
       call cadre
 !  DEFINE THE ARRAYS CONTAINING THE EXTREMA
-      ZX(1)=XMIN
-      ZX(2)=XMAX
-      ZY(1)=YMIN
-      ZY(2)=YMAX
+      ZX(1)=real(XMIN,Single)
+      ZX(2)=real(XMAX,Single)
+      ZY(1)=real(YMIN,Single)
+      ZY(2)=real(YMAX,Single)
 ! Specify the box
       CALL AGSETF('GRID/LEFT.',x1a)
       CALL AGSETF('GRID/RIGHT.',x1b)

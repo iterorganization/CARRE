@@ -18,7 +18,7 @@
       integer i,nin,k,npmx,np
 !      parameter(npmx=100)
       parameter(npmx=npstmx)
-      real x(npmx),y(npmx),xmin,xmax,ymin,ymax
+      real(Single) :: x(npmx),y(npmx),xmin,xmax,ymin,ymax
       character echx*3,echy*3
 !
 !  procedures
@@ -30,10 +30,10 @@
       nin=1
 !
 !  copie de variables double precision a simple precision
-      xmin=x1
-      xmax=x2
-      ymin=y1
-      ymax=y2
+      xmin=real(x1,Single)
+      xmax=real(x2,Single)
+      ymin=real(y1,Single)
+      ymax=real(y2,Single)
 !
 !     CALL newpag(xmin, xmax, ymin, ymax, 'R (m)$', 'Z (m)$', ' ',
 !    +     echx, echy)
@@ -42,14 +42,14 @@
          if(npstru(k).lt.0) then
             np=-npstru(k)
             do 70 i=1,np
-               x(i)=xstruc(i,k)
-               y(i)=ystruc(i,k)
+               x(i)=real(xstruc(i,k),Single)
+               y(i)=real(ystruc(i,k),Single)
    70       continue
          else
             np=npstru(k)
             do 75 i=1,np
-               x(i)=xstruc(i,k)
-               y(i)=ystruc(i,k)
+               x(i)=real(xstruc(i,k),Single)
+               y(i)=real(ystruc(i,k),Single)
    75       continue
             if(x(1).ne.x(np) .or. y(1).ne.y(np)) then
                np=np+1

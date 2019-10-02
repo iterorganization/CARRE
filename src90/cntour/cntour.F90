@@ -21,7 +21,7 @@
 !
 !  variables locales
       integer iwrk(1000),i1,i2,ll
-      real y(nxmax,nymax),rwrk(5000),x1min,x1max,x2min,x2max, & 
+      real(Single) :: y(nxmax,nymax),rwrk(5000),x1min,x1max,x2min,x2max, &
      &     x1minp,x1maxp,x2minp,x2maxp,x1ap,x1bp,x2ap,x2bp
       character sclx*3,scly*3
 !
@@ -35,20 +35,20 @@
 !  1.1  copie des variables double a simple precision
       do i1=1,n1
         do i2=1,n2
-          y(i1,i2)=f1(i1,i2)
+          y(i1,i2)=real(f1(i1,i2),Single)
         end do
       end do
 !
 !  1.2  on trace les lignes de niveau
 !
-      x1min=xmin
-      x1max=xmax
-      x2min=ymin
-      x2max=ymax
+      x1min=real(xmin,Single)
+      x1max=real(xmax,Single)
+      x2min=real(ymin,Single)
+      x2max=real(ymax,Single)
       sclx='LIN'
       scly='LIN'
       write(*,*) 'Starting'
-      call newpag(x1min,x1max,x2min,x2max,'R (m)$','Z (m)$', & 
+      call newpag(x1min,x1max,x2min,x2max,'R (m)$','Z (m)$', &
      &  ' ',sclx,scly)
       write(*,*) 'newpag OK'
       call getset(x1a,x1b,x2a,x2b,x1minp,x1maxp,x2minp,x2maxp,ll)
@@ -56,18 +56,18 @@
         x1ap=x1a+(x1min-x1minp)/(x1maxp-x1minp)*(x1b-x1a)
         x1bp=x1a+(x1max-x1minp)/(x1maxp-x1minp)*(x1b-x1a)
       else
-        x1ap=x1a+(log10(x1min)-log10(x1minp))/ & 
+        x1ap=x1a+(log10(x1min)-log10(x1minp))/ &
      &    (log10(x1maxp)-log10(x1minp))*(x1b-x1a)
-        x1bp=x1a+(log10(x1max)-log10(x1minp))/ & 
+        x1bp=x1a+(log10(x1max)-log10(x1minp))/ &
      &    (log10(x1maxp)-log10(x1minp))*(x1b-x1a)
       endif
       if(ll.eq.1 .or. ll.eq.3) then
         x2ap=x2a+(x2min-x2minp)/(x2maxp-x2minp)*(x2b-x2a)
         x2bp=x2a+(x2max-x2minp)/(x2maxp-x2minp)*(x2b-x2a)
       else
-        x2ap=x2a+(log10(x2min)-log10(x2minp))/ & 
+        x2ap=x2a+(log10(x2min)-log10(x2minp))/ &
      &    (log10(x2maxp)-log10(x2minp))*(x2b-x2a)
-        x2bp=x2a+(log10(x2max)-log10(x2minp))/ & 
+        x2bp=x2a+(log10(x2max)-log10(x2minp))/ &
      &    (log10(x2maxp)-log10(x2minp))*(x2b-x2a)
       endif
 !
@@ -94,7 +94,7 @@
 !  2.1  copie des variables double a simple precision
       do i1=1,n1
         do i2=1,n2
-          y(i1,i2)=f2(i1,i2)
+          y(i1,i2)=real(f2(i1,i2),Single)
         end do
       end do
 !
