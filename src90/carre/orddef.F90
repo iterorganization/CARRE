@@ -106,7 +106,7 @@
 !>>>
 !*** Order the plates 2 by 2 in x
 !<<<
-      write(0,'(1x,a3,a4,a6,2a9,2x,a1,18x,a2,16x,a1,18x,a2)') 'i', &
+      write(0,'(1x,a3,a4,a6,2a9,3x,a1,17x,a2,16x,a1,17x,a2)') 'i', &
      & 'ipx','xy','pty','aire',':','wx',':','wy'
 !>>>
       do i=1,nbdef-1,2 !{

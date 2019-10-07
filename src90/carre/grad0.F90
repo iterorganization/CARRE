@@ -1,6 +1,6 @@
 
 !***********************************************************************
-      SUBROUTINE GRAD0(equ,nxmax,nymax,gradmx)
+      SUBROUTINE GRAD0(equ)
 !***********************************************************************
       use KindDefinitions
       use carre_types
@@ -12,7 +12,6 @@
 
 !  arguments
       type(CarreEquilibrium), intent(inout) :: equ
-      INTEGER nxmax,nymax,gradmx
 
 !  variables locales
       INTEGER i, j

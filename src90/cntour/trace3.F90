@@ -1,9 +1,8 @@
-      subroutine trace3(xminx,xmaxx,yminx,ymaxx,separx,separy, &
-     &        ptsep,npx,nptot, &
-     &        nstruc,npstru,xstruc,ystruc,nivx,nivy, &
-     &        nivtot,nbniv,pntrat,distxo,xn1,yn1,nn1, &
-     &        repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, &
-     &        a00,a01,a10,a11,psi,nx,ny,x,y)
+      subroutine trace3(xminx,xmaxx,yminx,ymaxx, &
+     &        nstruc,npstru,xstruc,ystruc, &
+     &        pntrat,distxo,xn1,yn1,nn1, &
+     &        fctini,xfin,yfin,fctfin, &
+     &        psi,nx,ny,x,y)
 !======================================================================
 !
 !  version : 07.07.97 20:15
@@ -18,24 +17,18 @@
 
 !
 !  arguments
-      integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
-     &      nivtot(nbniv),ptsep(4,npx),nn1, &
-     &      repart,nx,ny
+      integer nstruc,npstru(strumx),nn1,nx,ny
 
-
-      real(rKind) :: xminx,xmaxx,yminx,ymaxx,separx(npnimx,4,npxmx), &
-     &       separy(npnimx,4,npxmx), &
-     &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
-     &       nivx(npnimx,nbniv),nivy(npnimx,nbniv),pntrat,distxo, &
-     &       xn1(nn1),yn1(nn1),xptxo,yptxo,fctini,xfin,yfin,fctfin, &
-     &       a00(nxmax,nymax,3),a01(nxmax,nymax,3),a10(nxmax,nymax,3), &
-     &       a11(nxmax,nymax,3),psi(nxmax,nymax),x(nxmax),y(nymax)
-
+      real(rKind) :: xminx,xmaxx,yminx,ymaxx, &
+     &       xstruc(npstmx,strumx),ystruc(npstmx,strumx), &
+     &       pntrat,distxo, &
+     &       xn1(nn1),yn1(nn1),fctini,xfin,yfin,fctfin, &
+     &       psi(nxmax,nymax),x(nxmax),y(nymax)
 
 !
 !  variables locales
-      integer i,j,nin,nn(2),inouv,npcrb(2),ii,jj,dir,indstr, &
-     &  plaque
+      integer i,nin,nn(2),inouv,npcrb(2),ii,jj,dir,indstr,plaque
+!     integer j
       real(rKind) :: valfct,zero
       parameter(zero=0.)
       real(rKind) :: xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2),x1, &

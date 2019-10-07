@@ -238,8 +238,7 @@
       y2 = nivy(1,2)
 
       distnv(1,idef) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                   ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                   ,'droite')
+     &                   ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calcul de la difference de psi entre ces 2 memes points.
 

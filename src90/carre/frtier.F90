@@ -37,8 +37,9 @@
       LOGICAL racord
 
 !  variables locales
-      INTEGER ipx,idniv,fraplq,i,j,idef,nbcrb,sens,nt(2),ii,jj, &
+      INTEGER ipx,idniv,fraplq,i,idef,nbcrb,sens,nt(2),ii,jj, &
      &  ptxext,indlim
+!     INTEGER j
       REAL(rKind) :: x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
 
 !  procedures
@@ -168,8 +169,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'droite')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -249,8 +249,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'gauche')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -394,8 +393,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'droite')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -478,8 +476,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'gauche')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -571,8 +568,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'gauche')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -655,8 +651,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'gauche')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -799,8 +794,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'droite')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -881,8 +875,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'gauche')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -967,8 +960,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'gauche')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 
@@ -1049,8 +1041,7 @@
          y2 = nivy(1,idniv)
 
          distnv(1,idniv) = plqdst(x0,y0,x2,y2,xstruc(1,inddef(idef)), &
-     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)) &
-     &                      ,'gauche')
+     &                      ystruc(1,inddef(idef)),npstru(inddef(idef)))
 
 !..Calculate the psi difference between these two points.
 

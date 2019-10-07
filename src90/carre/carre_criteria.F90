@@ -36,7 +36,6 @@ contains
     ! local working arrays holding criteria
     double precision :: lOrtpur(nppol),lPropo(nppol), lVarr(nppol)
 
-
     !  calculs
     i=1
     l1p=sqrt((x1(i)-x1(i+1))**2+(y1(i)-y1(i+1))**2)
@@ -64,10 +63,10 @@ contains
                &       +(y2(i)-y1(i))*(y1(i-1)-y1(i))
           cs4=(x2(i)-x1(i))*(x1(i+1)-x1(i)) &
                &       +(y2(i)-y1(i))*(y1(i+1)-y1(i))
-          cs1=cs1/(l2m*l12)
-          cs2=cs2/(l2p*l12)
-          cs3=cs3/(l1m*l12)
-          cs4=cs4/(l1p*l12)
+          if (l2m.gt.zero) cs1=cs1/(l2m*l12)
+          if (l2p.gt.zero) cs2=cs2/(l2p*l12)
+          if (l1m.gt.zero) cs3=cs3/(l1m*l12)
+          if (l1p.gt.zero) cs4=cs4/(l1p*l12)
 
           ! Orthogonality
           lOrtpur(i) = cs2+cs3-cs1-cs4
@@ -104,10 +103,10 @@ contains
                &       +(y2(i)-y1(i))*(y1(i-1)-y1(i))
           cs4=(x2(i)-x1(i))*(x1(i+1)-x1(i)) &
                &       +(y2(i)-y1(i))*(y1(i+1)-y1(i))
-          cs1=cs1/(l2m*l12)
-          cs2=cs2/(l2p*l12)
-          cs3=cs3/(l1m*l12)
-          cs4=cs4/(l1p*l12)
+          if (l2m.gt.zero) cs1=cs1/(l2m*l12)
+          if (l2p.gt.zero) cs2=cs2/(l2p*l12)
+          if (l1m.gt.zero) cs3=cs3/(l1m*l12)
+          if (l1p.gt.zero) cs4=cs4/(l1p*l12)
 
           lOrtpur(i)=cs2+cs3-cs1-cs4
 
@@ -115,8 +114,14 @@ contains
 !!$     &      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
           lPropo(i) = 0.0
 
-          lVarr(i)= (pasmin/(l2(i)-l2(i-1)))**2- &
+          if (l2(i).eq.l2(i-1)) then
+            lVarr(i) = (pasmin/(l2(i+1)-l2(i)))**2
+          else if (l2(i+1).eq.l2(i)) then
+            lVarr(i) = (pasmin/(l2(i)-l2(i-1)))**2
+          else
+            lVarr(i)= (pasmin/(l2(i)-l2(i-1)))**2- &
                &             (pasmin/(l2(i+1)-l2(i)))**2
+          endif
 
           ort(i)= lOrtpur(i) + lVarr(i)
 

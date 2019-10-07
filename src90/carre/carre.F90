@@ -95,7 +95,7 @@ PROGRAM CARRE
   ! Output final grid to Silo
   call writeGridStateToSiloFile('carreFinal00000', equ, struct, grid)
 
-  ! Finalize Carre 
+  ! Finalize Carre
   call carre_finalize(equ, struct, grid)
 
   STOP
@@ -112,7 +112,7 @@ contains
     ! internal
     REAL(rKind) :: zero,rmax,zmax
     PARAMETER ( zero=0.)
-    INTEGER i, j, ierror, iflag           
+    INTEGER i, j, ierror, iflag
     character lign80*80
 
     ! Set default loglevel (will be set again after reading carre.dat)
@@ -226,7 +226,7 @@ contains
     struct%rnstruc = struct%nstruc - par%nVirtualStructs
     struct%rnpstru(1:struct%rnstruc) = struct%npstru(par%nVirtualStructs+1:struct%nstruc)
     struct%rxstruc(:,1:struct%rnstruc) = struct%xstruc(:,par%nVirtualStructs+1:struct%nstruc)
-    struct%rystruc(:,1:struct%rnstruc) = struct%ystruc(:,par%nVirtualStructs+1:struct%nstruc)    
+    struct%rystruc(:,1:struct%rnstruc) = struct%ystruc(:,par%nVirtualStructs+1:struct%nstruc)
     struct%rclosed(1:struct%rnstruc) = struct%closed(par%nVirtualStructs+1:struct%nstruc)
 
     ! All structures (virtual + real) are now still in the standard struct%xstru,... arrays
@@ -260,11 +260,12 @@ contains
     !
     if(equ%npx.gt.0) then
 
-            call trace(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy,&
-                 & equ%ptsep,equ%npx,equ%nptot, & 
-                 &           struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, & 
-                 &           struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
-                 & grid%np1,par%npr,grid%xmail,grid%ymail,grid%nreg)
+            call trace(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), &
+                 &     equ%separx,equ%separy,equ%ptsep,equ%npx,equ%nptot, &
+                 &     struct%nstruc,struct%npstru, &
+                 &     struct%xstruc,struct%ystruc, &
+                 &     struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,&
+                 &     grid%np1,par%npr,grid%xmail,grid%ymail,grid%nreg)
 
     endif ! nptx.gt.0
 

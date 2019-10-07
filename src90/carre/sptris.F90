@@ -32,7 +32,7 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
        &     a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
        &     a01(nxmax,nymax,3),a11(nxmax,nymax,3)
   type(CarreStructures), intent(inout) :: struct
-  ! FIXME/CLEANUP: remove/replace arguments also contained in struct
+  ! FIXME/CLEAN-UP: remove/replace arguments also contained in struct
 
   !  variables locales
   integer ipx,ix,jx,isep,i1,i2,j1,j2,iref,jref,k,idir, &
@@ -79,7 +79,7 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
       fctpx(ipx) = a00(ix,jx,1) + a10(ix,jx,1)*ptx(ipx) &
            &                            + a01(ix,jx,1)*pty(ipx) &
            &                            + a11(ix,jx,1)*ptx(ipx)*pty(ipx)
-      write(0,*) 'fctpx =',fctpx(ipx)
+      write(0,"(a,1p,1e16.8)") 'fctpx =',fctpx(ipx)
 
       !..Initialise the co-ordinates of each separatrix curve
 
@@ -188,9 +188,9 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
   write(0,'(a,4i5)') 'After X-point loop: isep,npx,nbdef,nbdfav = ', &
        &                                        isep,npx,nbdef,nbdfav !###
   if(nbdef.gt.0) then !{
-      write(0,*) 'ixp_hlp :',(ixp_hlp(i),i=1,nbdef)
-      write(0,*) 'xsttmp :',(xsttmp(i),i=1,nbdef)
-      write(0,*) 'ysttmp :',(ysttmp(i),i=1,nbdef)
+      write(0,'(a,8i5)') 'ixp_hlp :',(ixp_hlp(i),i=1,nbdef)
+      write(0,'(a,1p,8f12.4)') 'xsttmp :',(xsttmp(i),i=1,nbdef)
+      write(0,'(a,1p,8f12.4)') 'ysttmp :',(ysttmp(i),i=1,nbdef)
   end if !}
   if(npx.gt.0 .and. isep.gt.0) then !{
       write(0,*) 'nptot'

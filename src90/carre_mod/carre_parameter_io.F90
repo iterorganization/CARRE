@@ -448,7 +448,7 @@ CONTAINS
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('refineAtStructs')) .EQ. 'refineAtStructs') THEN
-         call rdfrinarray(11,vari(ieg+1:80),par%refineAtStructs(1:par%nRefineAtStructs),&
+         call rdfrinarray(vari(ieg+1:80),par%refineAtStructs(1:par%nRefineAtStructs),&
               &par%nRefineAtStructs,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
@@ -461,8 +461,10 @@ CONTAINS
       ELSE IF (vari(1:6) .EQ. 'sellan') THEN
          call rdfrch(11,vari(ieg+1:80),novlan,ierror)
          if(ierror.eq.1) go to 98
-         if(novlan(1:8).eq.'francais'.or.novlan(1:7).eq.'english') then
-           sellan=novlan
+         if(novlan(1:8).eq.'francais') then
+           sellan(1:8)=novlan(1:8)
+         elseif(novlan(1:7).eq.'english') then
+           sellan(1:7)=novlan(1:7)
          else
            if(sellan(1:8).eq.'francais') then
              write(6,*)'Erreur de format. Veuillez recommencer.'
@@ -499,26 +501,20 @@ CONTAINS
     END SUBROUTINE CHANGE
 
 
-    subroutine rdfrinarray(iunit,vari,ii,nii,ierror)
+    subroutine rdfrinarray(vari,ii,nii,ierror)
       !  version : 03.07.2000 22:59
       implicit none
       !  read an array of integer numbers from a chain of characters vari
       !
       !  arguments
       integer nii
-      integer iunit,ii(nii),ierror
+      integer ii(nii),ierror
       character vari*(*)
-      !  iunit: unit of temporary file
       !  vari: chain of characters from which to read
       !  ii: integer read from vari (output)
       !  ierror: error flag: 0 for no error, 1 when there is an error.
       !
       !  calculations
-      !      rewind iunit
-      !      write(iunit,100)vari
-      !100   format(a)
-      !      rewind iunit
-      !      read(iunit,*,err=99)ii
       !      write (*,*) 'rdrfin: vari', vari
 #ifdef READOPT
       read(vari,err=99)ii

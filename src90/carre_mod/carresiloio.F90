@@ -332,7 +332,7 @@ contains
           end do
        end do
 
-       !call logmsg(LOGDEBUG,  'carre_postprocess: '//int2str(nIntPoints)//' boundary points')
+       !call logmsg(LOGDEBUG, 'carre_postprocess: '//int2str(nIntPoints)//' boundary points')
        if (nIntPoints > 0) then
           call siloWritePointGrid( csioDbfile, 'boundaryPoints', &
                & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )
@@ -354,7 +354,7 @@ contains
           end do
        end do
 
-       !call logmsg(LOGDEBUG,  'carre_postprocess: '//int2str(nIntPoints)//' boundary points')
+       !call logmsg(LOGDEBUG, 'carre_postprocess: '//int2str(nIntPoints)//' boundary points')
        if (nIntPoints > 0) then
           call siloWritePointGrid( csioDbfile, 'boundaryPointsFinalCheck', &
                & tmpX(1:nIntPoints), tmpY(1:nIntPoints) )

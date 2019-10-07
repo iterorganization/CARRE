@@ -158,10 +158,10 @@
         wx(4)=wx(1)
         wy(4)=wy(1)
 !c<<<
-!        write(0,'(17h ypto,pty,aire = ,1p,4e12.4)') ypto,pty,
-!     ,                                                    aire(wx,wy,4)
-!        write(0,'(5h wx: ,1p,4e12.4)') wx
-!        write(0,'(5h wy: ,1p,4e12.4)') wy
+!        write(0,'(a17,1p,4e12.4)')
+!     ,              ' ypto,pty,aire = ',ypto,pty,aire(wx,wy,4)
+!        write(0,'(a5,1p,4e12.4)') ' wx: ',wx
+!        write(0,'(a5,1p,4e12.4)') ' wy: ',wy
 !c>>>
         if((pty(ipx)-ypto)*aire(wx,wy,4).ge.zero) then
           ptsep(1,ipx)=kk(1)
@@ -328,10 +328,10 @@
             wx(4)=wx(1)
             wy(4)=wy(1)
 !c<<<
-!            write(0,'(17h ypto,pty,aire = ,1p,4e12.4)') ypto,pty,
-!     ,                                                    aire(wx,wy,4)
-!            write(0,'(5h wx: ,1p,4e12.4)') wx
-!            write(0,'(5h wy: ,1p,4e12.4)') wy
+!            write(0,'(a17,1p,4e12.4)')
+!     ,                  ' ypto,pty,aire = ',ypto,pty,aire(wx,wy,4)
+!            write(0,'(a5,1p,4e12.4)') ' wx: ',wx
+!            write(0,'(a5,1p,4e12.4)') ' wy: ',wy
 !c>>>
             if((pty(ipx)-ypto)*aire(wx,wy,4).le.zero) then
               ptsep(3,ipx) = kk(1)

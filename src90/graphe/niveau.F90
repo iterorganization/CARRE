@@ -188,7 +188,7 @@
 !    CLU = 0: Aucune ligne de niveau n'est tracee.
 !    CLU = 1: La ligne de niveau est tracee sans marque d'echelle ("label"!)
 !    CLU = 2: Seule la marque d'echelle est tracee, sans ligne.
-!    CLU = 3: Ala fois la ligne de niveau et la marque d'echelle sont tracees.
+!    CLU = 3: A la fois la ligne de niveau et la marque d'echelle sont tracees.
 !
 !  - CLD: Specifie le trait utilise pour la ligne de niveau courante.
 !

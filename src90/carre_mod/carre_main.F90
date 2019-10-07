@@ -64,7 +64,7 @@ contains
     !
     !..6.0  Determine the points where the derivatives in x and y vanish
     !
-    CALL GRAD0(equ, nxmax,nymax,gradmx)
+    CALL GRAD0(equ)
 
     !
     !..7.0  Select the X-points of interest from the original equilibrium data
@@ -199,10 +199,11 @@ contains
                 call trc_stk_out
              endif
 
-             call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, &
-                  &        equ%ptsep,equ%npx,equ%nptot, &
-                  &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
-                  &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
+             call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),&
+                  &      equ%separx,equ%separy,equ%ptsep,equ%npx,equ%nptot, &
+                  &      struct%nstruc,struct%npstru, &
+                  &      struct%xstruc,struct%ystruc, &
+                  &      struct%nivx,struct%nivy,struct%nivtot,struct%nbniv)
 
           end if
 

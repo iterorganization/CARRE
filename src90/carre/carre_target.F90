@@ -307,7 +307,7 @@ contains
 
 
 
-  FUNCTION plqdst(x0,y0,x2,y2,xst,yst,npst,doug)
+  FUNCTION plqdst(x0,y0,x2,y2,xst,yst,npst)
 
     !..Cette sous-routine calcule la distance entre deux points sur une meme
     !  structure, en longeant les segments de structure.
@@ -316,7 +316,6 @@ contains
     !  arguments
     INTEGER npst
     REAL(rKind) :: x0,y0,x2,y2,xst(npst),yst(npst)
-    CHARACTER*(*) doug
 
     !  variables locales
     INTEGER ind,ind1,ind2,sens
@@ -331,7 +330,6 @@ contains
     !.. npst: nombre de points de la structure.
     !.. x0,y0: point de depart sur la structure.
     !.. x2,y2: point d'arrivee sur la structure.
-    !.. doug: droite ou gauche
     !.. ind2: indice du segment sur lequel se trouve le point 2.
     !.. sens: sens dans lequel il faut partir pour la recherche,
     !         1 = sens des points de la structure, -1 = sens contraire.
@@ -342,7 +340,7 @@ contains
     x1 = x0
     y1 = y0
 
-    ! FIXME/CLEANUP: simplify this inefficient mess
+    ! FIXME/CLEAN-UP: simplify this inefficient mess
 
     !..Recherche du sens et indices de segment pour les deux points.
     ind1 = indsgm(xst,yst,npst,x1,y1)

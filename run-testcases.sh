@@ -8,6 +8,11 @@ if [ ! -d $logdir ]; then
     mkdir $logdir
 fi
 
+if [ ! $SOLPS_DEBUG = "" ]; then
+    export EXT_DEBUG=".debug"
+fi
+export TOOLCHAIN=${HOST_NAME}.${COMPILER}${EXT_DEBUG}
+
 for inputfile in $inputfiles; do
 
     dir=`dirname $inputfile`
@@ -21,7 +26,7 @@ for inputfile in $inputfiles; do
 
     ./clear-case output >>$logfile 2>&1
     
-    $OBJECTCODE/carre >>$logfile 2>&1
+    builds/$TOOLCHAIN/carre.exe >>$logfile 2>&1
     if [ $? -ne 0 -o ! -f carre.out ]; then
         echo "Testcase $dir: CARRE2 failed"
 	continue

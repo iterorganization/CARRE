@@ -300,7 +300,8 @@ contains
     double precision, intent(out) :: limpoint_min(2), limpoint_max(2)
 
     !  variables locales
-    integer :: ipx, ipxOther, isep, istru, i
+    integer :: ipx, ipxOther, isep, istru
+!!$    integer :: i
     integer :: ip, itarget, istep, istepTot
     real(rKind) :: &  ! minpsitot, maxpsitot,
          &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, vtaddpsi, &
@@ -312,7 +313,8 @@ contains
     real(rKind) :: ppsi(npstmx,struct%rnstruc)
     real(rKInd) :: tmpx(npstmx,2), tmpy(npstmx,2)
     real(rKind) :: vtmp1, vtmp2
-    double precision :: limPsiMax, limPsiMin, limPsi, pointPsi
+!!$    double precision :: limPsiMax, limPsiMin, limPsi
+    double precision :: pointPsi
     double precision :: gnorm, structsize
     integer :: nvtarget, idir, vtargetipx(struct%nbdef), vtistruc(struct%nbdef)
     integer :: nptmp(2), npvtmp

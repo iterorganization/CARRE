@@ -6,7 +6,6 @@
      &          gradmx=100  , npmamx=2000 , nrmamx=200, nregmx=6, &
      &          nsepsegmx = 10
 
-
 !     AUTOCONTINUE=.true. will skip questions when failing to converge
 #ifdef EUITM
 !     for ITM use, always skip
@@ -14,8 +13,6 @@
 #else
       logical, parameter :: AUTOCONTINUE = .true.      
 #endif
-
-
 
 !
 !======================================================================
@@ -28,12 +25,9 @@
 !***  npmamx      : max. number of the poloidal mesh points
 !***  nrmamx      : max. number of the radial mesh points
 !***  nregmx      : max. number of regions
-!***  npnimx      : max. number of points in the tracing curve (?)
+!***  npnimx      : max. number of points in tracing curves
 !***                (for curves tracing contour lines)
-!***  nbdmx       : max. number of divertor plates (?)
+!***  nbdmx       : max. number of divertor plate structures
 !***  nsepsegmx   : max. number of separatrix segments
 !***
-!.. npnimx: nombre maximum de points dans une courbe quelconque a
-!           tracer.
-!.. nbdmx: nombre maximum de structures etant une plaque de deflecteur.
 !======================================================================

@@ -454,11 +454,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
-     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
-     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg), &
+     &       grid%xn,grid%yn,nn,par%pntrat, &
+     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,fctini, &
+     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi, &
+     &       struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
      &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
-     &       xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
+     &       xptxo,yptxo,equ%xpto,equ%ypto, &
+     &       struct%nivx,struct%nivy,struct%nivtot, &
+     &       struct%nbniv,equ%distxo,diag,ireg)
 !----------------------------------------------------------------------
 
       ELSE IF ((equ%npx.EQ.2) .AND. (equ%racord)) THEN
@@ -1046,11 +1050,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
-     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
-     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg), &
+     &       grid%xn,grid%yn,nn,par%pntrat, &
+     &       pas,grid%np1(ireg),par%npr(ireg),x2,y2,fctini, &
+     &       equ%nx,equ%ny,equ%x,equ%y,equ%psi, &
+     &       struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
      &       equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
-     &       xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
+     &       xptxo,yptxo,equ%xpto,equ%ypto, &
+     &       struct%nivx,struct%nivy,struct%nivtot, &
+     &       struct%nbniv,equ%distxo,diag,ireg)
 !----------------------------------------------------------------------
 
       ELSE IF ((equ%npx.EQ.2) .AND. (.NOT.(equ%racord))) THEN
@@ -1099,7 +1107,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
      &                 ptxext)
 
          struct%distnv(1,1) = plqdst(xint,yint,xext,yext,struct%xstruc(1,struct%inddef(idef)) &
-     &            ,struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)),'droite')
+     &            ,struct%ystruc(1,struct%inddef(idef)),struct%npstru(struct%inddef(idef)))
 
 
          ii = ifind(xint,equ%x,equ%nx,1)
@@ -2086,11 +2094,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
-     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
-     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg), &
+     &      grid%xn,grid%yn,nn,par%pntrat, &
+     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,fctini, &
+     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi, &
+     &      struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
      &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
-     &      xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
+     &      xptxo,yptxo,equ%xpto,equ%ypto, &
+     &      struct%nivx,struct%nivy,struct%nivtot, &
+     &      struct%nbniv,equ%distxo,diag,ireg)
 
 
          ! Check whether we forgot to set radLineSepSeg somewhere
@@ -2342,11 +2354,15 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !---
          print*, 'ireg=', ireg
 !---
-         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg),grid%xn,grid%yn,nn,par%pntrat, &
-     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,xfin,yfin,fctini, &
-     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
+         CALL MAILCN(grid%xmail(1,1,ireg),grid%ymail(1,1,ireg), &
+     &      grid%xn,grid%yn,nn,par%pntrat, &
+     &      pas,grid%np1(ireg),par%npr(ireg),x2,y2,fctini, &
+     &      equ%nx,equ%ny,equ%x,equ%y,equ%psi, &
+     &      struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
      &      equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
-     &      xptxo,yptxo,equ%xpto,equ%ypto,struct%nivx,struct%nivy,struct%nivtot,struct%nbniv,equ%distxo,diag,ireg)
+     &      xptxo,yptxo,equ%xpto,equ%ypto, &
+     &      struct%nivx,struct%nivy,struct%nivtot, &
+     &      struct%nbniv,equ%distxo,diag,ireg)
 
 !       ...
       ENDIF
@@ -2478,13 +2494,11 @@ contains
     ! on colle la dernière ligne de niveau sur trace2 pour avoir
     ! la pénétration.
 
-    call trace3(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny),equ%separx,equ%separy, &
-         &        equ%ptsep,equ%npx,equ%nptot, &
+    call trace3(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), &
          &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
-         &        struct%nivx,struct%nivy,struct%nivtot,struct%nbniv, &
-         &         par%pntrat,equ%distxo,grid%xn,grid%yn,nn1, &
-         &         par%repart,xptxo,yptxo,fctini,xfin,yfin,fctfin, &
-         &         equ%a00,equ%a01,equ%a10,equ%a11,equ%psi,equ%nx,equ%ny,equ%x,equ%y)
+         &        par%pntrat,equ%distxo,grid%xn,grid%yn,nn1, &
+         &        fctini,xfin,yfin,fctfin, &
+         &        equ%psi,equ%nx,equ%ny,equ%x,equ%y)
 
     if (correct) then
         if(sellan(1:8).eq.'francais') then
@@ -2506,9 +2520,10 @@ contains
             call endpag
 
             call trace2(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), &
-                 &     equ%separx,equ%separy,equ%ptsep,equ%npx,equ%nptot, &
-                 &         struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc,struct%nivx,struct%nivy, &
-                 &         struct%nivtot,struct%nbniv)
+                 &      equ%separx,equ%separy,equ%ptsep,equ%npx,equ%nptot, &
+                 &      struct%nstruc,struct%npstru,struct%xstruc, &
+                 &      struct%ystruc,struct%nivx,struct%nivy, &
+                 &      struct%nivtot,struct%nbniv)
 
         endif
 
@@ -2546,6 +2561,7 @@ contains
 
 END subroutine
 
+#ifndef GFORTRAN
       integer function lnblnk(string)
       implicit none
       integer i
@@ -2563,3 +2579,4 @@ END subroutine
       lnblnk=1
       return
       end function lnblnk
+#endif

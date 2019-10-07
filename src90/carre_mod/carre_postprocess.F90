@@ -57,7 +57,7 @@ contains
     integer :: npReg(nregmx), npDiff, action
     integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
     double precision :: lPasMin
-    
+
     ! Only do postprocessing when doing grid extension
     if (par%carreMode == CARRE_EXTENDED) then
 
@@ -77,8 +77,8 @@ contains
             do ipx = 1, equ%npx
                 call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), npoint, xipol, xirad, findAll = .true.)
                 do ipoint = 1, npoint
-                    call logmsg(LOGDEBUG,  'carre_postprocess_computation: marking radial line required &
-                        & due to X-point #'//int2str(ipx)//" in region "//int2str(iReg))
+                    call logmsg(LOGDEBUG, 'carre_postprocess_computation: marking radial line required '// &
+                        & 'due to X-point #'//int2str(ipx)//" in region "//int2str(iReg))
                     call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
                 end do
             end do
@@ -86,7 +86,7 @@ contains
 
         ! Mark structures on which the grid is to be refined
         do iStruc = 1, par%nRefineAtStructs
-            struct%refineAtStructure(par%refineAtStructs(iStruc)) = .true.            
+            struct%refineAtStructure(par%refineAtStructs(iStruc)) = .true.
         end do
 
         ! Main iteration sequence
@@ -101,9 +101,9 @@ contains
         ! If broken cells exist, FIX
         ! If previous iteration was FIX, next is always COARSEN
         ! If no broken cells, but coarse cells exist, REFINE
-        ! If no broken cells, no cells to refine the main iteration is converged. Start cleanup sequence
+        ! If no broken cells, no cells to refine the main iteration is converged. Start clean-up sequence
 
-        ! Cleanup sequence rules are:
+        ! Clean-up sequence rules are:
         ! If too fine cells exist, do COARSEN-FORCE
         ! Stop when no cells were removed in last step
 
@@ -112,7 +112,7 @@ contains
         npDiff = 0
 
         do iPostProcess = 1, 42
-            call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess))            
+            call logmsg(LOGDEBUG, 'carre_postprocess: iteration '//int2str(iPostProcess))
 
             ! Compute face/structure intersections
             call computeFaceStructureIntersections(struct, grid, finalized = .false.)
@@ -120,7 +120,7 @@ contains
             ! Mark points to be inside/outside of vessel
             call labelPointsInsideOutside(equ, struct, grid, finalized = .false.)
 
-            ! Compute the object categorization 
+            ! Compute the object categorization
             call categorizeCellsAndFaces(lPasmin, finalized = .false.)
 
             ! Compute connection information between regions
@@ -153,7 +153,7 @@ contains
                         action = ACTION_REFINE
                     else
                         action = ACTION_COARSEN_FORCE
-!!$                        ! switch to cleanup resolution for coarsening
+!!$                        ! switch to clean-up resolution for coarsening
 !!$                        lPasMin = par%cleanupPasmin
 !!$                        ! recompute object categorization with cleanup minimum cell length
 !!$                        call categorizeCellsAndFaces(lPasmin, finalized = .false.)
@@ -168,53 +168,53 @@ contains
 
             select case (action)
             case (ACTION_REFINE_FIX)
-                ! Cells need refinement because of broken geometry                
+                ! Cells need refinement because of broken geometry
                 ! Fix cells by modifying the grid accordingly
                 if ( nCellsToRefineFix == 0 ) then
-                  call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                  call logmsg(LOGDEBUG, "carre_postprocess: action REFINE_FIX. "&
                     & //'no cells with critical geometry')
                 elseif ( nCellsToRefineFix == 1 ) then
-                  call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                  call logmsg(LOGDEBUG, "carre_postprocess: action REFINE_FIX. "&
                     & //int2str(nCellsToRefineFix)//' cell with critical geometry')
                 else
-                  call logmsg(LOGDEBUG,  "carre_postprocess: action REFINE_FIX. "&
+                  call logmsg(LOGDEBUG, "carre_postprocess: action REFINE_FIX. "&
                     & //int2str(nCellsToRefineFix)//' cells with critical geometry')
                 endif
                 call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_FIX)
             case (ACTION_COARSEN)
                 if ( nCellsToCoarsen > 0 ) then
                     if (nCellsToCoarsen == 1) then
-                      call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
+                      call logmsg(LOGDEBUG, "carre_postprocess: action COARSEN. "&
                         &//int2str(nCellsToCoarsen)//' cell to coarsen')
                     else
-                      call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. "&
+                      call logmsg(LOGDEBUG, "carre_postprocess: action COARSEN. "&
                         &//int2str(nCellsToCoarsen)//' cells to coarsen')
                     endif
                     call coarsenCells(grid, force = .false.)
                 else
-                    call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN. No cells to coarsen")
+                    call logmsg(LOGDEBUG, "carre_postprocess: action COARSEN. No cells to coarsen")
                 end if
             case (ACTION_REFINE)
                 if ( nCellsToRefine == 0 ) then
-                  call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                  call logmsg(LOGDEBUG, 'carre_postprocess: action REFINE. '//&
                     &'no cells with too low resolution')
                 elseif ( nCellsToRefine == 1 ) then
-                  call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                  call logmsg(LOGDEBUG, 'carre_postprocess: action REFINE. '//&
                     &int2str(nCellsToRefine)//' cell with too low resolution')
                 else
-                  call logmsg(LOGDEBUG,  'carre_postprocess: action REFINE. '//&
+                  call logmsg(LOGDEBUG, 'carre_postprocess: action REFINE. '//&
                     &int2str(nCellsToRefine)//' cells with too low resolution')
                 endif
                 ! Refine cells
-                call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)            
-            case (ACTION_COARSEN_FORCE)            
-!!$                call logmsg(LOGDEBUG,  "carre_postprocess: action COARSEN_FORCE. "&
+                call fixCells(equ, struct, grid, mode = FIXCELLS_MODE_REFINE)
+            case (ACTION_COARSEN_FORCE)
+!!$                call logmsg(LOGDEBUG, "carre_postprocess: action COARSEN_FORCE. "&
 !!$                    &//int2str(nCellsToCoarsen)//' cells to coarsen')
 !!$                call coarsenCells(grid, force = .true.)
             end select
 
             npDiff = sum(grid%np1(1:grid%nReg)-npReg(1:grid%nReg))
-            call logmsg(LOGDEBUG,  'carre_postprocess: iteration '//int2str(iPostProcess)//&
+            call logmsg(LOGDEBUG, 'carre_postprocess: iteration '//int2str(iPostProcess)//&
                 &": radial line delta is "//int2str(npDiff)//" (in all regions)")
 
             ! Stop iteration if no delta in final coarsen step
@@ -233,14 +233,14 @@ contains
 
         ! Finalize grid cells by moving external points
         ! of faces onto boundary intersections
-        call finalizeCells(grid, par)
+        call finalizeCells(grid)
 
         ! write cell finalization result
         call writeGridStateToSiloFile('carrePostProcD0', equ, struct, grid)
 
         ! Re-compute object categorizations
-        ! At this stage we postulate that all face-structure intersections 
-        ! coincide with grid nodes       
+        ! At this stage we postulate that all face-structure intersections
+        ! coincide with grid nodes
 
         ! Compute connection information between regions
         call computeConnectionInformation()
@@ -252,8 +252,8 @@ contains
         call categorizeCellsAndFaces(lPasmin, finalized = .true.)
         ! write cell finalization result
         call writeGridStateToSiloFile('carrePostProcE0', equ, struct, grid)
-        ! Forced coarsening of finalized grid 
-        !call forcedCoarsening(grid, par)       
+        ! Forced coarsening of finalized grid
+        !call forcedCoarsening(grid, par)
         ! write forced coarsening result
         call writeGridStateToSiloFile('carrePostProcE1', equ, struct, grid)
         ! Sanity check whether categorization agrees with knowledge from finalization
@@ -271,13 +271,13 @@ contains
 
         ! All points are inside the vessel, boundary points are marked later
         grid%pointFlag = GRID_INTERNAL
-        ! Compute face/structure intersections 
+        ! Compute face/structure intersections
         call computeFaceStructureIntersections(struct, grid, finalized=.true.)
         ! Mark points to be inside/outside of vessel (this identifies the boundary points)
         call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
 
-        ! Recompute the object categorization 
-        call categorizeCellsAndFaces(lPasmin, finalized = .true.)        
+        ! Recompute the object categorization
+        call categorizeCellsAndFaces(lPasmin, finalized = .true.)
 
         ! Recompute psi on grid
         call compute_psi_on_grid( equ, grid )
@@ -297,9 +297,9 @@ contains
 !!$
 !!$      nError = 0
 !!$
-!!$      call logmsg(LOGDEBUG,  'boundaryPointSanityCheck: # of set bnd. points is        '&
+!!$      call logmsg(LOGDEBUG, 'boundaryPointSanityCheck: # of set bnd. points is        '&
 !!$           &//int2str(count(grid%pointFlagFinalCheck == GRID_BOUNDARY))  )
-!!$      call logmsg(LOGDEBUG,  'boundaryPointSanityCheck: # of identified bnd. points is '&
+!!$      call logmsg(LOGDEBUG, 'boundaryPointSanityCheck: # of identified bnd. points is '&
 !!$           &//int2str(count(grid%pointFlag == GRID_BOUNDARY))  )
 !!$
 !!$      do iReg = 1, grid%nreg
@@ -312,7 +312,7 @@ contains
 !!$                  write (*,*) "Wrong categorization of boundary point iReg=", iReg, &
 !!$                       & ", iPol=", iPol, ", iRad=", iRad, &
 !!$                       & " at position (", grid%xmail(iPol, iRad, iReg),&
-!!$                       & ", ", grid%ymail(iPol, iRad, iReg) 
+!!$                       & ", ", grid%ymail(iPol, iRad, iReg)
 !!$                  nError = nError + 1
 !!$               end if
 !!$
@@ -356,7 +356,7 @@ contains
                   grid%ymail(iPol, iRad, iReg) = grid%ymail(iPol, iRad + 1, iReg)
                   grid%pointFlag(iPol, iRad, iReg) = GRID_BOUNDARY
                   grid%pointStructIndex(iPol, iRad, iReg) &
-                       & = grid%pointStructIndex(iPol, iRad + 1, iReg)                  
+                       & = grid%pointStructIndex(iPol, iRad + 1, iReg)
                end if
                if ( grid%pointFlag(iPol, iRad+1, iReg) == GRID_EXTERNAL ) then
                   if ( grid%pointFlag(iPol, iRad, iReg) == GRID_EXTERNAL ) then
@@ -366,7 +366,7 @@ contains
                   grid%ymail(iPol, iRad + 1, iReg) = grid%ymail(iPol, iRad, iReg)
                   grid%pointFlag(iPol, iRad + 1, iReg) = GRID_BOUNDARY
                   grid%pointStructIndex(iPol, iRad + 1, iReg) &
-                       & = grid%pointStructIndex(iPol, iRad, iReg)                  
+                       & = grid%pointStructIndex(iPol, iRad, iReg)
                end if
                if ( grid%pointFlag(iPol + 1, iRad, iReg) == GRID_EXTERNAL ) then
                   if ( grid%pointFlag(iPol + 1, iRad + 1, iReg) == GRID_EXTERNAL ) then
@@ -376,7 +376,7 @@ contains
                   grid%ymail(iPol + 1, iRad, iReg) = grid%ymail(iPol + 1, iRad + 1, iReg)
                   grid%pointFlag(iPol + 1, iRad, iReg) = GRID_BOUNDARY
                   grid%pointStructIndex(iPol + 1, iRad, iReg) &
-                       & = grid%pointStructIndex(iPol + 1, iRad + 1, iReg)                  
+                       & = grid%pointStructIndex(iPol + 1, iRad + 1, iReg)
                end if
                if ( grid%pointFlag(iPol + 1, iRad + 1, iReg) == GRID_EXTERNAL ) then
                   if ( grid%pointFlag(iPol + 1, iRad, iReg) == GRID_EXTERNAL ) then
@@ -386,13 +386,13 @@ contains
                   grid%ymail(iPol + 1, iRad + 1, iReg) = grid%ymail(iPol + 1, iRad, iReg)
                   grid%pointFlag(iPol + 1, iRad + 1, iReg) = GRID_BOUNDARY
                   grid%pointStructIndex(iPol + 1, iRad + 1, iReg) &
-                       & = grid%pointStructIndex(iPol + 1, iRad, iReg)                  
+                       & = grid%pointStructIndex(iPol + 1, iRad, iReg)
                end if
-               
+
             end do
          end do
       end do
-      
+
       call categorizeCellsAndFaces(lPasmin, finalized = .true.)
 
       where (grid%cellflag == GRID_BOUNDARY_COARSEN) grid%cellflag = GRID_BOUNDARY
@@ -425,7 +425,7 @@ contains
               do iRad = 1, grid%nr(iReg) - 1
 
                   ! loop over cell corners
-                  do i = 0, 1 ! poloidal 
+                  do i = 0, 1 ! poloidal
                       do j = 0, 1 ! radial
 
                           if ( isInternal(grid%pointFlag(iPol+i, iRad+j, iReg)) ) &
@@ -453,7 +453,7 @@ contains
           do iPol = 1, grid%np1(iReg) - 1
               do iRad = 1, grid%nr(iReg) - 1
 
-                  if (finalized) then 
+                  if (finalized) then
                       ! Finalized grid: derive boundary cells from boundary nodes
 
                       ! Only for internal cells
@@ -496,7 +496,7 @@ contains
                                & .or. &
                                &  grid%pointflag( &
                                & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
-                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg ) /= GRID_BOUNDARY )                              
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg ) /= GRID_BOUNDARY )
                           end if
                       end do
 
@@ -512,7 +512,7 @@ contains
 
                           if (doesIntersect) cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
                       end do
-                  end if 
+                  end if
 
               end do
           end do
@@ -539,7 +539,7 @@ contains
       where ( (grid%cellflag == GRID_INTERNAL) &
            & .and. (grid%hx < pasmin) ) grid%cellflag = GRID_INTERNAL_COARSEN
 
-      ! Figure out which must be refined due to too low resolution 
+      ! Figure out which must be refined due to too low resolution
 
       ! Increase resolution at the targets
       do iReg = 1, grid%nreg
@@ -550,7 +550,7 @@ contains
 
                   do iFace = 1, 4
                       !if (.not. structIsTarget(struct, grid%cellFaceIStruct(iFace, iPol, iRad, iReg)) ) cycle
-                      if (grid%cellFaceIStruct(iFace, iPol, iRad, iReg) == GRID_UNDEFINED) cycle 
+                      if (grid%cellFaceIStruct(iFace, iPol, iRad, iReg) == GRID_UNDEFINED) cycle
                       if (struct%refineAtStructure(grid%cellFaceIStruct(iFace, iPol, iRad, iReg))) then
                           grid%cellflag(iPol, iRad, iReg) = GRID_BOUNDARY_REFINE
                           exit
@@ -681,7 +681,7 @@ contains
   recursive subroutine setRadialLineFlag(grid, iReg, iPol, flag)
     type(CarreGrid), intent(inout) :: grid
     integer, intent(in) :: iReg, iPol, flag
-    
+
     ! internal
     integer :: iRegOther, iBnd, iPolOther(MAX_POINT_OCCUR), iRadOther(MAX_POINT_OCCUR), npoint
     double precision :: xBnd, yBnd
@@ -696,7 +696,7 @@ contains
     ! Follow into other regions
     do iBnd = 1, 2
 
-        select case (iBnd)            
+        select case (iBnd)
         case(1)
             xBnd = grid%xmail(iPol, 1, iReg)
             yBnd = grid%ymail(iPol, 1, iReg)
@@ -714,7 +714,7 @@ contains
             end if
         end do
 
-    end do    
+    end do
 
   end subroutine setRadialLineFlag
 
@@ -766,15 +766,16 @@ contains
 
   !> Label points to be in/outside of the vessel by stepping along faces
   !> and exploiting the intersection information
-  subroutine labelPointsInsideOutside( equ, struct, grid, finalized )      
+  subroutine labelPointsInsideOutside( equ, struct, grid, finalized )
     type(CarreEquilibrium), intent(in) :: equ
     type(CarreStructures), intent(in) :: struct
     type(CarreGrid), intent(inout) :: grid
     logical, intent(in) :: finalized
 
     ! internal
-    integer :: iReg, iPol, nBndPoints, ip, ir, ipMin, irMin, iRegMin
-    logical :: setBoundary 
+    integer :: iReg, iPol, ip, ir, ipMin, irMin, iRegMin
+!!$    integer :: nBndPoints
+!!$    logical :: setBoundary
     double precision :: dmin, d
 
     external :: dist
@@ -785,7 +786,7 @@ contains
 
     if (finalized) call markBoundaryPointsFinal(grid%pointFlag)
 
-    ! Find internal point: point closest to O-point    
+    ! Find internal point: point closest to O-point
     iRegMin = GRID_UNDEFINED
     dmin = huge(0.0d0)
     do iReg = 1, grid%nreg
@@ -801,9 +802,9 @@ contains
         end do
     end do
 
-    call logmsg(LOGDEBUG,  'labelPointsInsideOutside: internal point closest to O-point is region '//&
+    call logmsg(LOGDEBUG, 'labelPointsInsideOutside: internal point closest to O-point is region '//&
          & int2str(iRegMin)//', ip '//int2str(ipMin)//', ir '//int2str(irMin))
-    
+
     call markInternalPoints(ipMin, irMin, iRegMin, grid%pointFlag, finalized)
 
     if (.not. finalized) then
@@ -825,8 +826,8 @@ contains
             ! For every cell at the top of the region
             do iPol = 1, grid%np1(iReg) - 1
                 ! If it is an internal cell, both top nodes have to be boundary nodes.
-                
-                if ( count(grid%pointFlag(iPol:iPol+1, grid%nr(iReg)-1:grid%nr(iReg), iReg) == GRID_INTERNAL) > 0 ) then 
+
+                if ( count(grid%pointFlag(iPol:iPol+1, grid%nr(iReg)-1:grid%nr(iReg), iReg) == GRID_INTERNAL) > 0 ) then
 
                     where (grid%pointFlag(iPol:iPol+1, grid%nr(iReg), iReg) == GRID_INTERNAL) &
                          & grid%pointStructIndex(iPol:iPol+1, grid%nr(iReg), iReg) = BOUNDARY_NOSTRUCTURE
@@ -835,7 +836,7 @@ contains
                 end if
 
             end do
-        end do                
+        end do
 
 !!$        ! Mark boundary points at non-wall boundaries, which are currently marked as internal points
 !!$        do iReg = 1, grid%nreg
@@ -870,7 +871,7 @@ contains
     end if
 
   contains
-    
+
     !> Mark point (ip,ir) as internal and mark connected points recursively
     recursive subroutine markInternalPoints(ip, ir, iReg, points, finalized)
       integer, intent(in) :: ip, ir, iReg
@@ -892,7 +893,7 @@ contains
       ! Have we visited this point before?
       if ( points(ip, ir, iReg) /= GRID_UNDEFINED ) then
           ! Yes -> skip
-          return 
+          return
       end if
 
       ! So this point is internal
@@ -975,7 +976,7 @@ contains
               if ((ip < grid%np1(iReg)) &
                    & .and. grid%faceISec(FACE_POLOIDAL,ip,ir,iReg)) then
                   ipx = grid%faceISecPx(FACE_POLOIDAL,ip,ir,iReg)
-                  ipy = grid%faceISecPy(FACE_POLOIDAL,ip,ir,iReg)                              
+                  ipy = grid%faceISecPy(FACE_POLOIDAL,ip,ir,iReg)
 
                   if ( pointsIdentical(ipx, ipy, &
                        & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) points(ip,ir,iReg) = GRID_BOUNDARY
@@ -987,7 +988,7 @@ contains
               if ((ir < grid%nr(iReg)) &
                    & .and. grid%faceISec(FACE_RADIAL,ip,ir,iReg)) then
                   ipx = grid%faceISecPx(FACE_RADIAL,ip,ir,iReg)
-                  ipy = grid%faceISecPy(FACE_RADIAL,ip,ir,iReg)                              
+                  ipy = grid%faceISecPy(FACE_RADIAL,ip,ir,iReg)
 
                   if ( pointsIdentical(ipx, ipy, &
                        & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) points(ip,ir,iReg) = GRID_BOUNDARY
@@ -1001,17 +1002,17 @@ contains
     end subroutine markBoundaryPointsIteration
 
     !> Mark points which are very close to a line segment ("wall points") as boundary points.
-    !> This routine is used for the finalized grid, with the intention of 
+    !> This routine is used for the finalized grid, with the intention of
     !> using the result for the final object classification.
     subroutine markBoundaryPointsFinal(points)
       integer, intent(inout) :: points(npmamx,nrmamx,nregmx)
 
-      
+
       ! internal
       integer :: iReg, iPol, iRad, iStruct
       logical :: onStructure
       integer :: nError
-            
+
       grid%pointStructIndex = GRID_UNDEFINED
 
       ! First step: wall points
@@ -1036,9 +1037,9 @@ contains
 
       nError = 0
 
-      call logmsg(LOGDEBUG,  'markBoundaryPointsFinal: # of identified bnd. points is '&
+      call logmsg(LOGDEBUG, 'markBoundaryPointsFinal: # of identified bnd. points is '&
            &//int2str(count(points == GRID_BOUNDARY))  )
-      call logmsg(LOGDEBUG,  'markBoundaryPointsFinal: # of set bnd. points is        '&
+      call logmsg(LOGDEBUG, 'markBoundaryPointsFinal: # of set bnd. points is        '&
            &//int2str(count(grid%pointFlagFinalCheck == GRID_BOUNDARY))  )
 
       do iReg = 1, grid%nreg
@@ -1055,7 +1056,7 @@ contains
 
                   points(iPol, iRad, iReg) = GRID_BOUNDARY
                   grid%pointStructIndex(iPol, iRad, iReg) = -99
-                  
+
                   nError = nError + 1
                end if
 
@@ -1069,7 +1070,7 @@ contains
 
 
   !> Fix broken cells by modifying the grid / adding radial lines.
-  !> This subroutine has two operation modes: 
+  !> This subroutine has two operation modes:
   !> FIXCELLS_MODE_FIX fixes geometry issues arising from face/wall intersections
   !> FIXCELLS_MODE_REFINE refines grid cells
 
@@ -1086,7 +1087,7 @@ contains
     logical :: refineFace(2,npmamx,nrmamx,nregmx), recomputeIntersection, isRequired
     double precision, dimension(2,npmamx,nrmamx,nregmx) :: refineFacePx, refineFacePy
     double precision :: px, py
-    
+
     logical, dimension(nsepsegmx) :: sepSegUpdated ! work array to track which par
 
     ! Map from original grid indices (1:grid%np(iReg), 1:grid%nr(iReg))
@@ -1104,7 +1105,7 @@ contains
 
     double precision :: long
     external long
-    
+
 
 
     ! Set up identity maps for radial and poloidal point indices
@@ -1121,24 +1122,24 @@ contains
     do iReg = 1, grid%nreg
         do ip = 1, npPolOriginal(iReg) - 1
             do ir = 1, npRadOriginal(iReg) - 1
-                
+
                 select case (mode)
                 case(FIXCELLS_MODE_FIX)
 
                     if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE_FIX) then
-                        ! broken cell should have one intersected poloidal face               
+                        ! broken cell should have one intersected poloidal face
                         isecTopFace = (grid%cellFaceIStruct(FACE_TOP, ip, ir, iReg) /= GRID_UNDEFINED)
                         isecBotFace = (grid%cellFaceIStruct(FACE_BOTTOM, ip, ir, iReg) /= GRID_UNDEFINED)
 
                         ! If more than two intersections per cell,  grid/geometry has issues
                         if ( isecTopFace .and. isecBotFace ) then
-                            call logmsg(LOGDEBUG,  'fixCells: broken cell has two intersected poloidal faces:'//&
+                            call logmsg(LOGDEBUG, 'fixCells: broken cell has two intersected poloidal faces:'//&
                                  & int2str(ip)//', '//int2str(ir)//', '//int2str(iReg)//' corner at '//&
                                  & real2str(grid%xmail(ip,ir,iReg))//' '//real2str(grid%ymail(ip,ir,iReg)))
                         end if
 
                         ! Here, we are only interested in "real" intersections, i.e.
-                        ! intersections in the middle of the face, not directly in the face 
+                        ! intersections in the middle of the face, not directly in the face
                         ! endpoints
 
                         if (iSecTopFace) then
@@ -1181,17 +1182,17 @@ contains
                         ! To refine cell, split bottom face of cell in the middle.
                         ! Just splitting the line segment is not good enough. We have to
                         ! go back to the flux surface.
-                        
+
                         ! Find poloidal level line going through the poloidally aligned face
                         call findLevelLineForPoints( equ, &
                              & grid%xmail(ip, ir, iReg), grid%ymail(ip, ir, iReg), &
                              & grid%xmail(ip+1, ir, iReg), grid%ymail(ip+1, ir, iReg), &
                              & llX, llY, llNp )
-                        
+
                         call coord(llX(1:llNp),llY(1:llNp),llNp,&
                              & long(llX(1:llNp), llY(1:llNp), llNp) / 2.0d0,&
                              & refineFacePx(FACE_POLOIDAL, ip, ir, iReg),&
-                             & refineFacePy(FACE_POLOIDAL, ip, ir, iReg) )                        
+                             & refineFacePy(FACE_POLOIDAL, ip, ir, iReg) )
                     case(GRID_BOUNDARY_REFINE_FIX)
                         stop "fixCells: cell flag GRID_BOUNDARY_REFINE_FIX unexpected in mode REFINE"
                     end select
@@ -1205,17 +1206,17 @@ contains
 
     ! Loop over all poloidal faces and fix problem cells by inserting radial grid lines where requested.
     ! This modifies the mailx and maily arrays, especially changing the number of grid points.
-    ! The grid node indices thus become inconstent with the other arrays. This 
-    ! is accounted for by using mapping arrays between the original grid and the modified/fixed 
+    ! The grid node indices thus become inconstent with the other arrays. This
+    ! is accounted for by using mapping arrays between the original grid and the modified/fixed
     ! one. The maps are kept in ipMap and irMap:
     ! ipMap(ip, iReg) is the new poloidal index originally corresponding with poloidal index ip
     ! in region iReg. Same for irMap.
 
     iBrokenCell = 0
-    cellsRefinedFlag = .false.    
+    cellsRefinedFlag = .false.
 
     ! Only recompute the intersection between flux surface and structure when
-    ! fixing geometry issues.    
+    ! fixing geometry issues.
     recomputeIntersection = (mode == FIXCELLS_MODE_FIX)
     isRequired = (mode == FIXCELLS_MODE_FIX)
 
@@ -1223,7 +1224,7 @@ contains
         do ip = 1, npPolOriginal(iReg) - 1
             do ir = 1, npRadOriginal(iReg)
 
-                if (refineFace(FACE_POLOIDAL, ip, ir, iReg)) then        
+                if (refineFace(FACE_POLOIDAL, ip, ir, iReg)) then
 
                     if (cellsRefinedFlag(iReg, ip)) then
                         call logmsg( LOGDEBUGBULK, "fixCells: skipping refinement of radial cell strip in &
@@ -1238,10 +1239,10 @@ contains
 
                     ! Add a radial line through the intersection point
                     ! of this face with the structure. Note that the
-                    ! intersection point known at this point 
+                    ! intersection point known at this point
                     ! (grid%faceISecPx(INDEX_FACE_TOP, ip, ir, iReg),
                     !  grid%faceISecPy(INDEX_FACE_TOP, ip, ir, iReg))
-                    ! is inaccurate and will be recomputed 
+                    ! is inaccurate and will be recomputed
                     sepSegUpdated(:) = .false.
                     call addRadialLine( equ, struct, grid, &
                          & iReg, sepSegUpdated, &
@@ -1279,7 +1280,7 @@ contains
       do iDir = 1, 2
           if (grid%nbFaceReg(iReg, iPol, iDir) /= GRID_UNDEFINED) then
               call markRefined(grid%nbFaceReg(iReg, iPol, iDir), grid%nbFaceIPol(iReg, iPol, iDir))
-              !cellsRefinedFlag(grid%nbFaceReg(iReg, iPol, iDir), grid%nbFaceIPol(iReg, iPol, iDir)) = .true.              
+              !cellsRefinedFlag(grid%nbFaceReg(iReg, iPol, iDir), grid%nbFaceIPol(iReg, iPol, iDir)) = .true.
           end if
       end do
 
@@ -1293,9 +1294,9 @@ contains
   !> (This point has to be positioned exactly on a  poloidally/x-aligned face).
   !> If recomputeIntersection is true, (px,py) will be recomputed as the intersection
   !> of the face with a structure.
-  !> The region index iReg in which the face is located has to be given. 
+  !> The region index iReg in which the face is located has to be given.
   !> Optionally, the indices of the face (ip,ir) can be given, where
-  !> (iFcP,iFcR) is the left point (start point) of the face. 
+  !> (iFcP,iFcR) is the left point (start point) of the face.
   !> The flag isRequired indicates whether the gridline is required to fix geometry problems,
   !> i.e. should not be removed by a standard coarsening step.
   recursive subroutine addRadialLine( equ, struct, grid, &
@@ -1355,12 +1356,12 @@ contains
         if (.not. doesIntersect) then
             ! This can happen if multiple radial lines are added in one cell of the original grid,
             ! and the geometry changed such that the intersection vanishes.
-            call logmsg(LOGDEBUG,  'addRadialLine: did not find intersection of face with a structure!&
+            call logmsg(LOGDEBUG, 'addRadialLine: did not find intersection of face with a structure!&
                  & Skipping this radial line.')
             if (present(lineAdded)) lineAdded = .false.
             return
         end if
-        call logmsg(LOGDEBUGBULK,  'addRadialLine: old intersection '//real2str(px)//', '//real2str(py)//&
+        call logmsg(LOGDEBUGBULK, 'addRadialLine: old intersection '//real2str(px)//', '//real2str(py)//&
              &', new intersection '//real2str(newPx)//', '//real2str(newPy))
     else
         newPx = px
@@ -1406,7 +1407,7 @@ contains
         call csioSetSurface(0)
         call csioSetRelax(0)
         call csioOpenFile()
-        call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", llX(1:llNp), lly(1:llNp) )    
+        call siloWriteLineSegmentGridFromPoints( csioDbfile, "refLine", llX(1:llNp), lly(1:llNp) )
         call siloWriteQuadGrid( csioDbfile, "region", &
              & 3, grid%nr(iReg), &
              & grid%xmail(liFcP:liFcP+2, 1:grid%nr(iReg), iReg), &
@@ -1424,7 +1425,7 @@ contains
 
     ! Positive direction
     iSurface = 0
-    do ir = lIFcR + 1, grid%nr(iReg)       
+    do ir = lIFcR + 1, grid%nr(iReg)
         iSurface = iSurface + 1
         call csioSetSurface(delta=1)
         call insertPoints( equ, &
@@ -1435,7 +1436,7 @@ contains
     end do
 
     ! Negative direction
-    do ir = lIFcR - 1, 1, -1 
+    do ir = lIFcR - 1, 1, -1
         iSurface = iSurface + 1
         call csioSetSurface(delta=1)
         call insertPoints( equ, &
@@ -1457,9 +1458,9 @@ contains
                  & grid%xmail(1:grid%np1(i), 1:grid%nr(i), i), &
                  & grid%ymail(1:grid%np1(i), 1:grid%nr(i), i) )
         end do
-        call csioCloseFile()    
+        call csioCloseFile()
     end if
-#endif   
+#endif
 
     ! For points on boundary of region, insert
     ! radial lines starting at this point in all other regions
@@ -1488,7 +1489,7 @@ contains
                  & grid%ymail(liFcP+1, 1, iReg), &
                  & isRequired, &
                  & recomputeIntersection = .false., &
-                 & iFcR = iOtherFcR, iRegOrigin = iReg ) 
+                 & iFcR = iOtherFcR, iRegOrigin = iReg )
         end if
 
         ! Boundary face (liFcP,nrMax) -> (liFcP+2,nrMax)
@@ -1509,7 +1510,7 @@ contains
                  & grid%ymail(liFcP+1, grid%nr(iReg), iReg), &
                  & isRequired, &
                  & recomputeIntersection = .false., &
-                 & iFcR = iOtherFcR, iRegOrigin = iReg ) 
+                 & iFcR = iOtherFcR, iRegOrigin = iReg )
         end if
     end do
 
@@ -1525,7 +1526,7 @@ contains
                  & grid%xmail(1:grid%np1(i), 1:grid%nr(i), i), &
                  & grid%ymail(1:grid%np1(i), 1:grid%nr(i), i) )
         end do
-        call csioCloseFile()    
+        call csioCloseFile()
     end if
 #endif
 
@@ -1557,7 +1558,7 @@ contains
 
     ! coordinates of points on reference and new grid line
     ! (in distance from beginning of niveau line)
-    double precision :: lRef(npnimx), lNew(npnimx), lNewModified(npnimx)    
+    double precision :: lRef(npnimx), lNew(npnimx), lNewModified(npnimx)
 
     double precision :: lengthRef, lengthNew, curDist
     double precision :: lPasmin, lTgarde
@@ -1603,12 +1604,12 @@ contains
         ! Giving curDist as a parameter is a safety check that we do not get a
         ! point positioned "before", i.e. closer to the start point than the previous one
         lRef(iPol) = ruban(nivRefX(1:npNivRef), nivRefY(1:npNivRef), npNivRef,&
-             & refx(ipol), refy(ipol), curDist)       
+             & refx(ipol), refy(ipol), curDist)
         curDist = lRef(iPol)
         call assert(lRef(iPol) <= lengthRef, "insertPoints: length computation broken" )
     end do
     ! Last point is at end of reference line
-    lRef(size(newx)) = lengthRef 
+    lRef(size(newx)) = lengthRef
 
     ! Place an initial distribution of points on the new grid line
     lNew(1) = 0d0
@@ -1634,13 +1635,13 @@ contains
         call siloWriteLineSegmentGridFromPoints( csioDbfile, "newLine", nivNewX(1:npNivNew), nivNewY(1:npNivNew) )
         call siloWriteQuadGrid( csioDbfile, "region", &
              & size(newx), 2, &
-             & tmpMailx, tmpMaily )            
+             & tmpMailx, tmpMaily )
         call csioCloseFile()
     end if
 #endif
 
     ! Optimize distribution of grid points according to the criteria,
-    ! using the signed relaxation method 
+    ! using the signed relaxation method
 
     !nrelax = 0
     ! nrelax is coming from COMRLX.F. It is not a constant, can be modified by user I/O.
@@ -1649,7 +1650,7 @@ contains
         !      distribution orthogonale
         ! We compute the grid quality criterion for the initiali point distribution.
         ! Like nrelax, pasmin, l0 and l1 come from the COMRLX common block
-        ! The two zeros in the clort call are the guard lengths. We effectively 
+        ! The two zeroes in the clort call are the guard lengths. We effectively
         ! disable the "proportional distribution" criterion here.
         !lPasmin = pasmin * 1e-1
         !lPasmin = 1e-4
@@ -1672,7 +1673,7 @@ contains
                 lNewModified(ipol)=0.9*lNew(ipol)+0.1*lNew(ipol-1)
             endif
             call coord(nivNewX(1:npNivNew), nivNewY(1:npNivNew),&
-                 & npNivNew,lNewModified(iPol), & 
+                 & npNivNew,lNewModified(iPol), &
                  & newx(ipol),newy(ipol) )
 
             !diag%somort(ir,ireg)= diag%somort(ir,ireg)+(critNew(ipol)/nppol)
@@ -1683,7 +1684,7 @@ contains
 
         ! 4. on relaxe les points de facon iterative pour realiser la
         !    meilleure orthogonalite possible
-        !    We relax the node positions to get the best criteria match possible 
+        !    We relax the node positions to get the best criteria match possible
         do i=1,nrelax
 
             call clort( refx, refy,&
@@ -1695,7 +1696,7 @@ contains
             do ipol=2, size(newx) - 1
                 if(abs(critModified(ipol)).gt.rlcept) then
                     ! criterion for current node too big: move node
-                    del=-critModified(ipol)*(lNewModified(ipol)-lNew(ipol)) & 
+                    del=-critModified(ipol)*(lNewModified(ipol)-lNew(ipol)) &
                          & /(critModified(ipol)-critNew(ipol))
                     if(del.gt.0d0) then
                         del=min(del,relax*(lNewModified(ipol+1)-lNewModified(ipol)))
@@ -1708,7 +1709,7 @@ contains
                         lNewModified(ipol)=lNewModified(ipol)+del
                     endif
                     call coord(nivNewX(1:npNivNew), nivNewY(1:npNivNew),&
-                         & npNivNew,lNewModified(iPol), & 
+                         & npNivNew,lNewModified(iPol), &
                          & newx(ipol),newy(ipol) )
 
                 endif
@@ -1726,7 +1727,7 @@ contains
                 call siloWriteLineSegmentGridFromPoints( csioDbfile, "newLine", nivNewX(1:npNivNew), nivNewY(1:npNivNew) )
                 call siloWriteQuadGrid( csioDbfile, "region", &
                      & size(newx), 2, &
-                     & tmpMailx, tmpMaily )            
+                     & tmpMailx, tmpMaily )
                 call csioCloseFile()
             end if
 #endif
@@ -1736,7 +1737,7 @@ contains
 
         if(ortmax > rlcept) then
             ! The relaxation failed to produce good results with the
-            ! given number of iterations            
+            ! given number of iterations
         end if
 
     endif
@@ -1750,7 +1751,7 @@ contains
     ! internal
     integer :: iReg, ip, ir, np
     logical :: removeRadialLine(npmamx,nregmx), removeable
-    integer :: sepSegsDelta(nsepsegmx)    
+    integer :: sepSegsDelta(nsepsegmx)
 
     ! FIXME: cannot remove radial lines that are part of the wall, i.e. radial lines
     ! with two consecutive boundary points.
@@ -1812,12 +1813,12 @@ contains
 
   contains
 
-    ! Check whether the radial line going through ir, ireg can be removed, and 
+    ! Check whether the radial line going through ir, ireg can be removed, and
     ! if yes, mark it to be removed in array removeRadialLine for all regions.
     ! Also note the indices of the separatrix segments to update
     !
     ! The flag force indicates whether required lines can be removed or not
-    subroutine markRadialLine(ip, iReg, removeable, force) 
+    subroutine markRadialLine(ip, iReg, removeable, force)
       integer, intent(in) :: ip, ireg
       logical, intent(out) :: removeable
       logical, intent(in) :: force
@@ -1839,8 +1840,8 @@ contains
       if ( removeRadialLine(ip, ireg) ) return
 
       ! trace radial line through regions
-      call followRadialLine(grid, iReg, ip, inRegion, iPolRegion) 
-     
+      call followRadialLine(grid, iReg, ip, inRegion, iPolRegion)
+
       ! is it removeable?
       removeable = .true.
       ! 1) marked as required in any region? Can be overridden by force option.
@@ -1867,12 +1868,12 @@ contains
 
           updateSegSegs = .false.
           do i = 1, grid%nreg
-              if (inRegion(i)) then 
+              if (inRegion(i)) then
                   removeRadialLine(iPolRegion(i), i) = .true.
                   updateSegSegs( grid%radLineSepSeg(iPolRegion(i), i) ) = .true.
               end if
           end do
-          
+
           ! Update point deltas for separatrix segments touched by removing this radial line
           do i = 1, nsepsegmx
               if ( updateSegSegs(i) ) sepSegsDelta(i) = sepSegsDelta(i) + 1
@@ -1906,9 +1907,9 @@ contains
 
   end subroutine coarsenCells
 
-  ! Follow a radial line, note through which regions it passes 
+  ! Follow a radial line, note through which regions it passes
   ! and note the poloidal positions for every region
-  recursive subroutine followRadialLine(grid, iReg, iPol, inRegion, iPolRegion, regionVisited) 
+  recursive subroutine followRadialLine(grid, iReg, iPol, inRegion, iPolRegion, regionVisited)
     type(CarreGrid), intent(in) :: grid
     integer, intent(in) :: iReg, iPol
     logical, intent(inout), dimension(grid%nreg) :: inRegion
@@ -1921,7 +1922,7 @@ contains
     double precision :: xBnd, yBnd
 
     ! Set up tracking for visited regions at top of recursion
-    if (present(regionVisited)) then 
+    if (present(regionVisited)) then
         lRegionVisited = regionVisited
     else
         lRegionVisited = .false.
@@ -1945,7 +1946,7 @@ contains
             xBnd = grid%xmail(iPol, grid%nr(iReg), iReg)
             yBnd = grid%ymail(iPol, grid%nr(iReg), iReg)
         end select
-        
+
         do iRegOther = 1, grid%nreg
             if (iRegOther == iReg) cycle
             call findPointInRegion(grid, iRegOther, xBnd, yBnd, npoint, iPolOther, iRadOther)
@@ -1955,17 +1956,16 @@ contains
         end do
     end do
 
-    if (present(regionVisited)) then 
+    if (present(regionVisited)) then
         regionVisited = lRegionVisited
     end if
 
   end subroutine followRadialLine
-    
 
 
-  subroutine finalizeCells(grid, par)
+
+  subroutine finalizeCells(grid)
     type(CarreGrid), intent(inout) :: grid
-    type(CarreParameters), intent(in) :: par
 
     ! internal
     integer :: iReg, ir, ip, iFace, ip2, ir2
@@ -1986,7 +1986,7 @@ contains
     pointWasMoved = .false.
     grid%pointFlagFinalCheck = GRID_UNDEFINED
 
-    ! First fix cells with broken geometry (can happen at this stage due to 
+    ! First fix cells with broken geometry (can happen at this stage due to
     ! forced coarsening)
 
     do iReg = 1, grid%nReg
@@ -2000,13 +2000,13 @@ contains
                 nInt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_INTERNAL )
                 nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
                 if (.not. ((nInt == 3) .and. (nExt == 1)) ) cycle
-                                
+
                 call findPoint( ip, ir, iReg, GRID_EXTERNAL, ipFix, irFix )
-               
+
                 ! Consider the internal points connected to the external point
                 ! by a face. The internal point closer to the intersection point on its
                 ! face is moved onto this intersection point
-                
+
                 ! radial face
                 ! neighbour point
                 ipNbRad = ipFix
@@ -2040,7 +2040,7 @@ contains
                      & grid%ymail(ipNbPol,irNbPol,iReg), &
                      & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
                      & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
-                
+
                 ! Move internal point on the shorter internal face segment
                 if (dIntRad < dIntPol) then
                     call movePoint( &
@@ -2060,7 +2060,7 @@ contains
 
                 ! Mark as fixed
                 grid%cellflag(ip, ir, iReg) = GRID_BOUNDARY
- 
+
             end do
         end do
     end do
@@ -2097,11 +2097,11 @@ contains
 
                             ! Compute indices of neighbour point
                             ip2 = ip + dx
-                            ir2 = ir + dy                    
+                            ir2 = ir + dy
 
                             ! make sure neighbour point is in region
                             if ( (ip2 < 1) .or. (ip2 > grid%np1(iReg)) ) cycle
-                            if ( (ir2 < 1) .or. (ir2 > grid%nr(iReg)) ) cycle 
+                            if ( (ir2 < 1) .or. (ir2 > grid%nr(iReg)) ) cycle
 
                             ! figure out indices and type of face this point is on
                             ipFace = ip + min(dx, 0)
@@ -2125,7 +2125,7 @@ contains
                             if ( (iPass==2) .and. &
                                  & (grid%pointFlag(ip2, ir2, iReg) == GRID_BOUNDARY) ) then
 
-                                ! external and boundary point: 
+                                ! external and boundary point:
                                 ! move external point onto boundary point (-> triangle cell)
                                 call movePoint( grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
                                      & grid%xmail(ip2,ir2,iReg), grid%ymail(ip2,ir2,iReg), &
@@ -2148,8 +2148,8 @@ contains
     end do
 
     ! Now catch special case of internal cells with three external points and one internal point
-    ! (no boundary point). Make sure the external point not connected to the internal 
-    ! point via a face is placed on one of the other external points. If this is not 
+    ! (no boundary point). Make sure the external point not connected to the internal
+    ! point via a face is placed on one of the other external points. If this is not
     ! the case, move it to the external neighbour along the radial face.
 
     do iReg = 1, grid%nReg
@@ -2165,10 +2165,10 @@ contains
                 if (.not. ((nInt == 1) .and. (nExt == 3)) ) cycle
 
 
-                call logmsg(LOGDEBUG,  'finalizeCells: candidate cell '//int2str(ip)&
+                call logmsg(LOGDEBUG, 'finalizeCells: candidate cell '//int2str(ip)&
                      &//', '//int2str(ir)//', '//int2str(iReg) )
 
-                ! find the internal point                
+                ! find the internal point
                 call findPoint( ip, ir, iReg, GRID_INTERNAL, ipFix, irFix )
 
                 ! the external point we are interested in is on the opposite corner
@@ -2187,7 +2187,7 @@ contains
                 if ( pointsIdentical( &
                      & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
                      & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
-                   pointOk = .true.             
+                   pointOk = .true.
                    grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
                 end if
@@ -2199,14 +2199,14 @@ contains
                 if ( pointsIdentical( &
                      & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
                      & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
-                   pointOk = .true.             
+                   pointOk = .true.
                    grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
                 end if
 
                 ! if not ok, set it to neighbour in radial direction
                 if (.not. pointOk) then
-                    call logmsg(LOGDEBUG,  'finalizeCells: cell '//int2str(ip)//' '//int2str(ir)&
+                    call logmsg(LOGDEBUG, 'finalizeCells: cell '//int2str(ip)//' '//int2str(ir)&
                          &//' '//int2str(iReg)//', fixing node '//int2str(ipFix)//' '&
                          &//int2str(irFix)//' with node '//int2str(ipNb)//' '//int2str(irNb) )
                     call movePoint( grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
@@ -2229,7 +2229,7 @@ contains
 
       ! internal
       integer :: ipL, irL
-      
+
       ! find the internal point
       ipFix = GRID_UNDEFINED
       irFix = GRID_UNDEFINED
@@ -2248,7 +2248,7 @@ contains
 
     subroutine movePoint( xFrom, yFrom, xTo, yTo, markFixed )
       double precision, intent(in) :: xFrom, yFrom, xTo, yTo
-      logical, intent(in) :: markFixed 
+      logical, intent(in) :: markFixed
 
       ! internal
       integer :: iReg, ip(MAX_POINT_OCCUR), ir(MAX_POINT_OCCUR), npoint
@@ -2263,18 +2263,18 @@ contains
               grid%xmail(ip(1), ir(1), iReg) = xTo
               grid%ymail(ip(1), ir(1), iReg) = yTo
               pointWasMoved(ip(1), ir(1), iReg) = .true.
-              grid%pointFlagFinalCheck(ip(1), ir(1), iReg) = GRID_BOUNDARY                  
+              grid%pointFlagFinalCheck(ip(1), ir(1), iReg) = GRID_BOUNDARY
 
-              if (markFixed) then                
+              if (markFixed) then
                   ! Mark as boundary point
                   grid%pointFlag(ip(1), ir(1), iReg) = GRID_BOUNDARY
-                  
+
                   ! Mark all faces connected to this point as not intersected
                   grid%faceISec(FACE_RADIAL,ip(1),ir(1),iReg) = .false.
                   grid%faceISec(FACE_POLOIDAL,ip(1),ir(1),iReg) = .false.
                   if (ir(1)-1 > 0) grid%faceISec(FACE_RADIAL,ip(1),ir(1)-1,iReg) = .false.
                   if (ip(1)-1 > 0) grid%faceISec(FACE_POLOIDAL,ip(1)-1,ir(1),iReg) = .false.
-              end if              
+              end if
 
           end if
       end do

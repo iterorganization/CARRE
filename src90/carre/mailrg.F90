@@ -86,7 +86,8 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       REAL(rKind) :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx),cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
 
       integer :: ntt, sensspe
-      REAL(rKind) :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc, length_xp
+      REAL(rKind) :: fctxo, xtt(5), ytt(5), x22, y22, fctanc, length_xp
+!!$      REAL(rKind) :: x23, y23
 
 !  procedures
       INTEGER ifind
@@ -621,24 +622,24 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                           & nppol, ir, &
                           & mailx(1:nppol, 1:ir), maily(1:nppol, 1:ir) )
 
-                     call siloWriteQuadData( csioDbfile,  "region", "cort", &
+                     call siloWriteQuadData( csioDbfile, "region", "cort", &
                           & cort(1:nppol, 1:ir), DB_NODECENT )
-                     call siloWriteQuadData( csioDbfile,  "region", "cortpur", &
+                     call siloWriteQuadData( csioDbfile, "region", "cortpur", &
                           & cortpur(1:nppol, 1:ir), DB_NODECENT )
-                     call siloWriteQuadData( csioDbfile,  "region", "cpropo", &
+                     call siloWriteQuadData( csioDbfile, "region", "cpropo", &
                           & cpropo(1:nppol, 1:ir), DB_NODECENT )
-                     call siloWriteQuadData( csioDbfile,  "region", "cvarr", &
+                     call siloWriteQuadData( csioDbfile, "region", "cvarr", &
                           & cvarr(1:nppol, 1:ir), DB_NODECENT )
 
                      ! only current flux surface
                      call siloWriteLineSegmentGridFromPoints( csioDbfile, "currentsurface", mailx(1:nppol,ir), maily(1:nppol,ir) )
-                     call siloWriteUMData( csioDbfile,  "currentsurface", "ort", &
+                     call siloWriteUMData( csioDbfile, "currentsurface", "ort", &
                           & siloExpandSegmentData( ort2(1:nppol) ), DB_NODECENT )
-                     call siloWriteUMData( csioDbfile,  "currentsurface", "ortpur", &
+                     call siloWriteUMData( csioDbfile, "currentsurface", "ortpur", &
                           & siloExpandSegmentData( ortpur(1:nppol) ), DB_NODECENT )
-                     call siloWriteUMData( csioDbfile,  "currentsurface", "propo", &
+                     call siloWriteUMData( csioDbfile, "currentsurface", "propo", &
                           & siloExpandSegmentData( propo(1:nppol) ), DB_NODECENT )
-                     call siloWriteUMData( csioDbfile,  "currentsurface", "varr", &
+                     call siloWriteUMData( csioDbfile, "currentsurface", "varr", &
                           & siloExpandSegmentData( varr(1:nppol) ), DB_NODECENT )
                      end if
 #endif
@@ -650,47 +651,47 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                print*, &
      &          'L''algorithme adaptatif d''optimisation de '// &
      &          'l''orthogonalite de la maille n''a pas converge !'
-               print*,'ortmax=',ortmax
+               print '(a,1p,1f12.4)','ortmax=',ortmax
                print*,'Pensez a relancer le programme avec: '
-               print*, &
+               print '(a,1p,i8)', &
      &          '1) Un plus grand nombre d''iterations, '// &
      &           'actuellement nrelax = ',nrelax
-               print*, &
+               print '(a,1p,1f12.4)', &
      &          '2) Un autre facteur de relaxation, '// &
      &           'actuellement relax = ',relax
-               print*, &
+               print '(a,1p,1f12.4)', &
      &          '3) Un espacement minimal plus petit, '// &
      &           'actuellement pasmin = ',pasmin
-               print*, &
+               print '(a,1p,1f12.4)', &
      &          '4) Un critere d''orthogonalite moins strict, '// &
      &           'actuellement rlcept = ',rlcept
-               print*, &
+               print '(a,1p,2f12.4)', &
      &          '5) Des longueurs de garde plus importantes '// &
      &           '(ou nulles), actuellement tgarde = ',garde1,garde2
-               print*, &
+               if ( .not. AUTOCONTINUE ) print*, &
      &          'Voulez-vous continuer (o/n) ?'
              elseif(sellan(1:7).eq.'english') then
                print*, &
      &          'Mesh adaptation algorithm to optimize orthogonality'// &
      &          ' did not converge !'
-               print*,'ortmax=',ortmax
+               print '(a,1p,1f12.4)','ortmax=',ortmax
                print*,'Consider re-running with: '
-               print*, &
+               print '(a,1p,i8)', &
      &          '1) A larger number of iterations, '// &
      &           'currently nrelax = ',nrelax
-               print*, &
+               print '(a,1p,1f12.4)', &
      &          '2) Changing the relaxation factor, '// &
      &           'currently relax = ',relax
-               print*, &
+               print '(a,1p,1f12.4)', &
      &          '3) A smaller minimal spacing, '// &
      &           'currently pasmin = ',pasmin
-               print*, &
+               print '(a,1p,1f12.4)', &
      &          '4) A less stringent orthogonality criterion, '// &
      &           'currently rlcept = ',rlcept
-               print*, &
+               print '(a,1p,2f12.4)', &
      &          '5) Longer (or zero) guard lengths, '// &
      &           'currently tgarde = ',garde1,garde2
-               print*, &
+               if ( .not. AUTOCONTINUE ) print*, &
      &          'Do you wish to continue (y/n) ?'
              endif
              if ( .not. AUTOCONTINUE ) then

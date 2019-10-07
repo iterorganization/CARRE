@@ -141,7 +141,7 @@ module carre_types
       double precision :: targetRes = huge(0.0d0)
       double precision :: maxResJump = huge(0.0d0)
 
-      ! Default value is chosen to cause no cleanup
+      ! Default value is chosen to cause no clean-up
       double precision :: cleanupPasmin = 0.0d0
 
       ! Extended grid mode

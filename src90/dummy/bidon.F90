@@ -36,7 +36,7 @@
         integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
              &        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg
         real(rKind) :: x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
-             &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
+             &       xstruc(npstmx,strumx),ystruc(npstmx,strumx), &
              &       nivx(npnimx,nbniv),nivy(npnimx,nbniv), &
              &       xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*)
         return
@@ -54,26 +54,28 @@
 
 
         real(rKind) :: x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
-             &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
+             &       xstruc(npstmx,strumx),ystruc(npstmx,strumx), &
              &       nivx(npnimx,nbniv),nivy(npnimx,nbniv)
 
         return
       end subroutine trace2
 !=======================================================================
-      subroutine trace3(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot, &
-           &        nstruc,npstru,xstruc,ystruc,nivx,nivy, &
-           &        nivtot,nbniv)
+      subroutine trace3(x1,x2,y1,y2, &
+           &        nstruc,npstru,xstruc,ystruc, &
+           &        pntrat,distxo,xn1,yn1,nn1, &
+           &        fctini,xfin,yfin,fctfin, &
+           &        psi,nx,ny,x,y)
         use KindDefinitions
         implicit none
 #include <CARREDIM.F>
         !  arguments
-        integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
-             &      nivtot(nbniv),ptsep(4,npx)
+        integer nstruc,npstru(strumx),nn1,nx,ny
 
-
-        real(rKind) ::  x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
-             &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
-             &       nivx(npnimx,nbniv),nivy(npnimx,nbniv)
+        real(rKind) ::  x1,x2,y1,y2, &
+             &       xstruc(npstmx,strumx),ystruc(npstmx,strumx), &
+             &       pntrat,distxo, &
+             &       xn1(nn1),yn1(nn1),fctini,xfin,yfin,fctfin, &
+             &       psi(nxmax,nymax),x(nxmax),y(nymax)
 
         return
       end subroutine trace3

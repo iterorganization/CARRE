@@ -79,8 +79,8 @@
 !<<<
       write(0,*) 'Entering trgarng: nbdef=',nbdef
       if(nbdef.gt.0) then !{
-        write(0,'(1x,a8,i7,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
-        write(0,'(1x,a8,i7,9i10)') 'indxpt: ',(indxpt(i),i=1,nbdef)
+        write(0,'(1x,a8,i6,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
+        write(0,'(1x,a8,i6,9i10)') 'indxpt: ',(indxpt(i),i=1,nbdef)
         write(0,'(1x,a4,4x,1p,10e10.3)') 'xst:',(xst(i),i=1,nbdef)
         write(0,'(1x,a4,4x,1p,10e10.3)') 'yst:',(yst(i),i=1,nbdef)
       end if !}
@@ -175,7 +175,7 @@
 !<<<
       write(0,*) 'After re-arrangement: ',nbdef
       if(nbdef.gt.0) then !{
-        write(0,'(1x,a8,i7,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
+        write(0,'(1x,a8,i6,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
         write(0,'(1x,a4,4x,1p,10e10.3)') 'xst:',(xst(i),i=1,nbdef)
         write(0,'(1x,a4,4x,1p,10e10.3)') 'yst:',(yst(i),i=1,nbdef)
       end if !}

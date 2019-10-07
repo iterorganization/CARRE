@@ -1,5 +1,6 @@
-      SUBROUTINE MAILCN(mailx,maily,xn1,yn1,nn1,pntrat,pas,nppol,nprad, &
-     &               x2,y2,xfin,yfin,fctini,nx,ny,x,y,psi, &
+      SUBROUTINE MAILCN(mailx,maily, &
+     &               xn1,yn1,nn1,pntrat,pas,nppol,nprad, &
+     &               x2,y2,fctini,nx,ny,x,y,psi, &
      &               nstruc,npstru,xstruc,ystruc, &
      &               a00,a10,a01,a11,repart,xptxo,yptxo,xpto,ypto, &
      &               nivx,nivy,nivtot,nbniv,distxo,diag,ireg)
@@ -40,7 +41,7 @@
       REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), &
      &  ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), &
      &  maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2, &
-     &  xfin,yfin,fctini,a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
+     &  fctini,a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
      &  a01(nxmax,nymax,3),a11(nxmax,nymax,3), &
      &  xptxo,yptxo,xpto,ypto,nivx(npnimx,nivmx), &
      &  nivy(npnimx,nivmx),pntrat,distxo
@@ -403,24 +404,24 @@
                      & nppol, ir, &
                      & mailx(1:nppol, 1:ir), maily(1:nppol, 1:ir) )
 
-                call siloWriteQuadData( csioDbfile,  "region", "cort", &
+                call siloWriteQuadData( csioDbfile, "region", "cort", &
                      & cort(1:nppol, 1:ir), DB_NODECENT )
-                call siloWriteQuadData( csioDbfile,  "region", "cortpur", &
+                call siloWriteQuadData( csioDbfile, "region", "cortpur", &
                      & cortpur(1:nppol, 1:ir), DB_NODECENT )
-                call siloWriteQuadData( csioDbfile,  "region", "cpropo", &
+                call siloWriteQuadData( csioDbfile, "region", "cpropo", &
                      & cpropo(1:nppol, 1:ir), DB_NODECENT )
-                call siloWriteQuadData( csioDbfile,  "region", "cvarr", &
+                call siloWriteQuadData( csioDbfile, "region", "cvarr", &
                      & cvarr(1:nppol, 1:ir), DB_NODECENT )
 
                 ! only current flux surface
                 call siloWriteLineSegmentGridFromPoints( csioDbfile, "currentsurface", mailx(1:nppol,ir), maily(1:nppol,ir) )
-                call siloWriteUMData( csioDbfile,  "currentsurface", "ort", &
+                call siloWriteUMData( csioDbfile, "currentsurface", "ort", &
                      & siloExpandSegmentData( ort2(1:nppol) ), DB_NODECENT )
-                call siloWriteUMData( csioDbfile,  "currentsurface", "ortpur", &
+                call siloWriteUMData( csioDbfile, "currentsurface", "ortpur", &
                      & siloExpandSegmentData( ortpur(1:nppol) ), DB_NODECENT )
-                call siloWriteUMData( csioDbfile,  "currentsurface", "propo", &
+                call siloWriteUMData( csioDbfile, "currentsurface", "propo", &
                      & siloExpandSegmentData( propo(1:nppol) ), DB_NODECENT )
-                call siloWriteUMData( csioDbfile,  "currentsurface", "varr", &
+                call siloWriteUMData( csioDbfile, "currentsurface", "varr", &
                      & siloExpandSegmentData( varr(1:nppol) ), DB_NODECENT )
                 end if
 #endif
@@ -447,19 +448,19 @@
      &           'l''orthogonalite de la maille n''a pas converge !'
                 print*,'ortmax=',ortmax
                 print*,'Pensez a relancer le programme avec: '
-                print*, &
+                print '(a,1p,i8)', &
      &           '1) Un plus grand nombre d''iterations, '// &
      &            'actuellement nrelax = ',nrelax
-                print*, &
+                print '(a,1p,1f12.4)', &
      &           '2) Un autre facteur de relaxation, '// &
      &            'actuellement relax = ',relax
-                print*, &
+                print '(a,1p,1f12.4)', &
      &           '3) Un espacement minimal plus petit, '// &
      &            'actuellement pasmin = ',pasmin
-                print*, &
+                print '(a,1p,1f12.4)', &
      &           '4) Un critere d''orthogonalite moins strict, '// &
      &            'actuellement rlcept = ',rlcept
-                print*, &
+                if ( .not. AUTOCONTINUE ) print*, &
      &           'Voulez-vous continuer (o/n) ?'
               elseif(sellan(1:7).eq.'english') then
                 print*, &
@@ -467,19 +468,19 @@
      &           ' did not converge !'
                 print*,'ortmax=',ortmax
                 print*,'Consider re-running with: '
-                print*, &
+                print '(a,1p,i8)', &
      &           '1) A larger number of iterations, '// &
      &            'currently nrelax = ',nrelax
-                print*, &
+                print '(a,1p,1f12.4)', &
      &           '2) Changing the relaxation factor, '// &
      &            'currently relax = ',relax
-                print*, &
+                print '(a,1p,1f12.4)', &
      &           '3) A smaller minimal spacing, '// &
      &            'currently pasmin = ',pasmin
-                print*, &
+                print '(a,1p,1f12.4)', &
      &           '4) A less stringent orthogonality criterion, '// &
      &            'currently rlcept = ',rlcept
-                print*, &
+                if ( .not. AUTOCONTINUE ) print*, &
      &           'Do you wish to continue (y/n) ?'
               endif
               if ( .not. AUTOCONTINUE ) then
