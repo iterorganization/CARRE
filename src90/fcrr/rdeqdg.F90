@@ -30,7 +30,7 @@
       real(rKind) :: rgr(*), zgr(*), pfm(ngpr, *)
 !... toroidal field in tesla, radius in m
       real(rKind) :: btf, rtf
-      real ubtf, urtf
+      real(rKind) :: ubtf, urtf
 !... internal
       integer i, j
 !-----------------------------------------------------
