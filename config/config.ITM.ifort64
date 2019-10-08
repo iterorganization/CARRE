@@ -4,8 +4,6 @@
 LD_MSCL  ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER/}mscl -lmscl
 LD_NCARG ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lxcb
 
-DEFINES   = 
-
 FC        = ifort
 CPP       = /lib/cpp -C -traditional -ffreestanding
 

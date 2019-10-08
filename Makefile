@@ -70,6 +70,7 @@ include config/config.${HOST_NAME}.${COMPILER}.local
 MAKES+= config/config.${HOST_NAME}.${COMPILER}.local
 endif
 
+DEFINES  += ${SOLPS_CPP}
 ifdef SOLPS_DEBUG
 DEFINES  += -DDBG
 endif
@@ -198,8 +199,8 @@ ${OBJDIR}/libgcarre.a: ${GDEST} ${MAKES}
 	@ar rucv $@ ${GDEST}
 	ranlib $@
 
-${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_ual.${MOD} ${OBJDIR}/b2agfs.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/ipmain.o ${OBJDIR}/lwimai.o ${OBJDIR}/lwmain.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/subsys.o ${OBJDIR}/xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
-	@ar rucv $@ ${B2DEST} ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2agfs.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/ipmain.o ${OBJDIR}/lwimai.o ${OBJDIR}/lwmain.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/subsys.o ${OBJDIR}/xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_ual.${MOD} ${OBJDIR}/b2agfs.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/ipmain.o ${OBJDIR}/lnblnk.o ${OBJDIR}/lwimai.o ${OBJDIR}/lwmain.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/subsys.o ${OBJDIR}/xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+	@ar rucv $@ ${B2DEST} ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2agfs.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/ipmain.o ${OBJDIR}/lnblnk.o ${OBJDIR}/lwimai.o ${OBJDIR}/lwmain.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/subsys.o ${OBJDIR}/xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
 	ranlib $@
 
 clean:
@@ -337,6 +338,12 @@ ${OBJDIR}/ipmain.o: ${B2SRC}/utility/ipmain.F
 	ln -sf ${B2SRC}/utility/ipmain.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/ipmain.F ${OBJDIR}/ipmain.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/ipmain.o ${OBJDIR}/ipmain.f
+
+${OBJDIR}/lnblnk.o: ${B2SRC}/utility/lnblnk.F
+	mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/lnblnk.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/lnblnk.F ${OBJDIR}/lnblnk.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/lnblnk.o ${OBJDIR}/lnblnk.f
 
 ${OBJDIR}/lwimai.o: ${B2SRC}/utility/lwimai.F
 	mkdir -p ${SRCDIR}/b25_links/

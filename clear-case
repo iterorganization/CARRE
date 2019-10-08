@@ -10,12 +10,15 @@ fi
 
 if [ "$clear_input" = 1 ]; then
     rm -f structure.dat rzpsi.dat carre.dat btor.dat 
-    rm -f selptx.inf 
+    rm -f selptx.inf
+    rm -f source.txt
 fi
 
 # Output files
 
 rm -f carreFinal00000.silo carre.out 
 rm -f virtualstructure.out
-rm -f traduitAAA00000 traduit.out
+rm -f traduitAAA00000 traduit.out traduit.out.b2 traduit.out.sonnet
+rm -f vertex_data.out
 rm -f *.silo
+rm -f gmeta

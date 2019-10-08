@@ -19,7 +19,7 @@ for inputfile in $inputfiles; do
     logfile=$logdir"/"`echo $dir | tr / _`
 
     echo "Running testcase $dir, logfile is $logfile"
-    rm $logfile
+    rm -f $logfile
 
     ./clear-case >>$logfile 2>&1
     cp $dir/* .  
@@ -35,13 +35,11 @@ for inputfile in $inputfiles; do
     ./traduit-silo.sh >>$logfile 2>&1
     if [ $? -ne 0 -o ! -f traduitAAA00000 ]; then
         echo "Testcase $dir: traduit-silo.sh failed"
-	continue
     fi    
 
     ./traduit-b2.sh >>$logfile 2>&1
     if [ $? -ne 0 -o ! traduit.out ]; then
         echo "Testcase $dir: traduit-b2.sh failed"
-	continue
     fi    
 
     ./store-case $dir >>$logfile 2>&1

@@ -14,3 +14,12 @@ cat << EOF | builds/$TOOLCHAIN/traduit.exe
 carre.out
 2
 EOF
+
+mv traduit.out traduit.out.b2
+
+cat << EOF | builds/$TOOLCHAIN/traduit.exe
+carre.out
+4
+EOF
+
+mv traduit.out traduit.out.sonnet

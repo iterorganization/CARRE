@@ -49,5 +49,5 @@ meshes/
 # Temporary files created by scripts
 
 grep.lis
-testcase-verify-logs/
+testcase-verify*/
 

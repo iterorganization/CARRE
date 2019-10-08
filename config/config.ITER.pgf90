@@ -2,7 +2,6 @@
 LD_MSCL  ?= `pkg-config mscl --libs` -lgfortran
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
 
-DEFINES   = 
 ifndef SOLPS_CPP
 DEFINES  += -DPGF90
 endif

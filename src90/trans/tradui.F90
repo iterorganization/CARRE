@@ -336,8 +336,8 @@ program tradui
 !      region(:,:,0)=1
 
       ! set up the B2<->CPO mappings
-      call b2CreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),&
-          & b2cflag(-1:nx,-1:ny,:),&
+      call b2CreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
+          & b2cflag(-1:nx,-1:ny,:), &
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, ITM_OUTPUT_GHOSTCELLS, b2gd)
 
@@ -375,6 +375,8 @@ program tradui
          call euitm_deallocate(cpoedge)
 
          call close_ual(idx)
+#else
+         write(6,*) 'ITM CPO format not available when compiled without -DUSE_ITMCARRE !'
 #endif
       else if (isel == 7) then
 #ifdef USE_SILO
@@ -393,6 +395,8 @@ program tradui
          silo_tmp(-1:nx,-1:ny) = b2cflag(-1:nx,-1:ny,5)
          call b2silo_writeCvScalarReal( "grid", b2gd, "cflag5", nx, ny, silo_tmp(-1:nx,-1:ny) )
          call b2silo_close()
+#else
+         write(6,*) 'SILO format not available when compiled without -DUSE_SILO !'
 #endif
       end if
   else
