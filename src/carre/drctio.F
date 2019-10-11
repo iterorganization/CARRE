@@ -37,7 +37,7 @@ c=========================
 c.. xst,yst: tableaux des coordonnees des points de la structure.
 c.. npst: nombre de points de la structure.
 c.. x1,y1: point de depart sur la structure.
-c.. doug: drote ou gauche
+c.. doug: droite ou gauche
 c.. ind: indice du segment de structure.
 c=========================
 *  calculs

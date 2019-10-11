@@ -344,8 +344,10 @@ c        READ(vari(ieg+1:80),*,err=98) deltrn(6)
       ELSE IF (vari(1:6) .EQ. 'sellan') THEN
          call rdfrch(11,vari(ieg+1:80),novlan,ierror)
          if(ierror.eq.1) go to 98
-         if(novlan(1:8).eq.'francais'.or.novlan(1:7).eq.'english') then
-           sellan=novlan
+         if(novlan(1:8).eq.'francais') then
+           sellan(1:8)=novlan(1:8)
+         elseif(novlan(1:7).eq.'english') then
+           sellan(1:7)=novlan(1:7)
          else
            if(sellan(1:8).eq.'francais') then
              write(6,*)'Erreur de format. Veuillez recommencer.'

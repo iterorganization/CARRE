@@ -22,14 +22,13 @@ c  arguments
      .       xstruc(npstmx,strumx), ystruc(npstmx,strumx),
      .       nivx(npnimx,nbniv),nivy(npnimx,nbniv),
      .       xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*)
-
+      logical last
 c
 c  variables locales
       integer i,j,k,nin
       real x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
       real deltax,deltay
       character echx*3,echy*3
-      logical last
 c
 c  procedures
       external agcurv,newpag,endpag

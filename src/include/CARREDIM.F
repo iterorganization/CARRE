@@ -16,10 +16,7 @@ c***  nivmx       : max. number of the level lines
 c***  npmamx      : max. number of the poloidal mesh points
 c***  nrmamx      : max. number of the radial mesh points
 c***  nregmx      : max. number of regions
-c***  npnimx      : max. number of points in the tracing curve (?)
-c***  nbdmx       : max. number of divertor plates (?)
+c***  npnimx      : max. number of points in tracing curves
+c***  nbdmx       : max. number of divertor plate structures
 c***
-c.. npnimx: nombre maximum de points dans une courbe quelconque a
-c           tracer.
-c.. nbdmx: nombre maximum de structures etant une plaque de deflecteur.
 c======================================================================

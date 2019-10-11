@@ -187,7 +187,7 @@ C         definie par PAI et CLV.
 C    CLU = 0: Aucune ligne de niveau n'est tracee.
 C    CLU = 1: La ligne de niveau est tracee sans marque d'echelle ("label"!)
 C    CLU = 2: Seule la marque d'echelle est tracee, sans ligne.
-C    CLU = 3: Ala fois la ligne de niveau et la marque d'echelle sont tracees.
+C    CLU = 3: A la fois la ligne de niveau et la marque d'echelle sont tracees.
 C
 C  - CLD: Specifie le trait utilise pour la ligne de niveau courante.
 C

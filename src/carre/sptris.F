@@ -78,7 +78,7 @@ c>>>
         fctpx(ipx) = a00(ix,jx,1) + a10(ix,jx,1)*ptx(ipx)
      .                            + a01(ix,jx,1)*pty(ipx)
      .                            + a11(ix,jx,1)*ptx(ipx)*pty(ipx)
-        write(0,*) 'fctpx =',fctpx(ipx)
+        write(0,'(a,1p,1e16.8)') 'fctpx =',fctpx(ipx)
 
 *..Initialise the coordinates of each separatrix curve
 
