@@ -11,7 +11,7 @@ endif
 DEFINES = 
 
 FC      = ifort
-CPP     = /lib/cpp -C -traditional
+CPP     = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
 FFLAGS  = -g -C -debug all -traceback -check all
