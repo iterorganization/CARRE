@@ -17,9 +17,8 @@ module carre_niveau
 
   public crbniv, findLevelLineForPoints, findClosedLevelLine
 
-  logical, parameter :: DEBUGFILES_CRBNIV = .false.
-
 #ifdef USE_SILO
+  logical, parameter :: DEBUGFILES_CRBNIV = .false.
   integer, save :: CRBNIV_CALL = 0
 #endif
 

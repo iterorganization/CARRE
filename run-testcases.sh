@@ -47,3 +47,5 @@ for inputfile in $inputfiles; do
 done
 
 ./clear-case
+unset EXT_DEBUG TOOLCHAIN
+

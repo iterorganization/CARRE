@@ -41,12 +41,12 @@
 !=======================================================================
 !<<<
       write(0,*) 'Entering orddef: npx,nbdef= ',npx,nbdef
-      write(0,'(a9,20i4/(9x,20i4))') ' inddef: ',inddef
-      write(0,'(a6,1p,10e12.4/(6x,10e12.4))') ' xst: ',(xst(i),i=1,nbdef)
-      write(0,'(a6,1p,10e12.4/(6x,10e12.4))') ' yst: ',(yst(i),i=1,nbdef)
+      write(0,'(a9,i6,9i12)') ' inddef: ',(inddef(i),i=1,nbdef)
+      write(0,'(a6,1p,10e12.4)') ' xst: ',(xst(i),i=1,nbdef)
+      write(0,'(a6,1p,10e12.4)') ' yst: ',(yst(i),i=1,nbdef)
       if(npx.gt.0) then !{
-       write(0,'(a6,1p,10e12.4/(6x,10e12.4))') ' ptx: ',(ptx(i),i=1,npx)
-       write(0,'(a6,1p,10e12.4/(6x,10e12.4))') ' pty: ',(pty(i),i=1,npx)
+       write(0,'(a6,1p,10e12.4)') ' ptx: ',(ptx(i),i=1,npx)
+       write(0,'(a6,1p,10e12.4)') ' pty: ',(pty(i),i=1,npx)
       end if !}
 !>>>
 !*** Order the X-points from top to bottom if necessary

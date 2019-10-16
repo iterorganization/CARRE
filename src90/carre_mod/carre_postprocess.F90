@@ -29,10 +29,10 @@ module carre_postprocess
   ! Task parameters for subroutine fixCells
   integer, parameter :: FIXCELLS_MODE_FIX = 1       ! Fix geometry issues
   integer, parameter :: FIXCELLS_MODE_REFINE = 2    ! Fix resolution
-
+#ifdef USE_SILO
   logical, parameter :: DEBUGFILES_ADDRADIALLINE = .false.
   logical, parameter :: DEBUGFILES_INSERTPOINTS = .false.
-
+#endif
   ! Actions for postprocessing iteration
   integer, parameter :: ACTION_REFINE_FIX = 1
   integer, parameter :: ACTION_COARSEN = 2

@@ -21,9 +21,9 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 #endif
 
       IMPLICIT NONE
-
+#ifdef USE_SILO
       logical, parameter :: DEBUGFILES_MAILRG = .false.
-
+#endif
       ! Cette sous-routine fait le maillage curviligne orthogonal dans
       ! une region.
       !
@@ -81,9 +81,11 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       ! varr: minimal distance between points
       REAL(rKind) :: ortpur(npmamx),propo(npmamx),varr(npmamx)
 
+#ifdef USE_SILO
       ! cort,cortpur/propo/varr: optimization function + individual contributions for final
       ! grid point distribution for all grid nodes placed up to now
       REAL(rKind) :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx),cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
+#endif
 
       integer :: ntt, sensspe
       REAL(rKind) :: fctxo, xtt(5), ytt(5), x22, y22, fctanc, length_xp
@@ -539,12 +541,13 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                   & maily(1,ir),ort1,nppol,pasmin,garde1,garde2,l0,l1, &
                   & ortpur,propo,varr)
 
+#ifdef USE_SILO
              ! collect optimization function for all surfaces
              cort(1:nppol,ir) = ort1(1:nppol)
              cortpur(1:nppol,ir) = ortpur(1:nppol)
              cpropo(1:nppol,ir) = propo(1:nppol)
              cvarr(1:nppol,ir) = varr(1:nppol)
-
+#endif
 !
 !  3.   on procede a un premier deplacement des noeuds
              l2(1)=zero
@@ -580,11 +583,13 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
                           & maily(1,ir),ort2,nppol,pasmin,garde1,garde2,l0,l2, &
                           & ortpur,propo,varr)
 
+#ifdef USE_SILO
                      ! collect optimization function for all surfaces
                      cort(1:nppol,ir) = ort2(1:nppol)
                      cortpur(1:nppol,ir) = ortpur(1:nppol)
                      cpropo(1:nppol,ir) = propo(1:nppol)
                      cvarr(1:nppol,ir) = varr(1:nppol)
+#endif
 
                      ortmax=zero
                      do ipol=ipol1,ipoln

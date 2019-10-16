@@ -18,8 +18,9 @@
       use carre_criteria, only : clort
 
       IMPLICIT NONE
-
+#ifdef USE_SILO
       logical, parameter :: DEBUGFILES_MAILCN = .false.
+#endif
 
 !..  Cette sous-routine fait le maillage curviligne orthogonal dans
 !  la region centrale.
