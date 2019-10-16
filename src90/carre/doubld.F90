@@ -1,5 +1,6 @@
       SUBROUTINE DOUBLD(bouclx,boucly,xn1,yn1,nn1,pas, &
-     &  nprad,plaque,xext,yext,xextOffset,yextOffset,xptxex,yptxex,xpto,ypto,nx,ny,x,y, &
+     &  nprad,plaque,xext,yext,xextOffset,yextOffset, &
+     &  xptxex,yptxex,xpto,ypto,nx,ny,x,y, &
      &  psi,nstruc,npstru,xstruc,ystruc,a00,a10,a01, &
      &  a11,repart,xcrb2,ycrb2,npcrb2)
 !
@@ -38,8 +39,8 @@
       INTEGER nx,ny,nstruc,npstru(nstruc), &
      &        nn1,nprad,plaque,repart,npcrb2
 
-      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), &
-     &     ystruc(npstmx,nstruc),bouclx,boucly,xptxex,yptxex,xn1(nn1), &
+      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx), &
+     &     ystruc(npstmx,strumx),bouclx,boucly,xptxex,yptxex,xn1(nn1), &
      &     yn1(nn1),pas(nrmamx),xext,yext,xextOffset,yextOffset,a00(nxmax,nymax,3), &
      &     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), &
      &     xcrb2(npcrb2),ycrb2(npcrb2), &

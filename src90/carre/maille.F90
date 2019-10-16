@@ -10,10 +10,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 !*** connected double null, disconnected double null, or limiter)
 !======================================================================
 
+      use carre_types
       use KindDefinitions, only : rKind
       use CarreDiagnostics, only : CarreDiag
-      use carre_target, only : CarreEquilibrium, CarreParameters, CarreGrid, CarreStructures, &
-                          &    Carre_Extended, Grid_Extension_Off, drctio, plqdst
+      use carre_target, only : Carre_Extended, Grid_Extension_Off, drctio, plqdst
       use carre_equilibrium, only : compute_psi_on_grid
       use CarreSiloIO, only : csIOSetRegion
       use Logging
@@ -1337,10 +1337,13 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
                     call trc_stk_in('maille','*114')
                     CALL DOUBLD(bouclx,boucly,grid%xn,grid%yn,nn,spacer(1,1), &
-                        &        par%npr(1),struct%inddef(idef),xext,yext,xextOffset,yextOffset,&
+                        &        par%npr(1),struct%inddef(idef),xext,yext, &
+                        &        xextOffset,yextOffset, &
                         &        xptxex,yptxex,equ%xpto, &
-                        &        equ%ypto,equ%nx,equ%ny,equ%x,equ%y,equ%psi,struct%nstruc,struct%npstru,struct%xstruc, &
-                        &        struct%ystruc,equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
+                        &        equ%ypto,equ%nx,equ%ny,equ%x,equ%y,equ%psi, &
+                        &        struct%nstruc,struct%npstru, &
+                        &        struct%xstruc,struct%ystruc, &
+                        &        equ%a00,equ%a10,equ%a01,equ%a11,par%repart, &
                         &        xcrb2,ycrb2,npcrb2)
                     call trc_stk_out
                 endif
