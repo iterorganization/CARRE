@@ -1,5 +1,5 @@
 !=======================================================================
-      subroutine ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmax,nymax)
+      subroutine ecrim5(nfin,nx,ny,crx,cry,bb,fpsi,nxmax,nymax)
       use KindDefinitions
       implicit none
 !  cette routine ecrit la maille sous format DIVIMP. elle est identique
@@ -15,7 +15,7 @@
 !  arguments
       integer nfin,nx,ny,nxmax,nymax
       real(rKind) :: crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), &
-     &  bb(-1:nxmax,-1:nymax,0:3),b0r0
+     &  bb(-1:nxmax,-1:nymax,0:3)
       real(rKind) :: fpsi(-1:nxmax,-1:nymax,0:3)
 !
 !  local variables
@@ -186,7 +186,7 @@ contains
       call entete(7,'$r',iflag)
       read(7,100)lign80
       i=index(lign80,'=')
-      call rdfrin(11,lign80(i+1:80),nx,ierror)
+      call rdfrin(lign80(i+1:80),nx,ierror)
       READ(7,*) (x(i), i=1, nx)
 
 !..Read the values of y
@@ -196,7 +196,7 @@ contains
 
       i=index(lign80,'=')
 
-      call rdfrin(11,lign80(i+1:80),ny,ierror)
+      call rdfrin(lign80(i+1:80),ny,ierror)
       READ(7,*) (y(i), i=1, ny)
 
 !..Read the values of psi

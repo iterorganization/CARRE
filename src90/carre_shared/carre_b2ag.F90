@@ -5,14 +5,14 @@ module carre_b2ag
 contains
 
   subroutine carre_b2agbb (nx,ny,fpsi,ffbz,bb, &
-       &  crx,cry,psidx,psidy)
+       &  crx,psidx,psidy)
 
     use KindDefinitions
     !======================================================================
     !   ..input arguments (unchanged on exit)
     integer nx, ny
     real(rKind) fpsi(-1:nx,-1:ny,0:3), ffbz(-1:nx,-1:ny,0:3)
-    real(rKind) crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3), &
+    real(rKind) crx(-1:nx,-1:ny,0:3), &
          &  psidx(-1:nx,-1:ny,0:3),psidy(-1:nx,-1:ny,0:3)
     !   ..output arguments (unspecified on entry)
     real(rKind), intent(out) :: bb(-1:nx,-1:ny,0:3)
@@ -70,7 +70,8 @@ contains
 
     !   ..local variables
     integer ix, iy
-    real(rKind) :: t0,psdx,psdy,babs,pi,r0,b0
+    real(rKind) :: t0,babs,pi,r0,b0
+!   real(rKind) :: psdx,psdy
     !   ..procedures
     intrinsic sqrt,sign
     !-----------------------------------------------------------------------

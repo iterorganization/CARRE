@@ -1,7 +1,7 @@
-      subroutine b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmax,nymax, & 
-     &                  r,z,nreg,nregmx,nppol,nprad,npolmx,nradmx, & 
+      subroutine b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmax,nymax, &
+     &                  r,z,nreg,nregmx,nppol,nprad,npolmx,nradmx, &
      &                  nptseg,psidx,psidy,psi,psidxm,psidym,&
-     &                  cflag,b0r0, & 
+     &                  cflag,b0r0, &
      &                  ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,doGuardCells)
 !
 !  version : 12.01.99 13:10
@@ -30,15 +30,15 @@
       implicit none
 
       integer npolmx,nradmx,nxmax,nymax,ncutmx,nisomx
-      integer nx,ny,nreg,nregmx,nppol(nregmx),nprad(nregmx),nptseg(10), & 
+      integer nx,ny,nreg,nregmx,nppol(nregmx),nprad(nregmx),nptseg(10), &
      &  ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx),&
      &  cflag(npolmx,nradmx,nregmx,CARREOUT_NCELLFLAGS)
       integer b2cflag(-1:nxmax,-1:nymax,CARREOUT_NCELLFLAGS)
-      double precision :: crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), & 
-     &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), & 
-     &  r(npolmx,nradmx,nregmx),z(npolmx,nradmx,nregmx), & 
-     &  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3), & 
-     &  psi(npolmx,nradmx,nregmx),psidxm(npolmx,nradmx,nregmx), & 
+      double precision :: crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3), &
+     &  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3), &
+     &  r(npolmx,nradmx,nregmx),z(npolmx,nradmx,nregmx), &
+     &  psidx(-1:nxmax,-1:nymax,0:3),psidy(-1:nxmax,-1:nymax,0:3), &
+     &  psi(npolmx,nradmx,nregmx),psidxm(npolmx,nradmx,nregmx), &
      &  psidym(npolmx,nradmx,nregmx),b0r0
       logical :: doGuardCells
 !======================================================================
@@ -67,13 +67,13 @@
 !***  niso  : actual number of isolating cuts
 !***  nxiso : poloidal location of the isolating cuts (left edges)
 !***  cflag : flags associated with cells (object classifications, ...)
-!***  doGuardCells : If .true., guard cells are added and the cflag(:,:,:) 
+!***  doGuardCells : If .true., guard cells are added and the cflag(:,:,:)
 !     array is modified accordingly. If .false., no guard cells are added.
 !======================================================================
 
 !   ..local variables
 
-      integer ipol,irad,npol2g,npol2d, & 
+      integer ipol,irad,npol2g,npol2d, &
      &  ireg,ix,iy,npol1,npol2,npol3,i
       integer :: cix, ciy
       real(rKind) :: twopi,del,zero,one,tempo
@@ -88,28 +88,28 @@
       data znstxt / 'left', 'right' /
       data znptxt / 'bottom', 'center', 'top' /
       data znrtxt / 'inner', 'inside', 'outer' /
-      integer kq(2,3,3),nqp(2,3,3), & 
-     &  nqr(2,3,3),lqp(2,3,3),lqr(2,3,3),mqp(2,3,3),mqr(2,3,3), & 
-     &  ka(2),kb(2),kc(2),kd(2),ke(2),kf(2),kg(2),kh(2),ki(2), & 
-     &  lap(2),lbp(2),lcp(2),ldp(2),lep(2),lfp(2),lgp(2),lhp(2),lip(2), & 
-     &  lar(2),lbr(2),lcr(2),ldr(2),ler(2),lfr(2),lgr(2),lhr(2),lir(2), & 
-     &  map(2),mbp(2),mcp(2),mdp(2),mep(2),mfp(2),mgp(2),mhp(2),mip(2), & 
+      integer kq(2,3,3),nqp(2,3,3), &
+     &  nqr(2,3,3),lqp(2,3,3),lqr(2,3,3),mqp(2,3,3),mqr(2,3,3), &
+     &  ka(2),kb(2),kc(2),kd(2),ke(2),kf(2),kg(2),kh(2),ki(2), &
+     &  lap(2),lbp(2),lcp(2),ldp(2),lep(2),lfp(2),lgp(2),lhp(2),lip(2), &
+     &  lar(2),lbr(2),lcr(2),ldr(2),ler(2),lfr(2),lgr(2),lhr(2),lir(2), &
+     &  map(2),mbp(2),mcp(2),mdp(2),mep(2),mfp(2),mgp(2),mhp(2),mip(2), &
      &  mar(2),mbr(2),mcr(2),mdr(2),mer(2),mfr(2),mgr(2),mhr(2),mir(2)
-      equivalence & 
-     &    (ka,kq(1,1,1)),    (kb,kq(1,1,2)),     (kc,kq(1,1,3)), & 
-     &    (kd,kq(1,2,1)),    (ke,kq(1,2,2)),     (kf,kq(1,2,3)), & 
-     &    (kg,kq(1,3,1)),    (kh,kq(1,3,2)),     (ki,kq(1,3,3)), & 
-     &  (lap,lqp(1,1,1)),  (lbp,lqp(1,1,2)),   (lcp,lqp(1,1,3)), & 
-     &  (ldp,lqp(1,2,1)),  (lep,lqp(1,2,2)),   (lfp,lqp(1,2,3)), & 
-     &  (lgp,lqp(1,3,1)),  (lhp,lqp(1,3,2)),   (lip,lqp(1,3,3)), & 
-     &  (lar,lqr(1,1,1)),  (lbr,lqr(1,1,2)),   (lcr,lqr(1,1,3)), & 
-     &  (ldr,lqr(1,2,1)),  (ler,lqr(1,2,2)),   (lfr,lqr(1,2,3)), & 
-     &  (lgr,lqr(1,3,1)),  (lhr,lqr(1,3,2)),   (lir,lqr(1,3,3)), & 
-     &  (map,mqp(1,1,1)),  (mbp,mqp(1,1,2)),   (mcp,mqp(1,1,3)), & 
-     &  (mdp,mqp(1,2,1)),  (mep,mqp(1,2,2)),   (mfp,mqp(1,2,3)), & 
-     &  (mgp,mqp(1,3,1)),  (mhp,mqp(1,3,2)),   (mip,mqp(1,3,3)), & 
-     &  (mar,mqr(1,1,1)),  (mbr,mqr(1,1,2)),   (mcr,mqr(1,1,3)), & 
-     &  (mdr,mqr(1,2,1)),  (mer,mqr(1,2,2)),   (mfr,mqr(1,2,3)), & 
+      equivalence &
+     &    (ka,kq(1,1,1)),    (kb,kq(1,1,2)),     (kc,kq(1,1,3)), &
+     &    (kd,kq(1,2,1)),    (ke,kq(1,2,2)),     (kf,kq(1,2,3)), &
+     &    (kg,kq(1,3,1)),    (kh,kq(1,3,2)),     (ki,kq(1,3,3)), &
+     &  (lap,lqp(1,1,1)),  (lbp,lqp(1,1,2)),   (lcp,lqp(1,1,3)), &
+     &  (ldp,lqp(1,2,1)),  (lep,lqp(1,2,2)),   (lfp,lqp(1,2,3)), &
+     &  (lgp,lqp(1,3,1)),  (lhp,lqp(1,3,2)),   (lip,lqp(1,3,3)), &
+     &  (lar,lqr(1,1,1)),  (lbr,lqr(1,1,2)),   (lcr,lqr(1,1,3)), &
+     &  (ldr,lqr(1,2,1)),  (ler,lqr(1,2,2)),   (lfr,lqr(1,2,3)), &
+     &  (lgr,lqr(1,3,1)),  (lhr,lqr(1,3,2)),   (lir,lqr(1,3,3)), &
+     &  (map,mqp(1,1,1)),  (mbp,mqp(1,1,2)),   (mcp,mqp(1,1,3)), &
+     &  (mdp,mqp(1,2,1)),  (mep,mqp(1,2,2)),   (mfp,mqp(1,2,3)), &
+     &  (mgp,mqp(1,3,1)),  (mhp,mqp(1,3,2)),   (mip,mqp(1,3,3)), &
+     &  (mar,mqr(1,1,1)),  (mbr,mqr(1,1,2)),   (mcr,mqr(1,1,3)), &
+     &  (mdr,mqr(1,2,1)),  (mer,mqr(1,2,2)),   (mfr,mqr(1,2,3)), &
      &  (mgr,mqr(1,3,1)),  (mhr,mqr(1,3,2)),   (mir,mqr(1,3,3))
 
 !   ..procedures
@@ -170,13 +170,13 @@
 !***
 !*** These data are assigned to the variables:
 !***
-!***  k[a-i]	: carre region projected onto the B2 zone [a-i]
+!***  k[a-i]    : carre region projected onto the B2 zone [a-i]
 !***  l[a-i][pr]: starting index in poloidal or radial direction
 !***  m[a-i][pr]: ending index in poloidal or radial direction
 !***  n[a-i][pr]: number of cells in poloidal or radial direction
 !======================================================================
 !.computation
-      
+
 ! cleanly initialize output arrays
 
       crx = 0.0
@@ -191,13 +191,13 @@
 !      write(0,*) 'nprad: ',nprad
 !      write(0,*) 'nptseg: ',nptseg
 !      do k=1,nreg     ! {
-!	write(0,*) 'Region ',k
-!	do j=1,nprad(k)     ! {
-!	  write(0,'(4h r: ,1p,12e10.2/(4x,12e10.2))')
-!     -  					(r(i,j,k),i=1,nppol(k))
-!	  write(0,'(4h z: ,1p,12e10.2/(4x,12e10.2))')
-!     -  					(z(i,j,k),i=1,nppol(k))     ! }
-!	end do	    ! }
+!        write(0,*) 'Region ',k
+!        do j=1,nprad(k)     ! {
+!          write(0,'(4h r: ,1p,12e10.2/(4x,12e10.2))')
+!     -                                          (r(i,j,k),i=1,nppol(k))
+!          write(0,'(4h z: ,1p,12e10.2/(4x,12e10.2))')
+!     -                                          (z(i,j,k),i=1,nppol(k))     ! }
+!        end do    ! }
 !      end do
 !>>>
       twopi=2.* 4.*atan(one)
@@ -230,7 +230,7 @@
 !======================================================================
 !*** Define the equilibrium type
 
-!!!! Change the criteria (O-point is not necessarily around z=0) !!!   	
+!!!! Change the criteria (O-point is not necessarily around z=0) !!!
 !-ank19990108: done. To be honest, ssn-up and ssn-down are treated equally...
 
 !*** Now compare the vertical position of the X-point with that of the mid-SOL
@@ -245,14 +245,14 @@
         equtype='sn-down'
       else if(nreg.eq.5) then
         equtype='cdn-full'
-      else if(nreg.eq.6 .and. r(1,1,1).eq.r(1,1,3) .and. & 
+      else if(nreg.eq.6 .and. r(1,1,1).eq.r(1,1,3) .and. &
      &                                      z(1,1,1).eq.z(1,1,3) ) then
         equtype='ddn-up'
-      else if(nreg.eq.6 .and. r(1,1,1).eq.r(1,1,5) .and. & 
+      else if(nreg.eq.6 .and. r(1,1,1).eq.r(1,1,5) .and. &
      &                                      z(1,1,1).eq.z(1,1,5) ) then
         equtype='ddn-down'
       else
-        write(6,*) 'b2agfz: the equilibrium is of an unforeseen type.  ', & 
+        write(6,*) 'b2agfz: the equilibrium is of an unforeseen type.  ', &
      &                                                   'nreg = ',nreg
         stop
       end if
@@ -567,7 +567,7 @@
         ! }
           else     ! {
 
-            write(*,*) 'Non-recognisable option for disconnected ', & 
+            write(*,*) 'Non-recognisable option for disconnected ', &
      &              'double-null -- internal error in b2agfz: ',equtype
             stop
         ! }
@@ -609,11 +609,11 @@
           errenc=.false.
           do i=1,2      ! {
             do j=1,3     ! {
-              if(nqp(i,j,1).ne.nqp(i,j,2) .or. & 
+              if(nqp(i,j,1).ne.nqp(i,j,2) .or. &
      &           nqp(i,j,1).ne.nqp(i,j,3)) then  ! {
                 kk=j
                 if(i.eq.2 .and. kk.ne.2) kk=4-kk
-                write(0,*) 'Inconsistent poloidal grid dimensions. ', & 
+                write(0,*) 'Inconsistent poloidal grid dimensions. ', &
      &                                  'Region: ',znptxt(kk),znstxt(i)
                 errenc=.true.    ! }
               end if     ! }
@@ -628,9 +628,9 @@
 !xpb In Carre2 vessel mode, no longer need to ensure same radial width of
 !xpb computational contiguous but physically disjoint regions
 !!$            do k=1,3     ! {
-!!$              if(nqr(i,1,k).ne.nqr(i,2,k) .or. & 
+!!$              if(nqr(i,1,k).ne.nqr(i,2,k) .or. &
 !!$     &           nqr(i,1,k).ne.nqr(i,3,k)) then ! {
-!!$                write(0,*) 'Inconsistent radial grid dimensions. ', & 
+!!$                write(0,*) 'Inconsistent radial grid dimensions. ', &
 !!$     &                                   'Region: ',znrtxt(k),znstxt(i)
 !!$                write(*,*) '==> Check the npr specification in carre. '
 !!$                errenc=.true.    ! }
@@ -639,7 +639,7 @@
           end do
 !!$          do k=1,3      ! {
 !!$            if(nqr(1,1,k).ne.nqr(2,1,k)) then
-!!$              write(0,*) 'Inconsistent radial grid dimensions, ', & 
+!!$              write(0,*) 'Inconsistent radial grid dimensions, ', &
 !!$     &                            'right and left.  Region: ',znrtxt(k)
 !!$              write(*,*) '==> Check the npr specification in carre. '
 !!$              errenc=.true.
@@ -656,8 +656,8 @@
 !----------------------------------------------------------------------
 
 !<<<
-!	  write(0,'(1x,a8,9a4)') 'cdn-full',
-!     ,  			    'a','b','c','d','e','f','g','h','i'
+!          write(0,'(1x,a8,9a4)') 'cdn-full',
+!     ,                              'a','b','c','d','e','f','g','h','i'
 !>>>
 !*** Check some grid dimensions for consistency
 
@@ -797,16 +797,16 @@
             mir(2)=nprad(ki(2))
 
 !<<<
-!	write(0,'(1x,a8,9i4/9x,9i4)') 'Regions:',
-!     ,  			      (((kq(i,j,k),k=1,3),j=1,3),i=1,2)
-!	write(0,'(1x,a8,9i4/9x,9i4)') 'Start p:',
-!     ,  			     (((lqp(i,j,k),k=1,3),j=1,3),i=1,2)
-!	write(0,'(1x,a8,9i4/9x,9i4)') 'End   p:',
-!     ,  			     (((mqp(i,j,k),k=1,3),j=1,3),i=1,2)
-!	write(0,'(1x,a8,9i4/9x,9i4)') 'Start r:',
-!     ,  			     (((lqr(i,j,k),k=1,3),j=1,3),i=1,2)
-!	write(0,'(1x,a8,9i4/9x,9i4)') 'End   r:',
-!     ,  			     (((mqr(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'Regions:',
+!     ,                                (((kq(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'Start p:',
+!     ,                               (((lqp(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'End   p:',
+!     ,                               (((mqp(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'Start r:',
+!     ,                               (((lqr(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'End   r:',
+!     ,                               (((mqr(i,j,k),k=1,3),j=1,3),i=1,2)
 !>>>
 
 !*** Calculate dimensions of the B2 grid zones
@@ -821,10 +821,10 @@
           end do
 
 !<<<
-!	write(0,'(1x,a8,9i4/9x,9i4)') '    nqp:',
-!     ,  			     (((nqp(i,j,k),k=1,3),j=1,3),i=1,2)
-!	write(0,'(1x,a8,9i4/9x,9i4)') '    nqr:',
-!     ,  			     (((nqr(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') '    nqp:',
+!     ,                               (((nqp(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') '    nqr:',
+!     ,                               (((nqr(i,j,k),k=1,3),j=1,3),i=1,2)
 !>>>
 
 !*** Check them for consistency
@@ -835,7 +835,7 @@
               if(nqp(i,j,1).ne.nqp(i,j,3)) then     ! {
                 kk=j
                 if(i.eq.2 .and. kk.ne.2) kk=4-kk
-                write(0,*) 'Inconsistent poloidal grid dimensions. ', & 
+                write(0,*) 'Inconsistent poloidal grid dimensions. ', &
      &                                  'Region: ',znptxt(kk),znstxt(i)
                 errenc=.true.    ! }
               end if     ! }
@@ -850,9 +850,9 @@
 !xpb In Carre2 vessel mode, no longer need to ensure same radial width of
 !xpb computational contiguous but physically disjoint regions
 !!$            do k=1,3     ! {
-!!$              if(nqr(i,1,k).ne.nqr(i,2,k) .or. & 
+!!$              if(nqr(i,1,k).ne.nqr(i,2,k) .or. &
 !!$     &           nqr(i,1,k).ne.nqr(i,3,k)) then  ! {
-!!$                write(0,*) 'Inconsistent radial grid dimensions. ', & 
+!!$                write(0,*) 'Inconsistent radial grid dimensions. ', &
 !!$     &                                   'Region: ',znrtxt(k),znstxt(i)
 !!$                write(*,*) '==> Check the npr specification in carre. '
 !!$                errenc=.true.    ! }
@@ -861,7 +861,7 @@
           end do
 !!$          do k=1,3      ! {
 !!$            if(nqr(1,1,k).ne.nqr(2,1,k)) then
-!!$              write(0,*) 'Inconsistent radial grid dimensions, ', & 
+!!$              write(0,*) 'Inconsistent radial grid dimensions, ', &
 !!$     &                            'right and left.  Region: ',znrtxt(k)
 !!$              write(*,*) '==> Check the npr specification in carre. '
 !!$              errenc=.true.
@@ -884,7 +884,7 @@
 
         errenc=.false.
         if(ny.gt.nymax) then     ! {
-          write(*,*) 'Grid is too large in radial direction: ny=', & 
+          write(*,*) 'Grid is too large in radial direction: ny=', &
      &                                             ny,' > nymax=',nymax
           write(*,*) '==> Increase nrmamx in CARREDIM.F'
           errenc=.true.     ! }
@@ -895,9 +895,9 @@
 !*** Fill in the arrays
 
 !<<<
-!	write(0,*) 'b2agfz: filling the arrays. ny= ',ny
-!	write(0,'(11a5)') 'ihg','ipz','irz','irg','ix','lp','lr',
-!     ,  					  'mp','mr','iip','iir'
+!        write(0,*) 'b2agfz: filling the arrays. ny= ',ny
+!        write(0,'(11a5)') 'ihg','ipz','irz','irg','ix','lp','lr',
+!     ,                                            'mp','mr','iip','iir'
 !>>>
 
 !*** Two halves of the grid...
@@ -911,7 +911,7 @@
           nxx(ihg)=nqp(ihg,1,1)+nqp(ihg,2,1)+nqp(ihg,3,1)
           nx=nx+nxx(ihg)
           if(nx.ge.nxmax) then
-            write(*,*) 'Grid is too large in poloidal direction: nx=', & 
+            write(*,*) 'Grid is too large in poloidal direction: nx=', &
      &                                           nx+1,' > nxmax=',nxmax
             write(*,*) '==> Increase npmamx in CARREDIM.F'
             stop
@@ -919,7 +919,7 @@
 !*** Three poloidal zones
           do ipz=1,3     ! {
 ! The following line is to ensure the SOL pieces are lined up
-            iy=nyy-nqr(ihg,ipz,1)-nqr(ihg,ipz,2) 
+            iy=nyy-nqr(ihg,ipz,1)-nqr(ihg,ipz,2)
             ixx=ix
 !*** Three radial zones
             do irz=1,3     ! {
@@ -938,7 +938,7 @@
               mp=mp-iip
               mr=mr-iir
 !<<<
-!	      write(0,'(11i5)') ihg,ipz,irz,irg,ix,lp,lr,mp,mr,iip,iir
+!              write(0,'(11i5)') ihg,ipz,irz,irg,ix,lp,lr,mp,mr,iip,iir
 !>>>
 
 !*** Calculate the grid data for the zone
@@ -970,23 +970,23 @@
                   ffbz(ix,iy,2)=twopi*b0r0
                   ffbz(ix,iy,3)=twopi*b0r0
 
-                  ! Derive position cix, ciy storing the 
+                  ! Derive position cix, ciy storing the
                   ! values associated with the cell ix, iy
                   cix = j
                   ciy = i
                   if (iip == -1) cix = cix - 1
                   if (iir == -1) ciy = ciy - 1
 
-                  b2cflag(ix,iy,:)=cflag(cix,ciy,irg,:)                                  
+                  b2cflag(ix,iy,:)=cflag(cix,ciy,irg,:)
 ! If cells are inverted in poloidal or radial direction, also invert the
                   ! flags / indices stored for the faces
                   if (iip == -1) then
-                      b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(cix,ciy,irg,CELLFLAG_RIGHTFACE) 
-                      b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(cix,ciy,irg,CELLFLAG_LEFTFACE) 
-                  end if                     
+                      b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(cix,ciy,irg,CELLFLAG_RIGHTFACE)
+                      b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(cix,ciy,irg,CELLFLAG_LEFTFACE)
+                  end if
                   if (iir == -1) then
-                      b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(cix,ciy,irg,CELLFLAG_BOTTOMFACE) 
-                      b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(cix,ciy,irg,CELLFLAG_TOPFACE) 
+                      b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(cix,ciy,irg,CELLFLAG_BOTTOMFACE)
+                      b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(cix,ciy,irg,CELLFLAG_TOPFACE)
                   end if
 
                   iy=iy+1     ! }
@@ -1000,19 +1000,19 @@
               ix=ix+2     ! }
           end if
         end do
-      
-	if (doGuardCells) then
+
+        if (doGuardCells) then
 !*** periphery
         ix=-1
         do ihg=1,2     ! {
 !<<<
-!	  write(0,*) 'b2agfz: call periph. ix,nxx=',ix,nxx(ihg)
+!          write(0,*) 'b2agfz: call periph. ix,nxx=',ix,nxx(ihg)
 !>>>
 !*** This subroutine creates the guard cells around the grid block
 
-          call periph(nxx(ihg),ny, & 
-     &                crx(ix,-1,0),cry(ix,-1,0),fpsi(ix,-1,0), & 
-     &                ffbz(ix,-1,0),psidx(ix,-1,0),psidy(ix,-1,0), & 
+          call periph(nxx(ihg),ny, &
+     &                crx(ix,-1,0),cry(ix,-1,0),fpsi(ix,-1,0), &
+     &                ffbz(ix,-1,0),psidx(ix,-1,0),psidy(ix,-1,0), &
      &                del,nxmax,nymax)
           ix=ix+nxx(1)+2      ! }
         end do
@@ -1020,7 +1020,7 @@
 !<<<
 !        write(0,*) 'After periph. nx = ',nx
 !>>>
-	end if
+        end if
 
 !*** Determine the cut positions and lengths
 
@@ -1060,7 +1060,7 @@
 
 
 !---------------------------------------------------------------------- ! }
-      else if(index(equtype,'sn-down').gt.0 .or. & 
+      else if(index(equtype,'sn-down').gt.0 .or. &
      &        index(equtype,'sn-up').gt.0) then ! {
 !----------------------------------------------------------------------
 !  construct the mesh for the bottom single-null geometry
@@ -1083,7 +1083,7 @@
           write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
           stop     ! }
 !!$        else if(nprad(2).ne.nprad(3)) then     ! {
-!!$          write(6,*)'error in b2agfz: nprad(2)=',nprad(2), & 
+!!$          write(6,*)'error in b2agfz: nprad(2)=',nprad(2), &
 !!$     &      ' .ne. nprad(3)=',nprad(3)
 !!$          stop     ! }
         end if
@@ -1126,11 +1126,11 @@
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
 
-            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)                                  
-            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
-            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
-!!$            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
-!!$            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
+            b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE)
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE)
+!!$            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE)
+!!$            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)
 
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
@@ -1169,10 +1169,10 @@
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
 
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
-            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
-            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
-            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
-            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE)
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE)
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE)
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)
 
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
@@ -1211,10 +1211,10 @@
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
 
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
-            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
-            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
-            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
-            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE)
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE)
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE)
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
             end if
@@ -1252,20 +1252,20 @@
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
 
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
-            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
-            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
-            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
-            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE)
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE)
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE)
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)
             if (b2cflag(ix,iy,1) == 0) then
                 write (*,*) "b2agfz: broken cflag!"
             end if
           end do      ! }
         end do
 
-	if (doGuardCells) then
+        if (doGuardCells) then
 !  periphery
         call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
-	end if
+        end if
 !*** Specify the cuts
        ncut=2
         if(ncut.gt.ncutmx) then ! {
@@ -1346,8 +1346,8 @@
             psidy(ix,iy,3)=psidym(ipol,irad+1,ireg)    ! }
 
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
-            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
-            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE)
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE)
           end do      ! }
         end do
 !  central region
@@ -1382,16 +1382,16 @@
             psidy(ix,iy,3)=psidym(ipol,irad,ireg)     ! }
 
             b2cflag(ix,iy,:)=cflag(ipol,irad,ireg,:)
-            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE) 
-            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE) 
-            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE) 
-            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)             
+            b2cflag(ix,iy,CELLFLAG_LEFTFACE)=cflag(ipol,irad,ireg,CELLFLAG_RIGHTFACE)
+            b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=cflag(ipol,irad,ireg,CELLFLAG_LEFTFACE)
+            b2cflag(ix,iy,CELLFLAG_TOPFACE)=cflag(ipol,irad,ireg,CELLFLAG_BOTTOMFACE)
+            b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=cflag(ipol,irad,ireg,CELLFLAG_TOPFACE)
           end do      ! }
         end do
-	if (doGuardCells) then
+        if (doGuardCells) then
 !  periphery
         call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
-	end if
+        end if
 !----------------------------------------------------------------------  ! }
       else     ! {
 !----------------------------------------------------------------------
@@ -1403,8 +1403,8 @@
 !*** Rearrange the mesh if needed, in order to have a right-handed
 !*** system of coordinates
 
-      if( & 
-     & (crx(1,1,1)-crx(1,1,0))*(cry(1,1,2)-cry(1,1,0)) - & 
+      if( &
+     & (crx(1,1,1)-crx(1,1,0))*(cry(1,1,2)-cry(1,1,0)) - &
      & (crx(1,1,2)-crx(1,1,0))*(cry(1,1,1)-cry(1,1,0)).lt.zero) then ! {
 !c<<<
 !       write(0,*) 'changing the grid orientation...'

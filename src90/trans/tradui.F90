@@ -151,7 +151,7 @@ program tradui
       !
       ! Mailtri format
       !
-      call ecrim1(nout,nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, &
+      call ecrim1(nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, &
           &  nrmamx)
    elseif(isel.eq.8) then
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
@@ -159,9 +159,9 @@ program tradui
            par%nptseg,psidx,psidy,psi,psidxm,psidym,cflag,b0r0, &
            ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
-           &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+           &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
 !!$        call b2agbb (nx,ny,fpsi,ffbz,bb, &
-!!$          crx,cry,psidx,psidy,nxmx,nymx)
+!!$          crx,psidx,psidy,nxmx,nymx)
       call ecrim2_oldformat(nfin,nx,ny,&
            & crx(-1:nxmx,-1:nymx,0:3),&
            & cry(-1:nxmx,-1:nymx,0:3),bb(-1:nxmx,-1:nymx,0:3),nxmx,nymx)
@@ -175,7 +175,7 @@ program tradui
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
-          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+          &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! We do not create guard cells, but b2agfz still places
       ! the real cells starting at (0,0) (i.e. the x/y=-1 slots are empty).
       ! So here, the grid is actually stored in x=0:nx-1, y=0:ny-1, and
@@ -200,7 +200,7 @@ program tradui
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
-          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+          &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
       call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
   elseif(isel.eq.9) then
@@ -213,7 +213,7 @@ program tradui
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
-          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+          &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
   elseif(isel.eq.4) then
       !
@@ -225,7 +225,7 @@ program tradui
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
-          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+          &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmx,nymx, &
           &                                ncut,nxcut,nycut,niso,nxiso)
   elseif(isel.eq.5) then
@@ -238,9 +238,9 @@ program tradui
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
       call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
-          &    crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
+          &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! jdemod - added fpsi to call to ecrim5
-      call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
+      call ecrim5(nfin,nx,ny,crx,cry,bb,fpsi,nxmx,nymx)
   elseif(isel >= 6 .and. isel <= 7) then
 
       ! assemble the crx, cry arrays
@@ -266,7 +266,7 @@ program tradui
           ! Compute magnetic field with the same recipe as carre...
           call carre_b2agbb(nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),&
                & bb(-1:nx,-1:ny,0:3), &
-               & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),&
+               & crx(-1:nx,-1:ny,0:3), &
                & psidx(-1:nx,-1:ny,0:3), psidy(-1:nx,-1:ny,0:3) )
 
           ! add the ghost cells
@@ -325,13 +325,12 @@ program tradui
       allocate( region(-1:nx, -1:ny, 0:2) )
       allocate( resignore(-1:nx, -1:ny, 1:2) )
 
-      nncut = 0
-
-      call init_region(nx,ny,nncut,ncutmx, &
+      call init_region_extended(nx,ny,nncut,ncutmx, &
           & leftcut,rightcut,topcut,bottomcut, &
-          & leftix,rightix,rightiy,topix,topiy,bottomiy, &
+          & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
           & region,nnreg,resignore, &
-          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),periodic_bc)
+          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),periodic_bc, &
+          & b2cflag(-1:nx,-1:ny,:))
 
 !      region(:,:,0)=1
 

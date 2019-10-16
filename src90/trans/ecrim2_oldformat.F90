@@ -16,7 +16,7 @@
 !
 !  local variables
       integer ix,iy
-      real x0,y0
+      real(rKind) :: x0,y0
 !
 !  procedures
 !======================================================================

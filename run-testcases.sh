@@ -22,7 +22,7 @@ for inputfile in $inputfiles; do
     rm -f $logfile
 
     ./clear-case >>$logfile 2>&1
-    cp $dir/* .  
+    cp $dir/* .
 
     ./clear-case output >>$logfile 2>&1
     

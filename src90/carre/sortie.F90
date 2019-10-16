@@ -150,7 +150,8 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
              WRITE(10,"(a)") "'cellflags'"
              DO j=1, grid%nr(ireg) - 1
                  do i=1,grid%np1(ireg) - 1
-                     WRITE(10,"(1i4,4i4)") grid%cellflag(i,j,ireg), grid%cellFaceIStruct(:,i,j,ireg)
+                     WRITE(10,"(1i4,4i4)") grid%cellflag(i,j,ireg), &
+                                         & grid%cellFaceIStruct(:,i,j,ireg)
                  end do
              end do
 

@@ -577,8 +577,8 @@ contains
 
     ! external
     integer :: ifind
-    double precision :: long
-    external :: ifind, long
+    double precision :: leng
+    external :: ifind, leng
     logical :: foundLevelLine
 
     ! Find the cell of the starting point
@@ -612,7 +612,7 @@ contains
        if (foundEndPoint) then
           ! For the resulting level line, compute length
           ! and do bookkeeping to find the shortest
-          length = long(nivxTmp(1:npNivTmp), nivyTmp(1:npNivTmp), npNivTmp)
+          length = leng(nivxTmp(1:npNivTmp), nivyTmp(1:npNivTmp), npNivTmp)
 
           ! Heuristic: if the found level line is too large by an order of magnitude, reject it
           if ( (length/lengthFace) > 10d0 ) then

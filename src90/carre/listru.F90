@@ -51,7 +51,7 @@
       if(index(line,'$fin')+index(line,'$end').eq.0) then
         struct%nstruc=struct%nstruc+1
         struct%nomstr(struct%nstruc)=line
-!       call rdfrin(11,line,npstru(struct%nstruc),ifail)
+!       call rdfrin(line,npstru(struct%nstruc),ifail)
         read(iunit,*)struct%npstru(struct%nstruc)
         if(abs(struct%npstru(struct%nstruc)).le.1) then
           i=0

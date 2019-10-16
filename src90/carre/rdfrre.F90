@@ -1,24 +1,18 @@
-      subroutine rdfrre(iunit,vari,rr,ierror)
+      subroutine rdfrre(vari,rr,ierror)
 !  version : 03.07.2000 23:01
       use KindDefinitions
       implicit none
 !  read a real number from a chain of characters vari
 !
 !  arguments
-      integer iunit,ierror
+      integer ierror
       real(rKind) :: rr
       character vari*(*)
-!  iunit: unit of temporary file
 !  vari: chain of characters from which to read
 !  rr: real number read from vari (output)
 !  ierror: error flag: 0 for no error, 1 when there is an error.
 !
 !  calculations
-!      rewind iunit
-!      write(iunit,100)vari
-!100   format(a)
-!      rewind iunit
-!      read(iunit,*,err=99)rr
 !      write (*,*) 'rdrfre: vari', vari
 #ifdef READOPT
       read(vari,err=99) rr

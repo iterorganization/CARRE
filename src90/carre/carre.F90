@@ -152,7 +152,7 @@ contains
     call entete(7,'$r',iflag)
     read(7,100)lign80
     i=index(lign80,'=')
-    call rdfrin(11,lign80(i+1:80),equ%nx,ierror)
+    call rdfrin(lign80(i+1:80),equ%nx,ierror)
     READ(7,*) (equ%x(i), i=1, equ%nx)
 
     !..Read the values of y
@@ -160,7 +160,7 @@ contains
     call entete(7,'$z',iflag)
     read(7,100)lign80
     i=index(lign80,'=')
-    call rdfrin(11,lign80(i+1:80),equ%ny,ierror)
+    call rdfrin(lign80(i+1:80),equ%ny,ierror)
     READ(7,*) (equ%y(i), i=1, equ%ny)
 
     rmax = 0.0

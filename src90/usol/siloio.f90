@@ -210,7 +210,10 @@ contains
     integer, intent(in) :: mode
 
     ! internal
-    integer :: err, ierr
+    integer :: err
+#ifdef USE_SILO
+    integer :: ierr
+#endif
 
     if ( siloGetDisabled() ) return
 

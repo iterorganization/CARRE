@@ -29,10 +29,10 @@ CONTAINS
     implicit none
     type(CarreParameters), intent(inout) :: par
 
+#ifdef CARRE_NONINTERACTIVE
     ! internal
     integer :: ient,isor,ifail
 
-#ifdef CARRE_NONINTERACTIVE
     !..1.1  Read all the necessary data from the file    
     ient = 9
     isor = 0
@@ -139,312 +139,312 @@ CONTAINS
 
       IF (vari(1:6) .EQ. 'repart')THEN
 !        READ(vari(ieg+1:80),*,err=98)repart
-         call rdfrin(11,vari(ieg+1:80),par%repart,ierror)
+         call rdfrin(vari(ieg+1:80),par%repart,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'pntrat')THEN
 !        READ(vari(ieg+1:80),*,err=98)pntrat
-         call rdfrre(11,vari(ieg+1:80),par%pntrat,ierror)
+         call rdfrre(vari(ieg+1:80),par%pntrat,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'tgarde(1)')THEN
 !        READ(vari(ieg+1:80),*,err=98)tgarde(1)
-         call rdfrre(11,vari(ieg+1:80),par%tgarde(1),ierror)
+         call rdfrre(vari(ieg+1:80),par%tgarde(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'tgarde(2)')THEN
 !        READ(vari(ieg+1:80),*,err=98)tgarde(2)
-         call rdfrre(11,vari(ieg+1:80),par%tgarde(2),ierror)
+         call rdfrre(vari(ieg+1:80),par%tgarde(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'tgarde(3)')THEN
 !        READ(vari(ieg+1:80),*,err=98)tgarde(3)
-         call rdfrre(11,vari(ieg+1:80),par%tgarde(3),ierror)
+         call rdfrre(vari(ieg+1:80),par%tgarde(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'tgarde(4)')THEN
 !        READ(vari(ieg+1:80),*,err=98)tgarde(4)
-         call rdfrre(11,vari(ieg+1:80),par%tgarde(4),ierror)
+         call rdfrre(vari(ieg+1:80),par%tgarde(4),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'nptseg(1)') THEN
 !        READ(vari(ieg+1:80),*,err=98)nptseg(1)
-         call rdfrin(11,vari(ieg+1:80),par%nptseg(1),ierror)
+         call rdfrin(vari(ieg+1:80),par%nptseg(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'nptseg(2)') THEN
 !        READ(vari(ieg+1:80),*,err=98)nptseg(2)
-         call rdfrin(11,vari(ieg+1:80),par%nptseg(2),ierror)
+         call rdfrin(vari(ieg+1:80),par%nptseg(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'nptseg(3)') THEN
 !        READ(vari(ieg+1:80),*,err=98)nptseg(3)
-         call rdfrin(11,vari(ieg+1:80),par%nptseg(3),ierror)
+         call rdfrin(vari(ieg+1:80),par%nptseg(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'nptseg(4)') THEN
 !        READ(vari(ieg+1:80),*,err=98)nptseg(4)
-         call rdfrin(11,vari(ieg+1:80),par%nptseg(4),ierror)
+         call rdfrin(vari(ieg+1:80),par%nptseg(4),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'nptseg(5)') THEN
 !        READ(vari(ieg+1:80),*,err=98)nptseg(5)
-         call rdfrin(11,vari(ieg+1:80),par%nptseg(5),ierror)
+         call rdfrin(vari(ieg+1:80),par%nptseg(5),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'nptseg(6)') THEN
 !        READ(vari(ieg+1:80),*,err=98)nptseg(6)
-         call rdfrin(11,vari(ieg+1:80),par%nptseg(6),ierror)
+         call rdfrin(vari(ieg+1:80),par%nptseg(6),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'npr(1)') THEN
 !        READ(vari(ieg+1:80),*,err=98)npr(1)
-         call rdfrin(11,vari(ieg+1:80),par%npr(1),ierror)
+         call rdfrin(vari(ieg+1:80),par%npr(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'npr(2)') THEN
 !        READ(vari(ieg+1:80),*,err=98)npr(2)
-         call rdfrin(11,vari(ieg+1:80),par%npr(2),ierror)
+         call rdfrin(vari(ieg+1:80),par%npr(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'npr(3)') THEN
 !        READ(vari(ieg+1:80),*,err=98)npr(3)
-         call rdfrin(11,vari(ieg+1:80),par%npr(3),ierror)
+         call rdfrin(vari(ieg+1:80),par%npr(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'npr(4)') THEN
 !        READ(vari(ieg+1:80),*,err=98)npr(4)
-         call rdfrin(11,vari(ieg+1:80),par%npr(4),ierror)
+         call rdfrin(vari(ieg+1:80),par%npr(4),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'npr(5)') THEN
 !        READ(vari(ieg+1:80),*,err=98)npr(5)
-         call rdfrin(11,vari(ieg+1:80),par%npr(5),ierror)
+         call rdfrin(vari(ieg+1:80),par%npr(5),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'npr(6)') THEN
 !        READ(vari(ieg+1:80),*,err=98)npr(6)
-         call rdfrin(11,vari(ieg+1:80),par%npr(6),ierror)
+         call rdfrin(vari(ieg+1:80),par%npr(6),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltp1(1)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltp1(1)
-         call rdfrre(11,vari(ieg+1:80),par%deltp1(1),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltp1(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltp1(2)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltp1(2)
-         call rdfrre(11,vari(ieg+1:80),par%deltp1(2),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltp1(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltp1(3)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltp1(3)
-         call rdfrre(11,vari(ieg+1:80),par%deltp1(3),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltp1(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltp1(4)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltp1(4)
-         call rdfrre(11,vari(ieg+1:80),par%deltp1(4),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltp1(4),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltp1(5)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltp1(5)
-         call rdfrre(11,vari(ieg+1:80),par%deltp1(5),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltp1(5),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltp1(6)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltp1(6)
-         call rdfrre(11,vari(ieg+1:80),par%deltp1(6),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltp1(6),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltpn(1)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltpn(1)
-         call rdfrre(11,vari(ieg+1:80),par%deltpn(1),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltpn(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltpn(2)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltpn(2)
-         call rdfrre(11,vari(ieg+1:80),par%deltpn(2),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltpn(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltpn(3)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltpn(3)
-         call rdfrre(11,vari(ieg+1:80),par%deltpn(3),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltpn(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltpn(4)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltpn(4)
-         call rdfrre(11,vari(ieg+1:80),par%deltpn(4),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltpn(4),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltpn(5)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltpn(5)
-         call rdfrre(11,vari(ieg+1:80),par%deltpn(5),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltpn(5),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltpn(6)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltpn(6)
-         call rdfrre(11,vari(ieg+1:80),par%deltpn(6),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltpn(6),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltr1(1)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltr1(1)
-         call rdfrre(11,vari(ieg+1:80),par%deltr1(1),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltr1(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltr1(2)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltr1(2)
-         call rdfrre(11,vari(ieg+1:80),par%deltr1(2),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltr1(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltr1(3)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltr1(3)
-         call rdfrre(11,vari(ieg+1:80),par%deltr1(3),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltr1(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltr1(4)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltr1(4)
-         call rdfrre(11,vari(ieg+1:80),par%deltr1(4),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltr1(4),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltr1(5)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltr1(5)
-         call rdfrre(11,vari(ieg+1:80),par%deltr1(5),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltr1(5),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltr1(6)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltr1(6)
-         call rdfrre(11,vari(ieg+1:80),par%deltr1(6),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltr1(6),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltrn(1)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(1)
-         call rdfrre(11,vari(ieg+1:80),par%deltrn(1),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltrn(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltrn(2)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(2)
-         call rdfrre(11,vari(ieg+1:80),par%deltrn(2),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltrn(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltrn(3)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(3)
-         call rdfrre(11,vari(ieg+1:80),par%deltrn(3),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltrn(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltrn(4)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(4)
-         call rdfrre(11,vari(ieg+1:80),par%deltrn(4),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltrn(4),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltrn(5)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(5)
-         call rdfrre(11,vari(ieg+1:80),par%deltrn(5),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltrn(5),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:9) .EQ. 'deltrn(6)') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(6)
-         call rdfrre(11,vari(ieg+1:80),par%deltrn(6),ierror)
+         call rdfrre(vari(ieg+1:80),par%deltrn(6),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'nrelax') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(6)
-         call rdfrin(11,vari(ieg+1:80),nrelax,ierror)
+         call rdfrin(vari(ieg+1:80),nrelax,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:5) .EQ. 'relax') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(6)
-         call rdfrre(11,vari(ieg+1:80),relax,ierror)
+         call rdfrre(vari(ieg+1:80),relax,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'pasmin') THEN
 !        READ(vari(ieg+1:80),*,err=98)deltrn(6)
-         call rdfrre(11,vari(ieg+1:80),pasmin,ierror)
+         call rdfrre(vari(ieg+1:80),pasmin,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'rlcept') THEN
 !        READ(vari(ieg+1:80),*,err=98) deltrn(6)
-         call rdfrre(11,vari(ieg+1:80),rlcept,ierror)
+         call rdfrre(vari(ieg+1:80),rlcept,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('carreMode')) .EQ. 'carreMode') THEN
-         call rdfrin(11,vari(ieg+1:80),par%carreMode,ierror)
+         call rdfrin(vari(ieg+1:80),par%carreMode,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('equExtensionMode')) .EQ. 'equExtensionMode') THEN
-         call rdfrin(11,vari(ieg+1:80),par%equExtensionMode,ierror)
+         call rdfrin(vari(ieg+1:80),par%equExtensionMode,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('equDistanceFun')) .EQ. 'equDistanceFun') THEN
-         call rdfrin(11,vari(ieg+1:80),par%equDistanceFunction,ierror)
+         call rdfrin(vari(ieg+1:80),par%equDistanceFunction,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('psimin')) .EQ. 'psimin') THEN
-         call rdfrre(11,vari(ieg+1:80),par%psimin,ierror)
+         call rdfrre(vari(ieg+1:80),par%psimin,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('psimax')) .EQ. 'psimax') THEN
-         call rdfrre(11,vari(ieg+1:80),par%psimax,ierror)
+         call rdfrre(vari(ieg+1:80),par%psimax,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('rmin')) .EQ. 'rmin') THEN
-         call rdfrre(11,vari(ieg+1:80),par%rmin,ierror)
+         call rdfrre(vari(ieg+1:80),par%rmin,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('rmax')) .EQ. 'rmax') THEN
-         call rdfrre(11,vari(ieg+1:80),par%rmax,ierror)
+         call rdfrre(vari(ieg+1:80),par%rmax,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('zmin')) .EQ. 'zmin') THEN
-         call rdfrre(11,vari(ieg+1:80),par%zmin,ierror)
+         call rdfrre(vari(ieg+1:80),par%zmin,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('zmax')) .EQ. 'zmax') THEN
-         call rdfrre(11,vari(ieg+1:80),par%zmax,ierror)
+         call rdfrre(vari(ieg+1:80),par%zmax,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('addLeft')) .EQ. 'addLeft') THEN
-         call rdfrin(11,vari(ieg+1:80),par%addLeft,ierror)
+         call rdfrin(vari(ieg+1:80),par%addLeft,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('addRight')) .EQ. 'addRight') THEN
-         call rdfrin(11,vari(ieg+1:80),par%addRight,ierror)
+         call rdfrin(vari(ieg+1:80),par%addRight,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('addBottom')) .EQ. 'addBottom') THEN
-         call rdfrin(11,vari(ieg+1:80),par%addBottom,ierror)
+         call rdfrin(vari(ieg+1:80),par%addBottom,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('addTop')) .EQ. 'addTop') THEN
-         call rdfrin(11,vari(ieg+1:80),par%addTop,ierror)
+         call rdfrin(vari(ieg+1:80),par%addTop,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('equExpansionFactor')) .EQ. 'equExpansionFactor') THEN
-         call rdfrre(11,vari(ieg+1:80),par%equExpansionFactor,ierror)
+         call rdfrre(vari(ieg+1:80),par%equExpansionFactor,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('gridExtensionMode')) .EQ. 'gridExtensionMode') THEN
-         call rdfrin(11,vari(ieg+1:80),par%gridExtensionMode,ierror)
+         call rdfrin(vari(ieg+1:80),par%gridExtensionMode,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('targetResolution')) .EQ. 'targetResolution') THEN
-         call rdfrre(11,vari(ieg+1:80),par%targetRes,ierror)
+         call rdfrre(vari(ieg+1:80),par%targetRes,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('maxResJump')) .EQ. 'maxResJump') THEN
-         call rdfrre(11,vari(ieg+1:80),par%maxResJump,ierror)
+         call rdfrre(vari(ieg+1:80),par%maxResJump,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('cleanupPasmin')) .EQ. 'cleanupPasmin') THEN
-         call rdfrre(11,vari(ieg+1:80),par%cleanupPasmin,ierror)
+         call rdfrre(vari(ieg+1:80),par%cleanupPasmin,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('nVirtualStructs')) .EQ. 'nVirtualStructs') THEN
-         call rdfrin(11,vari(ieg+1:80),par%nVirtualStructs,ierror)
+         call rdfrin(vari(ieg+1:80),par%nVirtualStructs,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('nRefineAtStructs')) .EQ. 'nRefineAtStructs') THEN
-         call rdfrin(11,vari(ieg+1:80),par%nRefineAtStructs,ierror)
+         call rdfrin(vari(ieg+1:80),par%nRefineAtStructs,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('refineAtStructs')) .EQ. 'refineAtStructs') THEN
@@ -453,13 +453,13 @@ CONTAINS
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('loglevel')) .EQ. 'loglevel') THEN
-         call rdfrin(11,vari(ieg+1:80),par%logLevel,ierror)
+         call rdfrin(vari(ieg+1:80),par%logLevel,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
       ELSE IF (vari(1:len('distxo')) .EQ. 'distxo') THEN
          GO TO 10
       ELSE IF (vari(1:6) .EQ. 'sellan') THEN
-         call rdfrch(11,vari(ieg+1:80),novlan,ierror)
+         call rdfrch(vari(ieg+1:80),novlan,ierror)
          if(ierror.eq.1) go to 98
          if(novlan(1:8).eq.'francais') then
            sellan(1:8)=novlan(1:8)

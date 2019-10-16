@@ -83,7 +83,7 @@
       print *,'reading pfm...'
 !      read(lun,8000) ((pfm(i,j),i=1,nr),j=1,nz)
       read(lun,*) ((pfm(i,j),i=1,nr),j=1,nz)
- 8000 format(5(3x,e14.8))
+! 8000 format(5(3x,e14.8))
       iret=0
       return
 !-----------------------------------------------------

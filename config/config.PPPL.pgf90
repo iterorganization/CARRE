@@ -7,7 +7,7 @@ ifndef LD_NCARG
 endif
 
 ifndef SOLPS_CPP
-DEFINES  += -DPGF90
+DEFINES += -DPGF90
 endif
 
 FC      = pgf90
@@ -18,6 +18,12 @@ FFLAGS  = -g -C -tp=amd64
 else
 FFLAGS  = -O -tp=amd64
 endif
+ifdef IMAS_VERSION
+B2INCLUDE += `pkg-config imas-pgi ggd --cflags`
+endif
+ifdef LD_NETCDF
+B2INCLUDE += `nf-config --cflags`
+endif
 
 DBLPAD  = -r8 -i4
 
@@ -26,7 +32,7 @@ MOD     = mod
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG}
 LDFLAGS = 
-LDEXTRA = 
+LDEXTRA = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

@@ -91,10 +91,10 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
 !  procedures
       INTEGER ifind
-      REAL(rKind) :: aazero,long,nulort,ruban
+      REAL(rKind) :: aazero,leng,nulort,ruban
       LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,long,COORD,ifind,nulort, &
+      EXTERNAL aazero,leng,COORD,ifind,nulort, &
      &         UNTANG,SAUTE,chgdir,cross,ruban
 !======================================================================
 !..calculs
@@ -129,7 +129,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
    10 CONTINUE
 
       nn(1)=nn1
-      ll=long(xn(1,1),yn(1,1),nn(1))
+      ll=leng(xn(1,1),yn(1,1),nn(1))
 
 !..Calcul de la fonction pour le premier point de la courbe de reference
 
@@ -472,8 +472,8 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 !  de niveau a partir de ceux de la precedente.
 
          dernie=0.0
-         !ll=long(xn2,yn2,npni2)
-         ll=long(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv))
+         !ll=leng(xn2,yn2,npni2)
+         ll=leng(xn(1:nn(inouv),inouv),yn(1:nn(inouv),inouv),nn(inouv))
 !---
          if(nrelax.ge.0) then
            d1=0.

@@ -38,8 +38,8 @@ contains
     double precision :: minpsi(struct%rnstruc), maxpsi(struct%rnstruc)
     double precision :: x, y, psi, psi0, l
 
-    double precision feval2d, long
-    external feval2d, long
+    double precision feval2d, leng
+    external feval2d, leng
 
     ! First figure out min/max psi range to be covered by the grid
 
@@ -149,7 +149,7 @@ contains
     if (par%gridExtensionMode == GRID_EXTENSION_MODE_TARGET) then
        ! Place limiter triangle at middle of external limiting surface.
        ! Limiting surface: only external one relevant (no. 2)
-       l = long( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2) )
+       l = leng( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2) )
        call coord( struct%nivx(:,2), struct%nivy(:,2), struct%nivtot(2), &
             & l/2.0, x, y )
 
@@ -809,12 +809,12 @@ contains
     integer :: iniv
 
     !  procedures
-    real(rKind) :: long
-    external long
+    real(rKind) :: leng
+    external leng
 
     do iniv = 1, struct%nbniv
 
-       l = long( struct%nivx(:,iniv), struct%nivy(:,iniv), struct%nivtot(iniv) )
+       l = leng( struct%nivx(:,iniv), struct%nivy(:,iniv), struct%nivtot(iniv) )
        call coord( struct%nivx(:,iniv), struct%nivy(:,iniv), struct%nivtot(iniv), &
             & l/2.0, x, y )
 

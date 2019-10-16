@@ -19,9 +19,9 @@
 
 !  procedures
       INTEGER indcrb
-      REAL(rKind) :: long
+      REAL(rKind) :: leng
       INTRINSIC SQRT
-      EXTERNAL indcrb, long
+      EXTERNAL indcrb, leng
 
 !=========================
 !.. xn,yn: tableaux des coordonnees des points de la courbe.
@@ -33,7 +33,7 @@
 
       ind = indcrb(xn,yn,n,x1,y1,d)
 
-      dist = long(xn(1:ind),yn(1:ind),ind)
+      dist = leng(xn(1:ind),yn(1:ind),ind)
 
       ruban = dist + SQRT((x1-xn(ind))**2 + (y1-yn(ind))**2)
 

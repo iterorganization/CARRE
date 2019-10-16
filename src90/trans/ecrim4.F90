@@ -20,7 +20,8 @@
      &  bb(-1:nxmax,-1:nymax,0:3),b0r0
 !
 !  local variables
-      integer ix,iy,cut1,cut2,cutrgn,icell
+      integer ix,iy,cut1,cut2,icell
+!     integer cutrgn
       real(rKind) :: x0,y0,brat
 !
 !  procedures
@@ -57,7 +58,11 @@
 
 !* 2.2  calculate magnetic field ratio
 
-          brat=bb(ix,iy,0)/bb(ix,iy,3)
+          if (bb(ix,iy,3).eq.0.0_rKind) then
+            brat=0.0_rKind
+          else
+            brat=bb(ix,iy,0)/bb(ix,iy,3)
+          end if
 
 !* 2.3  print B2 input data
 

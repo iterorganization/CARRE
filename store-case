@@ -18,6 +18,6 @@ cp carre.out $1
 [ -e traduitAAA00000 ] && cp traduitAAA00000 $1
 [ -e traduit.out.b2 ] && cp traduit.out.b2 $1
 [ -e traduit.out.sonnet ] && cp traduit.out.sonnet $1
-cp vertex_data.out $1
-cp selptx.inf $1
+[ -e vertex_data.out ] && cp vertex_data.out $1
+[ -e selptx.inf ] && cp selptx.inf $1
 [ -e gmeta ] && cp gmeta $1

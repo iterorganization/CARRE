@@ -1,5 +1,5 @@
 !=======================================================================
-      subroutine ecrim1(nout,nfin,rm,zm,nptseg,nreg,nppol,nprad, & 
+      subroutine ecrim1(nfin,rm,zm,nptseg,nreg,nppol,nprad, &
      &  npmamx,nrmamx)
       use KindDefinitions
       implicit none
@@ -7,14 +7,14 @@
 !  par le programme carre, sous un format particulier.
 !
 !  arguments
-      integer npmamx,nrmamx,nout,nfin,nreg,nppol(*),nprad(*), & 
+      integer npmamx,nrmamx,nfin,nreg,nppol(*),nprad(*), &
      &  nptseg(*)
       real(rKind) :: rm(npmamx,nrmamx,*),zm(npmamx,nrmamx,*)
 !
 !  variables locales
       integer ntrmax
       parameter(ntrmax=3000)
-      integer ncoord,nelem,ielem,iplq(4),iflx(5),ir,ipol,ireg,i,j, & 
+      integer ncoord,nelem,ielem,iplq(4),iflx(5),ir,ipol,ireg,i,j, &
      &  e(3,ntrmax),v(3,ntrmax),icoord,itrop,iremp,cotali(ntrmax),t,r
       real(rKind) :: xmail(ntrmax/2),ymail(ntrmax/2)
 !
@@ -25,7 +25,6 @@
 !  calcul
 !
 !  1. format mailtri standard
-!     write(nout,*)'$coord'
       if(nreg.eq.3 .or.nreg.eq.6) then
 !  1.01   simple nul ou double nul deconnecte
         ncoord=nppol(1)*nprad(1)
@@ -137,8 +136,8 @@
           else
             v(2,ielem)=v(1,ielem-1)+1
           endif
-          e(1,ielem)=2*(nppol(1)-1)*(nprad(1)-1) & 
-     &        +2*(nppol(2)-1)*(nprad(2)-1) & 
+          e(1,ielem)=2*(nppol(1)-1)*(nprad(1)-1) &
+     &        +2*(nppol(2)-1)*(nprad(2)-1) &
      &        +2*(i-nptseg(1))+1
           e(2,ielem)=ielem+1
           e(3,ielem)=ielem-1
@@ -163,8 +162,8 @@
           v(1,ielem)=v(1,ielem-1)
           v(3,ielem)=v(2,ielem-1)
           v(2,ielem)=i+1
-          e(1,ielem)=2*(nppol(1)-1)*(nprad(1)-1) & 
-     &      +2*(nptseg(1)-1) & 
+          e(1,ielem)=2*(nppol(1)-1)*(nprad(1)-1) &
+     &      +2*(nptseg(1)-1) &
      &      +2*(i-(nptseg(1)+nptseg(3)-1))+1
           e(2,ielem)=ielem+1
           e(3,ielem)=ielem-1
@@ -319,7 +318,7 @@
         do j=2,nprad(ireg)-1
         do i=1,nppol(ireg)-1
           ielem=ielem+1
-          v(1,ielem)=nppol(1)*nprad(1)+nppol(2)*(nprad(2)-1) & 
+          v(1,ielem)=nppol(1)*nprad(1)+nppol(2)*(nprad(2)-1) &
      &      +(j-1)*(nppol(ireg)-1)+i
           if(i.eq.nppol(ireg)-1) then
             v(2,ielem)=v(1,ielem)-2*(nppol(ireg)-1)+1

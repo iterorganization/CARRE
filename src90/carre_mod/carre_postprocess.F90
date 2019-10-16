@@ -480,7 +480,7 @@ contains
                           end do
 
                           if ((iStructStart /= GRID_UNDEFINED) .and. (iStructEnd /= GRID_UNDEFINED)) then
-                              if ( StructStartOnTarget) then
+                              if ( StructStartOnTarget ) then
                                 grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructEnd
                               else
                                 grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructStart
@@ -1103,8 +1103,8 @@ contains
     double precision :: llx(npnimx), lly(npnimx)
     integer :: llNp
 
-    double precision :: long
-    external long
+    double precision :: leng
+    external leng
 
 
 
@@ -1190,7 +1190,7 @@ contains
                              & llX, llY, llNp )
 
                         call coord(llX(1:llNp),llY(1:llNp),llNp,&
-                             & long(llX(1:llNp), llY(1:llNp), llNp) / 2.0d0,&
+                             & leng(llX(1:llNp), llY(1:llNp), llNp) / 2.0d0,&
                              & refineFacePx(FACE_POLOIDAL, ip, ir, iReg),&
                              & refineFacePy(FACE_POLOIDAL, ip, ir, iReg) )
                     case(GRID_BOUNDARY_REFINE_FIX)
@@ -1573,8 +1573,8 @@ contains
 #endif
 
     ! externals
-    double precision :: long, ruban
-    external :: long, ruban
+    double precision :: leng, ruban
+    external :: leng, ruban
 
     ! some sanity checks
     call assert(size(refx) == size(refy))
@@ -1592,8 +1592,8 @@ contains
     !..We now place the grid points of the new grid line according
     !  to the spacing of the grid points on the reference grid line
 
-    lengthRef=long(nivRefX(1:npNivRef),nivRefY(1:npNivRef),npNivRef)
-    lengthNew=long(nivNewX(1:npNivNew),nivNewY(1:npNivNew),npNivNew)
+    lengthRef=leng(nivRefX(1:npNivRef),nivRefY(1:npNivRef),npNivRef)
+    lengthNew=leng(nivNewX(1:npNivNew),nivNewY(1:npNivNew),npNivNew)
 
     ! Compute coordinates (distance to first point) of given points on reference line
     ! First point is at zero

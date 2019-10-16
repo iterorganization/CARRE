@@ -20,6 +20,9 @@ ifeq (${FC_VERSION},12.0.2)
 FFLAGS   += -vec_report0
 LDFLAGS  += -i_dynamic
 endif
+ifdef IMAS_VERSION
+B2INCLUDE += `pkg-config imas-ifort ggd --cflags`
+endif
 
 DBLPAD    =
 
@@ -28,7 +31,7 @@ MOD       = mod
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG}
 LDFLAGS   =
-LDEXTRA   =
+LDEXTRA   = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

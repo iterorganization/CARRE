@@ -21,4 +21,4 @@ rm -f virtualstructure.out
 rm -f traduitAAA00000 traduit.out traduit.out.b2 traduit.out.sonnet
 rm -f vertex_data.out
 rm -f *.silo
-rm -f gmeta
+rm -f gmeta gmon.out

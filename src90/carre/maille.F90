@@ -18,6 +18,9 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       use CarreSiloIO, only : csIOSetRegion
       use Logging
       use Helper
+#ifndef CARRE_NONINTERACTIVE
+      use carre_parameter_io, only : change
+#endif
 
       IMPLICIT NONE
 
@@ -52,11 +55,10 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
       !  procedures
       INTEGER horair,ifind
-      REAL(rKind) :: long,ruban
-      EXTERNAL long,COORD,horair,ifind,LECCLE,lecclf,DOUBLD, &
+      REAL(rKind) :: leng,ruban
+      EXTERNAL leng,COORD,horair,ifind,LECCLE,lecclf,DOUBLD, &
      &         ruban,trace3 &
      &        ,trc_stk_in,trc_stk_out
-
 
 !=========================
 !.. npnimx: <=> npnimx
@@ -146,7 +148,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          DO 1 isep = 1, 3
 
-            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+            lg(isep) = leng(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
 
@@ -503,14 +505,14 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          ipx = 1
          DO 38 isep = 1, 4
-            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+            lg(isep) = leng(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
    38    CONTINUE
 
          ipx = 2
          DO 39 isep = 1, 2
-            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+            lg(isep+4) = leng(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
      &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                   equ%nptot(equ%ptsep(isep,ipx),ipx))
    39    CONTINUE
@@ -1153,14 +1155,14 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
          ipx = 1
          DO 102 isep = 1, 2
-            lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+            lg(isep) = leng(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                 equ%nptot(equ%ptsep(isep,ipx),ipx))
   102    CONTINUE
 
          ipx = 2
          DO 103 isep = 1, 2
-            lg(isep+4) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+            lg(isep+4) = leng(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
      &                   equ%separy(1,equ%ptsep(isep,ipx),ipx), &
      &                   equ%nptot(equ%ptsep(isep,ipx),ipx))
   103    CONTINUE
@@ -1272,7 +1274,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                         ireg=1
                         nmail=min(41,nn/5)
                         nmail=nmail+mod(nmail+1,2)
-                        ll=long(equ%separx(1,equ%ptsep(3,ipx),ipx), &
+                        ll=leng(equ%separx(1,equ%ptsep(3,ipx),ipx), &
                             &                equ%separy(1,equ%ptsep(3,ipx),ipx), &
                             &                equ%nptot(equ%ptsep(3,ipx),ipx))
                         grid%xmail(1,1,ireg)=equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx), &
@@ -1288,7 +1290,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                         grid%xmail(nmail/2+1,1,ireg)=xptxex
                         grid%ymail(nmail/2+1,1,ireg)=yptxex
 
-                        ll=long(equ%separx(1,equ%ptsep(4,ipx),ipx), &
+                        ll=leng(equ%separx(1,equ%ptsep(4,ipx),ipx), &
                             &                equ%separy(1,equ%ptsep(4,ipx),ipx), &
                             &                equ%nptot(equ%ptsep(4,ipx),ipx))
                         grid%xmail(nmail,1,ireg)=equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx), &
@@ -1346,7 +1348,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                 CALL NUNIFO(par%nptseg(3),lg(3),par%deltp1(3),par%deltpn(3),spacep(1,3), &
                     &               dpmin(3),dpmax(3))
 
-                lg(4) = long(equ%separx(1,equ%ptsep(3,ipx),ipx),equ%separy(1,equ%ptsep(3,ipx) &
+                lg(4) = leng(equ%separx(1,equ%ptsep(3,ipx),ipx),equ%separy(1,equ%ptsep(3,ipx) &
                     &              ,ipx),equ%nptot(equ%ptsep(3,ipx),ipx)) - lg(3)
                 CALL NUNIFO(par%nptseg(4),lg(4),par%deltp1(4),par%deltpn(4),spacep(1,4), &
                     &               dpmin(4),dpmax(4))
@@ -1377,7 +1379,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          xbcl(nbcl(1),1) = equ%separx(nbcl(1),equ%ptsep(3,ipx),ipx)
          ybcl(nbcl(1),1) = equ%separy(nbcl(1),equ%ptsep(3,ipx),ipx)
 
-         lbcl = long(xbcl(1,1),ybcl(1,1),nbcl(1))
+         lbcl = leng(xbcl(1,1),ybcl(1,1),nbcl(1))
 
          IF (lbcl .LE. lg(3)) THEN
             GO TO 120
@@ -1402,7 +1404,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
          ybcl(nbcl(2),2) = equ%separy(equ%nptot(equ%ptsep(3,ipx),ipx) - nbcl(2) + 1, &
      &                     equ%ptsep(3,ipx),ipx)
 
-         lbcl = long(xbcl(1,2),ybcl(1,2),nbcl(2))
+         lbcl = leng(xbcl(1,2),ybcl(1,2),nbcl(2))
 
          IF (lbcl .LE. lg(4)) THEN
             GO TO 121
@@ -2154,7 +2156,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Calculate the length of each separatrix
 
-         lg(isep) = long(struct%nivx(1,1),struct%nivy(1,1),struct%nivtot(1))
+         lg(isep) = leng(struct%nivx(1,1),struct%nivy(1,1),struct%nivtot(1))
 
          !..4.1  Read all the necessary data from the file
 
@@ -2463,6 +2465,7 @@ contains
     logical, intent(out) :: correct
 #ifndef CARRE_NONINTERACTIVE
     integer nn1
+    integer isor,ient,ifail
     real(rKind) :: pntrat_old
     character*3 rep
 #endif
@@ -2552,7 +2555,7 @@ contains
 !!$    double precision ::
 !!$
 !!$    do isep = 1, 4
-!!$        lg(isep) = long(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
+!!$        lg(isep) = leng(equ%separx(1,equ%ptsep(isep,ipx),ipx), &
 !!$             & equ%separy(1,equ%ptsep(isep,ipx),ipx), &
 !!$             & equ%nptot(equ%ptsep(isep,ipx),ipx))
 !!$    end do

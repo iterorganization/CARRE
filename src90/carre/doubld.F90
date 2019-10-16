@@ -66,10 +66,10 @@
 
 !  procedures
       INTEGER ifind
-      REAL(rKind) :: aazero,long,nulort,ruban
+      REAL(rKind) :: aazero,leng,nulort,ruban
       LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,long,COORD,ifind,nulort, &
+      EXTERNAL aazero,leng,COORD,ifind,nulort, &
      &         UNTANG,SAUTE,chgdir,cross,ruban &
      &        ,trc_stk_in,trc_stk_out,trc_stk
 !======================================================================
@@ -158,7 +158,7 @@
    10 CONTINUE
 
       nn(1)=nn1
-      ll=long(xn(1,1),yn(1,1),nn(1))
+      ll=leng(xn(1,1),yn(1,1),nn(1))
 
 !..Calculate the psi value at the first point of the reference curve
 
@@ -428,26 +428,26 @@
 !  nouvelle ligne de niveau a partir de celui de la precedente.
 
          dernie=zero
-         ll=long(xn2,yn2,npni2)
-           d1=zero
+         ll=leng(xn2,yn2,npni2)
+         d1=zero
 
 !..Definition de x1, y1, ux1,uy1 et d1 pour le bloc common comort.
 
-           x1=xbcl(ir+1)
-           y1=ybcl(ir+1)
+         x1=xbcl(ir+1)
+         y1=ybcl(ir+1)
 
-           CALL UNTANG(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,ux1,uy1, &
-     &                  d1,period)
+         CALL UNTANG(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,ux1,uy1, &
+     &               d1,period)
 
-           d1=ruban(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,d1)
+         d1=ruban(xn(1,ianc),yn(1,ianc),nn(ianc),x1,y1,d1)
 
 !..Calculate the intersection between the segment connecting the
 !  external X-point with the O-point and the innermost level line
 
-           sns=1
-           call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), &
+         sns=1
+         call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), &
      &       nn(inouv),xint,yint,iint,nint,sns)
-           if(nint.gt.0) then
+         if(nint.gt.0) then
              d1=zero
              d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),xint(nint), &
      &          yint(nint),d1)
@@ -455,13 +455,13 @@
              pasini=min(ll,1.25*d1)-dernie
              dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie, &
      &         dernie+pasini,50)
-           else
+         else
              dernie=0.55*ll
              pasini=0.3*ll
              dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie,ll,50)
-           end if
+         end if
 
-           CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),dist, &
+         CALL COORD(xn(1,inouv),yn(1,inouv),nn(inouv),dist, &
      &              xbcl(ir),ybcl(ir))
 
    25 CONTINUE
@@ -485,21 +485,21 @@
 !  interieure qui divisera cette separatrice en deux.
 
       dernie=zero
-      ll=long(xn2,yn2,npni2)
-        d1=zero
+      ll=leng(xn2,yn2,npni2)
+      d1=zero
 
 !..Definition de x1, y1, ux1,uy1 et d1 pour le bloc common comort.
 
-        x1=xbcl(2)
-        y1=ybcl(2)
-        CALL UNTANG(xn(1,inouv),yn(1,inouv),nn(inouv),x1,y1,ux1,uy1, &
-     &                  d1,period)
-        d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),x1,y1,d1)
+      x1=xbcl(2)
+      y1=ybcl(2)
+      CALL UNTANG(xn(1,inouv),yn(1,inouv),nn(inouv),x1,y1,ux1,uy1, &
+     &            d1,period)
+      d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),x1,y1,d1)
 
-        sns=1
-        call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), &
+      sns=1
+      call intrsc(x1,y1,xpto,ypto,xn(1,inouv),yn(1,inouv), &
      &    nn(inouv),xint,yint,iint,nint,sns)
-        if(nint.gt.0) then
+      if(nint.gt.0) then
           d1=zero
           d1=ruban(xn(1,inouv),yn(1,inouv),nn(inouv),xint(nint), &
      &       yint(nint),d1)
@@ -507,12 +507,12 @@
           pasini=min(ll,1.25*d1)-dernie
           dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie, &
      &      dernie+pasini,50)
-        else
+      else
           dernie=0.45*ll
           pasini=0.3*ll
           dist=aazero(nulort,dernie,pasini,epsmai,zero,dernie,ll,50)
-        end if
-        CALL COORD(xn2,yn2,npni2,dist,bouclx,boucly)
+      end if
+      CALL COORD(xn2,yn2,npni2,dist,bouclx,boucly)
 
 !c<<<
 !      write(0,*) '<=== Leaving doubld'

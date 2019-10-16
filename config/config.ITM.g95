@@ -20,7 +20,7 @@ MOD     = mod
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG}
 LDFLAGS = 
-LDEXTRA = 
+LDEXTRA = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

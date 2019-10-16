@@ -77,9 +77,9 @@
 
 !  procedures
       INTEGER ifind
-      REAL(rKind) :: aazero,long,nulort,ruban
+      REAL(rKind) :: aazero,leng,nulort,ruban
       INTRINSIC MOD,abs
-      EXTERNAL aazero,long,COORD1,ifind,nulort,UNTANG,ruban
+      EXTERNAL aazero,leng,COORD1,ifind,nulort,UNTANG,ruban
 !
 !  remarque: cette routine doit etre appelee apres frtier ou, dans le
 !            cas d'une configuration limiteur, apres limfnd car elle
@@ -283,7 +283,7 @@
 !..On definit maintenant les points de maille de la nouvelle ligne
 !  de niveau a partir de ceux de la precedente.
 
-          ll=long(xn2,yn2,npni2)
+          ll=leng(xn2,yn2,npni2)
           period=ll
 !***
 !         print*,'ll, period=',ll,period
@@ -294,7 +294,7 @@
             d1=zero
             ipol1=2
             ipoln=nppol
-            if(ir.eq.2) l0(nppol)=long(xn(1,ianc),yn(1,ianc),nn(ianc))
+            if(ir.eq.2) l0(nppol)=leng(xn(1,ianc),yn(1,ianc),nn(ianc))
 !
 !  1.   on dispose d'abord les points proportionellement a ceux de la
 !       ligne precedente

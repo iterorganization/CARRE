@@ -16,6 +16,9 @@ LDFLAGS   = -Wall
 else
 FFLAGS   += -O
 endif
+ifdef IMAS_VERSION
+B2INCLUDE += `pkg-config imas-gfortran ggd --cflags`
+endif
 
 DBLPAD    =
 
@@ -24,7 +27,7 @@ MOD       = mod
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG}
 LDFLAGS   =
-LDEXTRA   =
+LDEXTRA   = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

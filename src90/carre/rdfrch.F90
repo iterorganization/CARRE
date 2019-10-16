@@ -1,24 +1,18 @@
-      subroutine rdfrch(iunit,vari,ch,ierror)
+      subroutine rdfrch(vari,ch,ierror)
 !  version : 31.10.2007 12:43
       implicit none
 !  read a character string from a chain of characters vari
 !
 !  arguments
-      integer iunit,ierror
+      integer ierror
       character vari*(*), ch*(*)
 !  local variables
       integer i, j, l
-!  iunit: unit of temporary file
 !  vari: chain of characters from which to read
 !  ch: string read from vari (output)
 !  ierror: error flag: 0 for no error, 1 when there is an error.
 !
 !  calculations
-!      rewind iunit
-!      write(iunit,100)vari
-!100   format(a)
-!      rewind iunit
-!      read(iunit,*,err=99)rr
       l = len(vari)
       i = index(vari,'''')
       if (i.gt.0) then
