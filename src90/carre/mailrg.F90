@@ -38,8 +38,8 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad &
      &        ,plaque,repart,nbcrb,npcrb2,nnlast,ireg,xpind
 
-      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), &
-     &     ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), &
+      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx), &
+     &     ystruc(npstmx,strumx),mailx(npmamx,nrmamx), &
      &     maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2, &
      &     a00(nxmax,nymax,3),a10(nxmax,nymax,3),a01(nxmax,nymax,3), &
      &     a11(nxmax,nymax,3),gardd1,gardd2, &

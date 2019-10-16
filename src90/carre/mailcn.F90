@@ -39,8 +39,8 @@
       INTEGER nx,ny,nstruc,npstru(nstruc), &
      &  nn1,nppol,nprad,repart,nivtot(nivmx),nbniv,ireg
 
-      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,nstruc), &
-     &  ystruc(npstmx,nstruc),mailx(npmamx,nrmamx), &
+      REAL(rKind) :: x(nxmax),y(nymax),psi(nxmax,nymax),xstruc(npstmx,strumx), &
+     &  ystruc(npstmx,strumx),mailx(npmamx,nrmamx), &
      &  maily(npmamx,nrmamx),xn1(nn1),yn1(nn1),pas(nrmamx),x2,y2, &
      &  fctini,a00(nxmax,nymax,3),a10(nxmax,nymax,3), &
      &  a01(nxmax,nymax,3),a11(nxmax,nymax,3), &

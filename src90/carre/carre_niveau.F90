@@ -74,7 +74,7 @@ contains
 
 
     ! structure test parameters
-    INTEGER, intent(in), optional :: plaque, nstruc,npstru(:)
+    INTEGER, intent(in), optional :: plaque, nstruc, npstru(:)
     INTEGER, intent(out), optional :: indstr
     REAL(rKind), intent(in), optional :: xstruc(npstmx,strumx), ystruc(npstmx,strumx)
 
