@@ -75,10 +75,12 @@ contains
 
             ! The grid lines going into the X-point are also required...
             do ipx = 1, equ%npx
-                call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), npoint, xipol, xirad, findAll = .true.)
+                call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), &
+                   & npoint, xipol, xirad, findAll = .true.)
                 do ipoint = 1, npoint
-                    call logmsg(LOGDEBUG, 'carre_postprocess_computation: marking radial line required '// &
-                        & 'due to X-point #'//int2str(ipx)//" in region "//int2str(iReg))
+                    call logmsg(LOGDEBUG, 'carre_postprocess_computation: '// &
+                        & 'marking radial line required due to X-point #'// &
+                        &  int2str(ipx)//" in region "//int2str(iReg))
                     call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
                 end do
             end do
@@ -127,9 +129,11 @@ contains
             call computeConnectionInformation()
 
             if (iPostProcess > 9) then
-                call writeGridStateToSiloFile('carrePostPrcA'//int2str(iPostProcess), equ, struct, grid)
+                call writeGridStateToSiloFile('carrePostPrcA'//int2str(iPostProcess), &
+                   & equ, struct, grid)
             else
-                call writeGridStateToSiloFile('carrePostPrcA0'//int2str(iPostProcess), equ, struct, grid)
+                call writeGridStateToSiloFile('carrePostPrcA0'//int2str(iPostProcess), &
+                   & equ, struct, grid)
             end if
 
             ! Cell counts
@@ -192,7 +196,8 @@ contains
                     endif
                     call coarsenCells(grid, force = .false.)
                 else
-                    call logmsg(LOGDEBUG, "carre_postprocess: action COARSEN. No cells to coarsen")
+                    call logmsg(LOGDEBUG, "carre_postprocess: action COARSEN. "//&
+                       &"No cells to coarsen")
                 end if
             case (ACTION_REFINE)
                 if ( nCellsToRefine == 0 ) then
@@ -223,9 +228,11 @@ contains
 
         ! Did we converge, or stop because too many iterations?
         if (npDiff == 0) then
-            call logmsg(LOGDEBUG, "carre_postprocess: converged at iteration "//int2str(iPostProcess))
+            call logmsg(LOGDEBUG, "carre_postprocess: converged at iteration "// &
+               & int2str(iPostProcess))
         else
-            call logmsg(LOGDEBUG, "carre_postprocess: did NOT CONVERGE after iteration "//int2str(iPostProcess))
+            call logmsg(LOGDEBUG, "carre_postprocess: did NOT CONVERGE after iteration "// &
+               & int2str(iPostProcess))
         end if
 
         ! write results of postprocessing iteration
@@ -429,10 +436,12 @@ contains
                       do j = 0, 1 ! radial
 
                           if ( isInternal(grid%pointFlag(iPol+i, iRad+j, iReg)) ) &
-                               & cellIntNodeCount(iPol, iRad, iReg) = cellIntNodeCount(iPol, iRad, iReg) + 1
+                               & cellIntNodeCount(iPol, iRad, iReg) = &
+                               & cellIntNodeCount(iPol, iRad, iReg) + 1
 
                           if ( isExternal(grid%pointFlag(iPol+i, iRad+j, iReg)) ) &
-                               & cellExtNodeCount(iPol, iRad, iReg) = cellExtNodeCount(iPol, iRad, iReg) + 1
+                               & cellExtNodeCount(iPol, iRad, iReg) = &
+                               & cellExtNodeCount(iPol, iRad, iReg) + 1
 
                       end do
                   end do
@@ -481,22 +490,27 @@ contains
 
                           if ((iStructStart /= GRID_UNDEFINED) .and. (iStructEnd /= GRID_UNDEFINED)) then
                               if ( StructStartOnTarget ) then
-                                grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructEnd
+                                grid%cellFaceIStruct(iFace, ipol, irad, iReg) = &
+                                    & iStructEnd
                               else
-                                grid%cellFaceIStruct(iFace, ipol, irad, iReg) = iStructStart
+                                grid%cellFaceIStruct(iFace, ipol, irad, iReg) = &
+                                    & iStructStart
                               end if
                               if (iStructStart /= iStructEnd) then
-                                  call logmsg(LOGDEBUG, "categorizeCellsAndFaces: ambiguous face/structure association")
+                                  call logmsg(LOGDEBUG, "categorizeCellsAndFaces: '//&
+                                      & 'ambiguous face/structure association")
                               end if
-                              cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
+                              cellBndFaceCount(iPol, iRad, iReg) = &
+                                 & cellBndFaceCount(iPol, iRad, iReg) + 1
                           else
                               call assert( grid%pointflag( &
                                & iPol + CELL_FACE_POINT_DIP(iFace, 1), &
-                               & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg ) /= GRID_BOUNDARY &
-                               & .or. &
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg ) /= &
+                               & GRID_BOUNDARY .or. &
                                &  grid%pointflag( &
                                & iPol + CELL_FACE_POINT_DIP(iFace, 2), &
-                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg ) /= GRID_BOUNDARY )
+                               & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg ) /= &
+                               & GRID_BOUNDARY )
                           end if
                       end do
 
@@ -504,13 +518,16 @@ contains
                       ! During iteration: transfer intersection information from faces to cells
                       do iFace = 1, 4 ! left, bottom, right, top
                           doesIntersect = grid%faceISec(CELL_FACE_ALIGN(iFace), &
-                               & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+                               & iPol + CELL_FACE_DIP(iFace), &
+                               & iRad + CELL_FACE_DIR(iFace), iReg)
 
                           grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = &
                                & grid%faceISecIStruct(CELL_FACE_ALIGN(iFace), &
-                               & iPol + CELL_FACE_DIP(iFace), iRad + CELL_FACE_DIR(iFace), iReg)
+                               & iPol + CELL_FACE_DIP(iFace), &
+                               & iRad + CELL_FACE_DIR(iFace), iReg)
 
-                          if (doesIntersect) cellBndFaceCount(iPol, iRad, iReg) = cellBndFaceCount(iPol, iRad, iReg) + 1
+                          if (doesIntersect) cellBndFaceCount(iPol, iRad, iReg) = &
+                                           & cellBndFaceCount(iPol, iRad, iReg) + 1
                       end do
                   end if
 
@@ -520,7 +537,8 @@ contains
 
       ! Translate the face/structure intersections into cell flags
       ! First: all internal cells with an intersected face are boundary cells and are assumed to be unproblematic
-      where ( (cellBndFaceCount > 0) .and. (grid%cellFlag == GRID_INTERNAL) ) grid%cellflag = GRID_BOUNDARY
+      where ( (cellBndFaceCount > 0) .and. (grid%cellFlag == GRID_INTERNAL) ) &
+          & grid%cellflag = GRID_BOUNDARY
 
       ! If grid is finalized we are done now
       if (finalized) return
@@ -530,7 +548,8 @@ contains
       ! Then figure out which ones must be refined: cells with more than five edges
       ! Current recipe:
       ! -cells with three internal points and one external point
-      where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) grid%cellflag = GRID_BOUNDARY_REFINE_FIX
+      where ((cellExtNodeCount == 1) .and. (cellIntNodeCount == 3)) &
+          & grid%cellflag = GRID_BOUNDARY_REFINE_FIX
 
       ! Find cells with too high resolution
       call computeHxHy(grid)
@@ -550,7 +569,8 @@ contains
 
                   do iFace = 1, 4
                       !if (.not. structIsTarget(struct, grid%cellFaceIStruct(iFace, iPol, iRad, iReg)) ) cycle
-                      if (grid%cellFaceIStruct(iFace, iPol, iRad, iReg) == GRID_UNDEFINED) cycle
+                      if (grid%cellFaceIStruct(iFace, iPol, iRad, iReg) == &
+                         & GRID_UNDEFINED) cycle
                       if (struct%refineAtStructure(grid%cellFaceIStruct(iFace, iPol, iRad, iReg))) then
                           grid%cellflag(iPol, iRad, iReg) = GRID_BOUNDARY_REFINE
                           exit
@@ -571,13 +591,15 @@ contains
                        & .or. (grid%cellflag(iPol, iRad, iReg) == GRID_INTERNAL)) ) cycle
 
                   if ( iPol > 1 ) then
-                      if (grid%hx(iPol, iRad, iReg) / grid%hx(iPol - 1, iRad, iReg) > par%maxResJump) then
+                      if (grid%hx(iPol, iRad, iReg) / &
+                        & grid%hx(iPol - 1, iRad, iReg) > par%maxResJump) then
                           grid%cellflag(iPol, iRad, iReg) = GRID_REFINE
                       end if
                   end if
 
                   if ( iPol < grid%np1(iReg) - 1 ) then
-                      if (grid%hx(iPol, iRad, iReg) / grid%hx(iPol + 1, iRad, iReg) > par%maxResJump) then
+                      if (grid%hx(iPol, iRad, iReg) / &
+                        & grid%hx(iPol + 1, iRad, iReg) > par%maxResJump) then
                           grid%cellflag(iPol, iRad, iReg) = GRID_REFINE
                       end if
                   end if
@@ -708,7 +730,8 @@ contains
         do iRegOther = 1, grid%nreg
             if (iRegOther == iReg) cycle
 
-            call findPointInRegion(grid, iRegOther, xBnd, yBnd, npoint, iPolOther, iRadOther)
+            call findPointInRegion(grid, iRegOther, xBnd, yBnd, &
+                & npoint, iPolOther, iRadOther)
             if (npoint > 0) then
                 call setRadialLineFlag(grid, iRegOther, iPolOther(1), flag)
             end if
@@ -792,7 +815,8 @@ contains
     do iReg = 1, grid%nreg
         do ip = 1, grid%np1(iReg)
             do ir = 1, grid%nr(iReg)
-                d = dist(grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), equ%xpto, equ%ypto)
+                d = dist(grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg), &
+                    & equ%xpto, equ%ypto)
                 if (d < dmin) then
                     iRegMin = iReg
                     ipMin = ip
@@ -827,7 +851,8 @@ contains
             do iPol = 1, grid%np1(iReg) - 1
                 ! If it is an internal cell, both top nodes have to be boundary nodes.
 
-                if ( count(grid%pointFlag(iPol:iPol+1, grid%nr(iReg)-1:grid%nr(iReg), iReg) == GRID_INTERNAL) > 0 ) then
+                if ( count(grid%pointFlag(iPol:iPol+1, &
+                         & grid%nr(iReg)-1:grid%nr(iReg), iReg) == GRID_INTERNAL) > 0 ) then
 
                     where (grid%pointFlag(iPol:iPol+1, grid%nr(iReg), iReg) == GRID_INTERNAL) &
                          & grid%pointStructIndex(iPol:iPol+1, grid%nr(iReg), iReg) = BOUNDARY_NOSTRUCTURE
@@ -979,9 +1004,11 @@ contains
                   ipy = grid%faceISecPy(FACE_POLOIDAL,ip,ir,iReg)
 
                   if ( pointsIdentical(ipx, ipy, &
-                       & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) points(ip,ir,iReg) = GRID_BOUNDARY
+                       & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) &
+                     & points(ip,ir,iReg) = GRID_BOUNDARY
                   if ( pointsIdentical(ipx, ipy, &
-                       & grid%xmail(ip+1,ir,iReg), grid%ymail(ip+1,ir,iReg)) ) points(ip+1,ir,iReg) = GRID_BOUNDARY
+                       & grid%xmail(ip+1,ir,iReg), grid%ymail(ip+1,ir,iReg)) ) &
+                     & points(ip+1,ir,iReg) = GRID_BOUNDARY
               end if
 
               ! radial face
@@ -991,9 +1018,11 @@ contains
                   ipy = grid%faceISecPy(FACE_RADIAL,ip,ir,iReg)
 
                   if ( pointsIdentical(ipx, ipy, &
-                       & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) points(ip,ir,iReg) = GRID_BOUNDARY
+                       & grid%xmail(ip,ir,iReg), grid%ymail(ip,ir,iReg)) ) &
+                     & points(ip,ir,iReg) = GRID_BOUNDARY
                   if ( pointsIdentical(ipx, ipy, &
-                       & grid%xmail(ip,ir+1,iReg), grid%ymail(ip,ir+1,iReg)) ) points(ip,ir+1,iReg) = GRID_BOUNDARY
+                       & grid%xmail(ip,ir+1,iReg), grid%ymail(ip,ir+1,iReg)) ) &
+                     & points(ip,ir+1,iReg) = GRID_BOUNDARY
               end if
 
           end do
@@ -1020,7 +1049,8 @@ contains
           do iPol = 1, grid%np1(iReg)
               do iRad = 1, grid%nr(iReg)
 
-                  call isPointOnStructure(grid%xmail(iPol, iRad, iReg), grid%ymail(iPol, iRad, iReg), struct, &
+                  call isPointOnStructure(grid%xmail(iPol, iRad, iReg), &
+                       & grid%ymail(iPol, iRad, iReg), struct, &
                        & onStructure, iStruct)
                   if (onStructure) then
                       points(iPol, iRad, iReg) = GRID_BOUNDARY
@@ -1050,7 +1080,8 @@ contains
                     &  grid%pointFlagFinalCheck(iPol, iRad, iReg) == GRID_BOUNDARY ) then
 
                   call logmsg(LOGWARNING, "Wrong categorization of boundary point iReg="&
-                       & //int2str(iReg)//", iPol="//int2str(iPol)//", iRad="//int2str(iRad)&
+                       & //int2str(iReg)//", iPol=" &
+                       & //int2str(iPol)//", iRad="//int2str(iRad)&
                        & //" at position ("//real2str(grid%xmail(iPol, iRad, iReg))&
                        & //", "//real2str(grid%ymail(iPol, iRad, iReg)) )
 
@@ -1112,8 +1143,8 @@ contains
     npRadOriginal = grid%nr
     npPolOriginal = grid%np1
     do iReg = 1, grid%nreg
-        ipMap(:, iReg) = (/ (ip, ip = 1, grid%np1(iReg)) /)
-        irMap(:, iReg) = (/ (ir, ir = 1, grid%nr(iReg)) /)
+        ipMap(1:grid%np1(iReg), iReg) = (/ (ip, ip = 1, grid%np1(iReg)) /)
+        irMap(1:grid%nr(iReg),  iReg) = (/ (ir, ir = 1, grid%nr(iReg)) /)
     end do
 
     ! Figure out what faces have to be refined to fix the broken cells
@@ -1128,8 +1159,10 @@ contains
 
                     if (grid%cellflag(ip, ir, iReg) == GRID_BOUNDARY_REFINE_FIX) then
                         ! broken cell should have one intersected poloidal face
-                        isecTopFace = (grid%cellFaceIStruct(FACE_TOP, ip, ir, iReg) /= GRID_UNDEFINED)
-                        isecBotFace = (grid%cellFaceIStruct(FACE_BOTTOM, ip, ir, iReg) /= GRID_UNDEFINED)
+                        isecTopFace = &
+                           & (grid%cellFaceIStruct(FACE_TOP, ip, ir, iReg) /= GRID_UNDEFINED)
+                        isecBotFace = &
+                           & (grid%cellFaceIStruct(FACE_BOTTOM, ip, ir, iReg) /= GRID_UNDEFINED)
 
                         ! If more than two intersections per cell,  grid/geometry has issues
                         if ( isecTopFace .and. isecBotFace ) then
