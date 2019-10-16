@@ -38,6 +38,7 @@ contains
 
     !  calculs
     i=1
+    ort=zero
     l1p=sqrt((x1(i)-x1(i+1))**2+(y1(i)-y1(i+1))**2)
     l2p=sqrt((x2(i)-x2(i+1))**2+(y2(i)-y2(i+1))**2)
 

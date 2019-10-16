@@ -5,9 +5,9 @@ LD_MSCL  ?= -L/tokp/work/dpc/SOLPS-ITER/mscl -lmscl
 LD_NCARG ?= -L/tokp/work/dpc/SOLPS-ITER/NCARG/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lxcb
 
 FC        = ifort
-CPP       = /lib/cpp -C -traditional -ffreestanding
+CPP       = /lib/cpp -traditional -ffreestanding
 
-FFLAGS    = -module ${OBJDIR}/
+FFLAGS    = -module ${OBJDIR}
 ifdef SOLPS_DEBUG
 FFLAGS   += -g -C -debug all -traceback -check all -warn all -check noarg_temp_created -warn notruncated_source -warn nounused -p -gen-interfaces -warn interfaces
 LDFLAGS   = -check all -warn all -debug all # -gen-interfaces -warn interfaces

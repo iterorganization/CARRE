@@ -1825,7 +1825,6 @@ contains
 
       ! internal
       integer :: i
-      integer :: ipRegions(grid%nreg)
       logical :: updateSegSegs(nsepsegmx)
 
 
@@ -1834,7 +1833,6 @@ contains
 
 
       removeable = .false.
-      ipRegions = GRID_UNDEFINED
 
       ! already marked for removal?
       if ( removeRadialLine(ip, ireg) ) return

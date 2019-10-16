@@ -7,7 +7,7 @@ ifndef LD_NCARG
 endif
 
 FC      = g95
-CPP     = /lib/cpp -C -traditional
+CPP     = /lib/cpp -traditional
 
 FFLAGS  = -ffree-line-length-huge -fno-second-underscore -fmod=${OBJDIR}/
 ifdef SOLPS_DEBUG

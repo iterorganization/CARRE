@@ -5,10 +5,10 @@ LD_MSCL  ?= `pkg-config mscl --libs` -lgfortran
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lm -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
 
 FC        = ifort
-CPP       = /lib/cpp -C -traditional -ffreestanding
+CPP       = /lib/cpp -traditional -ffreestanding
 FC_VERSION = $(shell echo `ifort --version | head -1 | awk '{printf "%s ",$$3,"\n"}'`)
 
-FFLAGS    = -module ${OBJDIR}/
+FFLAGS    = -module ${OBJDIR}
 ifdef SOLPS_DEBUG
 FFLAGS   += -g -C -debug all -traceback -check all -warn all -check noarg_temp_created -warn notruncated_source -warn nounused -p -gen-interfaces -warn interfaces
 LDFLAGS   = -check all -warn all -debug all # -gen-interfaces -warn interfaces

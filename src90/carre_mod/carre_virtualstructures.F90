@@ -94,7 +94,8 @@ contains
 
        enddo ! structure point loop
 
-       write(0,*) 'virtualtargets Structure:', istru, ', psi range:', &
+       write(0,"(a,i3,a,2e16.8)") &
+            &       'virtualtargets Structure:', istru, ', psi range:', &
             &        minpsi(istru),  maxpsi(istru)
 
     enddo ! structure loop
@@ -304,7 +305,8 @@ contains
 !!$    integer :: i
     integer :: ip, itarget, istep, istepTot
     real(rKind) :: &  ! minpsitot, maxpsitot,
-         &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), vtminpsi, vtmaxpsi, vtaddpsi, &
+         &     minpsi(struct%rnstruc), maxpsi(struct%rnstruc), &
+         &     vtminpsi, vtmaxpsi, vtaddpsi, &
          &     dir, tol
     real(rKind) :: tx, ty, tpsi, gx, gy, dx, dxmax, pi, alpha, p
 
@@ -389,7 +391,8 @@ contains
 
           ! compute psi at point
           ppsi(ip,istru) = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
-               &           equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
+               &           equ%a00(:,:,1), equ%a10(:,:,1), &
+               &           equ%a01(:,:,1), equ%a11(:,:,1), &
                &           tx, ty )
 
           ! update min/max psi values
@@ -431,10 +434,12 @@ contains
              ! not close enough: step along grad psi towards separatrix
              ! compute grad psi at current position
              gx = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
-                  &              equ%a00(:,:,2), equ%a10(:,:,2), equ%a01(:,:,2), equ%a11(:,:,2), &
+                  &              equ%a00(:,:,2), equ%a10(:,:,2), &
+                  &              equ%a01(:,:,2), equ%a11(:,:,2), &
                   &              tx, ty )
              gy = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
-                  &              equ%a00(:,:,3), equ%a10(:,:,3), equ%a01(:,:,3), equ%a11(:,:,3), &
+                  &              equ%a00(:,:,3), equ%a10(:,:,3), &
+                  &              equ%a01(:,:,3), equ%a11(:,:,3), &
                   &              tx, ty )
              ! take a step, including a security factor
              ! FIXME: choose step size in a better way
@@ -445,9 +450,10 @@ contains
              ty = ty - dx * gy
              ! compute psi at new position
              tpsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
-                  &              equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
+                  &              equ%a00(:,:,1), equ%a10(:,:,1), &
+                  &              equ%a01(:,:,1), equ%a11(:,:,1), &
                   &              tx, ty )
-             ! write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi,  "target psi of X-point", equ%fctpx(ipx)
+             ! write (*,*) "tx ", tx, "ty ", ty, "tpsi ", tpsi, "target psi of X-point", equ%fctpx(ipx)
 
              ! TODO: if psi not moving in the right direction,
              ! decrease step size and try again
@@ -501,8 +507,8 @@ contains
           if (.not. doTarget) cycle
 
           write (0,"(a,i2,a,i2,a,i2)") &
-               &          'X-point : ', ipx, ', separatrix segment: ', isep, &
-               &          ', creating virtual structure taking the role of structure no. ', itarget
+               &   'X-point : ', ipx, ', separatrix segment: ', isep, &
+               &   ', creating virtual structure taking the role of structure no. ', itarget
 
           nvtarget = nvtarget + 1
           ! vtargetipx stores index of X-point associated with this target
@@ -565,7 +571,8 @@ contains
 
                 ! check whether the point is in the psi range we actually want to have
                 pointPsi = feval2d( equ%nx, equ%ny, equ%x, equ%y, &
-                     & equ%a00(:,:,1), equ%a10(:,:,1), equ%a01(:,:,1), equ%a11(:,:,1), &
+                     & equ%a00(:,:,1), equ%a10(:,:,1), &
+                     & equ%a01(:,:,1), equ%a11(:,:,1), &
                      & struct%rxstruc( ip, istru ), struct%rystruc( ip, istru ) )
 
                 ! if not, skip this point

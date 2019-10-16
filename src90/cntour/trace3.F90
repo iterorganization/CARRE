@@ -106,6 +106,7 @@
 !..Recherche du deuxieme point.
 
           dir=0
+          plaque=0
 
 !***
 !         print*,'call crbniv1 - mailcn'

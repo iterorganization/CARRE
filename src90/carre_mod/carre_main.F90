@@ -174,15 +174,15 @@ contains
              !
              !<<<
              write(0,*) '=== carre *..10.0 - before frtier'
-             write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' ptx:',equ%ptx(1:equ%npx)
-             write(0,'(a5,1p,8e12.4/(5x,8e12.4))') ' pty:',equ%pty(1:equ%npx)
+             write(0,'(a5,1p,8e12.4)') ' ptx:',equ%ptx(1:equ%npx)
+             write(0,'(a5,1p,8e12.4)') ' pty:',equ%pty(1:equ%npx)
              if(equ%limcfg.eq.0) then
                 write(0,*) 'nptot(4,nxpoints)'
                 write(0,'(1x,16i5)') ((equ%nptot(i,j),i=1,4),j=1,equ%npx)
                 write(0,*) 'Strike points (presumably)'
-                write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' x:',&
+                write(0,'(a3,1p,8e12.4)') ' x:',&
                      &     ((equ%separx(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
-                write(0,'(a3,1p,8e12.4/(3x,8e12.4))') ' y:',&
+                write(0,'(a3,1p,8e12.4)') ' y:',&
                      &     ((equ%separy(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
                 !>>>
                 call trc_stk_in('carre','*..10.0')

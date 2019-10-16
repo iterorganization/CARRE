@@ -68,9 +68,12 @@
       ! varr: minimal distance between points
       REAL(rKind) :: ortpur(npmamx),propo(npmamx),varr(npmamx)
 
+#ifdef USE_SILO
       ! cort,cortpur/propo/varr: optimization function + individual contributions for final
       ! grid point distribution for all grid nodes placed up to now
-      REAL(rKind) :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx),cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
+      REAL(rKind) :: cort(npmamx,nrmamx),cortpur(npmamx,nrmamx), &
+                   & cpropo(npmamx,nrmamx),cvarr(npmamx,nrmamx)
+#endif
 
       integer :: ntt
       REAL(rKind) :: fctxo, xtt(5), ytt(5), x22, y22, x23, y23, fctanc
@@ -323,12 +326,13 @@
      &          maily(1,ir),ort1,nppol+1,pasmin,zero,zero,l0,l1, &
      &          ortpur,propo,varr)
 
+#ifdef USE_SILO
               ! collect optimization function for all surfaces
               cort(1:nppol,ir) = ort1(1:nppol)
               cortpur(1:nppol,ir) = ortpur(1:nppol)
               cpropo(1:nppol,ir) = propo(1:nppol)
               cvarr(1:nppol,ir) = varr(1:nppol)
-
+#endif
 
 !***
 !             print*,'point 3'
@@ -365,11 +369,13 @@
      &            maily(1,ir),ort2,nppol+1,pasmin,zero,zero,l0,l2, &
      &            ortpur,propo,varr)
 
+#ifdef USE_SILO
                 ! collect optimization function for all surfaces
                 cort(1:nppol,ir) = ort2(1:nppol)
                 cortpur(1:nppol,ir) = ortpur(1:nppol)
                 cpropo(1:nppol,ir) = propo(1:nppol)
                 cvarr(1:nppol,ir) = varr(1:nppol)
+#endif
 
                 ortmax=zero
                 do ipol=ipol1,ipoln
@@ -414,7 +420,8 @@
                      & cvarr(1:nppol, 1:ir), DB_NODECENT )
 
                 ! only current flux surface
-                call siloWriteLineSegmentGridFromPoints( csioDbfile, "currentsurface", mailx(1:nppol,ir), maily(1:nppol,ir) )
+                call siloWriteLineSegmentGridFromPoints( csioDbfile, &
+                     & "currentsurface", mailx(1:nppol,ir), maily(1:nppol,ir) )
                 call siloWriteUMData( csioDbfile, "currentsurface", "ort", &
                      & siloExpandSegmentData( ort2(1:nppol) ), DB_NODECENT )
                 call siloWriteUMData( csioDbfile, "currentsurface", "ortpur", &
@@ -502,10 +509,14 @@
 !***
  19           continue
               do ipol=ipol1,ipoln
-                      diag%somortp(ir,ireg)= diag%somortp(ir,ireg)+ (ort2(ipol)/nppol)
-                      diag%somortpurp(ir,ireg) = diag%somortpurp(ir,ireg)+(ortpur(ipol)/nppol)
-                      diag%sompropop(ir,ireg) = diag%sompropop(ir,ireg)+(propo(ipol)/nppol)
-                      diag%somvarrp(ir,ireg) = diag%somvarrp(ir,ireg)+(varr(ipol)/nppol)
+                      diag%somortp(ir,ireg) = diag%somortp(ir,ireg) + &
+                                            & (ort2(ipol)/nppol)
+                      diag%somortpurp(ir,ireg) = diag%somortpurp(ir,ireg) + &
+                                            & (ortpur(ipol)/nppol)
+                      diag%sompropop(ir,ireg) = diag%sompropop(ir,ireg) + &
+                                            & (propo(ipol)/nppol)
+                      diag%somvarrp(ir,ireg) = diag%somvarrp(ir,ireg) + &
+                                            & (varr(ipol)/nppol)
               enddo
 !             print*,'apres 19 continue'
 !***
@@ -563,10 +574,14 @@
       period=zero
 
       do ir=2,nprad
-              diag%gdsomortp(ireg)=diag%gdsomortp(ireg)+(diag%somortp(ir,ireg)/(nprad-1))
-              diag%gdsomortpurp(ireg)=diag%gdsomortpurp(ireg)+(diag%somortpurp(ir,ireg)/(nprad-1))
-              diag%gdsompropop(ireg)=diag%gdsompropop(ireg)+(diag%sompropop(ir,ireg)/(nprad-1))
-              diag%gdsomvarrp(ireg)=diag%gdsomvarrp(ireg)+(diag%somvarrp(ir,ireg)/(nprad-1))
+              diag%gdsomortp(ireg) = diag%gdsomortp(ireg) + &
+                                   & (diag%somortp(ir,ireg)/(nprad-1))
+              diag%gdsomortpurp(ireg) = diag%gdsomortpurp(ireg) + &
+                                   & (diag%somortpurp(ir,ireg)/(nprad-1))
+              diag%gdsompropop(ireg) = diag%gdsompropop(ireg) + &
+                                   & (diag%sompropop(ir,ireg)/(nprad-1))
+              diag%gdsomvarrp(ireg) = diag%gdsomvarrp(ireg) + &
+                                   & (diag%somvarrp(ir,ireg)/(nprad-1))
       enddo
       RETURN
       END

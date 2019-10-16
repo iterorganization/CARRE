@@ -26,7 +26,7 @@
 !
 !  variables locales
       integer i,j,k,nin
-      real(rKind) :: x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
+      real(Single) :: x(npnimx),y(npnimx),xmin,xmax,ymin,ymax
       character echx*3,echy*3
 !
 !  procedures
@@ -41,12 +41,12 @@
 
 !     xmin=0.5
 !     xmax=1.2
-!     ymin =-0.3
+!     ymin=-0.3
 !     ymax=0.5
-      xmin=x1
-      xmax=x2
-      ymin=y1
-      ymax=y2
+      xmin=real(x1,Single)
+      xmax=real(x2,Single)
+      ymin=real(y1,Single)
+      ymax=real(y2,Single)
 !***
 !     xmin=0.6
 !     xmax=0.8
@@ -57,10 +57,10 @@
 !     DO 2 j=1, nstruc
 !        DO 4 i=1, npstru(j)
 !
-!            xmin=MIN(xmin,xstruc(i,j))
-!            xmax=MAX(xmax,xstruc(i,j))
-!            ymin=MIN(ymin,ystruc(i,j))
-!            ymax=MAX(ymax,ystruc(i,j))
+!            xmin=MIN(xmin,real(xstruc(i,j),Single))
+!            xmax=MAX(xmax,real(xstruc(i,j),Single))
+!            ymin=MIN(ymin,real(ystruc(i,j),Single))
+!            ymax=MAX(ymax,real(ystruc(i,j),Single))
 !   4    CONTINUE
 !   2 CONTINUE
 !***
@@ -74,8 +74,8 @@
           if(ptsep(j,i).gt.0) then
             DO 30 k=1, nptot(ptsep(j,i),i)
 
-               x(k)=separx(k,ptsep(j,i),i)
-               y(k)=separy(k,ptsep(j,i),i)
+               x(k)=real(separx(k,ptsep(j,i),i),Single)
+               y(k)=real(separy(k,ptsep(j,i),i),Single)
 
    30       CONTINUE
             if(nptot(ptsep(j,i),i).gt.0) &
@@ -94,8 +94,8 @@
       DO 40 i=1, nbniv
          DO 50 k=1, nivtot(i)
 
-               x(k)=nivx(k,i)
-               y(k)=nivy(k,i)
+               x(k)=real(nivx(k,i),Single)
+               y(k)=real(nivy(k,i),Single)
 
    50    CONTINUE
 !***

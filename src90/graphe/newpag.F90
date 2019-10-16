@@ -16,7 +16,7 @@
 !  title:      titre du graphique
 !  echx, echy: echelles des axes x et y respectivement.
 !
-      real(rKind) :: xmin,xmax,ymin,ymax
+      real(Single) :: xmin,xmax,ymin,ymax
       character*(*) xlab,ylab,title,echx,echy
 !
 !  variables en common

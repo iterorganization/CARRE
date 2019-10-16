@@ -9,9 +9,9 @@ ifndef LD_NCARG
 endif
 
 FC      = ifort
-CPP     = /lib/cpp -C -traditional -ffreestanding
+CPP     = /lib/cpp -traditional -ffreestanding
 
-FFLAGS  = -module ${OBJDIR}/
+FFLAGS  = -module ${OBJDIR}
 ifdef SOLPS_DEBUG
 FFLAGS += -g -warn all -check all -check noarg_temp_created -warn notruncated_source -warn nounused -debug all -p -C -gen-interfaces -warn interfaces -traceback
 FFLAGS += -g -C -debug all -traceback -check all

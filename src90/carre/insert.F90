@@ -81,8 +81,8 @@
       if(nbdef.gt.0) then !{
         write(0,'(1x,a8,i6,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
         write(0,'(1x,a8,i6,9i10)') 'indxpt: ',(indxpt(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'xst:',(xst(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'yst:',(yst(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10e12.4)') 'xst:',(xst(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10e12.4)') 'yst:',(yst(i),i=1,nbdef)
       end if !}
 !>>>
 !*** Select the primary X-points and correct the number of targets
@@ -176,8 +176,8 @@
       write(0,*) 'After re-arrangement: ',nbdef
       if(nbdef.gt.0) then !{
         write(0,'(1x,a8,i6,9i10)') 'inddef: ',(inddef(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'xst:',(xst(i),i=1,nbdef)
-        write(0,'(1x,a4,4x,1p,10e10.3)') 'yst:',(yst(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10e12.4)') 'xst:',(xst(i),i=1,nbdef)
+        write(0,'(1x,a4,4x,1p,10e12.4)') 'yst:',(yst(i),i=1,nbdef)
       end if !}
 !>>>
 
