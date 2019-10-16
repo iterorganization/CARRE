@@ -74,7 +74,7 @@ C     On identifie le point de depart
 *..Recherche du deuxieme point.
 
           dir=0
-
+          plaque=0
 c***
 c         print*,'call crbniv1 - mailcn'
 c***
