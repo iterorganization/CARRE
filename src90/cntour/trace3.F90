@@ -33,7 +33,7 @@
       parameter(zero=0.)
       real(rKind) :: xn(npnimx,2),yn(npnimx,2),xcrb(npnimx,2),ycrb(npnimx,2),x1, &
      &  x2,y1,y2
-      real(rKind) :: xs(npnimx),ys(npnimx),xmin,xmax,ymin,ymax
+      real(Single) :: xs(npnimx),ys(npnimx),xmin,xmax,ymin,ymax
 !
 !  procedures
       integer ifind
@@ -46,12 +46,12 @@
 
 !     xmin=0.5
 !     xmax=1.2
-!     ymin =-0.3
+!     ymin=-0.3
 !     ymax=0.5
-      xmin=xminx
-      xmax=xmaxx
-      ymin=yminx
-      ymax=ymaxx
+      xmin=real(xminx,Single)
+      xmax=real(xmaxx,Single)
+      ymin=real(yminx,Single)
+      ymax=real(ymaxx,Single)
 !***
 !     xmin=0.6
 !     xmax=0.8
@@ -62,10 +62,10 @@
 !     DO 2 j=1, nstruc
 !        DO 4 i=1, npstru(j)
 !
-!            xmin=MIN(xmin,xstruc(i,j))
-!            xmax=MAX(xmax,xstruc(i,j))
-!            ymin=MIN(ymin,ystruc(i,j))
-!            ymax=MAX(ymax,ystruc(i,j))
+!            xmin=MIN(xmin,real(xstruc(i,j),Single))
+!            xmax=MAX(xmax,real(xstruc(i,j),Single))
+!            ymin=MIN(ymin,real(ystruc(i,j),Single))
+!            ymax=MAX(ymax,real(ystruc(i,j),Single))
 !   4    CONTINUE
 !   2 CONTINUE
 !***
@@ -146,8 +146,8 @@
 
       endif
       do i=1,nn(inouv)
-        xs(i)=xn(i,inouv)
-        ys(i)=yn(i,inouv)
+        xs(i)=real(xn(i,inouv),Single)
+        ys(i)=real(yn(i,inouv),Single)
         enddo
       if(nn(inouv).gt.0) &
      & CALL agcurv(xs,1,ys,1,nn(inouv),nin)
