@@ -106,37 +106,37 @@ c  d'un fichier
 
       ieg = INDEX(vari,'=')
 
-      IF (vari(1:6) .EQ. 'repart')THEN
+      IF (vari(1:6) .EQ. 'repart') THEN
 c        READ(vari(ieg+1:80),*,err=98)repart
          call rdfrin(11,vari(ieg+1:80),repart,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
-      ELSE IF (vari(1:6) .EQ. 'distxo')THEN
+      ELSE IF (vari(1:6) .EQ. 'distxo') THEN
 c        READ(vari(ieg+1:80),*,err=98)distxo
          call rdfrre(11,vari(ieg+1:80),distxo,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
-      ELSE IF (vari(1:6) .EQ. 'pntrat')THEN
+      ELSE IF (vari(1:6) .EQ. 'pntrat') THEN
 c        READ(vari(ieg+1:80),*,err=98)pntrat
          call rdfrre(11,vari(ieg+1:80),pntrat,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
-      ELSE IF (vari(1:9) .EQ. 'tgarde(1)')THEN
+      ELSE IF (vari(1:9) .EQ. 'tgarde(1)') THEN
 c        READ(vari(ieg+1:80),*,err=98)tgarde(1)
          call rdfrre(11,vari(ieg+1:80),tgarde(1),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
-      ELSE IF (vari(1:9) .EQ. 'tgarde(2)')THEN
+      ELSE IF (vari(1:9) .EQ. 'tgarde(2)') THEN
 c        READ(vari(ieg+1:80),*,err=98)tgarde(2)
          call rdfrre(11,vari(ieg+1:80),tgarde(2),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
-      ELSE IF (vari(1:9) .EQ. 'tgarde(3)')THEN
+      ELSE IF (vari(1:9) .EQ. 'tgarde(3)') THEN
 c        READ(vari(ieg+1:80),*,err=98)tgarde(3)
          call rdfrre(11,vari(ieg+1:80),tgarde(3),ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
-      ELSE IF (vari(1:9) .EQ. 'tgarde(4)')THEN
+      ELSE IF (vari(1:9) .EQ. 'tgarde(4)') THEN
 c        READ(vari(ieg+1:80),*,err=98)tgarde(4)
          call rdfrre(11,vari(ieg+1:80),tgarde(4),ierror)
          if(ierror.eq.1) go to 98

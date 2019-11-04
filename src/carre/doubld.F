@@ -350,7 +350,7 @@ c               IF ((in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque),
 c     .                  ystruc(1,plaque),npstru(plaque)))
 c     .            .OR. (cross(ind,xn(1,inouv),yn(1,inouv),
 c     .                    xstruc(1,plaque),ystruc(1,plaque),
-c     .                    npstru(plaque))))   then
+c     .                    npstru(plaque)))) then
 
                if(li .or. lc) then
                   nn(inouv)=1
@@ -397,7 +397,7 @@ c               IF ((in(xn(2,inouv),yn(2,inouv),xstruc(1,plaque),
 c     .                  ystruc(1,plaque),npstru(plaque)))
 c     .            .OR. (cross(ind,xn(1,inouv),yn(1,inouv),
 c     .                    xstruc(1,plaque),ystruc(1,plaque),
-c     .                    npstru(plaque))))   THEN
+c     .                    npstru(plaque)))) THEN
 
                   write(*,*) 'Problem in doubld (n_call =',n_call,')'
                   write(*,*) '==> If a file "carre.dat" from an old ',

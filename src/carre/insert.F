@@ -37,7 +37,7 @@ c*** ... However, multiple intersections of separatrix branches starting
 c*** at the same x-point with the same target should be screened
 
       write(0,*) 'insert: indstr,nbdef,ipx',indstr,nbdef,ipx !###
-      if (indstr .gt. 0)  then !{
+      if (indstr .gt. 0) then !{
         do i=1, nbdef !{
           if (inddef(i).eq.indstr .and. ipx.eq.iipx(i)) return
         end do !}

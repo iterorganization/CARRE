@@ -353,7 +353,7 @@ c     enddo
 c***
 
             IF (cross(ind2,niv1x,niv1y,xstruc(1,plaque),
-     ,                         ystruc(1,plaque),npstru(plaque)))   THEN
+     ,                         ystruc(1,plaque),npstru(plaque))) THEN
 
                echec = .TRUE.
 c***
@@ -366,7 +366,7 @@ c***
 
       ELSE IF ((ecart1 .LT. const1) .OR. (ecart2 .LT. const1)) THEN
 
-         IF (chgdir(niv1x,niv1y,nivox,nivoy))     THEN
+         IF (chgdir(niv1x,niv1y,nivox,nivoy)) THEN
 
             k = 1
             dir = MOD(dir+1,4) + 1
@@ -386,13 +386,13 @@ c     enddo
 c     print*,'chgdir=',chgdir(niv1x,niv1y,nivox,nivoy)
 c***
 
-         IF (chgdir(niv1x,niv1y,nivox,nivoy))     THEN
+         IF (chgdir(niv1x,niv1y,nivox,nivoy)) THEN
 
             IF ((in(niv1x(2),niv1y(2),xstruc(1,plaque),
      .                         ystruc(1,plaque),npstru(plaque)))
      .         .OR. (cross(ind2,niv1x,niv1y,xstruc(1,plaque),
      .                         ystruc(1,plaque),npstru(plaque)))
-     .         .OR. ouvert)   THEN
+     .         .OR. ouvert) THEN
 
                k = 1
                dir = MOD(dir+1,4) + 1

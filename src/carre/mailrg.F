@@ -370,7 +370,7 @@ c***
      .                  ystruc(1,plaque),npstru(plaque)))
      .            .OR. (cross(ind,xn(1,inouv),yn(1,inouv),
      .                    xstruc(1,plaque),ystruc(1,plaque),
-     .                    npstru(plaque))))   THEN
+     .                    npstru(plaque)))) THEN
 
                   nn(inouv)=1
                   dir=MOD(dir+1,4) + 1
@@ -391,7 +391,7 @@ c***
      .                  ystruc(1,plaque),npstru(plaque)))
      .            .OR. (cross(ind,xn(1,inouv),yn(1,inouv),
      .                    xstruc(1,plaque),ystruc(1,plaque),
-     .                    npstru(plaque))))   THEN
+     .                    npstru(plaque)))) THEN
 
                   PRINT *,'probleme de marche 2 dans mailrg'
                   call pltend

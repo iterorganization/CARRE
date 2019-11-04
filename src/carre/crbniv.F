@@ -100,7 +100,7 @@ c*** prevent an unintended call to trvers.
                ENDIF
             ENDIF
             IF (trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),xt(1,1),
-     .                 yt(1,1),nt(1)))  THEN
+     .                 yt(1,1),nt(1))) THEN
                k=k-1
 
 cdps-20051115 Part of the above change.
@@ -132,7 +132,7 @@ cdps-20051115 Part of the above change.
                ENDIF
             ENDIF
             IF (trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),xt(1,1),
-     .                 yt(1,1),nt(1)))  THEN
+     .                 yt(1,1),nt(1))) THEN
                k=k-1
             ELSE IF (trvers2) THEN
                 k=k-1
@@ -161,9 +161,9 @@ cdps-20051115 Part of the above change.
                ENDIF
             ENDIF
             IF (trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),xt(1,1),
-     .                 yt(1,1),nt(1)))  THEN
+     .                 yt(1,1),nt(1))) THEN
                k=k-1
-            ELSE IF (trvers2) THEN 
+            ELSE IF (trvers2) THEN
                 k=k-1
             ELSE
                i=i-1
@@ -189,7 +189,7 @@ cdps-20051115 Part of the above change.
                ENDIF
             ENDIF
             IF (trvers(crbx(k-1),crby(k-1),crbx(k),crby(k),xt(1,1),
-     .                 yt(1,1),nt(1)))  THEN
+     .                 yt(1,1),nt(1))) THEN
                k=k-1
                write(6,*)'Erreur dans crbniv, travers.',
      .           ' Pas cense traverser de courbe'
