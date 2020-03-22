@@ -160,8 +160,8 @@ C    DEFAUT : CWM = 1.
 
 C  EPAISSEUR DES LIGNES DE NIVEAU
 
-C  - CLL:  Parametre controlant l'epaisseur de la ligne utilisee pour
-C          tracer la ligne de niveau.
+C  - CLL: Parametre controlant l'epaisseur de la ligne utilisee pour
+C         tracer la ligne de niveau.
 C    DEFAUT : CLL = 0. (COMPACK prend alors l'epaisseur par defaut qui
 C             correspond a environ .1 mm).
 

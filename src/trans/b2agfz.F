@@ -246,7 +246,7 @@ c*** Construct the full mesh for the disconnected double-null geometry,
 c*** inner x-point either below (down) or above (up) the axis
 c***
 c*** The grid is constructed of two adjacent parts corresponding to the
-c*** inner and outer halfs of the edge region.
+c*** inner and outer halves of the edge region.
 c***
 c*** Calculate the indices, increments, and counting for each zone
 

@@ -243,7 +243,7 @@ c----------------------------------------------------------------------
    35          CONTINUE
    30       CONTINUE
 *..   Index each curve not going to a plate (curve connecting the X-point
-*     from right:  3, from left:  4)
+*     from right: 3, from left: 4)
             do 40 ipx=1, npx
                wx(1)=separx(1,kk(2*(ipx-1)+1),ipx)
                wy(1)=separy(1,kk(2*(ipx-1)+1),ipx)

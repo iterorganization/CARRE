@@ -6,7 +6,7 @@ c
 c  version : 07.07.97 20:10
 c
 c======================================================================
-c  This routine finds the innermost point of the limitor. It defines
+c  This routine finds the innermost point of the limiter. It defines
 c  (ptx,pty), the coordinates of the X-point, to be the coordinates of
 c  that point. Finally, it parametrises the separatrix (the flux surface
 c  which goes through (ptx,pty) in curve nivx(*,1,1),nivy(*,1,1).
