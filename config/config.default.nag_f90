@@ -6,10 +6,8 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-ifdef SOLPS_CPP
-DEFINES   = ${SOLPS_CPP}
-else
-DEFINES   = -DNAGFOR
+ifndef SOLPS_CPP
+DEFINES  += -DNAGFOR
 endif
 
 FC        = nagfor

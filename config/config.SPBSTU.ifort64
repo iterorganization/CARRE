@@ -8,8 +8,6 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-DEFINES = 
-
 FC      = ifort
 CPP     = /usr/bin/cpp -traditional 
 

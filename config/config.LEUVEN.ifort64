@@ -8,8 +8,6 @@ endif
 #  $(error LD_NCARG not defined)
 #endif
 
-DEFINES = 
-
 FC      = ifort
 CPP     = /lib/cpp -traditional
 

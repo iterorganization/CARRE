@@ -9,8 +9,9 @@ ifndef LD_NCARG
 endif
 
 # LINK_NCARG  = -Wl,-L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
-
-DEFINES = -DHPUX
+ifndef SOLPS_CPP
+DEFINES += -DHPUX
+endif
 
 FC      = f77
 CPP     = /lib/cpp

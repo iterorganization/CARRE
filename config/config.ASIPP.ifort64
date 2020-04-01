@@ -11,8 +11,6 @@ LD_MSCL   ?= -L{MSCL_ROOT} -lmscl
 LD_NCARG  ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm # for NCARG v4.x.x
 
 
-DEFINES    = 
-
 FC         = ifort
 CPP        = /lib/cpp -C -traditional -ffreestanding
 

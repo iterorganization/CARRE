@@ -2,9 +2,8 @@
 LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG  ?= 
 
-DEFINES = 
 ifndef SOLPS_CPP
-DEFINES  += -DPGF90
+DEFINES += -DPGF90
 endif
 
 FC      = pgf90

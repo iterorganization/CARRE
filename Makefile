@@ -12,7 +12,8 @@ ifndef COMPILER
 $(error COMPILER not defined)
 endif
 
-MAKES = Makefile 
+MAKES = Makefile
+DEFINES = ${CARRE_DEFINES} ${SOLPS_CPP}
 # Include global SOLPS compiler settings
 ifndef SOLPS_CPP
 NODENAME = $(shell echo `hostname`)

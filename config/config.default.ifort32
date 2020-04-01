@@ -10,8 +10,6 @@ endif
 
 # LINK_NCARG  = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 
-DEFINES = 
-
 FC      = ifort
 CPP     = /lib/cpp -C -traditional
 

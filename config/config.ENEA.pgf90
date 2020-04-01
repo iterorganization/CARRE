@@ -6,7 +6,6 @@ ifndef LD_NCARG
   $(error LD_NCARG not defined)
 endif
 
-DEFINES = 
 ifndef SOLPS_CPP
 DEFINES  += -DPGF90
 endif
