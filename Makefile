@@ -100,7 +100,7 @@ LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJDIR)/%.o : %.F
 	- /bin/rm -f ${OBJDIR}/$*.f
-	${CPP} ${SOLPS_CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
