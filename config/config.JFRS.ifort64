@@ -1,0 +1,26 @@
+#  VERSION : 01.04.2015
+
+# check if necessary variables are correctly defined
+LD_MSCL  ?= -L${SOLPSLIB} -lmscl
+
+FC        = ftn
+CPP       = /lib/cpp -traditional -ffreestanding
+
+ifdef SOLPS_DEBUG
+FFLAGS    = -O0 -g -C -debug all -traceback -check all -fpe0
+else
+FFLAGS    = -O
+endif
+
+DBLPAD    =
+
+COMPILE   = ${FC} -c ${FFLAGS}
+
+LDLIBS    = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS   =
+LDEXTRA   = 
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

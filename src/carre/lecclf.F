@@ -48,7 +48,6 @@ c       Configuration limiteur
          WRITE(6,105)lg(1)
   105    FORMAT(/'Configuration limiteur.'//
      .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
-c$   .   'Nombre de points sur la separatrice:'/'longueur = ',F9.5)
          READ(5,*)nptseg(1)
 
          WRITE(6,101)

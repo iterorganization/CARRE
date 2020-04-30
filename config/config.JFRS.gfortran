@@ -1,0 +1,28 @@
+# check if necessary variables are correctly defined
+LD_MSCL ?= -L${SOLPSLIB} -lmscl
+
+ifndef SOLPS_CPP
+DEFINES += -DGFORTRAN
+endif
+
+FC      = ftn
+CPP     = /lib/cpp -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS  = -g -fbounds-check -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
+else
+FFLAGS  = -O
+endif
+
+DBLPAD  =
+
+COMPILE = ${FC} -c ${FFLAGS}
+
+LDLIBS  = ${LD_MSCL} ${LD_NCARG}
+LDFLAGS =
+LDEXTRA =
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+
