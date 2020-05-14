@@ -4,11 +4,10 @@
 ifndef LD_MSCL
   $(error LD_MSCL not defined)
 endif
-ifndef LD_NCARG
-  $(error LD_NCARG not defined)
+ifdef NCARG_ROOT
+LD_NCARG ?= -Wl,-L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 endif
 
-# LINK_NCARG  = -Wl,-L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 ifndef SOLPS_CPP
 DEFINES += -DHPUX
 endif
@@ -26,9 +25,7 @@ DBLPAD  =
 
 COMPILE = ${FC} -c ${FFLAGS}
 
-# LDLIBS= -Wl,-L${SOLPSLIB} -Wl,-L${SOLPSMASTER}/@sys/lib -Wl,-L/usr/local/lib
-LDLIBS  = -Wl, ${LD_MSCL} -Wl,${LD_NCARG} -Wl,-L/usr/lib/X11R5
-#LDFLAGS = -lncarg -lncarg_gks -lncarg_c -lncarg_loc -lmach -lX11 -lm
+LDLIBS  = ${LD_MSCL} ${LD_NCARG} -Wl,-L/usr/lib/X11R5
 LDFLAGS = -lmach
 LDEXTRA = 
 
