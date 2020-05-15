@@ -108,7 +108,7 @@ $(OBJDIR)/%.o : %.F
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
 ifdef LD_NCARG
-ifndef GLI_HOME
+ifeq ($(strip ${GLI_HOME}),)
 $(warning Carre graphics may not work because GLI_HOME is not defined.)
 endif
 all: VERSION ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/.x

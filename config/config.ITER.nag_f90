@@ -1,5 +1,6 @@
 # check if necessary variables are correctly defined
 GR_ROOT  ?= ${EBROOTGR}
+GLI_HOME ?= ${EBROOTGLI}
 ifdef NCARG_ROOT
 LD_NCARG ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lXrender -lbz2 -lz
 endif
