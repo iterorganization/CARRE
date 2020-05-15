@@ -87,7 +87,7 @@ ifdef SOLPS_CPP
 ALLTARGETS += ${OBJDIR}/${PROG_FCRR}
 endif
 
-EXCLUDELIS = carre.o tradui.o fcrr.o bidon.o fcrblkd.o
+MAINLIST = carre.o tradui.o fcrr.o bidon.o fcrblkd.o
 
 INCLUDE = -I${SRCDIR}/include
 
@@ -95,7 +95,7 @@ include ${OBJDIR}/LISTOBJ
 
 DEST = $(OBJS:%.o=$(OBJDIR)/%.o)
 GDEST = $(GOBJS:%.o=$(OBJDIR)/%.o)
-MAINLIST = $(EXCLUDELIS:.=\.)
+EXCLUDELIST = $(MAINLIST:.o=\\.o)
 LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJDIR)/%.o : %.F
@@ -169,7 +169,7 @@ TAGS:	tags
 tags:
 	rm -f TAGS ; etags ${SRCDIR}/*/*.F || touch TAGS
 
-depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${EXCLUDELIS:.o=.F}
+depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${MAINLIST:.o=.F}
 	@makedepend -f- ${INCLUDE} $^ | \
 	sed -e 's|${SRCDIR}/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
@@ -181,7 +181,7 @@ listobj:
 	for d in `echo "${FPATH}" | tr : \ `; do \
 		l="$$l `find $$d -name '*.F' -printf "%f "`"; \
 	done; \
-	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
+	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
 	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ
@@ -189,7 +189,7 @@ listobj:
 	for d in `echo "$(GPATH)" | tr : \ `; do \
 		ll="$$ll `find $$d -name '*.F' -printf "%f "`"; \
 	done; \
-	E="-e 's/\.F/\.o/g'" ; for f in $(MAINLIST); do \
+	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
 	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
