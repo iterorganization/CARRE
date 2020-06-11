@@ -2,7 +2,7 @@
 
 # check if necessary variables are correctly defined
 ifdef NCARG_ROOT
-LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lcairo -lXext -lX11 -lm -lfontconfig -lfreetype -lpthread -lXrender -lbz2
+LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lcairo -lXext -lX11 -lm -lfontconfig -lfreetype -lpthread -lXrender -lbz2 -lgfortran
 endif
 LD_MSCL  ?= -L${SOLPSLIB} -lmscl
 
@@ -20,7 +20,7 @@ DBLPAD    =
 COMPILE   = ${FC} -c ${FFLAGS}
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS   =
+LDFLAGS   = -dynamic
 LDEXTRA   = 
 
 #!!!Local Variables:

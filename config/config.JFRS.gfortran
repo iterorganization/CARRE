@@ -22,7 +22,7 @@ DBLPAD  =
 COMPILE = ${FC} -c ${FFLAGS}
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =
+LDFLAGS = -dynamic
 LDEXTRA =
 
 #!!!Local Variables:
