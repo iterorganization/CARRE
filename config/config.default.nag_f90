@@ -11,7 +11,7 @@ FC        = nagfor
 CPP       = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS    = -g -C 
+FFLAGS    = -g -C
 else
 FFLAGS    = -O
 endif
@@ -20,9 +20,9 @@ DBLPAD    = -r8 -i4
 
 COMPILE   = ${FC} -c ${FFLAGS}
 
-LDLIBS    = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS   = 
-LDEXTRA   = 
+LDLIBS    = ${LD_MSCL}
+LDFLAGS   = ${LD_NCARG}
+LDEXTRA   =
 
 #!!!Local Variables:
 #!!! mode: Makefile

@@ -17,14 +17,14 @@ else
 FFLAGS  = -O -vec_report0
 endif
 
-DBLPAD  = 
+DBLPAD  =
 
 COMPILE = ${FC} -c ${FFLAGS}
 
 #NCAR = ${NCARG_ROOT}/BD/*.o
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS = 
-#DUMMY   = builds/${HOST_NAME}.${COMPILER}/bidon.o 
+LDLIBS  = ${LD_MSCL}
+LDFLAGS = ${LD_NCARG}
+#DUMMY   = builds/${HOST_NAME}.${COMPILER}/bidon.o
 
 #!!!Local Variables:
 #!!! mode: Makefile

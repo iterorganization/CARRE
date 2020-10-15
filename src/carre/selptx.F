@@ -184,7 +184,7 @@ c
             end if
             if(k.eq.ipo) then
               write(*,*) 'Ambiguous definition of the X-point',
-     ,                              j,': the same as the plasma center'
+     ,                              j,': the same as the plasma centre'
               ex=.false.
               go to 20
             end if
