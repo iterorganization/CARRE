@@ -61,6 +61,11 @@ else
 $(error config/config.${HOST_NAME}.${COMPILER} not found.)
 endif
 
+ifeq ($(shell [ -e config/config.common.${COMPILER} ] && echo yes || echo no ),yes)
+include config/config.common.${COMPILER}
+MAKES+= config/config.common.${COMPILER}
+endif
+
 ifeq ($(shell [ -e config/config.${HOST_NAME}.${COMPILER}.local ] && echo yes || echo no ),yes)
 include config/config.${HOST_NAME}.${COMPILER}.local
 MAKES+= config/config.${HOST_NAME}.${COMPILER}.local
