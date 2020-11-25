@@ -1,11 +1,6 @@
-#  VERSION : 01.04.2015
-
 # check if necessary variables are correctly defined
 ifndef LD_MSCL
   $(error LD_MSCL not defined)
-endif
-ifndef LD_NCARG
-  $(error LD_NCARG not defined)
 endif
 
 FC      = ifort
@@ -13,23 +8,9 @@ CPP     = /lib/cpp -traditional -ffreestanding
 
 FFLAGS  = -module ${OBJDIR}
 ifdef SOLPS_DEBUG
-FFLAGS += -g -C -debug all -traceback -check all -warn all -check noarg_temp_created  -warn notruncated_source -warn nounused  -p -gen-interfaces -warn interfaces
+FFLAGS += -warn all -check noarg_temp_created  -warn notruncated_source -warn nounused  -p -gen-interfaces -warn interfaces
 LDFLAGS = -check all -warn all -debug all  # -gen-interfaces -warn interfaces
-else
-FFLAGS += -O
 endif
-ifdef IMAS_VERSION
-B2INCLUDE += `pkg-config imas-ifort ggd --cflags`
-endif
-
-DBLPAD  =
-
-COMPILE = ${FC} -c ${FFLAGS}
-MOD     = mod
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =
-LDEXTRA = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

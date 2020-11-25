@@ -1,0 +1,18 @@
+# check if necessary variables are correctly defined
+MSCL_ROOT ?= /global/project/projectdirs/atom/atom-install-cori/solps-libs/lib_gfortran
+LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
+LD_NCARG  ?= ${NCAR}
+
+FC      = ftn
+CPP     = cpp -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS  = -fbacktrace
+endif
+
+DBLPAD  = -fdefault-real-8
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

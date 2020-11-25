@@ -1,34 +1,18 @@
-#  VERSION : 01.04.2015
-
 # check if necessary variables are correctly defined
-IRISLIB ?= /fusion/projects/codes/solps/SOLPS-ITER/public_lib/GA.ifort64
-MSCL_ROOT ?= ${IRISLIB}
+IRISLIB    ?= /fusion/projects/codes/solps/SOLPS-ITER/public_lib/GA.ifort64
+MSCL_ROOT  ?= ${IRISLIB}
 NCARG_ROOT ?= ${IRISLIB}/NCARG
-LD_MSCL ?= -L${MSCL_ROOT} -lmscl
-LD_NCARG ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm
+LD_MSCL    ?= -L${MSCL_ROOT} -lmscl
+LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm
 
 FC      = ifort
 CPP     = /lib/cpp -traditional -ffreestanding
 
 FFLAGS  = -module ${OBJDIR}
 ifdef SOLPS_DEBUG
-FFLAGS += -g -C -debug all -traceback -check all -warn all -check noarg_temp_created -warn notruncated_source -warn nounused -p -gen-interfaces -warn interfaces
+FFLAGS += -warn all -check noarg_temp_created -warn notruncated_source -warn nounused -p -gen-interfaces -warn interfaces
 LDFLAGS = -check all -warn all -debug all # -gen-interfaces -warn interfaces
-else
-FFLAGS += -O
 endif
-ifdef IMAS_VERSION
-B2INCLUDE += `pkg-config imas-ifort ggd --cflags`
-endif
-
-DBLPAD  =
-
-COMPILE = ${FC} -c ${FFLAGS}
-MOD     = mod
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =
-LDEXTRA = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

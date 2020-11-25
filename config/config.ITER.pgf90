@@ -1,34 +1,15 @@
 # check if necessary variables are correctly defined
+GLI_HOME ?= ${EBROOTGLI}
 LD_MSCL  ?= `pkg-config mscl --libs` -lgfortran
+ifdef NCARG_ROOT
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
-
-ifndef SOLPS_CPP
-DEFINES  += -DPGF90
 endif
 
-FC        = pgf90
 CPP       = /lib/cpp -traditional -ffreestanding
 
-ifdef SOLPS_DEBUG
-FFLAGS    = -g -C 
-else
-FFLAGS    = -O
-endif
-ifdef IMAS_VERSION
-B2INCLUDE += `pkg-config imas-pgi ggd --cflags`
-endif
 ifdef LD_NETCDF
 B2INCLUDE += `nf-config --cflags`
 endif
-
-DBLPAD    = -r8 -i4
-
-COMPILE   = ${FC} -c ${FFLAGS} -module ${OBJDIR}
-MOD       = mod
-
-LDLIBS    = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS   = 
-LDEXTRA   = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile
