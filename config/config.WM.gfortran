@@ -10,7 +10,7 @@ ifdef SOLPS_DEBUG
 FFLAGS  = -fbacktrace
 endif
 
-DBLPAD  = 
+DBLPAD  =
 
 #!!!Local Variables:
 #!!! mode: Makefile
