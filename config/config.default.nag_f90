@@ -26,7 +26,7 @@ DBLPAD    = -r8 -i4
 COMPILE   = ${FC} -c ${FFLAGS} -mdir ${OBJDIR} -I${OBJDIR}
 MOD       = mod
 
-LDLIBS    = ${LD_MSCL} ${LD_NCARG}
+LDLIBS    = ${LD_MSCL} ${LD_NCARG} ${LD_NAG}
 LDFLAGS   = 
 LDEXTRA   = ${LD_UAL}
 
