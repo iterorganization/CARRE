@@ -1,12 +1,13 @@
 c=======================================================================
       subroutine enlpnt(v,nelem,xmail,ymail,ncoord,i1,i2)
       implicit none
+#include <CARRETYPES.F>
 c  on retire un point i1 de la liste des noeuds et on le remplace par le
 c  point d'indice i2
 c
 c  arguments
       integer nelem,v(3,nelem),ncoord,i1,i2
-      real xmail(ncoord),ymail(ncoord)
+      real(kind=R8) xmail(ncoord),ymail(ncoord)
 c
 c  variables locales
       integer i,j,ielem
