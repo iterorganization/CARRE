@@ -11,7 +11,7 @@ endif
 
 DBLPAD    =
 
-COMPILE   = ${FC} -c ${FFLAGS}
+COMPILE   = ${FC} -c ${FFLAGS} -module ${OBJDIR}
 
 LDLIBS    = ${LD_MSCL}
 LDFLAGS  += ${LD_NCARG}
