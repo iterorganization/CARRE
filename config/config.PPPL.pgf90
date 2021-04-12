@@ -2,37 +2,14 @@
 ifndef LD_MSCL
   $(error LD_MSCL not defined)
 endif
-ifndef LD_NCARG
-  $(error LD_NCARG not defined)
-endif
 
-ifndef SOLPS_CPP
-DEFINES += -DPGF90
-endif
-
-FC      = pgf90
 CPP     = /lib/cpp -traditional -ffreestanding
 
-ifdef SOLPS_DEBUG
-FFLAGS  = -g -C -tp=amd64
-else
-FFLAGS  = -O -tp=amd64
-endif
-ifdef IMAS_VERSION
-B2INCLUDE += `pkg-config imas-pgi ggd --cflags`
-endif
+FFLAGS  = -tp=amd64
+
 ifdef LD_NETCDF
 B2INCLUDE += `nf-config --cflags`
 endif
-
-DBLPAD  = -r8 -i4
-
-COMPILE = ${FC} -c ${FFLAGS} -module ${OBJDIR}
-MOD     = mod
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS = 
-LDEXTRA = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

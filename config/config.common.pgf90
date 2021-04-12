@@ -1,0 +1,29 @@
+ifndef SOLPS_CPP
+DEFINES  += -DPGF90
+endif
+
+FC        = pgf90
+
+ifdef SOLPS_DEBUG
+FFLAGS   += -g -C
+else
+FFLAGS   += -O
+endif
+
+DBLPAD    = -r8 -i4
+
+COMPILE   = ${FC} -c ${FFLAGS} -module ${OBJDIR}
+MOD       = mod
+
+ifdef IMAS_VERSION
+B2INCLUDE += `pkg-config imas-pgi ggd --cflags`
+endif
+
+LDLIBS    = ${LD_MSCL} ${LD_NAG}
+LDFLAGS   = ${LD_NCARG}
+LDEXTRA   = ${LD_UAL}
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

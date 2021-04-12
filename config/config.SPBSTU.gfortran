@@ -2,14 +2,14 @@
 LD_MSCL  ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER/}mscl -lmscl
 LD_NCARG ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lxcb
 
-FC      = ifort
-CPP     = /lib/cpp -traditional -ffreestanding
+FC      = gfortran
+CPP     = /lib/cpp -traditional
 
-FFLAGS  = -module ${OBJDIR}
 ifdef SOLPS_DEBUG
-FFLAGS += -warn all -check noarg_temp_created -warn notruncated_source -warn nounused -p -gen-interfaces -warn interfaces
-LDFLAGS = -check all -warn all -debug all # -gen-interfaces -warn interfaces
+FFLAGS  = -fbacktrace
 endif
+
+DBLPAD  =
 
 #!!!Local Variables:
 #!!! mode: Makefile

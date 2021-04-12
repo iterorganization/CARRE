@@ -1,34 +1,11 @@
 # check if necessary variables are correctly defined
 LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
-LD_NCARG  ?= 
 
-ifndef SOLPS_CPP
-DEFINES  += -DPGF90
-endif
-
-FC      = pgf90
 CPP     = /lib/cpp -traditional -ffreestanding
 
-ifdef SOLPS_DEBUG
-FFLAGS  = -g -C 
-else
-FFLAGS  = -O
-endif
-ifdef IMAS_VERSION
-B2INCLUDE += `pkg-config imas-pgi ggd --cflags`
-endif
 ifdef LD_NETCDF
 B2INCLUDE += `nf-config --cflags`
 endif
-
-DBLPAD  = -r8 -i4
-
-COMPILE = ${FC} -c ${FFLAGS} -module ${OBJDIR}
-MOD     = mod
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS = 
-LDEXTRA = ${LD_UAL}
 
 #!!!Local Variables:
 #!!! mode: Makefile

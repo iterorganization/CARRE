@@ -1,0 +1,30 @@
+COMPILER_MAJOR_VERSION = $(shell ${FC} -V 2>&1 | grep -o "Version [0-9]*" | cut -d ' ' -f 2 )
+
+ifdef SOLPS_DEBUG
+FFLAGS   += -g -C -debug all -traceback -check all
+else
+FFLAGS   += -O
+endif
+ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -le 12; echo $$?),0)
+FFLAGS   += -vec_report0
+endif
+ifdef IMAS_VERSION
+B2INCLUDE += `pkg-config imas-ifort ggd --cflags`
+endif
+
+DBLPAD    =
+
+COMPILE   = ${FC} -c ${FFLAGS}
+MOD       = mod
+
+LDLIBS    = ${LD_MSCL} ${LD_NAG}
+LDFLAGS  += ${LD_NCARG}
+LDEXTRA   = ${LD_UAL}
+ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -le 12; echo $$?),0)
+LDFLAGS  += -i_dynamic
+endif
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

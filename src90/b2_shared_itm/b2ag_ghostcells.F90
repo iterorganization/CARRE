@@ -296,7 +296,7 @@ contains
       integer, intent(in) :: oix, oiy, nodeA1, nodeB1, tix, tiy, nodeA2, nodeB2
 
       ! internal
-      real(R8), parameter :: del = 1.0e-1_R8
+      ! real(R8), parameter :: del = 1.0e-1_R8
       integer :: nodeAO, nodeBO
 
       ! Copy face endpoint to new face startpoint

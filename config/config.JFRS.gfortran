@@ -1,0 +1,21 @@
+# check if necessary variables are correctly defined
+ifdef NCARG_ROOT
+LD_NCARG ?= `pkg-config ncarg --libs`
+endif
+LD_MSCL ?= -L${SOLPSLIB} -lmscl
+
+FC      = ftn
+CPP     = /lib/cpp -traditional
+
+ifdef SOLPS_DEBUG
+FFLAGS  = -fbounds-check -fbacktrace
+endif
+
+DBLPAD  =
+
+LDFLAGS = -dynamic
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

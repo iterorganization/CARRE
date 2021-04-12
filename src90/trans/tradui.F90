@@ -11,6 +11,8 @@ program tradui
   use KindDefinitions
   use b2mod_connectivity
   use b2mod_grid_mapping
+  use b2mod_indirect
+  use b2mod_geo
   use b2ag_ghostcells
   use carre_types
   use carre_constants
@@ -35,9 +37,7 @@ program tradui
   real(rKind) :: r(npmamx,nrmamx,nregmx),z(npmamx,nrmamx,nregmx), &
       &  psi(npmamx,nrmamx,nregmx),psidxm(npmamx,nrmamx,nregmx), &
       &  psidym(npmamx,nrmamx,nregmx),distxo
-  real(rKind) :: crx(-1:nxmx,-1:nymx,0:3),cry(-1:nxmx,-1:nymx,0:3), &
-      &  bb(-1:nxmx,-1:nymx,0:3),b0r0, &
-      &  fpsi(-1:nxmx,-1:nymx,0:3),ffbz(-1:nxmx,-1:nymx,0:3), &
+  real(rKind) :: b0r0, &
       &  psidx(-1:nxmx,-1:nymx,0:3),psidy(-1:nxmx,-1:nymx,0:3),&
       &  psi_tmp(-1:nxmx,-1:nymx,0:4,0:2),&
       &  crx_tmp(-1:nxmx,-1:nymx,0:4),cry_tmp(-1:nxmx,-1:nymx,0:4)
@@ -47,21 +47,13 @@ program tradui
 
   character nom*80
 
-  ! connectivity and cut arrays
-  integer :: nncut
-  integer :: leftcut(ncutmx),rightcut(ncutmx),bottomcut(ncutmx),topcut(ncutmx)
-  integer, allocatable, dimension(:,:) :: leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy
-  integer :: periodic_bc
-
   type(CarreParameters) :: par
 
   type(B2GridMap) :: b2gd
-  integer :: inseltop, inselbot, nnreg(0:2)
-  integer, allocatable :: region(:,:,:), resignore(:,:,:)
+  integer :: inseltop, inselbot
   integer, parameter :: istyle = -1 ! hard-wired to DG format
 
   logical, parameter :: ITM_OUTPUT_GHOSTCELLS = .false.
-  real(rKind), parameter :: geom_match_dist = 1.0e-6_rKind
 
 
   ! variables for UAL I/O
@@ -147,13 +139,15 @@ program tradui
   write(6,*) 'The format chosen is :',isel
 
   !* 5.   Write the translated mesh to the output file
+  call alloc_b2mod_geo(nx,ny)
+  call alloc_b2mod_indirect(nx,ny,ncutmx)
   if(isel.eq.1) then
       !
       ! Mailtri format
       !
       call ecrim1(nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, &
           &  nrmamx)
-   elseif(isel.eq.8) then
+  elseif(isel.eq.8) then
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
            r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
            par%nptseg,psidx,psidy,psi,psidxm,psidym,cflag,b0r0, &
@@ -165,7 +159,7 @@ program tradui
       call ecrim2_oldformat(nfin,nx,ny,&
            & crx(-1:nxmx,-1:nymx,0:3),&
            & cry(-1:nxmx,-1:nymx,0:3),bb(-1:nxmx,-1:nymx,0:3),nxmx,nymx)
-   elseif(isel.eq.2) then
+  elseif(isel.eq.2) then
       !
       ! B2.5 Format (Carre script default)
       !
@@ -312,14 +306,9 @@ program tradui
           & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
 
       ! assemble the connectivity arrays
-      call init_connectivity (nx,ny,&
-          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),&
-          & b2cflag(-1:nx,-1:ny,:),&
-          & leftix,leftiy,rightix,rightiy, &
-          & topix,topiy,bottomix,bottomiy, &
-          & leftcut,rightcut,bottomcut,topcut, &
-          & periodic_bc,nncut,ncutmx,inseltop, inselbot, &
-          & geom_match_dist,istyle)
+      call init_connectivity (nx,ny, &
+          & b2cflag(-1:nx,-1:ny,:), &
+          & periodic_bc,nncut,inseltop,inselbot,istyle)
 
       ! compute the region arrays
       allocate( region(-1:nx, -1:ny, 0:2) )
@@ -329,7 +318,7 @@ program tradui
           & leftcut,rightcut,topcut,bottomcut, &
           & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
           & region,nnreg,resignore, &
-          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),periodic_bc, &
+          & periodic_bc, &
           & b2cflag(-1:nx,-1:ny,:))
 
 !      region(:,:,0)=1
@@ -402,5 +391,7 @@ program tradui
       write(6,*) 'Wrong value (must be 1 to 9): isel=',isel
       stop
   endif
+  call dealloc_b2mod_geo
+  call dealloc_b2mod_indirect
   !======================================================================
 end program tradui
