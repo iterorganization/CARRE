@@ -664,10 +664,10 @@ c---
              write(6,*) 's''effectueront par ligne de niveau.'
            endif
            write(6,*) 'Voulez-vous que les modifications se fassent'
-           write(6,*) 'uniformément le long de la ligne de niveau ou '
+           write(6,*) 'uniformement le long de la ligne de niveau ou '
            write(6,*) 'qu''elles se fassent par section?'
-  123      write(6,*) 'Répondez 1 pour uniforme, 2 pour les sections, '
-           write(6,*) 'et 3 pour des sections avec des pas predisposés.'
+  123      write(6,*) 'Repondez 1 pour uniforme, 2 pour les sections, '
+           write(6,*) 'et 3 pour des sections avec des pas predisposes.'
            read(5,*,end=270,err=123) choix
   270      continue
 
@@ -680,14 +680,14 @@ c---
              do ipol=2,ipoln
                l2(ipol)=l2(ipol)* coef
              enddo
-  709        write(6,*) 'Définissez les bords.'
-  710        write(6,*) 'Limite inférieure en R'
+  709        write(6,*) 'Definissez les bords.'
+  710        write(6,*) 'Limite inferieure en R'
              read(5,*,end=711, err=710) xmini
-  711        write(6,*) 'Limite supérieure en R'
+  711        write(6,*) 'Limite superieure en R'
              read(5,*,end=712,err=711) xmaxi
-  712        write(6,*) 'Limite inférieure en Z'
+  712        write(6,*) 'Limite inferieure en Z'
              read (5,*,end=713,err=712) ymini
-  713        write(6,*) 'Limite supérieure en Z'
+  713        write(6,*) 'Limite superieure en Z'
              read(5,*,end=714,err=713) ymaxi
 
   714        call endpag
@@ -696,7 +696,7 @@ c---
      .           nstruc,npstru,xstruc,ystruc,nivx,nivy,nivtot,nbniv,
      .           np1,nprsb,xmail,ymail,nreg,.false.)
              write(6,*) 'Voulez-vous redefinir les bords?'
-  715        write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
+  715        write(6,*) 'Repondez 1 si c''est oui et 0 si c''est non'
              read(5,*,end=716,err=715) rr
   716        if (rr.eq.1) go to 709
 
@@ -739,18 +739,18 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  1211          write(6,*) 'Voulez-vous redefinir les bords?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
+               write(6,*) 'Repondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=1212,err=1211) pra
  1212          if (pra.eq.0) go to 350
 
- 1213          write(6,*) 'Définissez les bords.'
- 1214          write(6,*) 'Limite inférieure en R'
+ 1213          write(6,*) 'Definissez les bords.'
+ 1214          write(6,*) 'Limite inferieure en R'
                read(5,*,end=1215, err=1214) xmini
- 1215          write(6,*) 'Limite supérieure en R'
+ 1215          write(6,*) 'Limite superieure en R'
                read(5,*,end=1216,err=1215) xmaxi
- 1216          write(6,*) 'Limite inférieure en Z'
+ 1216          write(6,*) 'Limite inferieure en Z'
                read (5,*,end=1217,err=1216) ymini
- 1217          write(6,*) 'Limite supérieure en Z'
+ 1217          write(6,*) 'Limite superieure en Z'
                read(5,*,end=1218,err=1217) ymaxi
 
  1218          call endpag
@@ -760,12 +760,12 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  1219          write(6,*) 'Recommencer?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
+               write(6,*) 'Repondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=1220,err=1219) sra
  1220          if (sra.eq.1) go to 1213
 
-  350          write(6,*) 'Choississez un coefficient qui sera utilisé '
-               write(6,'(a,i1)') 'dans la partie inférieure à 1/',iseg+1
+  350          write(6,*) 'Choississez un coefficient qui sera utilise '
+               write(6,'(a,i1)') 'dans la partie inferieure a 1/',iseg+1
                write(6,*) 'de nppol et qui multipliera la valeur '
                write(6,*) 'actuelle des ipol'
                read(5,*,end=310,err=350) coefa
@@ -786,7 +786,7 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
   430          write(6,*) 'Souhaitez-vous choisir un autre coefficient?'
-               write(6,*) 'Répondez 1 si oui, 0 si non.'
+               write(6,*) 'Repondez 1 si oui, 0 si non.'
                read(5,*,end=340,err=430) tra
   340          continue
                if (tra.eq.1) go to 350
@@ -829,18 +829,18 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  2211          write(6,*) 'Voulez-vous redefinir les bords?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
+               write(6,*) 'Repondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=2212,err=2211) pra
  2212          if (pra.eq.0) go to 2350
 
- 2213          write(6,*) 'Définissez les bords.'
- 2214          write(6,*) 'Limite inférieure en R'
+ 2213          write(6,*) 'Definissez les bords.'
+ 2214          write(6,*) 'Limite inferieure en R'
                read(5,*,end=2215, err=2214) xmini
- 2215          write(6,*) 'Limite supérieure en R'
+ 2215          write(6,*) 'Limite superieure en R'
                read(5,*,end=2216,err=2215) xmaxi
- 2216          write(6,*) 'Limite inférieure en Z'
+ 2216          write(6,*) 'Limite inferieure en Z'
                read (5,*,end=2217,err=2216) ymini
- 2217          write(6,*) 'Limite supérieure en Z'
+ 2217          write(6,*) 'Limite superieure en Z'
                read(5,*,end=2218,err=2217) ymaxi
 
  2218          call endpag
@@ -850,12 +850,12 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  2219          write(6,*) 'Recommencer?'
-               write(6,*) 'Répondez 1 si c''est oui et 0 si c''est non'
+               write(6,*) 'Repondez 1 si c''est oui et 0 si c''est non'
                read(5,*,end=2220,err=2219) sra
  2220          if (sra.eq.1) go to 2213
 
- 2350          write(6,*) 'Choississez un coefficient qui sera utilisé '
-               write(6,'(a,i1,a,i1)') 'dans la partie supérieure à ',
+ 2350          write(6,*) 'Choississez un coefficient qui sera utilise '
+               write(6,'(a,i1,a,i1)') 'dans la partie superieure a ',
      .          iseg,'/',iseg+1
                write(6,*) 'de nppol et qui multipliera la valeur '
                write(6,*) 'actuelle des ipol'
@@ -877,7 +877,7 @@ c---
      .           np1,nprsb,xmail,ymail,nreg,.false.)
 
  2430          write(6,*) 'Souhaitez-vous choisir un autre coefficient?'
-               write(6,*) 'Répondez 1 si oui, 0 si non.'
+               write(6,*) 'Repondez 1 si oui, 0 si non.'
                read(5,*,end=2340,err=2430) tra
  2340          continue
                if (tra.eq.1) go to 2350
