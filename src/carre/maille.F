@@ -372,7 +372,7 @@ c----------------------------------------------------------------------
 #ifdef MODIF
     8    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -484,7 +484,7 @@ c  1.3.2  region 2
 #ifdef MODIF
    18    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -897,7 +897,7 @@ c----------------------------------------------------------------------
 #ifdef MODIF
    48    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -1014,7 +1014,7 @@ c---
 #ifdef MODIF
    58    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -1114,7 +1114,7 @@ c---
 #ifdef MODIF
    68    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -1230,7 +1230,7 @@ c---
 #ifdef MODIF
    78    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -1882,7 +1882,7 @@ crm  augmenter ce test
 #ifdef MODIF
   128   if(sellan(1:8).eq.'francais') then
           write(6,*) 'Avec ou sans modifications?'
-          write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+          write(6,*) 'Repondez 1 avec modif et 0 sans modif'
         elseif(sellan(1:7).eq.'english') then
           write(6,*) 'With (1) or without (0) manual modifications?'
         endif
@@ -2080,7 +2080,7 @@ c---
 #ifdef MODIF
   148    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -2206,7 +2206,7 @@ c---
 #ifdef MODIF
   158    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -2302,7 +2302,7 @@ c---
 #ifdef MODIF
   168    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-            write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+            write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -2426,7 +2426,7 @@ c---
 #ifdef MODIF
   178    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
@@ -2788,7 +2788,7 @@ c----------------------------------------------------------------------
 #ifdef MODIF
   378    if(sellan(1:8).eq.'francais') then
            write(6,*) 'Avec ou sans modifications?'
-           write(6,*) 'Répondez 1 avec modif et 0 sans modif'
+           write(6,*) 'Repondez 1 avec modif et 0 sans modif'
          elseif(sellan(1:7).eq.'english') then
            write(6,*) 'With (1) or without (0) manual modifications?'
          endif
