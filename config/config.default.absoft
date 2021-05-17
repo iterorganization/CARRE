@@ -17,8 +17,8 @@ DBLPAD  = -N113 -i4
 COMPILE = ${FC} -c ${FFLAGS}
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =  
-LDEXTRA = 
+LDFLAGS =
+LDEXTRA =
 
 #!!!Local Variables:
 #!!! mode: Makefile

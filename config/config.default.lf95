@@ -13,13 +13,13 @@ else
 FFLAGS  = -O3 -Am -X9 -Kfast,eval -x-
 endif
 
-DBLPAD  = -Ad 
+DBLPAD  = -Ad
 
 COMPILE = ${FC} -c ${FFLAGS}
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS = 
-LDEXTRA = 
+LDFLAGS =
+LDEXTRA =
 
 #!!!Local Variables:
 #!!! mode: Makefile
