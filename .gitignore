@@ -12,6 +12,7 @@ TAGS
 LISTOBJ
 git_version.h
 git_version_*.h
+*_genmod.*
 linux.*/
 g77*/
 IBMaix*/

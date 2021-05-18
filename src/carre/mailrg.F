@@ -51,7 +51,7 @@ cank-970707: dimensions from the file
      .     xmini,xmaxi,ymini,ymaxi,separx(npnimx,4,npxmx),
      .     separy(npnimx,4,npxmx),
      .     nivx(npnimx,nbniv),nivy(npnimx,nbniv),
-     .     xmail(npmamx,nrmamx,nrmamx),ymail(npmamx,nrmamx,nrmamx)
+     .     xmail(npmamx,nrmamx,nregmx),ymail(npmamx,nrmamx,nregmx)
 
       LOGICAL nuldec
 
