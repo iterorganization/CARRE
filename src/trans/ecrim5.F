@@ -168,8 +168,8 @@ c
 
       subroutine get_psimin_carre(psimin_carre)
       implicit none
-      include 'CARRETYPES.F'
-      include 'CARREDIM.F'
+#include <CARRETYPES.F>
+#include <CARREDIM.F>
       real(kind=R8) psimin_carre
       
       character lign80*80
