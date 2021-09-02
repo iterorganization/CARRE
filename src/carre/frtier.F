@@ -47,8 +47,7 @@ c
       INTEGER drctio,ifind
       REAL(kind=R8) plqdst
       INTRINSIC MOD
-      EXTERNAL MARCHE,drctio,ifind,plqdst
-     ,        ,trc_stk_in,trc_stk_out
+      EXTERNAL MARCHE,drctio,ifind,plqdst,trc_stk_in,trc_stk_out
 c======================================================================
 c.. distnv: distance along the target from the separatrix strike-point
 c           to the starting point of the limiting level line

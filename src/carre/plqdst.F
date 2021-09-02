@@ -24,8 +24,7 @@ c
 *  procedures
       INTEGER indsgm,drctio
       INTRINSIC MOD,SQRT
-      EXTERNAL drctio,indsgm
-     ,        ,trc_stk_in,trc_stk_out
+      EXTERNAL drctio,indsgm,trc_stk_in,trc_stk_out
 
 c=========================
 c.. xst,yst: tableaux des coordonnees des points de la structure.

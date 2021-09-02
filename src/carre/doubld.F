@@ -73,8 +73,8 @@ cank-970707: dimensions from the file
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort,
-     .         UNTANG,SAUTE,chgdir,in,cross,ruban,drctio
-     ,        ,trc_stk_in,trc_stk_out,trc_stk
+     .         UNTANG,SAUTE,chgdir,in,cross,ruban,drctio,
+     ,         trc_stk_in,trc_stk_out,trc_stk
 c======================================================================
 c*** Input
 c.. xn1,yn1: points of parametrised inner separatrix

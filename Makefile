@@ -94,15 +94,17 @@ FPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy
 GPATH   = ${SRCDIR}/cntour:${SRCDIR}/graphe
 VPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/cntour:${SRCDIR}/dummy:${SRCDIR}/graphe
 
+INCLUDE = -I${SRCDIR}/include
+
 ALLTARGETS = ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
 # We can only build the dg-to-Carre converter fcrr when we have the SOLPS environment available
 ifdef SOLPS_CPP
 ALLTARGETS += ${OBJDIR}/${PROG_FCRR}
+DEFINES += -DSOLPS_CPP
+INCLUDE += -I${SOLPSTOP}/modules/B2.5/src/include.local -I${SOLPSTOP}/modules/B2.5/src/include
 endif
 
 MAINLIST = carre.o tradui.o fcrr.o bidon.o fcrblkd.o
-
-INCLUDE = -I${SRCDIR}/include
 
 include ${OBJDIR}/LISTOBJ
 
@@ -183,7 +185,7 @@ tags:
 	rm -f TAGS ; etags ${SRCDIR}/*/*.F || touch TAGS
 
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${MAINLIST:.o=.F}
-	@makedepend -f- ${INCLUDE} $^ | \
+	@makedepend ${DEFINES} -f- ${INCLUDE} $^ | \
 	sed -e 's|${SRCDIR}/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
 	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}

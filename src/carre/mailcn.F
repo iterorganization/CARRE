@@ -43,7 +43,7 @@ cank-970707: dimensions from the file
      .  xptxo,yptxo,xpto,ypto,nivx(npnimx,nivmx),
      .  nivy(npnimx,nivmx),pntrat,distxo,
      .  a,gdr(nrmamx),r(nrmamx),ra(nrmamx),
-     .  rho(nrmamx), gdpsi(nrmamx),racpsi(nrmamx),somort(nrmamx),
+     .  rho(nrmamx),gdpsi(nrmamx),racpsi(nrmamx),somort(nrmamx),
      .  somortp(nrmamx),gdsomortp,somortpur(nrmamx),
      .  somortpurp(nrmamx),gdsomortpurp,
      .  sompropo(nrmamx),sompropop(nrmamx),gdsompropop,
@@ -78,10 +78,9 @@ c======================================================================
 *
 c***
 c     print*,'entree dans mailcn: nxmax, ny, npstmx, nstruc= ',
-c    .  nxmax,ny,npstmx,nstruc
+c    .                            nxmax, ny, npstmx, nstruc
 c     print*,'npmamx,nrmamx, nn1, nxmax,nymax,nivmx=',
-c    ,       npmamx,nrmamx,nn1,nxmax,nm2,
-c    .  nivmx
+c    ,        npmamx,nrmamx, nn1, nxmax, nm2, nivmx
 c     print*,'npnimx=',npnimx
 c***
 
