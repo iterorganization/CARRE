@@ -27,7 +27,7 @@
       character sclx*3,scly*3
 !
 !  procedures
-      external cpseti,cpsetr,cpcldr,endpag,getset,newpag
+      external cprect,cpseti,cpsetr,cpcldr,endpag,getset,newpag
 !======================================================================
 !  calculs
 !

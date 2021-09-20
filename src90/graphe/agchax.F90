@@ -6,6 +6,7 @@
       implicit none
       integer iflg,iaxs,iprt
       real vils
+      external gslwsc
 !  variables en common
 #include <COMQUA.F>
 !======================================================================
