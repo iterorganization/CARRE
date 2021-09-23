@@ -21,7 +21,7 @@
 !
 !  variables locales
       integer iwrk(1000),i1,i2,ll
-      real(rKind) :: x1min,x1max,x2min,x2max
+      real(Single) :: x1min,x1max,x2min,x2max
       real(Single) :: y(nxmax,nymax),rwrk(5000), &
      &     x1minp,x1maxp,x2minp,x2maxp,x1ap,x1bp,x2ap,x2bp
       character sclx*3,scly*3
