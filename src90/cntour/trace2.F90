@@ -19,7 +19,7 @@
 
 
       real(rKind) :: x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
-     &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
+     &       xstruc(npstmx,strumx),ystruc(npstmx,strumx), &
      &       nivx(npnimx,nbniv),nivy(npnimx,nbniv)
 
 
