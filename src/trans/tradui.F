@@ -104,8 +104,7 @@ c Mailtri format
 c
       if(isel.eq.1) then
 c
-        call ecrim1(nout,nfin,r,z,nptseg,nreg,nppol,nprad,npmamx,
-     .  nrmamx)
+        call ecrim1(nfin,r,z,nptseg,nreg,nppol,nprad,npmamx,nrmamx)
 c
 c B2.5 Format
 c

@@ -9,15 +9,14 @@ c======================================================================
 #include <CARRETYPES.F>
 #include <FCRCOM.F>
       character*8 nam
-      integer lun
 c
       integer nnms
       parameter (nnms=8)
       integer i
       real(kind=R4) rdummy(1), rarray(nrgnx), parray(nsgmx)
-      character*8 name, unm(nnms), uline*80
+      character*8 name, unm(nnms)
       logical streql
-      external streql
+      external streql, rearri, rearre, resimi, resime, scipit
 c
 c*** List of the valid input keywords
       data unm /
@@ -27,102 +26,111 @@ c======================================================================
 c
       call locase(nam,name,8)
       do i=1,nnms
-        if(streql(name,unm(i))) go to (10,20,30,40,50,60,70,80),i
+        if(streql(name,unm(i))) exit
       end do
-      call scipit
-      return
 c----------------------------------------------------------------------
- 10   call rearri(npr,nrgnx,i)
-      if(i.gt.0) then
-        if(nrgn.gt.0) then
-          if(nrgn.ne.i) then
-            write(0,*) 'Inconsistent number of regions found for npr:',
-     ,                  i,' instead of ',nrgn
+      select case (i)
+      case (1)
+        call rearri(npr,nrgnx,i)
+        if(i.gt.0) then
+          if(nrgn.gt.0) then
+            if(nrgn.ne.i) then
+              write(0,*) 'Inconsistent number of regions found for npr:'
+     ,                   ,i,' instead of ',nrgn
+            end if
+            nrgn=max(nrgn,i)
+          else
+            nrgn=i
           end if
-          nrgn=max(nrgn,i)
-        else
-          nrgn=i
         end if
-      end if
-      return
- 20   call rearri(nptseg,nsgmx,i)
-      if(i.gt.0) then
-        if(nsgm.gt.0) then
-          if(nsgm.ne.i) then
-            write(0,*) 'Inconsistent number of sections found for ',
-     ,                  'nptseg:',i,' instead of ',nsgm
+      case (2)
+        call rearri(nptseg,nsgmx,i)
+        if(i.gt.0) then
+          if(nsgm.gt.0) then
+            if(nsgm.ne.i) then
+              write(0,*) 'Inconsistent number of sections found for ',
+     ,                    'nptseg:',i,' instead of ',nsgm
+            end if
+            nsgm=max(nsgm,i)
+          else
+            nsgm=i
           end if
-          nsgm=max(nsgm,i)
-        else
-          nsgm=i
         end if
-      end if
-      return
- 30   call rearre(rarray,nrgnx,i)
-      if(i.gt.0) then
-        if(nrgn.gt.0) then
-          if(nrgn.ne.i) then
-            write(0,*) 'Inconsistent number of regions found for ',
-     ,                  'deltr1:',i,' instead of ',nrgn
+      case (3)
+        call rearre(rarray,nrgnx,i)
+        if(i.gt.0) then
+          if(nrgn.gt.0) then
+            if(nrgn.ne.i) then
+               write(0,*) 'Inconsistent number of regions found for ',
+     ,                    'deltr1:',i,' instead of ',nrgn
+            end if
+            nrgn=max(nrgn,i)
+          else
+            nrgn=i
           end if
-          nrgn=max(nrgn,i)
-        else
-          nrgn=i
+          deltr1(1:i) = real(rarray(1:i),R8)
         end if
-        deltr1(1:i) = real(rarray(1:i),R8)
-      end if
-      return
- 40   call rearre(rarray,nrgnx,i)
-      if(i.gt.0) then
-        if(nrgn.gt.0) then
-          if(nrgn.ne.i) then
-            write(0,*) 'Inconsistent number of regions found for ',
-     ,                  'deltrn:',i,' instead of ',nrgn
+      case (4)
+        call rearre(rarray,nrgnx,i)
+        if(i.gt.0) then
+          if(nrgn.gt.0) then
+            if(nrgn.ne.i) then
+              write(0,*) 'Inconsistent number of regions found for ',
+     ,                    'deltrn:',i,' instead of ',nrgn
+            end if
+            nrgn=max(nrgn,i)
+          else
+            nrgn=i
           end if
-          nrgn=max(nrgn,i)
-        else
-          nrgn=i
+          deltrn(1:i) = real(rarray(1:i),R8)
         end if
-        deltrn(1:i) = real(rarray(1:i),R8)
-      end if
-      return
- 50   call rearre(parray,nsgmx,i)
-      if(i.gt.0) then
-        if(nsgm.gt.0) then
-          if(nsgm.ne.i) then
-            write(0,*) 'Inconsistent number of sections found for ',
-     ,                  'deltp1:',i,' instead of ',nsgm
+      case (5)
+        call rearre(parray,nsgmx,i)
+        if(i.gt.0) then
+          if(nsgm.gt.0) then
+            if(nsgm.ne.i) then
+              write(0,*) 'Inconsistent number of sections found for ',
+     ,                   'deltp1:',i,' instead of ',nsgm
+            end  if
+            nsgm=max(nsgm,i)
+          else
+            nsgm=i
           end if
-          nsgm=max(nsgm,i)
-        else
-          nsgm=i
+          deltp1(1:i) = real(parray(1:i),R8)
         end if
-        deltp1(1:i) = real(parray(1:i),R8)
-      end if
-      return
- 60   call rearre(parray,nsgmx,i)
-      if(i.gt.0) then
-        if(nsgm.gt.0) then
-          if(nsgm.ne.i) then
-            write(0,*) 'Inconsistent number of sections found for ',
-     ,                  'deltpn:',i,' instead of ',nsgm
+      case (6)
+        call rearre(parray,nsgmx,i)
+        if(i.gt.0) then
+          if(nsgm.gt.0) then
+            if(nsgm.ne.i) then
+              write(0,*) 'Inconsistent number of sections found for ',
+     ,                    'deltpn:',i,' instead of ',nsgm
+            end if
+            nsgm=max(nsgm,i)
+          else
+            nsgm=i
           end if
-          nsgm=max(nsgm,i)
-        else
-          nsgm=i
+          deltpn(1:i) = real(parray(1:i),R8)
         end if
-        deltpn(1:i) = real(parray(1:i),R8)
-      end if
+      case (7)
+        call rearre(rdummy,1,i)
+        pntrat = real(rdummy(1),R8)
+      case (8)
+        call resimi(nclstr)
+      case default
+        call scipit
+      end select
       return
- 70   call rearre(rdummy,1,i)
-      pntrat = real(rdummy(1),R8)
-      return
- 80   call resimi(nclstr)
-      return
+      end
 
 c======================================================================
-      entry fcrchktp(lun)
+      subroutine fcrchktp(lun)
 c======================================================================
+      implicit none
+#include <CARRETYPES.F>
+#include <FCRCOM.F>
+      integer lun
+      character*80 uline
 
 c*** Check whether "# topo" line is present in the target file (new DG)
 

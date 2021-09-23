@@ -30,6 +30,7 @@ c... toroidal field in tesla, radius in m
       real(kind=R8) :: btf, rtf
       real ubtf, urtf
       integer i, j
+      external rdeqlh
 c-----------------------------------------------------
 c
 c*** Read the plasma equilibrium ...

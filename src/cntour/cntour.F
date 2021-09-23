@@ -26,7 +26,7 @@ c  variables locales
       character sclx*3,scly*3
 c
 c  procedures
-      external cpseti,cpsetr,cpcldr,endpag,getset,newpag
+      external cpseti,cprect,cpsetr,cpcldr,endpag,getset,newpag
 c======================================================================
 c  calculs
 c
