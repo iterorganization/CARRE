@@ -40,6 +40,7 @@ contains
 
     double precision feval2d, leng
     external feval2d, leng
+    external coord
 
     ! First figure out min/max psi range to be covered by the grid
 
@@ -115,7 +116,7 @@ contains
          & x, y )
 
     write (*,*) limpoint_min_psi, limpoint_max_psi
-    write (*,*) np, x, y, psi0
+    write (*,"(i3,3e16.8)") np, x, y, psi0
 
     limpoint_max_psi = limpoint_max_psi + abs(limpoint_max_psi * 0.1)
     limpoint_min_psi = limpoint_min_psi - abs(limpoint_min_psi * 0.1)
@@ -328,7 +329,7 @@ contains
     !  procedures
     real(rKind) :: feval2d, angle, dist, norm
     external feval2d, angle, dist, norm
-
+    external rotate
 
 !!$    ! Figure out psi values for limiting curves
 !!$    limPsiMin = huge(limPsiMin)
@@ -818,6 +819,7 @@ contains
     !  procedures
     real(rKind) :: leng
     external leng
+    external coord
 
     do iniv = 1, struct%nbniv
 
@@ -847,6 +849,9 @@ contains
 
     double precision, parameter :: TRIANGLE_SIZE = 0.1
     double precision, parameter :: TRIANGLE_ANGLE = pi / 2.5
+
+    ! external
+    external rotate
 
     ox = ( x - equ%xpto )
     oy = ( y - equ%ypto )

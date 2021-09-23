@@ -2,7 +2,7 @@ ifndef SOLPS_CPP
 DEFINES += -DGFORTRAN
 endif
 
-FFLAGS  += -J${OBJDIR} -ffree-line-length-none -fno-second-underscore 
+FFLAGS  += -J${OBJDIR} -ffree-line-length-none -fno-second-underscore -frecursive
 ifdef SOLPS_DEBUG
 FFLAGS  += -g -fcheck=all -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
 LDFLAGS	+= -Wall
@@ -11,6 +11,9 @@ FFLAGS  += -O
 endif
 ifdef IMAS_VERSION
 B2INCLUDE += `pkg-config imas-gfortran ggd --cflags`
+endif
+ifdef AMNS_PREFIX
+B2INCLUDE += `pkg-config amns --cflags`
 endif
 
 COMPILE  = ${FC} -c ${FFLAGS}

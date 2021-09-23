@@ -39,6 +39,7 @@ contains
     external :: ifind, dist, feval2d
     integer :: ifind
     double precision :: dist, feval2d
+    external derive, inipsi
 
     if (par%equExtensionMode == EQU_EXTENSION_OFF) return
 

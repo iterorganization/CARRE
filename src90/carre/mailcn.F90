@@ -83,7 +83,7 @@
       INTEGER ifind
       REAL(rKind) :: aazero,leng,nulort,ruban
       INTRINSIC MOD,abs
-      EXTERNAL aazero,leng,COORD1,ifind,nulort,UNTANG,ruban
+      EXTERNAL aazero,leng,COORD1,ifind,nulort,UNTANG,ruban,saute,pltend,coord
 !
 !  remarque: cette routine doit etre appelee apres frtier ou, dans le
 !            cas d'une configuration limiteur, apres limfnd car elle

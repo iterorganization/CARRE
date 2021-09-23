@@ -79,7 +79,7 @@ contains
 
     !  arguments
     INTEGER n
-    REAL(rKind) :: x, y, xstr(abs(n)), ystr(abs(n))
+    REAL(rKind) :: x, y, xstr(iabs(n)), ystr(iabs(n))
 
     !  variables locales
     INTEGER i
@@ -161,6 +161,7 @@ contains
 
     !  procedures
     intrinsic sqrt,sin,cos
+    external trc_stk, pltend
 
     integer n_call
     data n_call /0/

@@ -3,7 +3,7 @@
      &  npmamx,nrmamx)
       use KindDefinitions
       implicit none
-!  cette sousroutine ecrit une maille curviligne orthogonale produite
+!  cette sous-routine ecrit une maille curviligne orthogonale produite
 !  par le programme carre, sous un format particulier.
 !
 !  arguments
@@ -17,6 +17,9 @@
       integer ncoord,nelem,ielem,iplq(4),iflx(5),ir,ipol,ireg,i,j, &
      &  e(3,ntrmax),v(3,ntrmax),icoord,itrop,iremp,cotali(ntrmax),t,r
       real(rKind) :: xmail(ntrmax/2),ymail(ntrmax/2)
+
+!  procedures externes
+      external enlpnt
 !
 !  iplq(i): indice de frontiere associe a la plaque i
 !  iflx(i): indice de frontiere associe a la surface de flux i

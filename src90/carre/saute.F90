@@ -31,7 +31,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
   !  procedures
   INTEGER ifind
   INTRINSIC SQRT,MAX,MIN
-  EXTERNAL ifind
+  EXTERNAL ifind,trc_stk,pltend
   intrinsic abs
 
   !======================================================================

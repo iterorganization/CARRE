@@ -497,8 +497,8 @@ contains
                                     & iStructStart
                               end if
                               if (iStructStart /= iStructEnd) then
-                                  call logmsg(LOGDEBUG, "categorizeCellsAndFaces: '//&
-                                      & 'ambiguous face/structure association")
+                                  call logmsg(LOGDEBUG, "categorizeCellsAndFaces: "//&
+                                      & "ambiguous face/structure association")
                               end if
                               cellBndFaceCount(iPol, iRad, iReg) = &
                                  & cellBndFaceCount(iPol, iRad, iReg) + 1
@@ -1136,7 +1136,7 @@ contains
 
     double precision :: leng
     external leng
-
+    external coord
 
 
     ! Set up identity maps for radial and poloidal point indices
@@ -1607,7 +1607,7 @@ contains
 
     ! externals
     double precision :: leng, ruban
-    external :: leng, ruban
+    external :: leng, ruban, coord
 
     ! some sanity checks
     call assert(size(refx) == size(refy))

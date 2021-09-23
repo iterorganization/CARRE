@@ -117,7 +117,7 @@ MODLIST = ${SRCDIR}/carre_mod/*.F90 ${SRCDIR}/usol/*.f90 ${SRCDIR}/itm_shared/*.
 
 DEFINES += -DBUILDING_CARRE ${CARRE_NONINTERACTIVE}
 
-INCLUDE = -I ${SRCDIR}/include
+INCLUDE = -I${SRCDIR}/include
 
 include ${OBJDIR}/LISTOBJ
 

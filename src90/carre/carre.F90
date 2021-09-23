@@ -53,8 +53,12 @@ PROGRAM CARRE
   type(CarreStructures) :: struct
   type(CarreGrid) :: grid
 
-  ! diagonstic output
+  ! diagnostic output
   type(CarreDiag) :: diag
+
+  ! external routines
+  external sortie, defaut, trace, cadre, motifs, entete, rdfrin, listru
+  external pltini, pltend
 
   !======================================================================
   !.. nxmax,nymax: maximum number of the data points in x and y

@@ -24,6 +24,9 @@
      &      chcslp   / & 
      &   'selptx.inf'/
       external fcraxn,fcrtrn,fcrdgi
+      external fcrchktp,fcrstri,fcrstro,fcrcrro,fcrfldi,fcrequo, &
+     &         fcrfldo,fcrslpo,fcrprp
+      external import
 
 #ifdef USE_ITMCARRE
       type(type_equilibrium), pointer :: cpoequil(:) => null()
@@ -50,6 +53,12 @@
       keylen=8
       mimp=1
       lena=8
+      jmess=2
+      lfin=72
+      finish = repeat(' ',8)
+      promp(1) = repeat(' ',8)
+      promp(2) = repeat(' ',8)
+      fixkey=.false.
 !
 !*** Read the data
 !

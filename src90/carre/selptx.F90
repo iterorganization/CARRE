@@ -27,6 +27,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
       &       xpto,ypto
   LOGICAL racord
   type(CarreParameters), intent(in) :: par
+  external pltend, endpag
 
   !  variables en common
 
@@ -68,7 +69,7 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
   parameter (nptxm=2)
   integer kptx(nptxm)
   real(rKind) :: xptxm(nptxm),yptxm(nptxm),xptom,yptom, &
-      &                         xpttol,xptdist(gradmx),rdist,x1,x2,y1,y2
+      &                         xpttol,xptdist(gradmx),x1,x2
   !      parameter (xpttol=5.e-2)
   logical ex,op
   logical :: havePredefinedXPoints
@@ -88,8 +89,6 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
   !                  a un point X.
   !.. ptxtmp,ptytmp: tableaux temporaires des coordonnees en x et y des
   !                  points X.
-  !======================================================================
-  rdist(x1,y1,x2,y2)=sqrt((x1-x2)**2+(y1-y2)**2)
   !======================================================================
   !..Initialisation
 
@@ -434,4 +433,17 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
   call endpag
 
   RETURN
+
+  CONTAINS
+
+  FUNCTION RDIST(X1,Y1,X2,Y2)
+  implicit none
+  real(rKind) :: Rdist
+  real(rKind) :: X1, Y1, X2, Y2
+
+  RDIST = sqrt((x1-x2)**2+(y1-y2)**2)
+
+  RETURN
+  END FUNCTION RDIST
+
 END SUBROUTINE SELPTX

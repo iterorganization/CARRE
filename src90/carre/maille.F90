@@ -40,16 +40,16 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
       !  variables locales
       INTEGER isep,ipas,ireg,ipx,sens,nn,idef, &
-     &  ii,jj,nbcrb,npcrb2 &
-     &  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail, xpind
+     &  ii,jj,nbcrb,npcrb2, &
+     &  ptxext,i,nbcl(2),nnlast,npr1,nmail,imail,xpind
       REAL(rKind) :: dist,x2,y2,lg(10), &
      &  xx,yy,fctini,fctfin,difpsi,dpmin(10), &
      &  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1, &
      &  gardd2,xptxo,yptxo,xint,yint,xext,yext,xextOffset,yextOffset,psiint, &
      &  psiext,xptxex,yptxex,bouclx,boucly,ll
       REAL(rKind) :: sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10), &
-     &  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx) &
-     &  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx), &
+     &  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx), &
+     &  xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx), &
      &  ynlast(npnimx)
       LOGICAL nuldec, correct, extended_grid
 
@@ -57,8 +57,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       INTEGER horair,ifind
       REAL(rKind) :: leng,ruban
       EXTERNAL leng,COORD,horair,ifind,LECCLE,lecclf,DOUBLD, &
-     &         ruban,trace3 &
-     &        ,trc_stk_in,trc_stk_out
+     &         ruban,trace3,nunifo,mailcn,mailrg, &
+     &         trc_stk_in,trc_stk_out
 
 !=========================
 !.. npnimx: <=> npnimx

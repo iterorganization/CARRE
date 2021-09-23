@@ -30,7 +30,7 @@ program tradui
   integer :: nxmx, nymx, ncutmx
   parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4)
   integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), &
-      & ifail,nx,ny, nnx, nny, &
+      & ifail,nx,ny,nnx,nny, &
       & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
       & cflag(npmamx,nrmamx,nregmx,CARREOUT_NCELLFLAGS)
   integer b2cflag(-1:nxmx,-1:nymx,CARREOUT_NCELLFLAGS)
@@ -69,7 +69,8 @@ program tradui
 
   !  procedures
   external limail, ecrim1, b2agfz, ecrim2, ecrim3, &
-      &        ecrim4
+      &        ecrim4, ecrim5, ecrim2_oldformat, ecrim3_extended, &
+      &        xertst
   !======================================================================
   !*** nregmx: maximum number of regions
   !*** npmamx: maximum number of points in poloidal direction for a data
@@ -139,8 +140,9 @@ program tradui
   write(6,*) 'The format chosen is :',isel
 
   !* 5.   Write the translated mesh to the output file
-  call alloc_b2mod_geo(nx,ny)
-  call alloc_b2mod_indirect(nx,ny,ncutmx)
+  call alloc_b2mod_geo(nxmx,nymx)
+  call alloc_b2mod_indirect(nxmx,nymx,nncutmax)
+  call xertst(nncutmax.eq.ncutmx, 'Unexpected maximum number of cuts !')
   if(isel.eq.1) then
       !
       ! Mailtri format
@@ -301,33 +303,30 @@ program tradui
 
       end if
 
-      ! allocate connectivity arrays
-      allocate( leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny),rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
-          & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
-
       ! assemble the connectivity arrays
       call init_connectivity (nx,ny, &
           & b2cflag(-1:nx,-1:ny,:), &
           & periodic_bc,nncut,inseltop,inselbot,istyle)
 
       ! compute the region arrays
-      allocate( region(-1:nx, -1:ny, 0:2) )
-      allocate( resignore(-1:nx, -1:ny, 1:2) )
-
       call init_region_extended(nx,ny,nncut,ncutmx, &
           & leftcut,rightcut,topcut,bottomcut, &
-          & leftix,leftiy,rightix,rightiy,topix,topiy,bottomix,bottomiy, &
-          & region,nnreg,resignore, &
+          & leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny), &
+          & rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
+          & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny), &
+          & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny), &
+          & region(-1:nx,-1:ny,0:2),nnreg,resignore(-1:nx,-1:ny,1:2), &
           & periodic_bc, &
           & b2cflag(-1:nx,-1:ny,:))
-
-!      region(:,:,0)=1
 
       ! set up the B2<->CPO mappings
       call b2CreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
           & b2cflag(-1:nx,-1:ny,:), &
-          & leftix,leftiy,rightix,rightiy, &
-          & topix,topiy,bottomix,bottomiy, ITM_OUTPUT_GHOSTCELLS, b2gd)
+          & leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny), &
+          & rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
+          & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny), &
+          & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny), &
+          & ITM_OUTPUT_GHOSTCELLS, b2gd)
 
 
       if (isel == 6) then
@@ -339,9 +338,12 @@ program tradui
 
          call b2ITMFillGridDescription( b2gd, itmgrid, &
               & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
-              & leftix,leftiy,rightix,rightiy, &
-              & topix,topiy,bottomix,bottomiy, &
-              & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:), ITM_OUTPUT_GHOSTCELLS )
+              & leftix(-1:nx,-1:ny),leftiy(-1:nx,-1:ny), &
+              & rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
+              & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny), &
+              & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny), &
+              & nnreg, topcut, region(-1:nx,-1:ny,0:2), &
+              & b2cflag(-1:nx,-1:ny,:), ITM_OUTPUT_GHOSTCELLS )
 
          allocate(cpoedge(1))
          allocate(cpoedge(1)%datainfo%dataprovider(1))

@@ -70,9 +70,9 @@
       REAL(rKind) :: aazero,leng,nulort,ruban
       LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
-      EXTERNAL aazero,leng,COORD,ifind,nulort, &
-     &         UNTANG,SAUTE,chgdir,cross,ruban &
-     &        ,trc_stk_in,trc_stk_out,trc_stk
+      EXTERNAL aazero,leng,COORD,ifind,nulort,intrsc, &
+     &         UNTANG,SAUTE,chgdir,cross,ruban,pltend, &
+     &         trc_stk_in,trc_stk_out,trc_stk
 !======================================================================
 !*** Input
 !.. xn1,yn1: points of parametrised inner separatrix

@@ -18,6 +18,9 @@ MOD       = mod
 ifdef IMAS_VERSION
 B2INCLUDE += `pkg-config imas-pgi ggd --cflags`
 endif
+ifdef AMNS_PREFIX
+B2INCLUDE += `pkg-config amns --cflags`
+endif
 
 LDLIBS    = ${LD_MSCL} ${LD_NAG}
 LDFLAGS   = ${LD_NCARG}

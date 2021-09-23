@@ -51,7 +51,7 @@
 !  procedures
       integer ifind,horair
       real(rKind) :: aire
-      external aire,horair,ifind
+      external aire,horair,ifind,marche,plurap,insert
       intrinsic sqrt
 
       !
