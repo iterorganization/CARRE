@@ -48,8 +48,12 @@ contains
     integer :: i, j, itmp, iTarget
     integer :: iSetupStruct, nEquSteps, iEquStep
 
-
     REAL(rKind), PARAMETER :: stp0=0.01, stpmin=0.001
+
+    ! external routines
+    external derive, inipsi, grad0, sptris, argsep, limfnd, frtier, maille
+    external trc_stk_in, trc_stk_out, trace2, selptx
+
     !
     !..4.0  Calculate the first partial derivatives in x and y and store
     !       them in arrays psidx and psidy

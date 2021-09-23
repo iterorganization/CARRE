@@ -28,7 +28,7 @@ program tradui
   integer :: nxmx, nymx, ncutmx
   parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4)
   integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), &
-      & ifail,nx,ny, nnx, nny, &
+      & ifail,nx,ny,nnx,nny, &
       & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
       & cflag(npmamx,nrmamx,nregmx,CARREOUT_NCELLFLAGS)
   integer b2cflag(-1:nxmx,-1:nymx,CARREOUT_NCELLFLAGS)
@@ -77,7 +77,8 @@ program tradui
 
   !  procedures
   external limail, ecrim1, b2agfz, ecrim2, ecrim3, &
-      &        ecrim4
+      &        ecrim4, ecrim5, ecrim2_oldformat, ecrim3_extended, &
+      &        xertst
   !======================================================================
   !*** nregmx: maximum number of regions
   !*** npmamx: maximum number of points in poloidal direction for a data
@@ -153,7 +154,7 @@ program tradui
       !
       call ecrim1(nfin,r,z,par%nptseg,nreg,nppol,nprad,npmamx, &
           &  nrmamx)
-   elseif(isel.eq.8) then
+  elseif(isel.eq.8) then
       call b2agfz(nx,ny,crx,cry,fpsi,ffbz,b2cflag,nxmx,nymx, &
            r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
            par%nptseg,psidx,psidy,psi,psidxm,psidym,cflag,b0r0, &
@@ -165,7 +166,7 @@ program tradui
       call ecrim2_oldformat(nfin,nx,ny,&
            & crx(-1:nxmx,-1:nymx,0:3),&
            & cry(-1:nxmx,-1:nymx,0:3),bb(-1:nxmx,-1:nymx,0:3),nxmx,nymx)
-   elseif(isel.eq.2) then
+  elseif(isel.eq.2) then
       !
       ! B2.5 Format (Carre script default)
       !
@@ -312,13 +313,13 @@ program tradui
           & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny),bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny) )
 
       ! assemble the connectivity arrays
-      call init_connectivity (nx,ny,&
-          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),&
-          & b2cflag(-1:nx,-1:ny,:),&
+      call init_connectivity (nx,ny, &
+          & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3), &
+          & b2cflag(-1:nx,-1:ny,:), &
           & leftix,leftiy,rightix,rightiy, &
           & topix,topiy,bottomix,bottomiy, &
           & leftcut,rightcut,bottomcut,topcut, &
-          & periodic_bc,nncut,ncutmx,inseltop, inselbot, &
+          & periodic_bc,nncut,ncutmx,inseltop,inselbot, &
           & geom_match_dist,istyle)
 
       ! compute the region arrays
@@ -331,8 +332,6 @@ program tradui
           & region,nnreg,resignore, &
           & crx(-1:nx,-1:ny,0:3),cry(-1:nx,-1:ny,0:3),periodic_bc, &
           & b2cflag(-1:nx,-1:ny,:))
-
-!      region(:,:,0)=1
 
       ! set up the B2<->CPO mappings
       call b2CreateMap( nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
@@ -352,7 +351,8 @@ program tradui
               & nx,ny,crx(-1:nx,-1:ny,:),cry(-1:nx,-1:ny,:), &
               & leftix,leftiy,rightix,rightiy, &
               & topix,topiy,bottomix,bottomiy, &
-              & nnreg, topcut, region, b2cflag(-1:nx,-1:ny,:), ITM_OUTPUT_GHOSTCELLS )
+              & nnreg, topcut, region, &
+              & b2cflag(-1:nx,-1:ny,:), ITM_OUTPUT_GHOSTCELLS )
 
          allocate(cpoedge(1))
          allocate(cpoedge(1)%datainfo%dataprovider(1))

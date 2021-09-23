@@ -97,7 +97,7 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,leng,COORD,ifind,nulort, &
-     &         UNTANG,SAUTE,chgdir,cross,ruban
+     &         UNTANG,SAUTE,chgdir,cross,ruban,pltend
 !======================================================================
 !..calculs
 !

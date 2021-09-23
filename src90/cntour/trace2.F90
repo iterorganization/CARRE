@@ -19,7 +19,7 @@
 
 
       real(rKind) :: x1,x2,y1,y2,separx(npnimx,4,npxmx),separy(npnimx,4,npxmx), &
-     &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
+     &       xstruc(npstmx,strumx),ystruc(npstmx,strumx), &
      &       nivx(npnimx,nbniv),nivy(npnimx,nbniv)
 
 
@@ -30,7 +30,7 @@
       character echx*3,echy*3
 !
 !  procedures
-      external agcurv,newpag,endpag
+      external agcurv,newpag,endpag,struct
 !
 !  calculs
       echx='LIN'

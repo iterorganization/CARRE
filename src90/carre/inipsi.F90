@@ -2,7 +2,7 @@
 !***********************************************************************
       SUBROUTINE INIPSI(equ,nxmax,nymax)
 !***********************************************************************
-        use carre_types
+      use carre_types
 
       implicit none
 !
@@ -10,9 +10,10 @@
 !  derivees par rapport a x et a y
 !
 !  arguments
-        type(CarreEquilibrium), intent(inout) :: equ
+      type(CarreEquilibrium), intent(inout) :: equ
 
       integer nxmax,nymax
+      external coeff
 !
 !  calculs
       CALL COEFF(nxmax,nymax,equ%nx,equ%ny,equ%x,equ%y,equ%psi,&

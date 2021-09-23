@@ -76,6 +76,7 @@ CONTAINS
 
 !  procedures
       INTRINSIC INDEX, MIN
+      external rdfrin, rdfrre, rdfrch
 
 !=========================
 !.. ient: indice correspondant a l'unite d'entree.

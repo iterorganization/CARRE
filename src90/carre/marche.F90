@@ -44,7 +44,7 @@
       INTEGER ifind
       LOGICAL chgdir, cross
       INTRINSIC MOD,SQRT
-      EXTERNAL chgdir,cross,ifind
+      EXTERNAL chgdir,cross,ifind,saute
 
 !=========================
 !.. plaque: indice de la structure (plaque) sur laquelle on marche.

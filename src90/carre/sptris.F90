@@ -47,7 +47,7 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
   !  procedures
   logical milieu
   real(rKind) :: interp
-  external insert,interp,milieu,orddef
+  external insert,interp,milieu,orddef,trgarng
   !=======================================================================
 
   !..Initialisation

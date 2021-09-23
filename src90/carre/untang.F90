@@ -23,7 +23,7 @@
 
 !  procedures
       INTEGER indcrb
-      EXTERNAL indcrb
+      EXTERNAL indcrb, pltend
       INTRINSIC SQRT
 
 !=========================

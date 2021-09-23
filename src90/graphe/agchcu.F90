@@ -5,6 +5,7 @@
 !======================================================================
       implicit none
       integer iflg, kdsh
+      external gslwsc, gstxfp
 !  variables en common
 #include <COMQUA.F>
       integer icar

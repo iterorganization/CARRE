@@ -19,6 +19,7 @@
 
 !  procedures
       INTRINSIC SQRT
+      external pltend
 
 !========================
 !.. n   : nombre de points de la courbe.

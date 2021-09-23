@@ -107,7 +107,7 @@ contains
     REAL(rKind) :: interp
     integer ifind
     INTRINSIC ABS,SQRT
-    EXTERNAL interp,milieu,trvers,ifind
+    EXTERNAL interp,milieu,trvers,ifind,pltend
 
     !=========================
     !.. f    :<=> psi.
