@@ -7,6 +7,7 @@
       IMPLICIT NONE
       INTEGER IFLG, LNNO
       CHARACTER*(*) LBNM
+      EXTERNAL GSTXFP
 !  variables en common
 #include <COMQUA.F>
       INTEGER ICAR

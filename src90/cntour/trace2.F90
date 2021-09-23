@@ -30,7 +30,7 @@
       character echx*3,echy*3
 !
 !  procedures
-      external agcurv,newpag,endpag
+      external agcurv,newpag,endpag,struct
 !
 !  calculs
       echx='LIN'
