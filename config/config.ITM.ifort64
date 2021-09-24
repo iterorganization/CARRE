@@ -12,6 +12,8 @@ FFLAGS   += -warn all -check noarg_temp_created -warn notruncated_source -warn n
 LDFLAGS   = -check all -warn all -debug all # -gen-interfaces -warn interfaces
 endif
 
+LD_UAL   += -lxml2 -lstdc++
+
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:

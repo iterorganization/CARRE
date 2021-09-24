@@ -42,10 +42,10 @@
 !
 !  1.2  on trace les lignes de niveau
 !
-      x1min=xmin
-      x1max=xmax
-      x2min=ymin
-      x2max=ymax
+      x1min=real(xmin,Single)
+      x1max=real(xmax,Single)
+      x2min=real(ymin,Single)
+      x2max=real(ymax,Single)
       sclx='LIN'
       scly='LIN'
       write(*,*) 'Starting'
