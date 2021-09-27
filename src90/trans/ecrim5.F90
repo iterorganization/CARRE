@@ -24,6 +24,9 @@
       real(rKind) :: psitarg
       real(rKind) :: psimin_carre
 !
+!  procedures
+      external entete,rdfrin
+!
 !     Read in the rzpsi.dat file to get the reference PSI values - in particular
 !     the minimum value of PSI on the grid.
 !

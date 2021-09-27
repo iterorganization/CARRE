@@ -17,6 +17,7 @@
       use KindDefinitions, only : rKind
       use carre_target, only : drctio, indsgm, inStruct
       use carre_niveau, only : crbniv
+      use trc_stk_mod
 
       IMPLICIT NONE
 
@@ -71,8 +72,7 @@
       LOGICAL chgdir,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,leng,COORD,ifind,nulort,intrsc, &
-     &         UNTANG,SAUTE,chgdir,cross,ruban,pltend, &
-     &         trc_stk_in,trc_stk_out,trc_stk
+     &         UNTANG,SAUTE,chgdir,cross,ruban,pltend
 !======================================================================
 !*** Input
 !.. xn1,yn1: points of parametrised inner separatrix
@@ -129,7 +129,7 @@
 
 !..Direction of circulation
 
-      call trc_stk_in('doubld','*5')
+      call trc_stk_in('doubld  ','*5      ')
       sens=drctio(xstruc(1,plaque),ystruc(1,plaque),npstru(plaque), &
      &       xext,yext,xextOffset,yextOffset,'gauche')
       call trc_stk_out
@@ -205,7 +205,7 @@
 
             fctnew=pas(ir)
 
-!            call trc_stk_in('doubld','repart=1')
+!            call trc_stk_in('doubld  ','repart=1')
 !            CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),
 !     .                npstru(plaque),x1,y1,valfct,x2,y2,pas(ir),sens,
 !     .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
@@ -215,7 +215,7 @@
 
             fctnew=valfct - pas(ir)
 
-!            call trc_stk_in('doubld','repart=2')
+!            call trc_stk_in('doubld  ','repart=2')
 !            CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque),
 !     .                npstru(plaque),x1,y1,valfct,x2,y2,fctnew,sens,
 !     .                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
@@ -223,7 +223,7 @@
 
          end if
 
-         call trc_stk_in('doubld','*12')
+         call trc_stk_in('doubld  ','*12     ')
          CALL SAUTE(xstruc(1,plaque),ystruc(1,plaque), &
      &                npstru(plaque),x1,y1,valfct,x2,y2,fctnew,sens, &
      &                repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)

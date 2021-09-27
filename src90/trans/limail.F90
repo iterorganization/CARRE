@@ -25,11 +25,13 @@
       real(rKind) :: r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*), &
      &     psidxm(npomax,nramax,*),psidym(npomax,nramax,*)
       character*8 carre_format
-
 !
 !  variables locales
       integer ipol,irad,ireg,iflag
       character ligne*80
+!
+!  procedures
+      external entete
 !
 !  2.   read in the number of regions and mesh variables in each region
       iflag=-1

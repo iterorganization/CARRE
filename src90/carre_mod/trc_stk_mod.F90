@@ -1,4 +1,4 @@
-      subroutine trc_stk
+module trc_stk_mod
 !
 !  version : 22.06.98 14:43
 !
@@ -8,13 +8,19 @@
 !*** call to the subroutines to be traced.
 !*** Two text parameters (*8) given to trc_stk_in appear on the output
 !======================================================================
-      character*(*) from, at
+      implicit none
       integer n
       parameter (n=50)
-      integer i, l
+      integer l
       character*8 call_from(n), call_at(n)
       data call_from /n*' '/, call_at /n*' '/, l /0/
       save
+
+      contains
+
+      subroutine trc_stk
+      implicit none
+      integer i
 !======================================================================
 !*** Output of the tracing information
         if(l.gt.0) then
@@ -23,8 +29,12 @@
      &                                             call_at(i), i=l,1,-1)
         end if
       return
+      end subroutine trc_stk
 !======================================================================
-      entry trc_stk_in(from,at)
+      subroutine trc_stk_in(from,at)
+      implicit none
+      character*8 from, at
+      integer i
 !======================================================================
       if(l.ge.n) then
         do i=2,n
@@ -37,15 +47,21 @@
       call_from(l) = from
       call_at(l) = at
       return
+      end subroutine trc_stk_in
 !======================================================================
-      entry trc_stk_out
+      subroutine trc_stk_out
+      implicit none
 !======================================================================
       if(l.gt.0) l = l - 1
       return
+      end subroutine trc_stk_out
 !======================================================================
-      entry trc_stk_reset
+      subroutine trc_stk_reset
+      implicit none
 !======================================================================
       l=0
       return
 !======================================================================
-      end
+      end subroutine trc_stk_reset
+
+end module trc_stk_mod

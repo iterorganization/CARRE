@@ -33,6 +33,8 @@
       real(rKind) :: ubtf, urtf
 !... internal
       integer i, j
+!... procedures
+      external rdeqlh
 !-----------------------------------------------------
 !
 !*** Read the plasma equilibrium ...

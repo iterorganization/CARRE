@@ -17,6 +17,7 @@
       data nms / & 
      &    'repart  ','nrelax  ','relax   ','pasmin  ','rlcept  ', & 
      &    'tgarde  ','xpttol  '/
+      external resimi, resime, rearre, fcrtrn
 !======================================================================
 !
       do i=1,nnm

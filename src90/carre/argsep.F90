@@ -35,7 +35,7 @@
       real(rKind) :: aire
       LOGICAL tsplaq
       INTRINSIC MOD, ABS
-      EXTERNAL coinci,tsplaq,aire
+      EXTERNAL coinci,tsplaq,aire,pltend
 
 !======================================================================
 !*** Input

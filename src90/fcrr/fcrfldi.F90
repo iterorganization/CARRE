@@ -13,6 +13,7 @@
       integer(Short) :: i
       real(rKind) :: btf,rtf
       logical ex
+      external rdeqdg
 !======================================================================
 !
       rbtor=0.

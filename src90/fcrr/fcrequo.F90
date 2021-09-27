@@ -10,6 +10,7 @@
       character ofile*(*)
 #include <FCRCOM.F>
       integer(Short) :: i
+      external wreqvr
 !======================================================================
 !
       open(2,file=ofile)

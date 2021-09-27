@@ -11,7 +11,7 @@ module KindDefinitions
   ! iIndex: used for indices, think 16bit signed for small grids
 !!$  integer, parameter :: iIndex = selected_int_kind( r = 4 )
   integer, parameter :: iIndex = iKind
-  ! iType: used for specifying types, where a low range is sufficient. Think byte. 
+  ! iType: used for specifying types, where a low range is sufficient. Think byte.
 !!$  integer, parameter :: iType = selected_int_kind( r = 2 )
   ! At the moment, all integer types are set to iKind, until at one point
   ! they will be introduced in the code.
@@ -19,12 +19,6 @@ module KindDefinitions
 
   ! iFlag: used for storing object information using bit flags
   integer, parameter :: iFlag = iKind
-  
-  !integer, parameter :: rKind = selected_real_kind(p=15)
-  ! rKind: usually double precision
-  real*8 :: dummy_r8
-  !integer, parameter :: rKind = SELECTED_REAL_KIND(14) !kind( 0.d0 )
-  integer, parameter :: rKind = kind(dummy_r8)
 
   ! comp.lang.fortran, Paul van Delst, Message <epohfj$j3m$1@news.nems.noaa.gov>
 
@@ -35,15 +29,18 @@ module KindDefinitions
   INTEGER, PARAMETER :: Single = SELECTED_REAL_KIND(6)  ! Single precision
   INTEGER, PARAMETER :: Double = SELECTED_REAL_KIND(14) ! Double precision
 
+  !integer, parameter :: rKind = SELECTED_REAL_KIND(14) !kind( 0.d0 )
+  integer, parameter :: rKind = Double
+
   ! constants : TODO: move this somewhere else
-  !REAL( rKind), PARAMETER :: pi = 3.14159265358979323846 !acos(-1.0d0) 
- 
+  !REAL( rKind), PARAMETER :: pi = 3.14159265358979323846 !acos(-1.0d0)
+
 
   real(rKind), parameter :: MYRKINDPREC = 1e-16
 
 
 contains
- 
+
   subroutine printKindInformation
     real(kind=rKind) :: xReal = 0.0_rKind
     integer(kind=iIndex) :: iIIndex = 0
@@ -75,18 +72,18 @@ contains
     write (*,'(f50.25)') sqrt( xReal ** 2 )
 
 
-  end subroutine  
+  end subroutine
 
   logical function realEqual( a, b, tol )
     real(rKind), intent(in) :: a, b
     real(rKind), intent(in), optional :: tol
-    
+
     if ( present( tol ) ) then
-            realEqual = ( abs( a - b ) < tol )    
+            realEqual = ( abs( a - b ) < tol )
     else
-            realEqual = ( abs( a - b ) < 2 * spacing( max( a, b ) ) )    
+            realEqual = ( abs( a - b ) < 2 * spacing( max( a, b ) ) )
     end if
-            
+
   end function realEqual
 
 

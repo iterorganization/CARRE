@@ -14,6 +14,7 @@
       parameter (nnms=4)
       integer(Short) :: i, j, lutrg
       character*8 unm(nnms)
+      external rearre, resimi, resime, skipit
 !
 !*** List of the valid input keywords
       data unm / & 

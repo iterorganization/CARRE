@@ -7,6 +7,7 @@ module carre_main
   use carre_virtualstructures
   use carre_equilibrium
   use carre_postprocess ! for writeSilo...
+  use trc_stk_mod
 #ifdef USE_SILO
   use SiloIO
 #endif
@@ -52,7 +53,7 @@ contains
 
     ! external routines
     external derive, inipsi, grad0, sptris, argsep, limfnd, frtier, maille
-    external trc_stk_in, trc_stk_out, trace2, selptx
+    external trace2, selptx
 
     !
     !..4.0  Calculate the first partial derivatives in x and y and store
@@ -189,7 +190,7 @@ contains
                 write(0,'(a3,1p,8e12.4)') ' y:',&
                      &     ((equ%separy(equ%nptot(i,j),i,j),i=1,4),j=1,equ%npx)
                 !>>>
-                call trc_stk_in('carre','*..10.0')
+                call trc_stk_in('carre   ','*..10.0 ')
 
                 call writeGridStateToSiloFile('carreFrtierA000', equ, struct)
 

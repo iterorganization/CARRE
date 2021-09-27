@@ -15,6 +15,7 @@
       parameter (nnms=8)
       integer(Short) i,j
       character*8 unm(nnms), uline*80
+      external rearre, rearri, resime, resimi, scipit
 !
 !*** List of the valid input keywords
       data unm / & 

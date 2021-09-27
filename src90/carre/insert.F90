@@ -10,14 +10,12 @@
 !.. This routine creates a vector of indices of the divertor targets
 
 !  arguments
-      integer indstr,nbdef,inddef(nbdmx),indxpt(nbdmx),ipx,npx
-      real(rKind) :: xst(nbdmx),yst(nbdmx),xtt(nbdmx),ytt(nbdmx)
+      integer indstr,nbdef,inddef(nbdmx),ipx
 
 !  variables locales
       integer npxmx4
       parameter (npxmx4=4*npxmx)
-      integer i,j,k,l,m,iipx(npxmx4), & 
-     &  ii(strumx),jj(nbdmx),kk(npxmx),ll(nbdmx),mm(npxmx)
+      integer i,iipx(npxmx4)
 
       data iipx /npxmx4*0/
       save iipx
@@ -46,10 +44,11 @@
         inddef(nbdef) = indstr
       end if !}
       return
+      end
 
 !=======================================================================
 
-      entry trgarng(inddef,indxpt,xst,yst,nbdef,npx)
+      subroutine trgarng(inddef,indxpt,xst,yst,nbdef,npx)
 !=======================================================================
 !*** Here, we determine the "primary" strikepoints - i.e., those
 !*** connected to the innermost X-point for each target, and check for
@@ -76,6 +75,16 @@
 !***  ll  - index of X-points corresponding to the "private" targets
 !***  mm  - number of "private" targets for each X-point
 !=======================================================================
+      use KindDefinitions
+      implicit none
+#include <CARREDIM.F>
+! arguments
+      integer nbdef,inddef(nbdmx),indxpt(nbdmx),npx
+      real(rKind) :: xst(nbdmx),yst(nbdmx)
+! local variables
+      integer i,j,k,l,m, &
+     &  ii(strumx),jj(nbdmx),kk(npxmx),ll(nbdmx),mm(npxmx)
+      real(rKind) :: xtt(nbdmx),ytt(nbdmx)
 !<<<
       write(0,*) 'Entering trgarng: nbdef=',nbdef
       if(nbdef.gt.0) then !{
@@ -107,8 +116,8 @@
           ll(k)=indxpt(j)
           mm(indxpt(j))=mm(indxpt(j))+1
         else if(ii(inddef(j)).gt.2) then !}{
-          write(0,*) 'Error found in INSERT (entry TRGARNG): too many ', & 
-     &      'intersections with separatrix branches for one target - ', & 
+          write(0,*) 'Error found in INSERT (entry TRGARNG): too many ', &
+     &      'intersections with separatrix branches for one target - ', &
      &      ii(inddef(j)), 'for structure ',inddef(j)
           stop
         end if !}
@@ -129,7 +138,7 @@
           m=m+1
           kk(m)=j
         else if(mm(j).gt.2) then !}{
-          write(0,*) 'Error found in INSERT (entry TRGARNG): too many ', & 
+          write(0,*) 'Error found in INSERT (entry TRGARNG): too many ', &
      &      '"private" targets for one X-point: ',j
           stop '==> Check the targets related to the inner X-point'
         end if !}
@@ -193,7 +202,7 @@
       do i=1,npx !{
         if(mm(i).ne.2) then !{
           m=m+1
-          write(0,*) 'Error found in INSERT (entry TRGARNG): wrong ', & 
+          write(0,*) 'Error found in INSERT (entry TRGARNG): wrong ', &
      &      'number of "private" targets. ipx,n = ',i,mm(i)
         end if !}
       end do !}

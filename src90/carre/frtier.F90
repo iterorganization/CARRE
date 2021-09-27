@@ -16,6 +16,7 @@
 !*** find and parametrise the limiting level line.
 !======================================================================
       use carre_target
+      use trc_stk_mod
       use Logging
       use Helper
 
@@ -45,8 +46,7 @@
 !  procedures
       INTEGER ifind
       INTRINSIC MOD
-      EXTERNAL MARCHE,ifind &
-     &        ,trc_stk_in,trc_stk_out
+      EXTERNAL MARCHE,ifind
 !======================================================================
 !.. distnv: distance along the target from the separatrix strike-point
 !           to the starting point of the limiting level line
@@ -142,7 +142,7 @@
 
 !..Direction of the sweep
 
-         call trc_stk_in('frtier','*15')
+         call trc_stk_in('frtier  ','*15     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -222,7 +222,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*24')
+         call trc_stk_in('frtier  ','*24     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -366,7 +366,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*35')
+         call trc_stk_in('frtier  ','*35     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -449,7 +449,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*44')
+         call trc_stk_in('frtier  ','*44     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -541,7 +541,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*55')
+         call trc_stk_in('frtier  ','*55     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(2,ipx),ipx)-1,ptsep(2,ipx),ipx), &
@@ -624,7 +624,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*64')
+         call trc_stk_in('frtier  ','*64     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -767,7 +767,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*74')
+         call trc_stk_in('frtier  ','*74     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0, &
               & separx(nptot(ptsep(3,ptxext),ptxext)-1,ptsep(3,ptxext),ptxext), &
@@ -848,7 +848,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*84')
+         call trc_stk_in('frtier  ','*84     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &
@@ -933,7 +933,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*94')
+         call trc_stk_in('frtier  ','*94     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(4,ptxext),ptxext)-1,ptsep(4,ptxext),ptxext), &
@@ -1014,7 +1014,7 @@
 
 !..Direction of the sweep.
 
-         call trc_stk_in('frtier','*98')
+         call trc_stk_in('frtier  ','*98     ')
          sens = drctio(xstruc(1,inddef(idef)),ystruc(1,inddef(idef)), &
               & npstru(inddef(idef)),x0,y0,&
               & separx(nptot(ptsep(1,ipx),ipx)-1,ptsep(1,ipx),ipx), &

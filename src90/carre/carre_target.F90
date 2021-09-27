@@ -4,6 +4,7 @@ module carre_target
 
   use KindDefinitions
   use carre_types
+  use trc_stk_mod
 
   implicit none
 
@@ -161,7 +162,7 @@ contains
 
     !  procedures
     intrinsic sqrt,sin,cos
-    external trc_stk, pltend
+    external pltend
 
     integer n_call
     data n_call /0/

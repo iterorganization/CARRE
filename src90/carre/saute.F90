@@ -5,6 +5,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
   !*** starting point and the step value
   !======================================================================
   use carre_target
+  use trc_stk_mod
   use Logging
 
   IMPLICIT NONE
@@ -31,7 +32,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
   !  procedures
   INTEGER ifind
   INTRINSIC SQRT,MAX,MIN
-  EXTERNAL ifind,trc_stk,pltend
+  EXTERNAL ifind,pltend
   intrinsic abs
 
   !======================================================================

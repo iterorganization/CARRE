@@ -21,6 +21,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 #ifndef CARRE_NONINTERACTIVE
       use carre_parameter_io, only : change
 #endif
+      use trc_stk_mod
 
       IMPLICIT NONE
 
@@ -57,8 +58,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       INTEGER horair,ifind
       REAL(rKind) :: leng,ruban
       EXTERNAL leng,COORD,horair,ifind,LECCLE,lecclf,DOUBLD, &
-     &         ruban,trace3,nunifo,mailcn,mailrg, &
-     &         trc_stk_in,trc_stk_out
+     &         ruban,trace3,nunifo,mailcn,mailrg
 
 !=========================
 !.. npnimx: <=> npnimx
@@ -305,7 +305,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*17')
+         call trc_stk_in('maille  ','*17     ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2,&
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx),&
@@ -388,7 +388,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*25 ')
+         call trc_stk_in('maille  ','*25     ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),&
               & x2,y2,&
@@ -709,7 +709,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*57')
+         call trc_stk_in('maille  ','*57     ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -792,7 +792,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*67')
+         call trc_stk_in('maille  ','*67     ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -890,7 +890,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*77')
+         call trc_stk_in('maille  ','*77     ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(2,ipx),ipx)-1,equ%ptsep(2,ipx),ipx), &
@@ -973,7 +973,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*87')
+         call trc_stk_in('maille  ','*87     ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -1335,7 +1335,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
                         ycrb2(npcrb2)=equ%separy(ipas,equ%ptsep(2,ipx),ipx)
                     end DO
 
-                    call trc_stk_in('maille','*114')
+                    call trc_stk_in('maille  ','*114    ')
                     CALL DOUBLD(bouclx,boucly,grid%xn,grid%yn,nn,spacer(1,1), &
                         &        par%npr(1),struct%inddef(idef),xext,yext, &
                         &        xextOffset,yextOffset, &
@@ -1605,7 +1605,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*145')
+         call trc_stk_in('maille  ','*145    ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -1757,7 +1757,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*157')
+         call trc_stk_in('maille  ','*157    ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(3,ipx),ipx)-1,equ%ptsep(3,ipx),ipx), &
@@ -1840,7 +1840,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*167')
+         call trc_stk_in('maille  ','*167    ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
@@ -1950,7 +1950,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*177')
+         call trc_stk_in('maille  ','*177    ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2, &
               & equ%separx(equ%nptot(equ%ptsep(4,ipx),ipx)-1,equ%ptsep(4,ipx),ipx), &
@@ -2032,7 +2032,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
 !..Relate the desirable sweeping direction to the structure orientation
 
-         call trc_stk_in('maille','*187')
+         call trc_stk_in('maille  ','*187    ')
          sens = drctio(struct%xstruc(1,struct%inddef(idef)),struct%ystruc(1,struct%inddef(idef)), &
               & struct%npstru(struct%inddef(idef)),x2,y2,&
               & equ%separx(equ%nptot(equ%ptsep(1,ipx),ipx)-1,equ%ptsep(1,ipx),ipx), &
