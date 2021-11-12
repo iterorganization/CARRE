@@ -18,8 +18,9 @@ c  arguments
      .  ffbz(-1:nxmax,-1:nymax,0:3),delpsi
 c
 c  local variables
-      integer ix,iy
+      integer ix,iy,id
       real(kind=R8) x0,y0
+      character*26 hlp_frm
 c
 c  procedures
 c======================================================================
@@ -39,15 +40,18 @@ c* 2.1  calculate coordinates of cell centre
 
 c* print B2.5
           write (nfin,117) ix+1,iy+1,x0,y0,crx(ix,iy,0),cry(ix,iy,0),
-     &      crx(ix,iy,1),cry(ix,iy,1),crx(ix,iy,2),cry(ix,iy,2),
-     &         crx(ix,iy,3),cry(ix,iy,3),bb(ix,iy,0),bb(ix,iy,2)
+     &         crx(ix,iy,1),cry(ix,iy,1),crx(ix,iy,2),cry(ix,iy,2),
+     &         crx(ix,iy,3),cry(ix,iy,3), bb(ix,iy,0), bb(ix,iy,2)
          
         enddo
       enddo
 
+      id = int(log10(max(abs(minval(fpsi)-delpsi),
+     .                   abs(maxval(fpsi)-delpsi))))
+      write(hlp_frm,'(a,i1,a)') '(I4,1X,I4,1X,12(F13.',10-id,',1X))'
       do iy=-1,ny
         do ix=-1,nx
-          write (nfin,117) ix+1,iy+1,
+          write (nfin,hlp_frm) ix+1,iy+1,
      &     fpsi(ix,iy,0)-delpsi,fpsi(ix,iy,1)-delpsi,
      &     fpsi(ix,iy,2)-delpsi,fpsi(ix,iy,3)-delpsi,
      &     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
