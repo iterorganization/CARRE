@@ -326,7 +326,7 @@ program tradui
           & rightix(-1:nx,-1:ny),rightiy(-1:nx,-1:ny), &
           & topix(-1:nx,-1:ny),topiy(-1:nx,-1:ny), &
           & bottomix(-1:nx,-1:ny),bottomiy(-1:nx,-1:ny), &
-          & ITM_OUTPUT_GHOSTCELLS, b2gd)
+          & ITM_OUTPUT_GHOSTCELLS, b2gd, .true.)
 
 
       if (isel == 6) then
