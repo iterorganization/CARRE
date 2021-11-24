@@ -21,6 +21,9 @@ endif
 ifdef AMNS_PREFIX
 B2INCLUDE += `pkg-config amns --cflags`
 endif
+ifeq ($(shell `pkg-config --exists fundamental-constants`; echo $$?),0)
+B2INCLUDE += `pkg-config fundamental-constants --cflags`
+endif
 
 LDLIBS    = ${LD_MSCL} ${LD_NAG}
 LDFLAGS   = ${LD_NCARG}

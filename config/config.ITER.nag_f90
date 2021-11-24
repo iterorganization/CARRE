@@ -9,6 +9,9 @@ DEFINES   = ${SOLPS_CPP}
 else
 DEFINES   = -DNAGFOR
 endif
+ifeq ($(shell `pkg-config --exists fundamental-constants`; echo $$?),0)
+B2INCLUDE += `pkg-config fundamental-constants --cflags`
+endif
 
 FC        = nagfor
 CPP       = /lib/cpp -traditional -ffreestanding

@@ -3,7 +3,7 @@ ifndef LD_MSCL
   $(error LD_MSCL not defined)
 endif
 
-CPP       = /lib/cpp -traditional -ffreestanding
+CPP        = /lib/cpp -traditional -ffreestanding
 
 ifdef LD_NETCDF
 B2INCLUDE += `nf-config --flags`
