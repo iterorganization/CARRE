@@ -78,7 +78,7 @@ C
       CALL CPSETR('VPT-VIEWPORT TOP',YBP)
 C
 
-C  DEFINITION DU NOMBRE DE LIGNES DE NIVEAUX
+C  DEFINITION DU NOMBRE DE LIGNES DE NIVEAU
 
 C  - CLS: Determine de quelle facon les lignes de niveau seront choisies.
 C
@@ -151,7 +151,7 @@ C    DEFAUT : 0
 C  FACTEUR MULTIPLICATIF POUR LA GROSSEUR DES CARACTERES
 
 C  - CWM: Facteur mutiplicatif pour les caracteres qui sont utilises dans
-C         les marques d'echelle ("labels"!) des lignes de niveaux.
+C         les marques d'echelle ("labels"!) des lignes de niveau.
 C         CWM multiplie la grosseur par defaut des caracteres.
 C    DEFAUT : CWM = 1.
 
@@ -218,13 +218,13 @@ C             PACK.
 
 
 C
-C  CALCUL DES LIGNES DE NIVEAUX
+C  CALCUL DES LIGNES DE NIVEAU
       CALL CPRECT(Z,NXMAX,NX,NY,RWRK,NRW,IWRK,NIW)
 C
 C  TRACE UN PERIMETRE (PAS NECESSAIRE SI NEWPAG A ETE APPELE).
 C     CALL CPBACK(Z,RWRK,IWRK)
 C
-C  TRACE LES LIGNES DE NIVEAUX
+C  TRACE LES LIGNES DE NIVEAU
       CALL CPCLDR(Z,RWRK,IWRK)
 C  INFORMATION ET HAUT/BAS
       CALL CPLBDR(Z,RWRK,IWRK)
