@@ -2,7 +2,7 @@
 ifdef NCARG_ROOT
 LD_NCARG ?= `pkg-config ncarg --libs`
 endif
-LD_MSCL ?= -L/opt/gcc/8.3.0/snos/lib64 -lgfortran -L${SOLPSLIB} -lmscl
+LD_MSCL ?= -L${SOLPSLIB} -lmscl
 
 FC      = ftn
 CPP     = /lib/cpp -traditional
