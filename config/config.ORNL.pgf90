@@ -7,26 +7,7 @@ LD_NCARG  ?= -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 endif
 LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
 
-ifndef SOLPS_CPP
-DEFINES += -DPGF90
-endif
-
-FC      = pgf90
 CPP     = /lib/cpp -traditional
-
-ifdef SOLPS_DEBUG
-FFLAGS  = -g -C 
-else
-FFLAGS  = -O
-endif
-
-DBLPAD  = -r8 -i4
-
-COMPILE = ${FC} -c ${FFLAGS}
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS = 
-
 
 #!!!Local Variables:
 #!!! mode: Makefile

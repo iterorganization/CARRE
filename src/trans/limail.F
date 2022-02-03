@@ -27,6 +27,9 @@ c  variables locales
       integer ipol,irad,ireg,iflag
       character ligne*80
 c
+c  procedures externes
+      external entete
+c
 c  2.   read in the number of regions and mesh variables in each region
       iflag=-1
       call entete(nrid,'$maille',iflag)

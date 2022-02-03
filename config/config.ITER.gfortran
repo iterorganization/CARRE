@@ -1,30 +1,18 @@
 # check if necessary variables are correctly defined
 GLI_HOME ?= ${EBROOTGLI}
-LD_MSCL  ?= `pkg-config mscl --libs` -lgfortran
+LD_MSCL  ?= `pkg-config mscl --libs`
 ifdef NCARG_ROOT
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2 -ldl
-endif
-
-ifndef SOLPS_CPP
-DEFINES += -DGFORTRAN
 endif
 
 FC        = gfortran
 CPP       = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS    = -g -gdwarf-2 -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
-else
-FFLAGS    = -O
+FFLAGS    = -gdwarf-2 -fbacktrace
 endif
 
 DBLPAD    =
-
-COMPILE   = ${FC} -c ${FFLAGS}
-
-LDLIBS    = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS   =
-LDEXTRA   =
 
 #!!!Local Variables:
 #!!! mode: Makefile

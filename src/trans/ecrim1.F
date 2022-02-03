@@ -1,14 +1,13 @@
 c=======================================================================
-      subroutine ecrim1(nout,nfin,rm,zm,nptseg,nreg,nppol,nprad,
+      subroutine ecrim1(nfin,rm,zm,nptseg,nreg,nppol,nprad,
      .  npmamx,nrmamx)
       implicit none
 #include <CARRETYPES.F>
-c  cette sousroutine ecrit une maille curviligne orthogonale produite
+c  cette sous-routine ecrit une maille curviligne orthogonale produite
 c  par le programme carre, sous un format particulier.
 c
 c  arguments
-      integer npmamx,nrmamx,nout,nfin,nreg,nppol(*),nprad(*),
-     .  nptseg(*)
+      integer npmamx,nrmamx,nfin,nreg,nppol(*),nprad(*),nptseg(*)
       real(kind=R8) rm(npmamx,nrmamx,*),zm(npmamx,nrmamx,*)
 c
 c  variables locales
@@ -25,7 +24,6 @@ c
 c  calcul
 c
 c  1. format mailtri standard
-c     write(nout,*)'$coord'
       if(nreg.eq.3 .or.nreg.eq.6) then
 c  1.01   simple nul ou double nul deconnecte
         ncoord=nppol(1)*nprad(1)
@@ -74,7 +72,7 @@ c  1.01   double nul connecte
         enddo
         enddo
       else
-        write(6,*)'non prevu dans ecrima: nreg=',nreg
+        write(6,*)'non prevu dans ecrim1: nreg=',nreg
         return
       endif
 

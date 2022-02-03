@@ -5,6 +5,7 @@ c
 c======================================================================
 c  variables en common
 #include <COMQUA.F>
+      external gstxfp,gslwsc
 c======================================================================
 C The routine AGCHCU is called by AGCURV just before and just after each
 C curve is drawn.  The default version does nothing.  A user may supply

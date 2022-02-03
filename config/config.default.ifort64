@@ -1,5 +1,3 @@
-#  VERSION : 01.04.2015
-
 # check if necessary variables are correctly defined
 ifndef LD_MSCL
   $(error LD_MSCL not defined)
@@ -7,20 +5,6 @@ endif
 
 FC        = ifort
 CPP       = /lib/cpp -C -traditional
-
-ifdef SOLPS_DEBUG
-FFLAGS    = -g -C -debug all -traceback -check all
-else
-FFLAGS    = -O -vec_report0
-endif
-
-DBLPAD    =
-
-COMPILE   = ${FC} -c ${FFLAGS}
-
-LDLIBS    = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS   =
-LDEXTRA   = 
 
 #!!!Local Variables:
 #!!! mode: Makefile

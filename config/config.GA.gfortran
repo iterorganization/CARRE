@@ -5,26 +5,14 @@ NCARG_ROOT ?= ${IRISLIB}/ncarg-6.0.0
 LD_MSCL    ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/lib64 -lX11 -lm
 
-ifndef SOLPS_CPP
-DEFINES += -DGFORTRAN
-endif
-
 FC      = gfortran
 CPP     = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS  = -g -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
-else
-FFLAGS  = -O
+FFLAGS  = -fbacktrace
 endif
 
 DBLPAD  =
-
-COMPILE = ${FC} -c ${FFLAGS}
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =
-LDEXTRA =
 
 #!!!Local Variables:
 #!!! mode: Makefile

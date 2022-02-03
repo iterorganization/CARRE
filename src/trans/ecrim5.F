@@ -25,6 +25,9 @@ c  local variables
       real(kind=R8) psitarg
       real(kind=R8) psimin_carre
 c
+c  procedures externes
+      external entete,rdfrin
+c
 c     Read in the rzpsi.dat file to get the reference PSI values - in particular
 c     the minimum value of PSI on the grid. 
 c
@@ -168,8 +171,8 @@ c
 
       subroutine get_psimin_carre(psimin_carre)
       implicit none
-      include 'CARRETYPES.F'
-      include 'CARREDIM.F'
+#include <CARRETYPES.F>
+#include <CARREDIM.F>
       real(kind=R8) psimin_carre
       
       character lign80*80

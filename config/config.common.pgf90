@@ -1,19 +1,13 @@
-# check if necessary variables are correctly defined
-ifndef LD_MSCL
-  $(error LD_MSCL not defined)
-endif
-
 ifndef SOLPS_CPP
-DEFINES  += -DNAGFOR
+DEFINES  += -DPGF90
 endif
 
-FC        = nagfor
-CPP       = /lib/cpp -traditional
+FC        = pgf90
 
 ifdef SOLPS_DEBUG
-FFLAGS    = -g -C
+FFLAGS   += -g -C
 else
-FFLAGS    = -O
+FFLAGS   += -O
 endif
 
 DBLPAD    = -r8 -i4

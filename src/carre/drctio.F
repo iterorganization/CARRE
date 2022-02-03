@@ -24,8 +24,7 @@ c======================================================================
       intrinsic sqrt,sin,cos
       INTEGER indsgm
       logical in
-      EXTERNAL indsgm,in
-     ,         ,trc_stk
+      EXTERNAL indsgm,in,trc_stk
 
 c<<<
       integer n_call

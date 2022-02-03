@@ -31,7 +31,7 @@ c  variables locales
       character echx*3,echy*3
 c
 c  procedures
-      external agcurv,newpag,endpag
+      external agcurv,struct,newpag,endpag
 c
 c  calculs
       echx='LIN'

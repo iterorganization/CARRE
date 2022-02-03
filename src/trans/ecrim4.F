@@ -22,8 +22,9 @@ c  arguments
      .  fpsi(-1:nxmax,-1:nymax,0:3),ffbz(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
-      integer ix,iy,cut1,cut2,cutrgn,icell
+      integer id,ix,iy,cut1,cut2,cutrgn,icell
       real(kind=R8) x0,y0,brat
+      character*26 hlp_frm
 c
 c  procedures
 c======================================================================
@@ -64,18 +65,18 @@ c* 2.2  calculate magnetic field ratio
 c* 2.3  print B2 input data
 
           write(nfin,101) icell,ix+1,iy+1,crx(ix,iy,2),cry(ix,iy,2),
-     .      crx(ix,iy,3),cry(ix,iy,3)
+     .                                    crx(ix,iy,3),cry(ix,iy,3)
  101      format(3x,'Element',i7,' = (',i3,',',i3,'): (',
      .      1pe17.10,',',1pe17.10,')',
-     .      6x,'(',1pe17.10,',',1pe17.10,')')
-          write(nfin,102)brat,x0,y0
+     .            6x,'(',1pe17.10,',',1pe17.10,')')
+          write(nfin,102) brat,x0,y0
  102      format(3x,'Field ratio  = ',1pe17.10,13x,
-     .      '(',1pe17.10,',',1pe17.10,')')
-          write(nfin,103)crx(ix,iy,0),cry(ix,iy,0),
-     .      crx(ix,iy,1),cry(ix,iy,1)
+     .               '(',1pe17.10,',',1pe17.10,')')
+          write(nfin,103) crx(ix,iy,0),cry(ix,iy,0),
+     .                    crx(ix,iy,1),cry(ix,iy,1)
  103      format(
      .      t32,'(',1pe17.10,',',1pe17.10,')',
-     .      6x,'(',1pe17.10,',',1pe17.10,')')
+     .       6x,'(',1pe17.10,',',1pe17.10,')')
           write(nfin,105)
  105      format(3x,'------------------------------------------------',
      ,                      '----------------------------------------')
@@ -83,15 +84,18 @@ c* 2.3  print B2 input data
         enddo
       enddo
 
+      id = int(log10(max(abs(minval(fpsi)-delpsi),
+     .                   abs(maxval(fpsi)-delpsi))))
+      write(hlp_frm,'(a,i1,a)') '(i4,1x,i4,1x,12(f13.',10-id,',1x))'
       do iy=-1,ny
         do ix=-1,nx
-          write(nfin,110) ix+1,iy+1,
+          write(nfin,hlp_frm) ix+1,iy+1,
      .     fpsi(ix,iy,0)-delpsi,fpsi(ix,iy,1)-delpsi,
      .     fpsi(ix,iy,2)-delpsi,fpsi(ix,iy,3)-delpsi,
      .     ffbz(ix,iy,0),ffbz(ix,iy,1),ffbz(ix,iy,2),ffbz(ix,iy,3)
         end do
       enddo
- 110  format(i4,1x,i4,1x,8(f13.8,1x))
+! 110  format(i4,1x,i4,1x,8(f13.8,1x))
 c
 c* 3.   look for the outermost ring with a cut and determine the indices
 c       of the polygon on which these cuts occur

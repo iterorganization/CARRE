@@ -20,8 +20,8 @@ cank-970707: dimensions from the file
 
 *  arguments
       INTEGER nptseg(10),repart,npr(nregmx),ient,isor,ifail
-      REAL(kind=R8) deltp1(10),deltpn(10),deltr1(10),deltrn(10),pntrat
-     .       ,tgarde(4),distxo,psi_X(2),psi_O
+      REAL(kind=R8) deltp1(10),deltpn(10),deltr1(10),deltrn(10),pntrat,
+     .              tgarde(4),distxo,psi_X(2),psi_O
 
 *  variables locales
       INTEGER ieg,ierror,ipx,npx

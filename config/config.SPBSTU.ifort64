@@ -1,28 +1,9 @@
-#  VERSION : 01.04.2015
-
 # check if necessary variables are correctly defined
-ifndef LD_MSCL
-  $(error LD_MSCL not defined)
-endif
+LD_MSCL  ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER/}mscl -lmscl
+LD_NCARG ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lxcb
 
 FC      = ifort
-CPP     = /usr/bin/cpp -traditional 
-
-##–ffreestanding
-
-ifdef SOLPS_DEBUG
-FFLAGS  = -g -C -debug all -traceback -check all
-else
-FFLAGS  = -O -vec_report0
-endif
-
-DBLPAD  =
-
-COMPILE = ${FC} -c ${FFLAGS}
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =
-LDEXTRA =
+CPP     = /lib/cpp -C -traditional -ffreestanding
 
 #!!!Local Variables:
 #!!! mode: Makefile

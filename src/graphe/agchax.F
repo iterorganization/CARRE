@@ -5,6 +5,7 @@ c
 c======================================================================
 c  variables en common
 #include <COMQUA.F>
+      external gslwsc
 c======================================================================
 C The routine AGCHAX is called by AGAXIS just before and just after each
 C of a selected set of objects on the axes are drawn.  A user may supply

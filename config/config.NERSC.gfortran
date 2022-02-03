@@ -3,27 +3,14 @@ MSCL_ROOT ?= /global/project/projectdirs/atom/atom-install-cori/solps-libs/lib_g
 LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG  ?= ${NCAR}
 
-ifndef SOLPS_CPP
-DEFINES += -DGFORTRAN
-endif
-
 FC      = ftn
 CPP     = cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS  = -g -fcheck=all -fbacktrace -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
-else
-FFLAGS  = -O
+FFLAGS  = -fbacktrace
 endif
 
 DBLPAD  = -fdefault-real-8
-
-COMPILE = ${FC} -c ${FFLAGS}
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =
-LDEXTRA =
-
 
 #!!!Local Variables:
 #!!! mode: Makefile

@@ -217,6 +217,18 @@ cxpb  Verifier que les valeurs presentees sont correctes
      .        T2,'You need more than 2 points on this segment!')
           endif
         endif
+        if (nptseg(i).gt.npmamx) then
+          correct=.false.
+          if(sellan(1:8).eq.'francais') then
+            write(6,2831) i, npmamx
+ 2831       format(//T2,'Donnees invalides pour le segment',i2,'!'//
+     .        T2,'Le nombre de points depasse le maximum de ',i4,'!')
+          elseif(sellan(1:7).eq.'english') then
+            write(6,2830) i, npmamx
+ 2830       format(//T2,'Invalid data for segment',i2,'!'//
+     .        T2,'The maximum allowed number of points is ',i4,'!')
+          endif
+        endif
         if (abs(dpmin(i)).lt.pasmin .or.
      .      abs(dpmax(i)).lt.pasmin) then
           correct = .false.
@@ -281,6 +293,20 @@ cxpb  Verifier que les valeurs presentees sont correctes
      .   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
         endif
       endif
+      do i = 1, nreg
+        if (npr(i).gt.nrmamx) then
+          correct=.false.
+          if(sellan(1:8).eq.'francais') then
+            write(6,2921) i, nrmamx
+ 2921       format(//T2,'Donnees invalides pour la region',i2,'!'//
+     .        T2,'Le nombre de points depasse le maximum de ',i4,'!')
+          elseif(sellan(1:7).eq.'english') then
+            write(6,2920) i, nrmamx
+ 2920       format(//T2,'Invalid data for region',i2,'!'//
+     .        T2,'The maximum allowed number of points is ',i4,'!')
+          endif
+        endif
+      end do
       do i = 1, 2*max(1,npx)
         if (tgarde(i).lt.0.0) then
           correct = .false.

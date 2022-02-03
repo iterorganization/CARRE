@@ -45,9 +45,9 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   npx, npxtot,ptsep(4,npxmx),
      .   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx),
      .   nbdef, nivtot(nivmx), nbniv,ptxint,nreg,
-     .   np1(nregmx), npr(nregmx), ierror,iflag,limcfg,
-     .   itmp,ireg,
-     .   modif,nprsb(nregmx)
+     .   np1(nregmx), npr(nregmx), ierror, iflag, limcfg,
+     .   itmp, ireg,
+     .   modif, nprsb(nregmx)
 
       REAL(kind=R8) x(nxmax), y(nymax), psi(nxmax,nymax),
      .   psidx(nxmax,nymax), psidy(nxmax,nymax),
@@ -55,24 +55,24 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   pointx(gradmx), pointy(gradmx),
      .   ptx(npxmx), pty(npxmx), xpto, ypto, fctpx(npxmx),
      .   separx(npnimx,4,npxmx), separy(npnimx,4,npxmx),
-     .   nivx(npnimx,nivmx),nivy(npnimx,nivmx),distnv(5,nivmx),
-     .   xn(npnimx),yn(npnimx),xmail(npmamx,nrmamx,nregmx),
-     .   ymail(npmamx,nrmamx,nregmx),a00(nxmax,nymax,3),
-     .   a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3),
-     .   pntrat,distxo,gdpsi(nrmamx,nregmx),racpsi(nrmamx,nregmx),
+     .   nivx(npnimx,nivmx), nivy(npnimx,nivmx), distnv(5,nivmx),
+     .   xn(npnimx), yn(npnimx), xmail(npmamx,nrmamx,nregmx),
+     .   ymail(npmamx,nrmamx,nregmx), a00(nxmax,nymax,3),
+     .   a10(nxmax,nymax,3), a01(nxmax,nymax,3), a11(nxmax,nymax,3),
+     .   pntrat, distxo, gdpsi(nrmamx,nregmx), racpsi(nrmamx,nregmx),
      .   a(nregmx),
      .   gdr(nrmamx,nregmx),
-     .   r(nrmamx,nregmx),ra(nrmamx,nregmx),rho(nrmamx,nregmx),
-     .   somort(nrmamx,nregmx),somortp(nrmamx,nregmx),
-     .   gdsomortp(nregmx),xmini,
-     .   xmaxi,ymini,ymaxi,somortpur(nrmamx,nregmx),
-     .   somortpurp(nrmamx,nregmx),gdsomortpurp(nregmx),
-     .   sompropo(nrmamx,nregmx),sompropop(nrmamx,nregmx),
+     .   r(nrmamx,nregmx), ra(nrmamx,nregmx), rho(nrmamx,nregmx),
+     .   somort(nrmamx,nregmx), somortp(nrmamx,nregmx),
+     .   gdsomortp(nregmx), xmini,
+     .   xmaxi, ymini, ymaxi, somortpur(nrmamx,nregmx),
+     .   somortpurp(nrmamx,nregmx), gdsomortpurp(nregmx),
+     .   sompropo(nrmamx,nregmx), sompropop(nrmamx,nregmx),
      .   gdsompropop(nregmx),
-     .   somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx),
+     .   somvarr(nrmamx,nregmx), somvarrp(nrmamx,nregmx),
      .   gdsomvarrp(nregmx),
-     .   somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
-     .   gdsomtotp(nregmx),segt(nrmamx,nregmx),
+     .   somtot(nrmamx,nregmx), somtotp(nrmamx,nregmx),
+     .   gdsomtotp(nregmx), segt(nrmamx,nregmx),
      .   tgarde(4)
 
       LOGICAL racord
@@ -94,8 +94,8 @@ cank-970702: moved dimensions to the CARREDIM.F
 *
       INTRINSIC MIN,index
       EXTERNAL pltini,pltend,cadre,motifs,DERIVE,cntour,GRAD0,
-     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete
-     ,        ,trc_stk_in,trc_stk_out
+     .   SELPTX,SPTRIS,ARGSEP,FRTIER,MAILLE,trace,trace2,entete,
+     ,   trc_stk_in,trc_stk_out
 c======================================================================
 c.. nxmax,nymax: maximum number of the data points in x and y
 c.. gradmx: maximum number of points where the gradient vanishes

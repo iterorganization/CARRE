@@ -3,26 +3,9 @@ ifndef LD_MSCL
   $(error LD_MSCL not defined)
 endif
 
-ifndef SOLPS_CPP
-DEFINES += -DPGF90
-endif
-
-FC      = pgf90
 CPP     = /lib/cpp -traditional
 
-ifdef SOLPS_DEBUG
-FFLAGS  = -g -C -tp=amd64
-else
-FFLAGS  = -O -tp=amd64
-endif
-
-DBLPAD  = -r8 -i4
-
-COMPILE = ${FC} -c ${FFLAGS}
-
-LDLIBS  = ${LD_MSCL} ${LD_NCARG}
-LDFLAGS =
-LDEXTRA =
+FFLAGS  = -tp=amd64
 
 #!!!Local Variables:
 #!!! mode: Makefile

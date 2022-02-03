@@ -42,7 +42,7 @@ cank-970707: dimensions from the file
      .     xcrb2(npcrb2),ycrb2(npcrb2),xnlast(nnlast),ynlast(nnlast),
      .     xpto,ypto,a,gdr(nrmamx),r(nrmamx),
      .     ra(nrmamx),
-     .     rho(nrmamx), gdpsi(nrmamx),racpsi(nrmamx),
+     .     rho(nrmamx),gdpsi(nrmamx),racpsi(nrmamx),
      .     somort(nrmamx),somortp(nrmamx),gdsomortp,
      .     somortpur(nrmamx),somortpurp(nrmamx),gdsomortpurp,
      .     sompropo(nrmamx),sompropop(nrmamx),gdsompropop,

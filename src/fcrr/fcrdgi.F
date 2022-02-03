@@ -16,7 +16,7 @@ c
       real(kind=R4) x(3), xarray(3,nxptm), rdummy
       character*8 name, unm(nnms)
       logical streql
-      external streql
+      external streql,rearre,resime,skipit
 c
 c*** List of the valid input keywords
       data unm /
@@ -27,57 +27,60 @@ c======================================================================
 c
       call locase(nam,name,8)
       do i=1,nnms
-        if(streql(name,unm(i))) go to (10,20,30,40,50,60,70),i
+        if(streql(name,unm(i))) exit
       end do
-      call skipit
-      return
 c-----------------------------------------------------------------------
+      select case (i)
+      case (1)
 c*** xptcntr
- 10   call rearre(xarray,3*nxptm,i)
-      nxpt=0
-      if(i.lt.2) then
-        write(*,*) '*** fcrtrn: too few values for xptcntr'
-        xptcntr(1,1)=-1.0_R8
-      else
-        nxpt=max(i/3,1)
-        do j=1,nxpt
-          do i=1,3
-            xptcntr(i,j)=0.001_R8*real(xarray(i,j),R8)
+        call rearre(xarray,3*nxptm,i)
+        nxpt=0
+        if(i.lt.2) then
+          write(*,*) '*** fcrtrn: too few values for xptcntr'
+          xptcntr(1,1)=-1.0_R8
+        else
+          nxpt=max(i/3,1)
+          do j=1,nxpt
+            do i=1,3
+              xptcntr(i,j)=0.001_R8*real(xarray(i,j),R8)
+            end do
           end do
-        end do
-      end if
-      return
+        end if
+      case(2)
 c*** xlpcntr
- 20   call rearre(x,3,i)
-      if(i.lt.2) then
-        write(*,*) '*** fcrtrn: too few values for xlpcntr'
-        xlpcntr(1)=-1.0_R8
-      else
-        xlpcntr(1)=0.001_R8*real(x(1),R8)
-        xlpcntr(2)=0.001_R8*real(x(2),R8)
-      end if
-      return
+        call rearre(x,3,i)
+        if(i.lt.2) then
+          write(*,*) '*** fcrtrn: too few values for xlpcntr'
+          xlpcntr(1)=-1.0_R8
+        else
+          xlpcntr(1)=0.001_R8*real(x(1),R8)
+          xlpcntr(2)=0.001_R8*real(x(2),R8)
+        end if
+      case (3)
 c*** trg_spcf
- 30   call resimi(lutrg)
-      ntrg=max0(ntrg,lutrg)
-      return
+        call resimi(lutrg)
+        ntrg=max0(ntrg,lutrg)
+      case (4)
 c*** tgtgrd
- 40   if(lutrg.le.0 .or. lutrg.gt.ntrgx) then !{
-        write(*,*) 'Target index outside limits: ',lutrg
-        stop ' ==> Corrupted DG output files?' 
-      else !}{
-        call resime(rdummy)
-        tgarde(lutrg) = real(rdummy,R8)
-      end if !}
-      return
+        if(lutrg.le.0 .or. lutrg.gt.ntrgx) then !{
+          write(*,*) 'Target index outside limits: ',lutrg
+          stop ' ==> Corrupted DG output files?'
+        else !}{
+          call resime(rdummy)
+          tgarde(lutrg) = real(rdummy,R8)
+        end if !}
+      case (5)
 c***  lm_cnfg
- 50   call resimi(lm_cnfg)
-      return
+        call resimi(lm_cnfg)
+      case (6)
 c***  lm_pntrt
- 60   call resime(lm_pntrt)
-      return
+        call resime(lm_pntrt)
+      case (7)
 c***  lm_grcln
- 70   call resime(lm_grcln)
+        call resime(lm_grcln)
+      case default
+        call skipit
+      end select
       return
 c======================================================================
       end

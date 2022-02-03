@@ -4,7 +4,13 @@ c
      .        nbdmx, gradmx, npmamx, nrmamx, nregmx
       parameter (nxmax=1025,  nymax=1025, npstmx=360, npnimx=5000,
      .           npxmx=4   , strumx=60  ,  nivmx=8  , nbdmx=8  ,
-     .           gradmx=100, npmamx=500 , nrmamx=200, nregmx=6)
+     .           gradmx=100, nregmx=6)
+#ifdef SOLPS_CPP
+#include "DIMENSIONS.F"
+      parameter (npmamx=DEF_NXD, nrmamx=DEF_NYD)
+#else
+      parameter (npmamx=500, nrmamx=200)
+#endif
 c
 c======================================================================
 c***  gradmx      : max. number of points with zero gradients (x/o)

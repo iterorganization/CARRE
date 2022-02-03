@@ -36,7 +36,7 @@ cank-970707: dimensions from the file
      .     somort(nrmamx,nregmx),somortp(nrmamx,nregmx),
      .     gdsomortp(nregmx),somortpur(nrmamx,nregmx),
      .     somortpurp(nrmamx,nregmx),
-     .     gdsomortpurp(nregmx), sompropo(nrmamx,nregmx),
+     .     gdsomortpurp(nregmx),sompropo(nrmamx,nregmx),
      .     sompropop(nrmamx,nregmx),
      .     gdsompropop(nregmx),
      .     somvarr(nrmamx,nregmx),somvarrp(nrmamx,nregmx),
@@ -103,7 +103,7 @@ c======================================================================
             endif
          endif
 c
-*..Ecriture des parametres qui pouront servir au prochain essai.
+*..Ecriture des parametres qui pourront servir au prochain essai.
          if(sellan(1:8).eq.'francais') then
            write(10,*)'$parametres'
          elseif(sellan(1:7).eq.'english') then
@@ -154,7 +154,7 @@ c
   205      format('$end')
          endif
 
-*..Ecriture des points de mailles.
+*..Ecriture des points de maille.
 
        ELSEIF (numero .EQ. 2) THEN
          write(10,114)
@@ -171,7 +171,7 @@ c
   108       FORMAT('''nppol=''',I5,'  ''nprad=''',I5)
 
             DO 32 j=1, npr(ireg)
-            do 31 i=1,np1(ireg)
+            do 31 i=1, np1(ireg)
                xx = xmail(i,j,ireg)
                yy = ymail(i,j,ireg)
                ii = ifind(xx,x,nx,1)
@@ -218,7 +218,7 @@ c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
      .         gdr(i,ireg),r(i,ireg),rho(i,ireg),ra(i,ireg)
            enddo
          enddo
-  129    FORMAT(i2,1p6E16.8)
+  129    FORMAT(i3,1p6E16.8)
 
          if(sellan(1:8).eq.'francais') then
            WRITE(10,110)
@@ -243,7 +243,7 @@ c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
      .         somortpur(i,ireg),somortpurp(i,ireg)
             enddo
          enddo
-  139    FORMAT(i2,1p4E16.8)
+  139    FORMAT(i3,1p4E16.8)
 
          write(10,*)
          write(10,134) 
@@ -267,7 +267,7 @@ c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
      .         segt(i,ireg)
             enddo
          enddo
-  149    FORMAT(i2,1p3E16.8)
+  149    FORMAT(i3,1p3E16.8)
 
          if(sellan(1:8).eq.'francais') then
            WRITE(10,110)

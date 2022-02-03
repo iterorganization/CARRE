@@ -64,16 +64,16 @@ cank-970707: dimensions from the file
 
 *  variables locales
       INTEGER nptseg(10),isep,ipas,ipx,sens,nn,idef,
-     .  repart,nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2
-     .  ,ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
+     .  repart,nsep,ii,jj,ient,isor,ifail,nbcrb,npcrb2,
+     .  ptxext,i,nbcl(2),nnlast,npr1,nmail,imail
       REAL(kind=R8) dist,x2,y2,lg(10),deltp1(10),deltpn(10),
      .  deltr1(10),deltrn(10),xx,yy,fctini,fctfin,difpsi,dpmin(10),
      .  dpmax(10),drmin(10),drmax(10),xfin,yfin,gardd1,
      .  gardd2,xptxo,yptxo,xint,yint,xext,yext,psiint,
      .  psiext,xptxex,yptxex,bouclx,boucly,ll,pntrat_old,psi_X(2),psi_O
       REAL(kind=R8) sepmax(npnimx,8),sepmay(npnimx,8),spacep(npmamx,10),
-     .  spacer(npmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx)
-     .  ,xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx),
+     .  spacer(nrmamx,10),pas(nrmamx),xcrb2(npnimx),ycrb2(npnimx),
+     .  xbcl(npnimx,2),ybcl(npnimx,2),lbcl,xnlast(npnimx),
      .  ynlast(npnimx)
       CHARACTER*3 rep
       LOGICAL nuldec, correct
@@ -82,8 +82,8 @@ cank-970707: dimensions from the file
       INTEGER drctio,horair,ifind
       REAL(kind=R8) long,plqdst,ruban
       EXTERNAL long,COORD,drctio,horair,ifind,LECCLE,lecclf,DOUBLD,
-     .         ruban,plqdst,trace3
-     ,        ,trc_stk_in,trc_stk_out
+     .         ruban,plqdst,trace3,
+     ,         trc_stk_in,trc_stk_out
 c=========================
 c.. npnimx: <=> npnimx
 c.. nreg  : number of regions

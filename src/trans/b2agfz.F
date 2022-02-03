@@ -883,7 +883,11 @@ c*** Dimensions for one half of the grid
         if(ny.gt.nymax) then      ! {
           write(*,*) 'Grid is too large in radial direction: ny=',
      ,                                             ny,' > nymax=',nymax
+#ifdef SOLPS_CPP
+          write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
+#else
           write(*,*) '==> Increase nrmamx in CARREDIM.F'
+#endif
           errenc=.true.     ! }
         end if
 
@@ -905,9 +909,13 @@ c*** Two halves of the grid...
           nxx(ihg)=nqp(ihg,1,1)+nqp(ihg,2,1)+nqp(ihg,3,1)
           nx=nx+nxx(ihg)
           if(nx.ge.nxmax) then
-            write(*,*) 'Grid is too large in poloial direction: nx=',
+            write(*,*) 'Grid is too large in poloidal direction: nx=',
      ,                                           nx+1,' > nxmax=',nxmax
+#ifdef SOLPS_CPP
+            write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
+#else
             write(*,*) '==> Increase npmamx in CARREDIM.F'
+#endif
             stop
           end if
 c*** Three poloidal zones
@@ -1045,6 +1053,26 @@ c       print*,'npol3=',npol3
 c***
 c
 c  test values of nprad compared to nx and ny
+        if(ny.gt.nymax) then
+          write(*,*) 'Grid is too large in radial direction: ny=',
+     ,                                             ny,' > nymax=',nymax
+#ifdef SOLPS_CPP
+          write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
+#else
+          write(*,*) '==> Increase nrmamx in CARREDIM.F'
+#endif
+          stop
+        end if
+        if(nx.gt.nxmax) then
+          write(*,*) 'Grid is too large in poloidal direction: nx=',
+     ,                                         nx,' > nxmax=',nxmax
+#ifdef SOLPS_CPP
+          write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
+#else
+          write(*,*) '==> Increase npmamx in CARREDIM.F'
+#endif
+          stop
+        end if
         if(npol1.ne.nx) then    ! {
           write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
           stop      ! }
@@ -1228,6 +1256,26 @@ c       print*,'npol2=',npol2
 c***
 c
 c  test values of nprad compared to nx and ny
+        if(ny.gt.nymax) then
+          write(*,*) 'Grid is too large in radial direction: ny=',
+     ,                                             ny,' > nymax=',nymax
+#ifdef SOLPS_CPP
+          write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
+#else
+          write(*,*) '==> Increase nrmamx in CARREDIM.F'
+#endif
+          stop
+        end if
+        if(nx.gt.nxmax) then
+          write(*,*) 'Grid is too large in poloidal direction: nx=',
+     ,                                         nx,' > nxmax=',nxmax
+#ifdef SOLPS_CPP
+          write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
+#else
+          write(*,*) '==> Increase npmamx in CARREDIM.F'
+#endif
+          stop
+        end if
         if(npol1.ne.nx) then      ! {
           write(6,*)'error in b2agfz: npol1=',npol1,' nx=',nx
           stop      ! }
