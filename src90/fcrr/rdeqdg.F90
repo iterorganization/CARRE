@@ -41,7 +41,8 @@
 !
       iret=0
       print *,'rdeqdg: before rdeqlh'
-      call rdeqlh(lun,nr,nz,ubtf,urtf,*99)
+      call rdeqlh(lun,nr,nz,ubtf,urtf,iret)
+      if (iret.eq.1) goto 99
       btf=ubtf
       rtf=urtf
       print *,'rdeqdg: after rdeqlh. nr,nz,btf,rtf= ',nr,nz,btf,rtf

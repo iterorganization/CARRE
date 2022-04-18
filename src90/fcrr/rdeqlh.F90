@@ -1,4 +1,4 @@
-      subroutine rdeqlh(lun,nr,nz,btf,rtf,*)
+      subroutine rdeqlh(lun,nr,nz,btf,rtf,iret)
 !
 !  version : 16.09.2000 00:19
 !
@@ -9,7 +9,7 @@
 !
       use KindDefinitions
       implicit none
-      integer(Short) :: lun,nr,nz
+      integer(Short) :: lun,nr,nz,iret
       real(rKind) :: btf,rtf
       integer i,j,k,l
       character ss*80, s(80), hh*80, h(80), utb
@@ -17,6 +17,7 @@
       logical ll
 !=======================================================================
 !
+      iret=0
       utb=char(9)
       rtf=-1.
  10   read(lun,'(a)',end=90) ss
@@ -83,6 +84,7 @@
 !*** Error encountered
 !
  90   write (6,*) 'Wrong format of the equilibrium file - sorry!'
-      return 1
+      iret=1
+      return
 !=======================================================================
-      end
+      end subroutine rdeqlh

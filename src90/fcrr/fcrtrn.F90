@@ -9,12 +9,11 @@
       implicit none
 #include <FCRCOM.F>
       character*(8) nam
-      integer lun
 !
       integer nnms
       parameter (nnms=8)
       integer(Short) i,j
-      character*8 unm(nnms), uline*80
+      character*8 unm(nnms)
       external rearre, rearri, resime, resimi, scipit
 !
 !*** List of the valid input keywords
@@ -114,10 +113,16 @@
        call scipit
       end select
       return
+      end subroutine fcrtrn
 
 !======================================================================
-      entry fcrchktp(lun)
+      subroutine fcrchktp(lun)
 !======================================================================
+      use KindDefinitions
+      implicit none
+#include <FCRCOM.F>
+      integer lun
+      character*80 uline
 
 !*** Check whether "# topo" line is present in the target file (new DG)
 
@@ -130,4 +135,4 @@
  9010 rewind(lun)
       return
 !======================================================================
-      end
+      end subroutine fcrchktp

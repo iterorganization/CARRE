@@ -6,10 +6,10 @@
 !*** Converts the dg data into the input files for Carre
 !======================================================================
 
-#ifdef USE_ITMCARRE
+#if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
       use euITM_schemas  ! IGNORE
       use euITM_routines ! IGNORE
-      use b2mod_ual
+      use b2mod_ual      ! IGNORE
 #endif
 
       implicit none
@@ -28,7 +28,7 @@
      &         fcrfldo,fcrslpo,fcrprp
       external import
 
-#ifdef USE_ITMCARRE
+#if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
       type(type_equilibrium), pointer :: cpoequil(:) => null()
       type(type_limiter) :: cpolimiter
       integer :: idx
@@ -91,7 +91,7 @@
       call fcrslpo(chcslp)
 
 !     Write equlibrium and limiter CPO 
-#ifdef USE_ITMCARRE
+#if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
 
       call fillLimiterCpo( cpolimiter )
       allocate(cpoequil(1))
@@ -195,4 +195,4 @@ contains
 #endif
 
 !======================================================================
-      end
+      end program fcrr

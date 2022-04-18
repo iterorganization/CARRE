@@ -13,12 +13,14 @@ program tradui
   use b2mod_grid_mapping
   use b2mod_indirect
   use b2mod_geo
-  use b2ag_ghostcells
   use carre_types
-  use carre_constants
-  use carre_parameter_io
   use tradui_constants
+  use b2ag_ghostcells
   use carre_b2ag
+  use carre_parameter_io
+#if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
+  use carre_constants
+#endif
 
   implicit none
 
@@ -57,7 +59,7 @@ program tradui
 
 
   ! variables for UAL I/O
-#ifdef USE_ITMCARRE
+#if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
   type(type_complexgrid) :: itmgrid
   type (type_edge),pointer :: cpoedge(:) => null()
   integer :: idx, shot, run, ix, iy
@@ -128,7 +130,7 @@ program tradui
   write(6,*) '3: format SONNET-DIVIMP'
   write(6,*) '4: format DG-SONNET-B2-EIRENE'
   write(6,*) '5: revised DIVIMP with grid parameters and PSI values'
-#ifdef USE_ITMCARRE
+#if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
   write(6,*) '6: Write ITM CPO'
 #endif
 #ifdef USE_SILO
@@ -330,7 +332,7 @@ program tradui
 
 
       if (isel == 6) then
-#ifdef USE_ITMCARRE
+#if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
 
          !
          ! CPO Output
