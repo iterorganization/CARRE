@@ -1,5 +1,6 @@
 ifndef SOLPS_CPP
 DEFINES  += -DPGF90
+FFLAGS   += -Mnorpath
 endif
 
 FC        = pgf90
