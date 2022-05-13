@@ -1,7 +1,8 @@
 # check if necessary variables are correctly defined
-ifndef LD_MSCL
-  $(error LD_MSCL not defined)
-endif
+NCARG_ROOT ?= /tokp/work/dpc/SOLPS-ITER/NCARG
+MSCL_ROOT  ?= /tokp/work/dpc/SOLPS-ITER/mscl
+LD_MSCL    ?= -L${MSCL_ROOT} -lmscl
+LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/afs/.ipp/tok/soft/cairo/1.16.0/lib -lcairo -L/afs/.ipp/tok/soft/freetype/2.11.1/lib -lfreetype -L/usr/X11R6/lib64 -lX11 -lm
 
 FC      = ifort
 CPP     = /lib/cpp -C -traditional -ffreestanding
