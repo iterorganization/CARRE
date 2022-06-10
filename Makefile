@@ -318,8 +318,8 @@ ${OBJDIR}/LISTOBJ: listobj ${ITM_SRC_PREREQS}
 VERSION: ${SRCDIR}/include/git_version_Carre.h
 
 ${SRCDIR}/include/git_version_Carre.h: force
-	@echo "      character*33 ::" > ${SRCDIR}/include/git_version_new.h
-	@echo "     . git_version_Carre = '`git describe --dirty --always`'" >> ${SRCDIR}/include/git_version_new.h
+	@echo "      character*32 :: git_version_Carre =" > ${SRCDIR}/include/git_version_new.h
+	@echo "     . '`git describe --dirty --always | cut -c 1-32`'" >> ${SRCDIR}/include/git_version_new.h
 	@if cmp -s ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; then rm ${SRCDIR}/include/git_version_new.h; else mv ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; fi
 
 ${OBJDIR}/dependencies.${COMPILER}:
