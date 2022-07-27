@@ -23,7 +23,7 @@ cank-970707: dimensions from the file
 #include <CARREDIM.F>
 
 *  arguments
-      integer nx,ny,npx,iptx(npx),jptx(npx),
+      integer nx,ny,npx,iptx(npxmx),jptx(npxmx),
      .     nptot(4,npxmx),nstruc,npstru(strumx),
      .     indplq(4,npxmx),inddef(nbdmx),nbdef
       real(kind=R8)
@@ -198,6 +198,9 @@ c>>>
 *  coordinates are at the end of ptx and pty (see routine SELPTX)
 
       ipx=npx+1
+      ix = iptx(ipx)  
+      jx = jptx(ipx)
+
       fctpx(ipx) = a00(ix,jx,1) + a10(ix,jx,1)*ptx(ipx)
      .           + a01(ix,jx,1)*pty(ipx)
      .           + a11(ix,jx,1)*ptx(ipx)*pty(ipx)

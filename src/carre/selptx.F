@@ -244,6 +244,8 @@ c
           ypto=pointy(ipo)
           ptx(npx+1)=xpto
           pty(npx+1)=ypto
+          iptx(npx+1)=ii(ipo)
+          jptx(npx+1)=jj(ipo)
         else
           write(*,*) 'Too many X-points specified in selptx.inf: ',nptx
           write(*,*) 'Check the specification or the nptxm parameter ',
