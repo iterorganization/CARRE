@@ -46,8 +46,9 @@ c* print B2.5
         enddo
       enddo
 
-      id = int(log10(max(abs(minval(fpsi)-delpsi),
-     .                   abs(maxval(fpsi)-delpsi))))
+      id = max(1,int(log10(max(abs(minval(fpsi)-delpsi),
+     .                   abs(maxval(fpsi)-delpsi)))))
+
       write(hlp_frm,'(a,i1,a)') '(I4,1X,I4,1X,12(F13.',10-id,',1X))'
       do iy=-1,ny
         do ix=-1,nx
