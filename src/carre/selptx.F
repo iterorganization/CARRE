@@ -342,6 +342,8 @@ c  ceci servira a distinguer le point X interieur d'un double nul decon-
 c  necte a la fin de la routine sptris
            ptx(npx+1)=xpto
            pty(npx+1)=ypto
+           iptx(npx+1)=ii(ipo)
+           jptx(npx+1)=jj(ipo)
 
         end if
 
