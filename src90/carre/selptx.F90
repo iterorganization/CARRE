@@ -372,6 +372,8 @@ SUBROUTINE SELPTX(npxtot,npx,pointx,pointy,ii,jj,ptx, &
           !  necte a la fin de la routine sptris
           ptx(npx+1)=xpto
           pty(npx+1)=ypto
+          iptx(npx+1)=ii(ipo)
+          jptx(npx+1)=jj(ipo)
 
       end if
 
