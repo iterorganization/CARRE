@@ -373,7 +373,7 @@ ${OBJDIR}/b2mod_geo.${MOD}: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_geo_cor
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo.F ${OBJDIR}/b2mod_geo.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
 
-${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD}
+${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_constants.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	@rm -f $@
 	ln -sf ${B2SRC}/modules/b2mod_geo2.F ${SRCDIR}/b25_links/
@@ -463,7 +463,7 @@ ${OBJDIR}/cfrure.o: ${B2SRC}/utility/cfrure.F
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/cfrure.F ${OBJDIR}/cfrure.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/cfrure.o ${OBJDIR}/cfrure.f
 
-${OBJDIR}/cfvers.o: ${B2SRC}/utility/cfvers.F
+${OBJDIR}/cfvers.o: ${B2SRC}/utility/cfvers.F ${B2SRC}/include/git_version_B25.h
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/cfvers.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/cfvers.F ${OBJDIR}/cfvers.f
@@ -540,6 +540,15 @@ ${OBJDIR}/xertst.o: ${B2SRC}/utility/xertst.F
 	ln -sf ${B2SRC}/utility/xertst.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/xertst.F ${OBJDIR}/xertst.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/xertst.o ${OBJDIR}/xertst.f
+
+${B2SRC}/include/git_version_B25.h:
+	@echo "      character*32 :: git_version_B25 =" > ${B2SRC}/include/git_version_new.h
+	@echo "     . '`git describe --dirty --always | cut -c 1-32`'" >> ${B2SRC}/include/git_version_new.h
+	@echo "      character*32 :: git_version_ADAS =" >> ${B2SRC}/include/git_version_new.h
+	@echo "     . '`( cd $${SOLPSTOP}/modules/adas ; git describe --dirty --always | cut -c 1-32 )`'" >> ${B2SRC}/include/git_version_new.h
+	@echo "      character*32 :: git_version_SOLPS =" >> ${B2SRC}/include/git_version_new.h
+	@echo "     . '`( cd $${SOLPSTOP} ; git describe --dirty --always | cut -c 1-32 )`'" >> ${B2SRC}/include/git_version_new.h
+	@if cmp -s ${B2SRC}/include/git_version_new.h ${B2SRC}/include/git_version_B25.h; then rm ${B2SRC}/include/git_version_new.h; else mv ${B2SRC}/include/git_version_new.h ${B2SRC}/include/git_version_B25.h; fi
 
 ifdef ITM_ENVIRONMENT_LOADED
 ${OBJDIR}/b2xvsg.o: ${B2SRC}/b2aux/b2xvsg.F
