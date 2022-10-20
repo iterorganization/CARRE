@@ -229,11 +229,11 @@ ${OBJDIR}/libgcarre.a: ${GDEST} ${MAKES}
 	ranlib $@
 
 ifdef ITM_ENVIRONMENT_LOADED
-${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${OBJDIR}/b2mod_anomalous_transport.${MOD} ${OBJDIR}/b2mod_average.${MOD} ${OBJDIR}/b2mod_b2plot_wall_loading.${MOD} ${OBJDIR}/b2mod_boundary_namelist.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_diag.${MOD} ${OBJDIR}/b2mod_eirdiag.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_b2cmpa.${MOD} ${OBJDIR}/b2mod_b2cmpb.${MOD} ${OBJDIR}/b2mod_b2cmrc.${MOD} ${OBJDIR}/b2mod_b2plot.${MOD} ${OBJDIR}/b2mod_balance.${MOD} ${OBJDIR}/b2mod_eirene_globals.${MOD} ${OBJDIR}/b2mod_elements.${MOD} ${OBJDIR}/b2mod_external.${MOD} ${OBJDIR}/b2mod_feedback.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_interp.${MOD} ${OBJDIR}/b2mod_layer.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_mwti.${MOD} ${OBJDIR}/b2mod_neutr_src_scaling.${MOD} ${OBJDIR}/b2mod_neutrals_namelist.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_plasma.${MOD} ${OBJDIR}/b2mod_ppout.${MOD} ${OBJDIR}/b2mod_rates.${MOD} ${OBJDIR}/b2mod_residuals.${MOD} ${OBJDIR}/b2mod_sources.${MOD} ${OBJDIR}/b2mod_tallies.${MOD} ${OBJDIR}/b2mod_transport.${MOD} ${OBJDIR}/b2mod_transport_nspecies.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_ual.${MOD} ${OBJDIR}/b2mod_ual_io.${MOD} ${OBJDIR}/b2mod_ual_io_data.${MOD} ${OBJDIR}/b2mod_ual_io_grid.${MOD} ${OBJDIR}/b2mod_user_namelist.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_wall.${MOD} ${OBJDIR}/b2mod_work.${MOD} ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/b2mod_ipmain.${MOD} ${OBJDIR}/lnblnk.o ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/machsfr.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
-	@ar rucv $@ ${B2DEST} ${OBJDIR}/b2mod_anomalous_transport.o ${OBJDIR}/b2mod_average.o ${OBJDIR}/b2mod_b2plot_wall_loading.o ${OBJDIR}/b2mod_boundary_namelist.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_diag.o ${OBJDIR}/b2mod_eirdiag.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmpa.o ${OBJDIR}/b2mod_b2cmpb.o ${OBJDIR}/b2mod_b2cmrc.o ${OBJDIR}/b2mod_b2plot.o ${OBJDIR}/b2mod_balance.o ${OBJDIR}/b2mod_eirene_globals.o ${OBJDIR}/b2mod_elements.o ${OBJDIR}/b2mod_feedback.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_interp.o ${OBJDIR}/b2mod_layer.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_mwti.o ${OBJDIR}/b2mod_neutr_src_scaling.o ${OBJDIR}/b2mod_neutrals_namelist.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_plasma.o ${OBJDIR}/b2mod_ppout.o ${OBJDIR}/b2mod_rates.o ${OBJDIR}/b2mod_residuals.o ${OBJDIR}/b2mod_sources.o ${OBJDIR}/b2mod_tallies.o ${OBJDIR}/b2mod_transport.o ${OBJDIR}/b2mod_transport_nspecies.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2mod_ual_io.o ${OBJDIR}/b2mod_ual_io_data.o ${OBJDIR}/b2mod_ual_io_grid.o ${OBJDIR}/b2mod_user_namelist.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_wall.o ${OBJDIR}/b2mod_work.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/lnblnk.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/machsfr.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2mod_anomalous_transport.${MOD} ${OBJDIR}/b2mod_b2plot_wall_loading.${MOD} ${OBJDIR}/b2mod_boundary_namelist.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_diag.${MOD} ${OBJDIR}/b2mod_eirdiag.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_b2cmpa.${MOD} ${OBJDIR}/b2mod_b2cmpb.${MOD} ${OBJDIR}/b2mod_b2cmrc.${MOD} ${OBJDIR}/b2mod_b2plot.${MOD} ${OBJDIR}/b2mod_balance.${MOD} ${OBJDIR}/b2mod_eirene_globals.${MOD} ${OBJDIR}/b2mod_elements.${MOD} ${OBJDIR}/b2mod_external.${MOD} ${OBJDIR}/b2mod_feedback.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo2.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_interp.${MOD} ${OBJDIR}/b2mod_layer.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_mwti.${MOD} ${OBJDIR}/b2mod_neutr_src_scaling.${MOD} ${OBJDIR}/b2mod_neutrals_namelist.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_plasma.${MOD} ${OBJDIR}/b2mod_ppout.${MOD} ${OBJDIR}/b2mod_rates.${MOD} ${OBJDIR}/b2mod_residuals.${MOD} ${OBJDIR}/b2mod_running_average.${MOD} ${OBJDIR}/b2mod_sources.${MOD} ${OBJDIR}/b2mod_tallies.${MOD} ${OBJDIR}/b2mod_transport.${MOD} ${OBJDIR}/b2mod_transport_nspecies.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_ual.${MOD} ${OBJDIR}/b2mod_ual_io.${MOD} ${OBJDIR}/b2mod_ual_io_data.${MOD} ${OBJDIR}/b2mod_ual_io_grid.${MOD} ${OBJDIR}/b2mod_user_namelist.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_wall.${MOD} ${OBJDIR}/b2mod_work.${MOD} ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/b2mod_ipmain.${MOD} ${OBJDIR}/lnblnk.o ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/machsfr.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+	@ar rucv $@ ${B2DEST} ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_anomalous_transport.o ${OBJDIR}/b2mod_b2plot_wall_loading.o ${OBJDIR}/b2mod_boundary_namelist.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_diag.o ${OBJDIR}/b2mod_eirdiag.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmpa.o ${OBJDIR}/b2mod_b2cmpb.o ${OBJDIR}/b2mod_b2cmrc.o ${OBJDIR}/b2mod_b2plot.o ${OBJDIR}/b2mod_balance.o ${OBJDIR}/b2mod_eirene_globals.o ${OBJDIR}/b2mod_elements.o ${OBJDIR}/b2mod_feedback.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_interp.o ${OBJDIR}/b2mod_layer.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_mwti.o ${OBJDIR}/b2mod_neutr_src_scaling.o ${OBJDIR}/b2mod_neutrals_namelist.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_plasma.o ${OBJDIR}/b2mod_ppout.o ${OBJDIR}/b2mod_rates.o ${OBJDIR}/b2mod_residuals.o ${OBJDIR}/b2mod_running_average.o ${OBJDIR}/b2mod_sources.o ${OBJDIR}/b2mod_tallies.o ${OBJDIR}/b2mod_transport.o ${OBJDIR}/b2mod_transport_nspecies.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2mod_ual_io.o ${OBJDIR}/b2mod_ual_io_data.o ${OBJDIR}/b2mod_ual_io_grid.o ${OBJDIR}/b2mod_user_namelist.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_wall.o ${OBJDIR}/b2mod_work.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/lnblnk.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/machsfr.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
 else
-${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/ifill.o ${OBJDIR}/machsfr.o ${OBJDIR}/lnblnk.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
-	@ar rucv $@ ${B2DEST} ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/ifill.o ${OBJDIR}/machsfr.o ${OBJDIR}/nagsubst.o ${OBJDIR}/lnblnk.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
+${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo2.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/ifill.o ${OBJDIR}/machsfr.o ${OBJDIR}/lnblnk.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
+	@ar rucv $@ ${B2DEST} ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwure.o ${OBJDIR}/ifill.o ${OBJDIR}/machsfr.o ${OBJDIR}/nagsubst.o ${OBJDIR}/lnblnk.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
 endif
 	ranlib $@
 
@@ -331,6 +331,20 @@ ${OBJDIR}/dependencies.${COMPILER}:
 	${MAKE} depend
 
 ifdef SOLPS_CPP
+${OBJDIR}/b2mod_ad.${MOD}: ${B2SRC}/modules/b2mod_ad.F ${OBJDIR}/b2mod_types.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	@rm -f $@
+	ln -sf ${B2SRC}/modules/b2mod_ad.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_ad.F ${OBJDIR}/b2mod_ad.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_ad.f
+
+${OBJDIR}/b2mod_b2cmfs.${MOD}: ${B2SRC}/modules/b2mod_b2cmfs.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	@rm -f $@
+	ln -sf ${B2SRC}/modules/b2mod_b2cmfs.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_b2cmfs.F ${OBJDIR}/b2mod_b2cmfs.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmfs.f
+
 ${OBJDIR}/b2mod_cellhelper.${MOD}: ${B2SRC}/ids/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_types.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	@rm -f $@
@@ -358,6 +372,13 @@ ${OBJDIR}/b2mod_geo.${MOD}: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_geo_cor
 	ln -sf ${B2SRC}/modules/b2mod_geo.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo.F ${OBJDIR}/b2mod_geo.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
+
+${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	@rm -f $@
+	ln -sf ${B2SRC}/modules/b2mod_geo2.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo2.F ${OBJDIR}/b2mod_geo2.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo2.f
 
 ${OBJDIR}/b2mod_geo_corner.${MOD}: ${B2SRC}/modules/b2mod_geo_corner.F
 	@mkdir -p ${SRCDIR}/b25_links/
@@ -448,7 +469,7 @@ ${OBJDIR}/cfvers.o: ${B2SRC}/utility/cfvers.F
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/cfvers.F ${OBJDIR}/cfvers.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/cfvers.o ${OBJDIR}/cfvers.f
 
-${OBJDIR}/cfwure.o: ${B2SRC}/utility/cfwure.F
+${OBJDIR}/cfwure.o: ${B2SRC}/utility/cfwure.F ${OBJDIR}/b2mod_ad.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/cfwure.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/cfwure.F ${OBJDIR}/cfwure.f
@@ -647,13 +668,6 @@ ${OBJDIR}/b2mod_mwti.${MOD}: ${B2SRC}/modules/b2mod_mwti.F90 ${OBJDIR}/b2mod_tra
 	ln -sf ${B2SRC}/modules/b2mod_mwti.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_mwti.F90 ${OBJDIR}/b2mod_mwti.f90
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_mwti.o ${OBJDIR}/b2mod_mwti.f90
-
-${OBJDIR}/b2mod_b2cmfs.${MOD}: ${B2SRC}/modules/b2mod_b2cmfs.F
-	@mkdir -p ${SRCDIR}/b25_links/
-	@rm -f $@
-	ln -sf ${B2SRC}/modules/b2mod_b2cmfs.F ${SRCDIR}/b25_links/
-	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_b2cmfs.F ${OBJDIR}/b2mod_b2cmfs.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmfs.f
 
 ${OBJDIR}/b2mod_b2cmpa.${MOD}: ${B2SRC}/modules/b2mod_b2cmpa.F
 	@mkdir -p ${SRCDIR}/b25_links/

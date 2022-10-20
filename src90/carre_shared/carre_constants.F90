@@ -1,5 +1,5 @@
 module carre_constants
-
+  use KindDefinitions
   implicit none
 
   private 
@@ -32,5 +32,7 @@ module carre_constants
   ! structure). This is used to mark boundary faces in standard grids that 
   ! do not touch the wall.
   integer, parameter, public :: BOUNDARY_NOSTRUCTURE = -1
+
+  real(rkind), parameter, public :: geom_match_dist = 1.0e-6_rKind
 
 end module carre_constants

@@ -13,6 +13,7 @@ program tradui
   use b2mod_grid_mapping
   use b2mod_indirect
   use b2mod_geo
+  use b2mod_geo2
   use carre_types
   use tradui_constants
   use b2ag_ghostcells
@@ -156,7 +157,7 @@ program tradui
            r,z,nreg,nregmx,nppol,nprad,npmamx,nrmamx, &
            par%nptseg,psidx,psidy,psi,psidxm,psidym,cflag,b0r0, &
            ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:,0),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
            &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
 !!$        call b2agbb (nx,ny,fpsi,ffbz,bb, &
 !!$          crx,psidx,psidy,nxmx,nymx)
@@ -172,7 +173,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.false.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:,0),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! We do not create guard cells, but b2agfz still places
       ! the real cells starting at (0,0) (i.e. the x/y=-1 slots are empty).
@@ -182,7 +183,7 @@ program tradui
       call ecrim2(nfin,nx,ny,&
           & crx(0:nxmx,0:nymx,0:3),&
           & cry(0:nxmx,0:nymx,0:3),&
-          & fpsi(0:nxmx,0:nymx,0:3),&
+          & fpsi(0:nxmx,0:nymx,0:3,0),&
           & psidx(0:nxmx,0:nymx,0:3),psidy(0:nxmx,0:nymx,0:3),&
           & bb(0:nxmx,0:nymx,0:3),&
           & ffbz(0:nxmx,0:nymx,0:3),&
@@ -197,7 +198,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:,0),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3(nfin,nx,ny,crx,cry,bb,nxmx,nymx)
       call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
@@ -210,7 +211,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:,0),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim3_extended(nfin,nx,ny,crx,cry,bb,nxmx,nymx,b2cflag)
   elseif(isel.eq.4) then
@@ -222,7 +223,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:,0),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       call ecrim4(nfin,nx,ny,crx,cry,bb,b0r0,nxmx,nymx, &
           &                                ncut,nxcut,nycut,niso,nxiso)
@@ -235,7 +236,7 @@ program tradui
           & par%nptseg,psidx,psidy,&
           & psi,psidxm,psidym,cflag,b0r0, &
           & ncutmx,ncut,nxcut,nycut,nisomx,niso,nxiso,.true.)
-      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
+      call carre_b2agbb (nx,ny,fpsi(-1:nx,-1:ny,:,0),ffbz(-1:nx,-1:ny,:),bb(-1:nx,-1:ny,:), &
           &    crx(-1:nx,-1:ny,:),psidx(-1:nx,-1:ny,:),psidy(-1:nx,-1:ny,:))
       ! jdemod - added fpsi to call to ecrim5
       call ecrim5(nfin,nx,ny,crx,cry,bb,fpsi,nxmx,nymx)
@@ -262,13 +263,13 @@ program tradui
           call computeGridSizeWithGhostCells(nnx, nny, niso, nx, ny)
 
           ! Compute magnetic field with the same recipe as carre...
-          call carre_b2agbb(nx,ny,fpsi(-1:nx,-1:ny,:),ffbz(-1:nx,-1:ny,:),&
+          call carre_b2agbb(nx,ny,fpsi(-1:nx,-1:ny,:,0),ffbz(-1:nx,-1:ny,:),&
                & bb(-1:nx,-1:ny,0:3), &
                & crx(-1:nx,-1:ny,0:3), &
                & psidx(-1:nx,-1:ny,0:3), psidy(-1:nx,-1:ny,0:3) )
 
           ! add the ghost cells
-          psi_tmp(-1:nx,-1:ny,0:3,0) = fpsi(-1:nx,-1:ny,:)
+          psi_tmp(-1:nx,-1:ny,0:3,0) = fpsi(-1:nx,-1:ny,:,0)
           psi_tmp(-1:nx,-1:ny,0:3,1) = psidx(-1:nx,-1:ny,:)
           psi_tmp(-1:nx,-1:ny,0:3,2) = psidy(-1:nx,-1:ny,:)
           crx_tmp(-1:nx,-1:ny,1:4) = crx(-1:nx,-1:ny,:)
@@ -281,7 +282,7 @@ program tradui
               & ffbz(-1:nx,-1:ny,:), &
               & b2cflag(-1:nx,-1:ny,:), withSourceOffset=.true.)
 
-          fpsi(-1:nx,-1:ny,0:3) = psi_tmp(-1:nx,-1:ny,0:3,0)
+          fpsi(-1:nx,-1:ny,0:3,0) = psi_tmp(-1:nx,-1:ny,0:3,0)
           psidx(-1:nx,-1:ny,0:3) = psi_tmp(-1:nx,-1:ny,0:3,1)
           psidy(-1:nx,-1:ny,0:3) = psi_tmp(-1:nx,-1:ny,0:3,2)
           crx(-1:nx,-1:ny,:) = crx_tmp(-1:nx,-1:ny,1:4)
