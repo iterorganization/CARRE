@@ -325,7 +325,6 @@ contains
 
     !  procedures
     INTRINSIC MOD,SQRT
-    EXTERNAL trc_stk_in,trc_stk_out
 
     !=========================
     !.. xst,yst: tableaux des coordonnees des points de la structure.
