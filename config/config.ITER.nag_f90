@@ -4,10 +4,8 @@ LD_NCARG ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-
 LD_MSCL  ?= `pkg-config mscl --libs`
 LD_GR    ?= -L${GR_ROOT}/lib -lgr
 
-ifdef SOLPS_CPP
-DEFINES   = ${SOLPS_CPP}
-else
-DEFINES   = -DNAGFOR
+ifndef SOLPS_CPP
+DEFINES  += -DNAGFOR
 endif
 ifeq ($(shell `pkg-config --exists fundamental-constants`; echo $$?),0)
 B2INCLUDE += `pkg-config fundamental-constants --cflags`
