@@ -82,7 +82,7 @@
       integer nbdef,inddef(nbdmx),indxpt(nbdmx),npx
       real(rKind) :: xst(nbdmx),yst(nbdmx)
 ! local variables
-      integer i,j,k,l,m, &
+      integer i,j,k,l,m,n,&
      &  ii(strumx),jj(nbdmx),kk(npxmx),ll(nbdmx),mm(npxmx)
       real(rKind) :: xtt(nbdmx),ytt(nbdmx)
 !<<<
@@ -124,6 +124,32 @@
       end do !}
 !<<<
       write(0,*) 'Single intersections : ',k
+      if (k.eq.0.and.nbdef.eq.8) then  ! case of a "perfectly symmetric" connected double-null
+!xpb We will try throwing away one of each of the separatrix segments
+       n=0
+       do i=1,nbdef
+        do j=i+1,nbdef
+         if(inddef(i).eq.inddef(j).and.i.ne.j.and. &
+     &      indxpt(i).ne.indxpt(j)) then
+          n=n+1
+          k=k+1
+          if(n.le.2) then ! assign to the first X-point
+            ii(inddef(j))=ii(inddef(j))-1
+            jj(k)=j
+            ll(k)=indxpt(j)
+            mm(indxpt(j))=mm(indxpt(j))+1
+          else ! assign to the second X-point
+            ii(inddef(i))=ii(inddef(i))-1
+            jj(k)=i
+            ll(k)=indxpt(i)
+            mm(indxpt(i))=mm(indxpt(i))+1
+          endif
+         endif
+        end do
+       end do
+       write(0,*) 'Single intersections after duplicates removal : ',k
+      end if
+!
       if(k.gt.0) then !{
         write(0,*) 'jj : ',(jj(i),i=1,k)
         write(0,*) 'll : ',(ll(i),i=1,k)

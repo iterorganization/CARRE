@@ -2512,7 +2512,7 @@ contains
     ! on colle la dernière ligne de niveau sur trace2 pour avoir
     ! la pénétration.
 
-    call trace3(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), &
+    if (nn1.gt.1) call trace3(equ%x(1),equ%x(equ%nx),equ%y(1),equ%y(equ%ny), &
          &        struct%nstruc,struct%npstru,struct%xstruc,struct%ystruc, &
          &        par%pntrat,equ%distxo,grid%xn,grid%yn,nn1, &
          &        fctini,xfin,yfin,fctfin, &
