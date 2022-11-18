@@ -114,7 +114,7 @@ EXCLUDELIST = $(MAINLIST:.o=\\.o)
 LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJDIR)/%.o : %.F
-	- /bin/rm -f ${OBJDIR}/$*.f
+	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
@@ -162,12 +162,12 @@ ${OBJDIR}/${PROG_FCRR}: ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.
 	rm -f ${OBJDIR}/${PROG_FCRR} 2> /dev/null; \
 	${FC} $(FFLAGS) ${FFLAGSEXTRA} -o ${OBJDIR}/${PROG_FCRR} ${OBJDIR}/fcrr.o ${OBJDIR}/fcrblkd.o ${OBJDIR}/libcarre.a ${LDLIBS} $(LDFLAGS) $(LDEXTRA)
 
-${OBJDIR}/libcarre.a: ${DEST} ${MAKES}
-	@ar rucv $@ ${DEST}
+${OBJDIR}/libcarre.a: ${DEST}
+	@ar rc $@ ${DEST}
 	ranlib $@
 
-${OBJDIR}/libgcarre.a: ${GDEST} ${MAKES}
-	@ar rucv $@ ${GDEST}
+${OBJDIR}/libgcarre.a: ${GDEST}
+	@ar rc $@ ${GDEST}
 	ranlib $@
 
 clean:
@@ -233,4 +233,4 @@ echo:
 	@echo INCLUDE=${INCLUDE}
 	@echo DEFINES=${DEFINES}
 	@echo GOBJS=${GOBJS}
-	@echo DEST =${DEST}
+	@echo DEST=${DEST}
