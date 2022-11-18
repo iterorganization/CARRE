@@ -3,7 +3,7 @@ COMPILER_MAJOR_VERSION = $(shell ${FC} -V 2>&1 | grep -o "Version [0-9]*" | cut 
 ifdef SOLPS_DEBUG
 FFLAGS   += -g -C -debug all -traceback -check all
 else
-FFLAGS   += -O
+FFLAGS   += -O -fp-model=precise
 endif
 ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -le 12; echo $$?),0)
 FFLAGS   += -vec_report0
