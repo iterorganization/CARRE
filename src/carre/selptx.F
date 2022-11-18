@@ -125,7 +125,7 @@ c*** lconn>0 means "connect x-points")
 
 c*** Set the absolute tolerance for each candidate point
 
- 11         do j=1,npxtot
+ 11       do j=1,npxtot
             x1=1.e30
             do i=1,npxtot
               if(i.ne.j) then
@@ -141,7 +141,7 @@ c
           k=0
           do i=1,npxtot
             if(abs(xptom-pointx(i)).le.xptdist(i) .and.
-     .                         abs(yptom-pointy(i)).le.xptdist(i)) then
+     .         abs(yptom-pointy(i)).le.xptdist(i)) then
               if(k.eq.0) then
                 k=i
               else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k))
@@ -164,10 +164,10 @@ c
             k=0
             do i=1,npxtot
               if(abs(xptxm(j)-pointx(i)).le.xptdist(i) .and.
-     ,                      abs(yptxm(j)-pointy(i)).le.xptdist(i)) then
+     ,           abs(yptxm(j)-pointy(i)).le.xptdist(i)) then
                 if(k.eq.0) then
                   k=i
-              else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k))
+                else if(rdist(pointx(i),pointy(i),pointx(k),pointy(k))
      .                       .gt.eps_hlp) then
                   write(*,*) 'Ambiguous definition of the X-point',
      ,                     j,': points ',k,'  and ',i,'  are too close'

@@ -42,9 +42,9 @@ cank-970702: moved dimensions to the CARREDIM.F
       PARAMETER (cstlin=0.00, zero=0.)
       INTEGER i, j, nx, ny, nstruc, npstru(strumx),
      .   ii(gradmx), jj(gradmx), iptx(npxmx), jptx(npxmx),
-     .   npx, npxtot,ptsep(4,npxmx),
-     .   nptot(4,npxmx), indplq(4,npxmx),inddef(nbdmx),
-     .   nbdef, nivtot(nivmx), nbniv,ptxint,nreg,
+     .   npx, npxtot, ptsep(4,npxmx),
+     .   nptot(4,npxmx), indplq(4,npxmx), inddef(nbdmx),
+     .   nbdef, nivtot(nivmx), nbniv, ptxint, nreg,
      .   np1(nregmx), npr(nregmx), ierror, iflag, limcfg,
      .   itmp, ireg,
      .   modif, nprsb(nregmx)
