@@ -41,7 +41,7 @@
           write(nfin,hlp_format) nx,"  ",ny,"  ",niso,"  ",nxiso(1:nisomx)
       end if
 
-      write(hlp_format,'(a,i1,a)') '(I4,1X,I4,1X,29(F12.8,1X),', &
+      write(hlp_format,'(a,i1,a)') '(I4,1X,I4,1X,29(F13.8,1X),', &
                                   &  CARREOUT_NCELLFLAGS,'(I4,1X))'
       do iy=0,ny-1
         do ix=0,nx-1
