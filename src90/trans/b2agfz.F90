@@ -75,7 +75,7 @@
 
       integer ipol,irad,npol2g,npol2d, &
      &  ireg,ix,iy,npol1,npol2,npol3,i
-      integer :: cix, ciy
+      integer :: cix, ciy, tempoi
       real(rKind) :: twopi,del,zero,one,tempo
       parameter(del=1.e-2,zero=0.,one=1.)
       logical ex
@@ -193,10 +193,10 @@
 !      do k=1,nreg     ! {
 !        write(0,*) 'Region ',k
 !        do j=1,nprad(k)     ! {
-!          write(0,'(4h r: ,1p,12e10.2/(4x,12e10.2))')
-!     -                                          (r(i,j,k),i=1,nppol(k))
-!          write(0,'(4h z: ,1p,12e10.2/(4x,12e10.2))')
-!     -                                          (z(i,j,k),i=1,nppol(k))     ! }
+!          write(0,'(4h r: ,1p,12e10.2/(4x,12e10.2))') &
+!     &                                          (r(i,j,k),i=1,nppol(k))
+!          write(0,'(4h z: ,1p,12e10.2/(4x,12e10.2))') &
+!     &                                          (z(i,j,k),i=1,nppol(k))     ! }
 !        end do    ! }
 !      end do
 !>>>
@@ -376,13 +376,23 @@
 
             lar(1)=nprad(ka(1))
             mar(1)=1
+            if (nprad(ka(2)).gt.nprad(kh(2))) then
             lar(2)=nprad(ka(2))
-            mar(2)=lar(2)-lar(1)+1
+            mar(2)=nprad(kh(2))
+            else
+            lar(2)=0
+            mar(2)=0
+            endif
 
             lbr(1)=1
             mbr(1)=nprad(kb(1))
-            lbr(2)=mar(2)
+            if (nprad(ka(2)).gt.nprad(kh(2))) then
+            lbr(2)=nprad(kh(2))
             mbr(2)=1
+            else
+            lbr(2)=nprad(kb(2))
+            mbr(2)=1
+            endif
 
             lcr(1)=1
             mcr(1)=nprad(kc(1))
@@ -404,13 +414,23 @@
             lfr(2)=1
             mfr(2)=nprad(kf(2))
 
+            if (nprad(kg(1)).gt.nprad(kb(1))) then
             lgr(1)=nprad(kg(1))
-            mgr(1)=lgr(1)-lar(1)+1
+            mgr(1)=nprad(kb(1))
+            else
+            lgr(1)=0
+            mgr(1)=0
+            endif
             lgr(2)=nprad(kg(2))
             mgr(2)=1
 
-            lhr(1)=mgr(1)
+            if (nprad(kg(1)).gt.nprad(kb(1))) then
+            lhr(1)=nprad(kb(1))
             mhr(1)=1
+            else
+            lhr(1)=nprad(kg(1))
+            mhr(1)=1
+            endif
             lhr(2)=1
             mhr(2)=nprad(kh(2))
 
@@ -520,13 +540,23 @@
             lip(2)=mfp(2)
             mip(2)=nppol(ki(2))
 
+            if (nprad(ka(1)).gt.nprad(kh(1))) then
             lar(1)=nprad(ka(1))
-            mar(1)=lar(1)-nprad(kd(1))+1
+            mar(1)=nprad(kh(1))
+            else
+            lar(1)=0
+            mar(1)=0
+            endif
             lar(2)=nprad(ka(2))
             mar(2)=1
 
-            lbr(1)=mar(1)
+            if (nprad(ka(1)).gt.nprad(kh(1))) then
+            lbr(1)=nprad(kh(1))
             mbr(1)=1
+            else
+            lbr(1)=nprad(kb(1))
+            mbr(1)=1
+            endif
             lbr(2)=1
             mbr(2)=nprad(kb(2))
 
@@ -552,13 +582,23 @@
 
             lgr(1)=nprad(kg(1))
             mgr(1)=1
+            if (nprad(kg(2)).gt.nprad(kb(2))) then
             lgr(2)=nprad(kg(2))
-            mgr(2)=lgr(2)-nprad(kd(2))+1
+            mgr(2)=nprad(kb(2))
+            else
+            lgr(2)=0
+            mgr(2)=0
+            endif
 
             lhr(1)=1
             mhr(1)=nprad(kh(1))
-            lhr(2)=mgr(2)
+            if (nprad(kg(2)).gt.nprad(kb(2))) then
+            lhr(2)=nprad(kb(2))
             mhr(2)=1
+            else
+            lhr(2)=nprad(kg(2))
+            mhr(2)=1
+            endif
 
             lir(1)=1
             mir(1)=nprad(ki(1))
@@ -574,16 +614,16 @@
           end if
 
 !c<<<
-!        write(0,'(1x,a8,9i4/9x,9i4)') 'Regions:',
-!     ,                                (((kq(i,j,k),k=1,3),j=1,3),i=1,2)
-!        write(0,'(1x,a8,9i4/9x,9i4)') 'Start p:',
-!     ,                               (((lqp(i,j,k),k=1,3),j=1,3),i=1,2)
-!        write(0,'(1x,a8,9i4/9x,9i4)') 'End   p:',
-!     ,                               (((mqp(i,j,k),k=1,3),j=1,3),i=1,2)
-!        write(0,'(1x,a8,9i4/9x,9i4)') 'Start r:',
-!     ,                               (((lqr(i,j,k),k=1,3),j=1,3),i=1,2)
-!        write(0,'(1x,a8,9i4/9x,9i4)') 'End   r:',
-!     ,                               (((mqr(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'Regions:', &
+!     &                                (((kq(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'Start p:', &
+!     &                               (((lqp(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'End   p:', &
+!     &                               (((mqp(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'Start r:', &
+!     &                               (((lqr(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') 'End   r:', &
+!     &                               (((mqr(i,j,k),k=1,3),j=1,3),i=1,2)
 !c>>>
 
 !*** Calculate dimensions of the B2 grid zones
@@ -598,10 +638,10 @@
           end do
 
 !c<<<
-!        write(0,'(1x,a8,9i4/9x,9i4)') '    nqp:',
-!     ,                               (((nqp(i,j,k),k=1,3),j=1,3),i=1,2)
-!        write(0,'(1x,a8,9i4/9x,9i4)') '    nqr:',
-!     ,                               (((nqr(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') '    nqp:', &
+!     &                               (((nqp(i,j,k),k=1,3),j=1,3),i=1,2)
+!        write(0,'(1x,a8,9i4/9x,9i4)') '    nqr:', &
+!     &                               (((nqr(i,j,k),k=1,3),j=1,3),i=1,2)
 !c>>>
 
 !*** Check them for consistency
@@ -880,7 +920,12 @@
 
 !*** Dimensions for one half of the grid
 
-        ny=nqr(1,1,1)+nqr(1,1,2)+nqr(1,1,3)
+        ny=0
+        do ihg=1,2
+          do ipz=1,3
+            ny=max(ny,nqr(ihg,ipz,1)+nqr(ihg,ipz,2)+nqr(ihg,ipz,3))
+          enddo
+        enddo
 
         errenc=.false.
         if(ny.gt.nymax) then     ! {
@@ -904,9 +949,12 @@
 
         ix=0
         nx=0
-        nyy=max(nqr(1,1,1)+nqr(1,1,2), &
-              & nqr(1,2,1)+nqr(1,2,2), &
-              & nqr(1,3,1)+nqr(1,3,2))
+        nyy=0
+        do ihg=1,2
+          do ipz=1,3
+            nyy=max(nyy,nqr(ihg,ipz,1)+nqr(ihg,ipz,2))
+          enddo
+        enddo
         do ihg=1,2     ! {
           nxx(ihg)=nqp(ihg,1,1)+nqp(ihg,2,1)+nqp(ihg,3,1)
           nx=nx+nxx(ihg)
@@ -1066,7 +1114,7 @@
 !  construct the mesh for the bottom single-null geometry
 
         nx=nptseg(1)+nptseg(2)+nptseg(3)-3
-        ny=nprad(1)+nprad(2)-2
+        ny=max(nprad(1)+nprad(2),nprad(3)+nprad(2))-2
         npol2g=nptseg(2)-1
         npol2d=nptseg(1)-1
         npol3=nptseg(3)-1
@@ -1095,11 +1143,12 @@
 !       print*,'psi=',psi
 !       print*,'psidxm=',psidxm
 !***
+        nyy=max(nprad(2),nprad(3))
         ireg=1
         do ipol=1,npol1     ! {
           ix=nx-ipol
           do irad=1,nprad(ireg)-1     ! {
-            iy=(nprad(2)-2)+irad
+            iy=(nyy-2)+irad
             crx(ix,iy,0)=r(ipol+1,irad,ireg)
             cry(ix,iy,0)=z(ipol+1,irad,ireg)
             fpsi(ix,iy,0)=psi(ipol+1,irad,ireg)
@@ -1142,7 +1191,7 @@
         do ipol=npol2,npol2d+1,-1     ! {
           ix=npol2-ipol
           do irad=1,nprad(ireg)-1     ! {
-            iy=(nprad(ireg)-1)-irad
+            iy=(nyy-1)-irad
             crx(ix,iy,0)=r(ipol+1,irad+1,ireg)
             cry(ix,iy,0)=z(ipol+1,irad+1,ireg)
             fpsi(ix,iy,0)=psi(ipol+1,irad+1,ireg)
@@ -1184,7 +1233,7 @@
         do ipol=npol3,1,-1     ! {
           ix=npol2g+(npol3-ipol)
           do irad=1,nprad(ireg)-1     ! {
-            iy=(nprad(ireg)-1)-irad
+            iy=(nyy-1)-irad
             crx(ix,iy,0)=r(ipol+1,irad+1,ireg)
             cry(ix,iy,0)=z(ipol+1,irad+1,ireg)
             fpsi(ix,iy,0)=psi(ipol+1,irad+1,ireg)
@@ -1225,7 +1274,7 @@
         do ipol=1,npol2d      ! {
           ix=nx-ipol
           do irad=1,nprad(ireg)-1     ! {
-            iy=(nprad(ireg)-1)-irad
+            iy=(nyy-1)-irad
             crx(ix,iy,0)=r(ipol+1,irad+1,ireg)
             cry(ix,iy,0)=z(ipol+1,irad+1,ireg)
             fpsi(ix,iy,0)=psi(ipol+1,irad+1,ireg)
@@ -1267,7 +1316,7 @@
         call periph(nx,ny,crx,cry,fpsi,ffbz,psidx,psidy,del,nxmax,nymax)
         end if
 !*** Specify the cuts
-       ncut=2
+        ncut=2
         if(ncut.gt.ncutmx) then ! {
           write(*,*) 'Too many cuts. ncut,ncutmx =',ncut,ncutmx
           write(*,*) '==> Increase ncutmx in tradui.F'
@@ -1277,14 +1326,14 @@
           end do  ! }
         else  ! {
           if(index(equtype,'-down').gt.0) then
-          nxcut(1)=nptseg(2)-1
-         else
-          nxcut(1)=nptseg(1)-1
-         end if
+            nxcut(1)=nptseg(2)-1
+          else
+            nxcut(1)=nptseg(1)-1
+          end if
           nxcut(2)=nxcut(1)+nptseg(3)-1
-        nycut(1)=nprad(3)-1
-        nycut(2)=nycut(1)  ! }
-      end if
+          nycut(1)=nprad(3)-1
+          nycut(2)=nycut(1)  ! }
+        end if
 !
 !----------------------------------------------------------------------  ! }
       else if(index(equtype,'limiter').gt.0) then     ! {
@@ -1482,9 +1531,37 @@
               psidy(i,iy,0)=tempo
               tempo=psidy(ix,iy,3)
               psidy(ix,iy,3)=psidy(i,iy,2)
-              psidy(i,iy,2)=tempo     ! }
+              psidy(i,iy,2)=tempo
+
+              tempoi=b2cflag(ix,iy,CELLFLAG_TYPE)
+              b2cflag(ix,iy,CELLFLAG_TYPE)=b2cflag(i,iy,CELLFLAG_TYPE)
+              b2cflag(i,iy,CELLFLAG_TYPE)=tempoi
+
+              tempoi=b2cflag(ix,iy,CELLFLAG_LEFTFACE)
+              b2cflag(ix,iy,CELLFLAG_LEFTFACE)=b2cflag(i,iy,CELLFLAG_RIGHTFACE)
+              b2cflag(i,iy,CELLFLAG_RIGHTFACE)=tempoi
+
+              tempoi=b2cflag(ix,iy,CELLFLAG_RIGHTFACE)
+              b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=b2cflag(i,iy,CELLFLAG_LEFTFACE)
+              b2cflag(i,iy,CELLFLAG_LEFTFACE)=tempoi
+
+              tempoi=b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)
+              b2cflag(ix,iy,CELLFLAG_BOTTOMFACE)=b2cflag(i,iy,CELLFLAG_BOTTOMFACE)
+              b2cflag(i,iy,CELLFLAG_BOTTOMFACE)=tempoi
+
+              tempoi=b2cflag(ix,iy,CELLFLAG_TOPFACE)
+              b2cflag(ix,iy,CELLFLAG_TOPFACE)=b2cflag(i,iy,CELLFLAG_TOPFACE)
+              b2cflag(i,iy,CELLFLAG_TOPFACE)=tempoi
+
+
+            else
+
+              tempoi=b2cflag(ix,iy,CELLFLAG_LEFTFACE)
+              b2cflag(ix,iy,CELLFLAG_LEFTFACE)=b2cflag(i,iy,CELLFLAG_RIGHTFACE)
+              b2cflag(ix,iy,CELLFLAG_RIGHTFACE)=tempoi
+
             end if     ! }
-          end do      ! }
+          end do     ! }
         end do     ! }
       end if
 
