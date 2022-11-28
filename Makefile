@@ -253,7 +253,7 @@ local:
 TAGS:	tags
 
 tags:
-	rm -f TAGS ; etags ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` || touch TAGS
+	rm -f TAGS ; ctags -e -f TAGS ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` || touch TAGS
 
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F90} ${B2OBJS:.o=.F90} ${EXCLUDELIS:.o=.F90} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90}
 	@makedepend ${DEFINES} -f- ${INCLUDE} $^ | \
