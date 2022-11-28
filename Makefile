@@ -183,7 +183,7 @@ local:
 TAGS:	tags
 
 tags:
-	rm -f TAGS ; etags ${SRCDIR}/*/*.F || touch TAGS
+	rm -f TAGS ; ctags -e -f TAGS ${SRCDIR}/*/*.F || touch TAGS
 
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${MAINLIST:.o=.F}
 	@makedepend ${DEFINES} -f- ${INCLUDE} $^ | \
