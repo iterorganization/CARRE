@@ -64,7 +64,7 @@ c
       parameter (nptxm=2)
       integer kptx(nptxm)
       real(kind=R8) xptxm(nptxm),yptxm(nptxm),xptom,yptom,
-     ,                         xpttol,xptdist(gradmx),rdist,x1,x2,y1,y2
+     ,                         xpttol,xptdist(gradmx),x1,x2
 c      parameter (xpttol=5.0e-2_R8)
       logical ex,op
 cank>>>
@@ -83,8 +83,6 @@ c.. iptxtm,jptxtm: tableaux temporaires des indices des carres ou il y
 c                  a un point X.
 c.. ptxtmp,ptytmp: tableaux temporaires des coordonnees en x et y des
 c                  points X.
-c======================================================================
-      rdist(x1,y1,x2,y2)=sqrt((x1-x2)**2+(y1-y2)**2)
 c======================================================================
 *..Initialisation
 
@@ -405,4 +403,17 @@ cnba  'cntour'.
       call endpag
 
       RETURN
+
+c======================================================================
+
+      contains
+
+      function rdist(x1,y1,x2,y2)
+      real(kind=R8) :: rdist
+      real(kind=R8), intent(in) :: x1, y1, x2, y2
+
+      rdist=sqrt((x1-x2)**2+(y1-y2)**2)
+      return
+      end function rdist
+
       END

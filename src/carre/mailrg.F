@@ -81,12 +81,12 @@ cank-970707: dimensions from the file
 #endif
 
 *  procedures
-      INTEGER indsgm,ifind,drctio
+      INTEGER indsgm,ifind !,drctio
       REAL(kind=R8) aazero,long,nulort,ruban
       LOGICAL chgdir,in,cross
       INTRINSIC MOD,SQRT
       EXTERNAL aazero,long,COORD,indsgm,ifind,CRBNIV,nulort,
-     .         UNTANG,SAUTE,chgdir,in,cross,ruban,clort,drctio
+     .         UNTANG,SAUTE,chgdir,in,cross,ruban,clort !,drctio
 c======================================================================
 *..calculs
 *

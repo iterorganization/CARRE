@@ -37,7 +37,8 @@ c*** Read the plasma equilibrium ...
 c
       iret=0
       print *,'rdeqdg: before rdeqlh'
-      call rdeqlh(lun,nr,nz,ubtf,urtf,*99)
+      call rdeqlh(lun,nr,nz,ubtf,urtf,iret)
+      if (iret.eq.1) goto 99
       btf=ubtf
       rtf=urtf
       print '(a,2i5,1p,2(1x,e14.7))',
