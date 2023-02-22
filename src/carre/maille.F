@@ -2875,7 +2875,7 @@ c---
      .              x,y,psi,nstruc,npstru,xstruc,ystruc,
      .              a00,a10,a01,a11,repart,
      .              gardd1,gardd2,nbcrb,xcrb2,ycrb2,npcrb2,xnlast,
-     .              ynlast,nnlast,nuldec,0,xpto,ypto,
+     .              ynlast,nnlast,nuldec,1,xpto,ypto,
      .              gdpsi(1,ireg),racpsi(1,ireg),
      .              a(ireg),gdr(1,ireg),r(1,ireg),ra(1,ireg),
      .              rho(1,ireg),somort(1,ireg),somortp(1,ireg),

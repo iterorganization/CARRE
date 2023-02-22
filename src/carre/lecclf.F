@@ -76,7 +76,7 @@ c       Configuration limiteur
 
          WRITE(6,122)distxo
   122    FORMAT(/'Nombre de points dans la region 2 (interieure) et'
-     .     ,' penetration:'/'penetration maximale =',F11.8)
+     .     ,' penetration:'/'penetration maximale = ',F11.8)
          READ(5,*)npr(2),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -168,9 +168,9 @@ c       Configuration limiteur
   110    FORMAT(//'Nombre de points dans la direction radiale pour la ',
      .    'region 1 (SOL):')
          WRITE(6,111)distnv(1,1)
-  111    FORMAT('Distance totale =',F9.6)
+  111    FORMAT('Distance totale = ',F9.6)
          WRITE(6,112)distnv(2,1)
-  112    FORMAT('Difference totale de psi =',F9.5)
+  112    FORMAT('Difference totale de psi = ',F9.5)
          READ(5,*)npr(1)
 
          WRITE(6,113)
@@ -215,7 +215,7 @@ c       Configuration limiteur
             difpsi = fctfin - fctini
 
             WRITE(6,121)difpsi
-  121       FORMAT(/'delta-psi =', F9.6)
+  121       FORMAT(/'delta-psi = ', F9.6)
 
          ENDIF
 
@@ -373,7 +373,7 @@ c       Configuration limiteur
 
          WRITE(6,164)distxo
   164    FORMAT(/'Nombre de points dans la region 5 (interieure) et'
-     .     ,' penetration:'/'penetration totale =',F11.8)
+     .     ,' penetration:'/'penetration totale = ',F11.8)
          READ(5,*)npr(5),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -553,7 +553,7 @@ c       Configuration limiteur
 
          WRITE(6,189)distxo
   189    FORMAT(/'Nombre de points dans la region 6 (interieure) et'
-     .     ,' penetration:'/'penetration totale =',F11.8)
+     .     ,' penetration:'/'penetration totale = ',F11.8)
          READ(5,*)npr(6),pntrat
 
          pntrat = MIN(pntrat,distxo)

@@ -41,7 +41,7 @@ c======================================================================
         write(iusor,205) 'SEPARATRIX SEGMENTS:'
  205    FORMAT(//T10,A)
       endif
-        write(iusor,110)'#','nptseg(i)','lg(i)','deltp1(i)','deltpn(i)',
+      write(iusor,110)'#','nptseg(i)','lg(i)','deltp1(i)','deltpn(i)',
      .          'dpmin','dpmax'
   110 FORMAT(/T2,A1,T6,A9,T18,A5,T29,A9,T41,A9,T54,A6,T66,A6/75('='))
 
@@ -63,18 +63,18 @@ c======================================================================
 
       IF (repart .EQ. 1) THEN
         if(sellan(1:8).eq.'francais') then
-         write(iusor,121) 'Repartition selon la distance:',
+          write(iusor,121) 'Repartition selon la distance:',
      .     ' repart=',repart
         elseif(sellan(1:7).eq.'english') then
-         write(iusor,221) 'Distribution in displacement along plates:',
+          write(iusor,221) 'Distribution in displacement along plates:',
      .     ' repart=',repart
         endif
-  121    FORMAT(T14,A,i5)
-  221    FORMAT(T14,2A,i5)
+  121   FORMAT(T14,A,i5)
+  221   FORMAT(T14,2A,i5)
 
-         write(iusor,122)'region','npr(i)','distance','deltr1(i)',
+        write(iusor,122)'region','npr(i)','distance','deltr1(i)',
      .     'deltrn(i)','drmin','drmax'
-  122    FORMAT(/T2,A6,T9,A6,T17,A8,T29,A9,T41,A9,T54,A6,T66,A6/
+  122   FORMAT(/T2,A6,T9,A6,T17,A8,T29,A9,T41,A9,T54,A6,T66,A6/
      .            75('='))
 
       ELSE IF (repart .EQ. 2) THEN
@@ -181,6 +181,7 @@ c  par relaxation
       endif
       write(iusor,164)nrelax,relax,pasmin,rlcept
  164  format(t2,i5,t15,f6.3,t30,1pe10.3,t45,1pe10.3)
+      flush(iusor)
 
 cxpb  Verifier que les valeurs presentees sont correctes
 

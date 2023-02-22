@@ -299,5 +299,6 @@ c 109          FORMAT(1p5E16.9)   mis en commentaire le 13 juin 1994
       
       ENDIF
 
+      flush(10)
       RETURN
       END

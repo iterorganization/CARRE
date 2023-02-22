@@ -178,9 +178,9 @@ c       simple nul
   210    format(//'Number of nodes in the radial direction for',
      .     ' region 1 (SOL):')
          write(6,211)distnv(1,1)
-  211    format('total distance =',f9.6)
+  211    format('total distance = ',f9.6)
          write(6,212)distnv(2,1)
-  212    format('total variation in psi',f9.6)
+  212    format('total variation in psi = ',f9.6)
          READ(5,*)npr(1)
 
          WRITE(6,213)
@@ -207,7 +207,7 @@ c       simple nul
 
          WRITE(6,220)distxo
   220    format(/'Number of nodes in region 3 (interior) and'
-     .     ,' penetration:'/'maximum penetration =',f11.8)
+     .     ,' penetration:'/'maximum penetration = ',f11.8)
          READ(5,*)npr(3),pntrat
 
          pntrat = MIN(pntrat,distxo)
@@ -226,7 +226,7 @@ c       simple nul
             difpsi = fctfin - fctini
 
             WRITE(6,121)difpsi
-  121       FORMAT(/'delta-psi =', F9.6)
+  121       FORMAT(/'delta-psi = ', F9.6)
 
          ENDIF
 

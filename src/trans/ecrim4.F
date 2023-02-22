@@ -85,7 +85,8 @@ c* 2.3  print B2 input data
       enddo
 
       id = int(log10(max(abs(minval(fpsi)-delpsi),
-     .                   abs(maxval(fpsi)-delpsi))))
+     .                   abs(maxval(fpsi)-delpsi),
+     .                   abs(minval(ffbz)),abs(maxval(ffbz)))))
       write(hlp_frm,'(a,i1,a)') '(i4,1x,i4,1x,12(f13.',10-id,',1x))'
       do iy=-1,ny
         do ix=-1,nx

@@ -85,6 +85,9 @@ c     print*,'npnimx=',npnimx
 c***
 
 *..Initialisation.
+      gdr=0.0_R8
+      gdpsi=0.0_R8
+      racpsi=0.0_R8
       somort=0.0_R8
       somortp=0.0_R8
       gdsomortp=0.0_R8
@@ -252,7 +255,7 @@ c***
           racpsi(ir)= sqrt(gdpsi(ir))
           sens=2
           x1 = gdr(ir-1)
-          y1=ypto
+          y1 = ypto
           CALL SAUTE(xtt,ytt,ntt,x1,y1,fctanc,x23,y23,fctnew,sens,
      .               repart,nx,ny,x,y,a00,a10,a01,a11,nxmax,nymax)
 
@@ -305,6 +308,7 @@ c       ligne precedente
             enddo
             if(nrelax.gt.0) then
 c
+              l0(nppol+1)=l0(nppol)+l0(2)-l0(1)
               l1(nppol+1)=l1(nppol)+l1(2)-l1(1)
               mailx(nppol+1,ir-1)=mailx(2,ir-1)
               maily(nppol+1,ir-1)=maily(2,ir-1)

@@ -105,7 +105,7 @@ c
      .      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
           varr(i)= (pasmin/(l2(i)-l2(i-1)))**2-
      .             (pasmin/(l2(i+1)-l2(i)))**2
-          tot(i)= ortpur(i)- propo(i) + varr(i)
+          tot(i)= ortpur(i) - propo(i) + varr(i)
         enddo
       endif
 c
