@@ -383,7 +383,7 @@ ${OBJDIR}/b2mod_geo.o: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_cellhelper.$
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo.F ${OBJDIR}/b2mod_geo.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
 
-${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_constants.${MOD}
+${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/carre_constants.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_geo2.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo2.F ${OBJDIR}/b2mod_geo2.f
