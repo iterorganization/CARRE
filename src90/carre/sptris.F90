@@ -195,11 +195,11 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
   if(npx.gt.0 .and. isep.gt.0) then !{
       write(0,*) 'nptot'
       do j=1,npx !{
-          write(0,'(2x,20i4)') (nptot(i,j),i=1,isep)
+          write(0,'(2x,20i5)') (nptot(i,j),i=1,isep)
       end do !}
       write(0,*) 'indplq'
       do j=1,npx !{
-          write(0,'(2x,20i4)') (indplq(i,j),i=1,isep)
+          write(0,'(2x,20i5)') (indplq(i,j),i=1,isep)
       end do !}
   end if !}
   !>>>
