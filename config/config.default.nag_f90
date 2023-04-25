@@ -26,7 +26,7 @@ endif
 
 DBLPAD    = -r8 -i4
 
-COMPILE   = ${FC} -c ${FFLAGS} -mdir ${OBJDIR} -I${OBJDIR}
+COMPILE   = ${FC} -c ${FFLAGS} ${FFLAGSEXTRA} -mdir ${OBJDIR} -I${OBJDIR}
 MOD       = mod
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG} ${LD_NAG}

@@ -13,7 +13,7 @@ endif
 
 DBLPAD    = -r8 -i4
 
-COMPILE   = ${FC} -c ${FFLAGS} -module ${OBJDIR}
+COMPILE   = ${FC} -c ${FFLAGS} ${FFLAGSEXTRA} -module ${OBJDIR}
 MOD       = mod
 
 ifdef IMAS_VERSION

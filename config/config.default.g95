@@ -23,7 +23,7 @@ endif
 
 DBLPAD  = -r8
 
-COMPILE = ${FC} -c ${FFLAGS}
+COMPILE = ${FC} -c ${FFLAGS} ${FFLAGSEXTRA}
 MOD     = mod
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG} ${LD_NAG}
