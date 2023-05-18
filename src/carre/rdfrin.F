@@ -19,16 +19,12 @@ c      rewind iunit
 c      read(iunit,*,err=99)ii
 #ifdef READOPT
       read(vari,err=99)ii
-#else
-#ifdef GFORTRAN
+#elif defined(GFORTRAN)
       read(vari,*,err=99)ii
-#else
-#ifdef NAGFOR
+#elif defined(NAGFOR)
       read(vari,*,err=99)ii
 #else
       read(vari,'(i)',err=99)ii
-#endif
-#endif
 #endif
       ierror=0
       return
