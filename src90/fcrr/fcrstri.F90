@@ -10,6 +10,7 @@
       integer lun
 #include <FCRCOM.F>
       integer(Short) :: i,j,k,l,n
+      real(Single) x, y
 !======================================================================
 !
       rewind(lun)
@@ -20,9 +21,9 @@
         read(lun,*,err=900) k
         do j=1,k
           l=l+1_Short
-          read(lun,*,err=900) xstr(l),ystr(l)
-          xstr(l)=1.e-3*xstr(l)
-          ystr(l)=1.e-3*ystr(l)
+          read(lun,*,err=900) x,y
+          xstr(l)=1.e-3_rKind*real(x,rKind)
+          ystr(l)=1.e-3_rKind*real(y,rKind)
         end do
         nstr=nstr+1_Short
         lstr(nstr)=k

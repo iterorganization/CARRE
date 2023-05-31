@@ -12,16 +12,19 @@
 !
       integer nnm
       parameter (nnm=7)
-      character nms(nnm)*8
+      real(Single) rdummy, rarray(ntrgx)
+      character*8 name, nms(nnm)
       integer i
+      logical carre_streql
       data nms / & 
      &    'repart  ','nrelax  ','relax   ','pasmin  ','rlcept  ', & 
      &    'tgarde  ','xpttol  '/
-      external resimi, resime, rearre, fcrtrn
+      external carre_streql, resimi, resime, rearre, fcrtrn
 !======================================================================
 !
+      call locase(nam,name,8)
       do i=1,nnm
-        if(nam.eq.nms(i)) exit
+        if(carre_streql(name,nms(i))) exit
       end do
       select case (i)
       case (1)
@@ -29,17 +32,22 @@
       case (2)
         call resimi(nrelax)
       case (3)
-        call resime(relax)
+        call resime(rdummy)
+        relax = real(rdummy,rKind)
       case (4)
-        call resime(pasmin)
+        call resime(rdummy)
+        pasmin = real(rdummy,rKind)
       case (5)
-        call resime(rlcept)
+        call resime(rdummy)
+        rlcept = real(rdummy,rKind)
       case (6)
-        call rearre(tgarde,ntrgx,ntrg)
+        call rearre(rarray,ntrgx,ntrg)
+        tgarde(1:ntrg) = real(rarray(1:ntrg),rKind)
       case (7)
-        call resime(xpttol)
+        call resime(rdummy)
+        xpttol = real(rdummy,rKind)
       case default
-        call fcrtrn(nam)
+        call fcrtrn(name)
       end select
       return
 !======================================================================

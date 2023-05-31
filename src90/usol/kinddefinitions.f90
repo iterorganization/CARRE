@@ -23,7 +23,7 @@ module KindDefinitions
   ! comp.lang.fortran, Paul van Delst, Message <epohfj$j3m$1@news.nems.noaa.gov>
 
   INTEGER, PARAMETER :: Byte    = SELECTED_INT_KIND(1)   ! Byte  integer
-  INTEGER, PARAMETER :: Short   = SELECTED_INT_KIND(4)   ! Short integer
+  INTEGER, PARAMETER :: Short   = SELECTED_INT_KIND(8)   ! Short integer
   INTEGER, PARAMETER :: Long    = SELECTED_INT_KIND(8)   ! Long  integer
 
   INTEGER, PARAMETER :: Single = SELECTED_REAL_KIND(6)  ! Single precision

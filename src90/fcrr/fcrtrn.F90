@@ -12,9 +12,11 @@
 !
       integer nnms
       parameter (nnms=8)
-      integer(Short) i,j
-      character*8 unm(nnms)
-      external rearre, rearri, resime, resimi, scipit
+      integer(Short) :: i
+      real(Single) :: rdummy(1), rarray(nrgnx), parray(nsgmx)
+      character*8 name, unm(nnms)
+      logical carre_streql
+      external carre_streql, rearre, rearri, resime, resimi, scipit
 !
 !*** List of the valid input keywords
       data unm / & 
@@ -22,11 +24,12 @@
      &    'dltpn   ','pntrat  ','clstruct'/
 !======================================================================
 !
-      do j=1,nnms
-          if(nam.eq.unm(j)) exit
+      call locase(nam,name,8)
+      do i=1,nnms
+        if(carre_streql(name,unm(i))) exit
       end do
 !----------------------------------------------------------------------
-      select case (j)
+      select case (i)
       case (1)
        call rearri(npr,nrgnx,i)
        if(i.gt.0) then
@@ -54,7 +57,7 @@
         end if
        end if
       case (3)
-       call rearre(deltr1,nrgnx,i)
+       call rearre(rarray,nrgnx,i)
        if(i.gt.0) then
         if(nrgn.gt.0) then
          if(nrgn.ne.i) then
@@ -65,9 +68,10 @@
         else
          nrgn=i
         end if
+        deltr1(1:i) = real(rarray(1:i),rKind)
        end if
       case (4)
-       call rearre(deltrn,nrgnx,i)
+       call rearre(rarray,nrgnx,i)
        if(i.gt.0) then
         if(nrgn.gt.0) then
          if(nrgn.ne.i) then
@@ -78,9 +82,10 @@
         else
          nrgn=i
         end if
+        deltrn(1:i) = real(rarray(1:i),rKind)
        end if
       case (5)
-       call rearre(deltp1,nsgmx,i)
+       call rearre(parray,nsgmx,i)
        if(i.gt.0) then
         if(nsgm.gt.0) then
          if(nsgm.ne.i) then
@@ -91,9 +96,10 @@
         else
          nsgm=i
         end if
+        deltp1(1:i) = real(parray(1:i),rKind)
        end if
       case (6)
-       call rearre(deltpn,nsgmx,i)
+       call rearre(parray,nsgmx,i)
        if(i.gt.0) then
         if(nsgm.gt.0) then
          if(nsgm.ne.i) then
@@ -104,9 +110,11 @@
         else
          nsgm=i
         end if
+        deltpn(1:i) = real(parray(1:i),rKind)
        end if
       case (7)
-       call resime(pntrat)
+        call rearre(rdummy,1,i)
+        pntrat = real(rdummy(1),rKind)
       case (8)
        call resimi(nclstr)
       case default

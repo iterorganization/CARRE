@@ -16,9 +16,9 @@
       external rdeqdg
 !======================================================================
 !
-      rbtor=0.
-      btf=0.
-      rtf=0.
+      rbtor=0.0_rKind
+      btf=0.0_rKind
+      rtf=0.0_rKind
       inquire(file='field.dg',exist=ex)
       if(ex) then
         open(lun+2,file='field.dg')
@@ -30,8 +30,8 @@
         stop
       end if
       if(ex) close(lun+2)
-      rbtor=real(rtf*btf,Single)
-      if(rbtor.ne.0.) return                                           ! DPC
+      rbtor=rtf*btf
+      if(rbtor.ne.0.0_rKind) return                                    ! DPC
 !======================================================================
       write(*,*) 'fcrfldi: no data on the toroidal field found.'
       write(*,*) 'These data should be either in the equilibrium file', & 

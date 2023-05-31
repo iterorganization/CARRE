@@ -10,7 +10,8 @@
 #include <FCRCOM.F>
       integer(Short) :: i, j
       logical ex,uex
-      real u, dpi
+      real(rKind) u, dpi
+      real(rKind) tgtgrd(4)
       parameter (dpi=2.*3.141592653589793238462643383280)
 !======================================================================
 !*** (lower single-null configuration)
@@ -18,6 +19,16 @@
 !      nsgm=3
 !      nrgn=3
 !
+!*** Convert data for limiter configurations
+      if (lm_cnfg.eq.1) then
+        write (*,*) 'Limiter configuration'
+        npr(2)=npr(nrgn)
+        nptseg(1)=nptseg(nsgm)
+        deltr1(2)=deltr1(nrgn)
+        deltrn(2)=deltrn(nrgn)
+        nrgn=2
+        pntrat = real(lm_pntrt,rKind)
+      end if
 !*** Check the data
 !
       ex=.false.
@@ -25,7 +36,7 @@
         ex=.true.
         write (*,*) 'fcrprp: wrong value of repart',repart
       end if
-      if(pntrat.le.0.) then
+      if(pntrat.le.0.0_rKind) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of pntrat',pntrat
       end if
@@ -33,15 +44,15 @@
         ex=.true.
         write (*,*) 'fcrprp: wrong value of nrelax',nrelax
       end if
-      if(relax.le.0.) then
+      if(relax.le.0.0_rKind) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of relax',relax
       end if
-      if(pasmin.le.0.) then
+      if(pasmin.le.0.0_rKind) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of pasmin',pasmin
       end if
-      if(rlcept.le.0.) then
+      if(rlcept.le.0.0_rKind) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of rlcept',rlcept
       end if
@@ -65,7 +76,7 @@
       end if
       uex=.false.
       do i=1,nrgn
-       uex=uex .or. deltr1(i).eq.0
+       uex=uex .or. deltr1(i).eq.0.0_rKind
       end do
       if(uex) then
         ex=.true.
@@ -74,7 +85,7 @@
       end if
       uex=.false.
       do i=1,nrgn
-       uex=uex .or. deltrn(i).eq.0
+       uex=uex .or. deltrn(i).eq.0.0_rKind
       end do
       if(uex) then
         ex=.true.
@@ -83,7 +94,7 @@
       end if
       uex=.false.
       do i=1,nsgm
-       uex=uex .or. deltp1(i).eq.0
+       uex=uex .or. deltp1(i).eq.0.0_rKind
       end do
       if(uex) then
         ex=.true.
@@ -92,7 +103,7 @@
       end if
       uex=.false.
       do i=1,nsgm
-       uex=uex .or. deltpn(i).eq.0
+       uex=uex .or. deltpn(i).eq.0.0_rKind
       end do
       if(uex) then
         ex=.true.
@@ -122,8 +133,10 @@
         stop
       end if
 
-!      write(0,*) 'fcrprp: ldgv2 = ',ldgv2
-      if(.not.ldgv2) then
+#ifdef DBG
+      write(0,*) 'fcrprp: ldgv2 = ',ldgv2
+#endif
+      if(.not.ldgv2.and.lm_cnfg.eq.0) then
 !
 !*** Re-arrange the input data to fit the Carre conventions
 !*** (lower single-null configuration created with old DG)
@@ -161,10 +174,10 @@
 !*** ... re-scale the poloidal dimensions from mm (DG) to m (Carre)
 !
       do i=1,nsgm
-        deltp1(i)=0.001*deltp1(i)
-        deltpn(i)=0.001*deltpn(i)
+        deltp1(i)=0.001_rKind*deltp1(i)
+        deltpn(i)=0.001_rKind*deltpn(i)
       end do
-      pntrat=0.001*pntrat
+      if (lm_cnfg.eq.0) pntrat=0.001_rKind*pntrat
 !
 !*** ... and the poloidal flux from wb/rad (DG) to wb (Carre)
 !
@@ -177,5 +190,17 @@
         deltr1(i)=deltr1(i)*dpi
         deltrn(i)=deltrn(i)*dpi
       end do
+!
+!*** ... for DN cases, re-order the tgarde array to Carre ordering
+!
+      if (ntrg.eq.4) then
+        do i=1,ntrg ! storing the values in DG order
+          tgtgrd(i)=tgarde(i)
+        end do
+        tgarde(1)=tgtgrd(3)
+        tgarde(2)=tgtgrd(2)
+        tgarde(3)=tgtgrd(4)
+        tgarde(4)=tgtgrd(1)
+      end if
 !======================================================================
       end

@@ -6,9 +6,11 @@
       integer(Short) :: repart,nrelax,nxpt, &
      &  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg, &
      &  nstr,lstr(nnstr),nclstr, &
-     &  nr,nz
+     &  nr,nz, &
+     &  lm_cnfg
       logical ldgv2
-      real(Single) :: relax,pasmin,rlcept,pntrat, &
+      real(Single) :: lm_pntrt,lm_grcln
+      real(rKind) :: relax,pasmin,rlcept,pntrat, &
      &  deltp1(nsgmx),deltr1(nrgnx), &
      &  deltpn(nsgmx),deltrn(nrgnx),tgarde(ntrgx), &
      &  xstr(nmstr),ystr(nmstr),rbtor, &
@@ -19,9 +21,11 @@
      &  deltp1,deltr1,deltpn,deltrn,tgarde, &
      &  xstr,ystr,rbtor, &
      &  xptcntr,xlpcntr,xpttol, &
+     &  lm_pntrt,lm_grcln, &
      &  repart,nrelax,nxpt, &
      &  nsgm,nptseg,nrgn,npr,ntrg, &
      &  nstr,lstr,nclstr,nr,nz, &
+     &  lm_cnfg, &
      &  ldgv2
 !
 !*** nnstr : maximum number of structures to be imported from dg
