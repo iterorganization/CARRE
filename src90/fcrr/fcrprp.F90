@@ -126,6 +126,11 @@
         write (*,*) 'fcrprp: too few closed structures, nclstr=',nclstr
       end if
 !
+      if(carre_mode.lt.0.or.carre_mode.gt.2)then
+        ex=.true.
+        write (*,*) 'fcrprp: wrong value of Carre2 mode, carre_mode=',carre_mode
+      endif
+!
       if(ex) then
         write (*,*) 'fcrprp: errors detected in the input data.'
         write (*,*) 'Check DG output (must be in the Carre mode) ', & 

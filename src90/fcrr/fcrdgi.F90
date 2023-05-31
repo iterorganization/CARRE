@@ -11,7 +11,7 @@
       character*(8) nam
 !
       integer nnms
-      parameter (nnms=7)
+      parameter (nnms=11)
       integer(Short) :: i, j, lutrg
       real(Single) x(3), xarray(3,nxptm), rdummy
       character*8 name, unm(nnms)
@@ -21,7 +21,8 @@
 !*** List of the valid input keywords
       data unm / &
      &    'xptcntr ','xlpcntr ','trg_spcf','tgtgrd  ','lm_cnfg ', &
-     &    'lm_pntrt','lm_grcln'/
+     &    'lm_pntrt','lm_grcln','crr_mode','grd_mode','equ_mode', &
+     &    'trgt_res'/
       data lutrg / 0 /
 !======================================================================
 !
@@ -74,10 +75,25 @@
         call resimi(lm_cnfg)
       case (6)
 !***  lm_pntrt
-        call resime(lm_pntrt)
+        call resime(rdummy)
+        lm_pntrt = real(rdummy,rKind)
       case (7)
 !***  lm_grcln
-        call resime(lm_grcln)
+        call resime(rdummy)
+        lm_grcln = real(rdummy,rKind)
+      case (8)
+!***  car_mode
+        call resimi(carre_mode)
+      case (9)
+!***  grd_mode
+        call resimi(grid_ext_mode)
+      case (10)
+!***  equ_mode
+        call resimi(equ_ext_mode)
+      case (11)
+!***  trgt_res
+        call resime(rdummy)
+        target_res = real(rdummy,rKind)
       case default
         call skipit
       end select

@@ -25,6 +25,9 @@
       open(2,file=ofile)
       rewind(2)
       write(2,'(a)') '$parameters'
+      write(2,700) 'carreMode',carre_mode
+      write(2,700) 'gridExtensionMode',grid_ext_mode
+      write(2,700) 'equExtensionMode',equ_ext_mode
       do i=1,niscl
         write(2,700) chiprm(i),iprmeq(i)
       end do
@@ -44,6 +47,7 @@
       do j=1,ntrg
         write(2,730) 'tgarde',j,tgarde(j)
       end do
+      write(2,720) 'targetResolution',target_res
       write(2,'(a)') '$end'
       close(2)
 !======================================================================

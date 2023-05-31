@@ -1,4 +1,4 @@
-!  version : 05.02.99 13:35
+G!  version : 05.02.99 13:35
 !
       integer nnstr,nmstr,nsgmx,nrgnx,ntrgx,ngpr,ngpz,nxptm
       parameter (nsgmx=6, nrgnx=6, ntrgx=4, nxptm=2)
@@ -7,7 +7,8 @@
      &  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg, &
      &  nstr,lstr(nnstr),nclstr, &
      &  nr,nz, &
-     &  lm_cnfg
+     &  lm_cnfg, &
+     &  carre_mode, grid_ext_mode, equ_ext_mode
       logical ldgv2
       real(Single) :: lm_pntrt,lm_grcln
       real(rKind) :: relax,pasmin,rlcept,pntrat, &
@@ -16,16 +17,18 @@
      &  xstr(nmstr),ystr(nmstr),rbtor, &
      &  xptcntr(3,nxptm),xlpcntr(3),xpttol
       real(rKind) :: pfm(ngpr,ngpz),rgr(ngpr),zgr(ngpz)
+      real(rKind) :: target_res
       common/fcrcom/pfm,rgr,zgr, &
      &  relax,pasmin,rlcept,pntrat, &
      &  deltp1,deltr1,deltpn,deltrn,tgarde, &
      &  xstr,ystr,rbtor, &
      &  xptcntr,xlpcntr,xpttol, &
      &  lm_pntrt,lm_grcln, &
+     &  target_res, &
      &  repart,nrelax,nxpt, &
      &  nsgm,nptseg,nrgn,npr,ntrg, &
      &  nstr,lstr,nclstr,nr,nz, &
-     &  lm_cnfg, &
+     &  lm_cnfg, carre_mode, grid_ext_mode, equ_ext_mode, &
      &  ldgv2
 !
 !*** nnstr : maximum number of structures to be imported from dg
