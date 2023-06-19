@@ -8,7 +8,7 @@
       use KindDefinitions
       implicit none
 #include <FCRCOM.F>
-      integer(Short) :: i, j
+      integer(Short) :: i, j, k, l
       logical ex,uex
       real(rKind) u, dpi
       real(rKind) tgtgrd(4)
@@ -125,6 +125,7 @@
         ex=.true.
         write (*,*) 'fcrprp: too few closed structures, nclstr=',nclstr
       end if
+      lclstr(1:nclstr) = .true.
 !
       if(carre_mode.lt.0.or.carre_mode.gt.2)then
         ex=.true.
@@ -207,5 +208,30 @@
         tgarde(3)=tgtgrd(4)
         tgarde(4)=tgtgrd(1)
       end if
+
+
+!
+!*** For Carre2 extended grids modes, construct the polygons of the
+!*** real vessel wall
+!
+      if (carre_mode.eq.2) then
+        ! construct polygons out of the vessel segments
+        call construct_vessel_polygons
+
+        ! add to the list of structures
+        k = sum(lstr(1:nstr))
+        l = 0
+        do i=1,nstrv
+          do j=1,lstrv(i)
+            l = l + 1_Short
+            xstr(k+l) = xstrv(l)
+            ystr(k+l) = ystrv(l)
+          end do
+          lstr(nstr+i) = lstrv(i)
+          lclstr(nstr+i) = lclstrv(i)
+        end do
+
+      endif
+
 !======================================================================
       end

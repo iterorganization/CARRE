@@ -1,21 +1,24 @@
-G!  version : 05.02.99 13:35
+!  version : 05.02.99 13:35
 !
       integer nnstr,nmstr,nsgmx,nrgnx,ntrgx,ngpr,ngpz,nxptm
       parameter (nsgmx=6, nrgnx=6, ntrgx=4, nxptm=2)
       parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=1000)
       integer(Short) :: repart,nrelax,nxpt, &
      &  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg, &
-     &  nstr,lstr(nnstr),nclstr, &
+     &  nstr,nstrv,lstr(nnstr),lstrv(nnstr),nclstr, &
      &  nr,nz, &
      &  lm_cnfg, &
-     &  carre_mode, grid_ext_mode, equ_ext_mode
+     &  carre_mode, grid_ext_mode, equ_ext_mode, &
+     &  vess_elm(nmstr), nvess, npp, fclbl(nmstr)
       logical ldgv2
+      logical lclstr(nnstr), lclstrv(nnstr)
       real(Single) :: lm_pntrt,lm_grcln
       real(rKind) :: relax,pasmin,rlcept,pntrat, &
      &  deltp1(nsgmx),deltr1(nrgnx), &
      &  deltpn(nsgmx),deltrn(nrgnx),tgarde(ntrgx), &
      &  xstr(nmstr),ystr(nmstr),rbtor, &
-     &  xptcntr(3,nxptm),xlpcntr(3),xpttol
+     &  xptcntr(3,nxptm),xlpcntr(3),xpttol, &
+     &  p1(3,nmstr), p2(3,nmstr), xstrv(nmstr), ystrv(nmstr)
       real(rKind) :: pfm(ngpr,ngpz),rgr(ngpr),zgr(ngpz)
       real(rKind) :: target_res
       common/fcrcom/pfm,rgr,zgr, &
@@ -24,12 +27,13 @@ G!  version : 05.02.99 13:35
      &  xstr,ystr,rbtor, &
      &  xptcntr,xlpcntr,xpttol, &
      &  lm_pntrt,lm_grcln, &
-     &  target_res, &
+     &  target_res, p1, p2, xstrv, ystrv, &
      &  repart,nrelax,nxpt, &
      &  nsgm,nptseg,nrgn,npr,ntrg, &
-     &  nstr,lstr,nclstr,nr,nz, &
+     &  nstr,nstrv,lstr,lstrv,nclstr,nr,nz, &
      &  lm_cnfg, carre_mode, grid_ext_mode, equ_ext_mode, &
-     &  ldgv2
+     &  vess_elm, nvess, npp, fclbl, &
+     &  ldgv2, lclstr, lclstrv
 !
 !*** nnstr : maximum number of structures to be imported from dg
 !*** nmstr : maximum number of nodes in all the structures
@@ -48,6 +52,7 @@ G!  version : 05.02.99 13:35
 !*** ntrg  : number of targets
 !*** tgarde: guard length in front of targets
 !*** nstr  : number of the structures imported from dg
+!*** nstrv : number of additional vessel structures to be created/written for carre2
 !*** lstr  : array containing their lengths
 !*** nclstr: number of closed structures (they come first)
 !*** xstr,

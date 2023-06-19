@@ -28,6 +28,11 @@
       write(2,700) 'carreMode',carre_mode
       write(2,700) 'gridExtensionMode',grid_ext_mode
       write(2,700) 'equExtensionMode',equ_ext_mode
+      if (nstrv.gt.0) then
+        ! If vessel structures are present, the first nstr
+        ! structures are assumed to be virtual ones
+        write(2,700) 'nVirtualStructs', nstr
+      endif
       do i=1,niscl
         write(2,700) chiprm(i),iprmeq(i)
       end do

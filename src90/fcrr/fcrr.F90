@@ -60,6 +60,10 @@
       promp(2) = repeat(' ',8)
       fixkey=.false.
 !
+!*** Set some defaults
+!
+      call fcrdef
+!
 !*** Read the data
 !
       open(1,file=chtrg)
@@ -137,7 +141,7 @@ contains
         write(cpo % limiter_unit(j) % name(1),'(a,i4)') 'Structure ', j
         allocate( cpo % limiter_unit( j ) % closed(1) )
 
-        if(j.le.nclstr) then
+        if(lclstr(j)) then
             ! Closed structure
             cpo % limiter_unit( j ) % closed(1) = 'y'
         else

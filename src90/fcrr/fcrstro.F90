@@ -14,10 +14,10 @@
 !
       open(2,file=chcstr)
       rewind(2)
-      write(2,*) nstr
+      write(2,*) nstr + nstrv
       write(2,'(a)') '$structures'
       k=0
-      do j=1,nstr
+      do j=1,nstr + nstrv
       write(2,'(a,i4)') 'Structure ',j
         if(j.eq.1) then
 !*** This is for structures in "Sonnet" format:
@@ -30,7 +30,7 @@
           end do
         end if
         l=lstr(j)
- 10     if(j.le.nclstr) then
+ 10     if(lclstr(j)) then
           write(2,*) l+1
         else
           write(2,*) -l
@@ -38,7 +38,7 @@
         do i=1,l
           write(2,*) xstr(k+i),ystr(k+i)
         end do
-        if(j.le.nclstr) then
+        if(lclstr(j)) then
           write(2,*) xstr(k+1),ystr(k+1)
         end if
         k=k+lstr(j)

@@ -11,9 +11,9 @@
       character*(8) nam
 !
       integer nnms
-      parameter (nnms=11)
+      parameter (nnms=15)
       integer(Short) :: i, j, lutrg
-      real(Single) x(3), xarray(3,nxptm), rdummy
+      real(Single) x(3), xarray(3,nxptm), rdummy, rarray(3,nmstr)
       character*8 name, unm(nnms)
       logical carre_streql
       external carre_streql, rearre, resimi, resime, skipit
@@ -22,7 +22,7 @@
       data unm / &
      &    'xptcntr ','xlpcntr ','trg_spcf','tgtgrd  ','lm_cnfg ', &
      &    'lm_pntrt','lm_grcln','crr_mode','grd_mode','equ_mode', &
-     &    'trgt_res'/
+     &    'trgt_res','vess_elm','p1      ','p2      ','fclbl   '/
       data lutrg / 0 /
 !======================================================================
 !
@@ -37,7 +37,7 @@
         call rearre(xarray,3*nxptm,i)
         nxpt=0
         if(i.lt.2) then
-          write(*,*) '*** fcrtrn: too few values for xptcntr'
+          write(*,*) '*** fcrdgi: too few values for xptcntr'
           xptcntr(1,1)=-1.0_rKind
         else
          nxpt=max(i/3_Short,1_Short)
@@ -51,7 +51,7 @@
       case (2)
         call rearre(x,3,i)
         if(i.lt.2) then
-          write(*,*) '*** fcrtrn: too few values for xlpcntr'
+          write(*,*) '*** fcrdgi: too few values for xlpcntr'
           xlpcntr(1)=-1.0_rKind
         else
           xlpcntr(1)=0.001_rKind*real(x(1),rKind)
@@ -94,6 +94,37 @@
 !***  trgt_res
         call resime(rdummy)
         target_res = real(rdummy,rKind)
+      case (12)
+!***  vess_elm
+        call rearri(vess_elm,nmstr,i)
+        nvess = i
+      case (13)
+!***  p1
+        call rearre(rarray,3*nmstr,i)
+        npp=max(i/3_Short,1_Short)
+        do j=1,npp
+          do i=1,3
+            p1(i,j)=0.001_rKind*real(rarray(i,j),rKind)
+          end do
+        end do
+      case (14)
+!***  p2
+        call rearre(rarray,3*nmstr,i)
+        j=max(i/3_Short,1_Short)
+        if (j.ne.npp) then
+          write(*,*) '*** fcrdgi: inconsistent p1 and p2'
+          stop ' ==> Corrupted DG output files?'
+        endif
+        do j=1,npp
+          do i=1,3
+            p2(i,j)=0.001_rKind*real(rarray(i,j),rKind)
+          end do
+        end do
+      case (15)
+!***  fclbl
+        call rearri(fclbl,nmstr,i)
+        write (*,*) 'fclbl = ', fclbl
+        write (*,*) '    i = ', i
       case default
         call skipit
       end select
