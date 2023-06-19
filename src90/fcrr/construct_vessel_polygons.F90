@@ -46,7 +46,7 @@
         write (*,*) 'Warning: possibly inconsistent fclbl definition in DG model'
         stop
       elseif (fclblmin.eq.0.and.fclblmax.eq.0) then
-        write (*,*) 'All vessel elements have fclbl = 0. Proceeding with single polygon, resetting label to 1.'
+        write (*,*) 'All vessel elements have fclbl = 0. Labels will be automatically assigned to individual polygon pieces.'
       end if
       allocate(fclbls(fclblmax-fclblmin+1))
       fclbls = [(i, i = fclblmin, fclblmax)]
