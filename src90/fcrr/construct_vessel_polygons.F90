@@ -5,12 +5,15 @@
       use KindDefinitions
       implicit none
 #include <FCRCOM.F>
-      integer(Short) :: i, j, k, l, ipt, npts, npth, nptt
+      integer(Short) :: i, j, k, l, ipt, npts, npth, nptt, ilbl
+      integer(Short) :: fclblmin, fclblmax
+      integer(Short), allocatable :: fclbls(:)
       real(rKind) :: xsrt, ysrt, xend, yend
       real(rKind) :: xhead(nmstr), yhead(nmstr), xtail(nmstr), ytail(nmstr)
       logical lfound, ldir, lused(nvess)
       logical points_match
       external points_match
+      intrinsic min, max
 !======================================================================
 
       ! init
@@ -27,19 +30,56 @@
         return
       end if
 
+      ! check which values of fclbl are present
+      fclblmin = 1e5
+      fclblmax = 0
+      do i = 1, nvess
+        fclblmin = min(fclbl(vess_elm(i)),fclblmin)
+        fclblmax = max(fclbl(vess_elm(i)),fclblmax)
+        if (fclbl(vess_elm(i)).eq.0) then
+          write (*,*) 'Warning: element ', vess_elm(i), ' has fclbl 0.'
+        endif
+      end do
+
+      ! consistency checks
+      if (fclblmin.ne.1.and..not.(fclblmin.eq.0.and.fclblmax.eq.0)) then
+        write (*,*) 'Warning: possibly inconsistent fclbl definition in DG model'
+        stop
+      elseif (fclblmin.eq.0.and.fclblmax.eq.0) then
+        write (*,*) 'All vessel elements have fclbl = 0. Proceeding with single polygon, resetting label to 1.'
+      end if
+      allocate(fclbls(fclblmax-fclblmin+1))
+      fclbls = [(i, i = fclblmin, fclblmax)]
+
+!      write (*,*) 'construct_vessel_polygons: fclbl'
+!      write (*,*) 'min and max label: ', fclblmin, fclblmax
+!      do i = 1,nvess
+!        write (*,*) 'segment i =',i,', label ',fclbl(vess_elm(i))
+!      end do
+
+      
+
       ! sort elements into polygons
       lused = .false.
       npts  = 0
+      ilbl  = 0
       do while (.not.all(lused))
 
         nstrv = nstrv + 1
+        ilbl  = ilbl + 1
 
         ! find suitable unused element to start search
         lfound = .false.
         i = 0
         do while (.not.lfound)
           i = i + 1
-          if (.not.lused(i)) lfound = .true.
+          if (.not.lused(i).and.fclbl(vess_elm(i)).eq.fclbls(ilbl)) lfound = .true.
+          if (i.gt.nvess) then
+            write (*,*) 'Found no elements with fclbl = ',fclbls(ilbl), '.'
+            write (*,*) 'Min fclbl = ', fclblmin
+            write (*,*) 'Max fclbl = ', fclblmax
+            stop ' ==> Check DG model'
+          end if
         end do
  
         ! set the initial element
@@ -66,7 +106,7 @@
                ! no further point found in this direction
                ! switch to other side
                ldir = .false.
-            elseif (.not.lused(i)) then
+            elseif (.not.lused(i).and.fclbl(vess_elm(i)).eq.fclbls(ilbl)) then
               if (points_match (xend, yend, p1(1,vess_elm(i)), p1(2,vess_elm(i)))) then
                 lfound   = .true.
                 lused(i) = .true.
@@ -100,7 +140,7 @@
                ! no further point found in this direction
                ! terminate search for this polygon
                ldir = .true.
-            elseif (.not.lused(i)) then
+            elseif (.not.lused(i).and.fclbl(vess_elm(i)).eq.fclbls(ilbl)) then
               if (points_match (xsrt, ysrt, p1(1,vess_elm(i)), p1(2,vess_elm(i)))) then
                 lfound   = .true.
                 lused(i) = .true.
@@ -145,6 +185,19 @@
         npts = npts + nptt + npth
 
       end do
+
+      deallocate(fclbls)
+
+      ! Some consistency checks
+      ! To be added: check that complete vessel is closed in case of multiple (open) polygons
+      if (fclblmin.eq.0.and.fclblmax.eq.0) then
+        if (nstrv.ne.1) then
+          write (*,*) 'Problem with definition vessel elements.'
+        elseif (.not.lclstrv(1)) then
+          write (*,*) 'Vessel polygon not closed'
+        end if
+      end if
+       
 
       write (*,*) 'construct_vessel_polygons -- built ', nstrv, ' vessel polygons'
 

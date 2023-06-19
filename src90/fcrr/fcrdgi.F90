@@ -123,8 +123,6 @@
       case (15)
 !***  fclbl
         call rearri(fclbl,nmstr,i)
-        write (*,*) 'fclbl = ', fclbl
-        write (*,*) '    i = ', i
       case default
         call skipit
       end select
