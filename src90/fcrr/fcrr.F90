@@ -15,14 +15,14 @@
       implicit none
 #include <impcon.inc>
       logical ex
-      character*14 chtrg,chstr,chequ,chaux,chdgo, & 
-     &             chcfld,chcequ,chcstr,chccrr,chcslp
+      character*15 chtrg,chstr,chequ,chaux,chdgo, & 
+     &             chcfld,chcequ,chcstr,chccrr,chcslp,chcvss
       data chtrg ,  chstr ,  chequ ,  chaux , chdgo  / & 
      &   'dg.trg','dg.str','dg.equ','dg.aux','dg.dgo'/, & 
      &     chcfld    ,  chcequ   ,     chcstr    ,  chccrr   / & 
      &   'btor.dat'  ,'rzpsi.dat','structure.dat','carre.dat'/, & 
-     &      chcslp   / & 
-     &   'selptx.inf'/
+     &      chcslp   , chcvss    / & 
+     &   'selptx.inf','vessel.dat'/
       external fcraxn,fcrtrn,fcrdgi
       external fcrchktp,fcrstri,fcrstro,fcrcrro,fcrfldi,fcrequo, &
      &         fcrfldo,fcrslpo,fcrprp
@@ -93,7 +93,7 @@
 !*** ... and produce the files to be read by carre
 !
       call fcrequo(chcequ)
-      call fcrstro(chcstr)
+      call fcrstro(chcstr,chcvss)
       call fcrcrro(chccrr)
       call fcrfldo(chcfld)
       call fcrslpo(chcslp)

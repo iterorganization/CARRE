@@ -33,17 +33,20 @@
       ! check which values of fclbl are present
       fclblmin = 1e5
       fclblmax = 0
+      j = 0
       do i = 1, nvess
         fclblmin = min(fclbl(vess_elm(i)),fclblmin)
         fclblmax = max(fclbl(vess_elm(i)),fclblmax)
-        if (fclbl(vess_elm(i)).eq.0) then
-          write (*,*) 'Warning: element ', vess_elm(i), ' has fclbl 0.'
-        endif
       end do
 
       ! consistency checks
       if (fclblmin.ne.1.and..not.(fclblmin.eq.0.and.fclblmax.eq.0)) then
         write (*,*) 'Warning: possibly inconsistent fclbl definition in DG model'
+        do i = 1, nvess
+          if (fclbl(vess_elm(i)).eq.0) then
+            write (*,*) 'Element ', vess_elm(i), ' has fclbl 0.'
+          endif
+        end do
         stop
       elseif (fclblmin.eq.0.and.fclblmax.eq.0) then
         write (*,*) 'All vessel elements have fclbl = 0. Labels will be automatically assigned to individual polygon pieces.'
@@ -191,11 +194,11 @@
       ! Some consistency checks
       ! To be added: check that complete vessel is closed in case of multiple (open) polygons
       if (fclblmin.eq.0.and.fclblmax.eq.0) then
-        if (nstrv.ne.1) then
-          write (*,*) 'Problem with definition vessel elements.'
-        elseif (.not.lclstrv(1)) then
-          write (*,*) 'Vessel polygon not closed'
-        end if
+        !if (nstrv.ne.1) then
+        !  write (*,*) 'Problem with definition vessel elements.'
+        !elseif (.not.lclstrv(1)) then
+        !  write (*,*) 'Vessel polygon not closed'
+        !end if
       end if
        
 

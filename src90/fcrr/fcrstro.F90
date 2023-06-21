@@ -1,4 +1,4 @@
-      subroutine fcrstro(chcstr)
+      subroutine fcrstro(chcstr,chcvss)
 !
 !  version : 05.02.99 13:37
 !
@@ -7,7 +7,7 @@
 !======================================================================
       use KindDefinitions
       implicit none
-      character chcstr*(*)
+      character chcstr*(*), chcvss*(*)
 #include <FCRCOM.F>
       integer i,j,k,l
 !======================================================================
@@ -45,5 +45,30 @@
       end do
       write(2,'(a)') '$end'
       close(2)
+      if (nstrv.gt.0) then
+      open(2,file=chcvss)
+      rewind(2)
+      write(2,*) nstrv
+      write(2,'(a)') '$structures'
+      k=sum(lstr(1:nstr))
+      do j=nstr+1,nstr+nstrv
+        write(2,'(a,i4)') 'Structure ',j-nstr
+        l=lstr(j)
+        if(lclstr(j)) then
+          write(2,*) l+1
+        else
+          write(2,*) -l
+        end if
+        do i=1,l
+          write(2,*) xstr(k+i),ystr(k+i)
+        end do
+        if(lclstr(j)) then
+          write(2,*) xstr(k+1),ystr(k+1)
+        end if
+        k=k+lstr(j)
+      end do
+      write(2,'(a)') '$end'
+      close(2)
+      endif
 !======================================================================
       end
