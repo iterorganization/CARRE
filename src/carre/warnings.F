@@ -7,6 +7,9 @@ C Calculation of the distance separatrix-outer border limit
 C in the SOL-region and output on the file 'warnings.dat'
 C for the use in the automatic grid generator AGG
 c****************************************************************
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
 #include <CARRETYPES.F>
 #include <CARREDIM.F>
       REAL(KIND=R8)

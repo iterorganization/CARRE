@@ -11,6 +11,9 @@ c  (ptx,pty), the coordinates of the X-point, to be the coordinates of
 c  that point. Finally, it parametrises the separatrix (the flux surface
 c  which goes through (ptx,pty) in curve nivx(*,1,1),nivy(*,1,1).
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 
 cank-970707: dimensions from the file

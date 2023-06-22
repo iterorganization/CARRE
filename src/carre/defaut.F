@@ -3,6 +3,9 @@ c
 c  version : 22.06.98 14:45
 c
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 c..  Definition de certaines variables par defaut
 c

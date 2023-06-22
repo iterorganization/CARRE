@@ -15,7 +15,9 @@ cdps - Translation:
 * final level line which goes from one target to another without 
 * hitting a structure.
 c======================================================================
-
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 
 cank-970707: dimensions from the file

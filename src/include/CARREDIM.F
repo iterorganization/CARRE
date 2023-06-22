@@ -6,7 +6,9 @@ c
      .           npxmx=4   , strumx=60  ,  nivmx=8  , nbdmx=8  ,
      .           gradmx=100, nregmx=6)
 #ifdef SOLPS_CPP
+#ifndef DIMENSIONS_MODULE
 #include "DIMENSIONS.F"
+#endif
       parameter (npmamx=DEF_NXD, nrmamx=DEF_NYD)
 #else
       parameter (npmamx=500, nrmamx=200)

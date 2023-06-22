@@ -15,6 +15,9 @@ c*** Starting from a separatrix strike-point, the routine sets the
 c*** direction of the search along the target and then calls MARCHE to
 c*** find and parametrise the limiting level line.
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 
 cank-970707: dimensions from the file

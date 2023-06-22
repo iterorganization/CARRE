@@ -6,7 +6,9 @@ c======================================================================
 *..  Cette sous-routine calcule en chaque point ou psi est defini, la
 *  derivee selon x et la derivee selon y.
 c======================================================================
-
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 
 cank-970707: dimensions from the file

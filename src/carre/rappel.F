@@ -5,6 +5,9 @@ c
 c  version : 07.07.97 18:37
 c
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 
 *..  Cette sous-routine imprime a l'ecran un tableau contenant tous les

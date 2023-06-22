@@ -4,6 +4,9 @@ c
 c  version : 07.02.99 22:05
 c
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 
 *..  Cette sous-routine imprime la liste des points ou le gradient

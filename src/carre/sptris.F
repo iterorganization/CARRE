@@ -15,7 +15,9 @@ c*** Finally, a subroutine ORDDEF is called to order the targets
 c*** according to the CARRE conventions, i.e. from right to left, from 
 c*** top to bottom.
 c=======================================================================
-
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 cank-970707: dimensions from the file
 *  dimensions

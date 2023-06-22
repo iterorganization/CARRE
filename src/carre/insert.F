@@ -3,6 +3,9 @@ c
 c  version: 17.11.99 23:56
 c
 c=======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 #include <CARRETYPES.F>
 #include <CARREDIM.F>

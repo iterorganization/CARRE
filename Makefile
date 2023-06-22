@@ -3,7 +3,7 @@
 PROG      = carre.exe
 PROG_TRA  = traduit.exe
 PROG_FCRR = fcrr.exe
-
+B2SRC     = ${SOLPSTOP}/modules/B2.5/src
 # Test whether necessary environment variables are defined; if not, exit
 ifndef HOST_NAME
 $(error HOST_NAME not defined)
@@ -101,7 +101,11 @@ ALLTARGETS = ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
 ifdef SOLPS_CPP
 ALLTARGETS += ${OBJDIR}/${PROG_FCRR}
 DEFINES += -DSOLPS_CPP
+ifeq ($(shell [ -s ${B2SRC}/modules/b2mod_dimensions.F ] && echo yes || echo no ),yes)
+DEFINES += -DDIMENSIONS_MODULE
+else
 INCLUDE += -I${SOLPSTOP}/modules/B2.5/src/include.local -I${SOLPSTOP}/modules/B2.5/src/include
+endif
 endif
 
 MAINLIST = carre.o tradui.o fcrr.o bidon.o fcrblkd.o
@@ -112,15 +116,6 @@ DEST = $(OBJS:%.o=$(OBJDIR)/%.o)
 GDEST = $(GOBJS:%.o=$(OBJDIR)/%.o)
 EXCLUDELIST = $(MAINLIST:.o=\\.o)
 LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
-
-$(OBJDIR)/%.o : %.F
-	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
-	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
-	case $< in \
-		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
-		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
-	esac; \
-	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
 ifdef LD_NCARG
 ifeq ($(strip ${GLI_HOME}),)
@@ -169,6 +164,28 @@ ${OBJDIR}/libcarre.a: ${DEST}
 ${OBJDIR}/libgcarre.a: ${GDEST}
 	@ar rc $@ ${GDEST}
 	ranlib $@
+
+$(OBJDIR)/%.o : %.F ${OBJDIR}/libb25.a
+	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
+	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	case $< in \
+		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) ${OBJDIR}/libb25.a -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${OBJDIR}/libb25.a -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+	esac; \
+	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+
+${OBJDIR}/libb25.a: ${MAKES} ${OBJDIR}/b2mod_dimensions.${MOD}
+	@ar uvr $@ ${OBJDIR}/b2mod_dimensions.o
+	ranlib $@
+
+# how to make it do this only once?? what if ${B2SRC}/modules/b2mod_dimensions.F does not exist?
+${OBJDIR}/b2mod_dimensions.${MOD}: ${B2SRC}/modules/b2mod_dimensions.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	if [ -s ${B2SRC}/modules/b2mod_dimensions.F ]; then ln -sf ${B2SRC}/modules/b2mod_dimensions.F ${SRCDIR}/b25_links/; fi
+	if [ ! -s ${SRCDIR}/b25_links/b2mod_dimensions.F ]; then touch ${SRCDIR}/b25_links/b2mod_dimensions.F; fi
+	-${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
+	$(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
+	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
 clean:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ

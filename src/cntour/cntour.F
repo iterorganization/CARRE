@@ -3,6 +3,9 @@ c
 c  version : 07.07.97 20:32
 c
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 c  lignes de niveau pour les deux fonctions f1=0 et f2=0
 c

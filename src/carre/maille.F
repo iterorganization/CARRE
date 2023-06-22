@@ -18,6 +18,9 @@ c*** This subroutine makes the orthogonal curvilinear grid for
 c*** various possible magnetic configurations (single null,
 c*** connected double null, disconnected double null, or limiter)
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 
 cank-970707: dimensions from the file

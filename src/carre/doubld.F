@@ -13,6 +13,9 @@ c*** the point on the loop of the inner separatrix where it should be
 c*** split into two separatrices (thus forcing a mesh point to be at
 c*** the outer X-point)
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 
 c======================================================================

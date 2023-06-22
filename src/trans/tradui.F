@@ -8,6 +8,9 @@ cank -- The comments are translated from French, sorry for errors!
 c*** This program translates the grid created with carre into other
 c*** grid formats
 c======================================================================
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 
 cank-970707: dimensions from the file

@@ -17,6 +17,7 @@ c*** flux surfaces.  It finds the localisation of the X-points,
 c*** parametrises the separatrices passing through them, and traces
 c*** them together with the real structures.
 c======================================================================
+      USE B2MOD_DIMENSIONS ! IGNORE
       IMPLICIT NONE
 
 c  a modifier pour generaliser la geometrie:

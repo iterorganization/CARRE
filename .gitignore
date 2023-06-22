@@ -23,6 +23,7 @@ unicos*/
 bin/
 builds/
 lib/
+b25_links/
 
 # Carre temporary files
 

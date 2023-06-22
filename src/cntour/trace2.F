@@ -5,6 +5,9 @@ c======================================================================
 c
 c  version : 07.07.97 20:15
 c
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 
 cank-970707: dimensions from the file

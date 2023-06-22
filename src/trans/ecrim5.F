@@ -1,5 +1,8 @@
 c=======================================================================
       subroutine ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmax,nymax)
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 #include <CARRETYPES.F>
 c  cette routine ecrit la maille sous format DIVIMP. elle est identique
@@ -170,6 +173,9 @@ c
 c
 
       subroutine get_psimin_carre(psimin_carre)
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 #include <CARRETYPES.F>
 #include <CARREDIM.F>

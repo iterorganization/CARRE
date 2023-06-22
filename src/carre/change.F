@@ -6,6 +6,9 @@ c
 c  version : 07.07.97 18:38
 c
 ************************************************************************
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       IMPLICIT NONE
 #include <CARRETYPES.F>
 
