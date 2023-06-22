@@ -103,6 +103,7 @@ ALLTARGETS += ${OBJDIR}/${PROG_FCRR}
 DEFINES += -DSOLPS_CPP
 ifeq ($(shell [ -s ${B2SRC}/modules/b2mod_dimensions.F ] && echo yes || echo no ),yes)
 DEFINES += -DDIMENSIONS_MODULE
+LIBB2 = ${OBJDIR}/libb25.a
 else
 INCLUDE += -I${SOLPSTOP}/modules/B2.5/src/include.local -I${SOLPSTOP}/modules/B2.5/src/include
 endif
@@ -165,15 +166,16 @@ ${OBJDIR}/libgcarre.a: ${GDEST}
 	@ar rc $@ ${GDEST}
 	ranlib $@
 
-$(OBJDIR)/%.o : %.F ${OBJDIR}/libb25.a
+$(OBJDIR)/%.o : %.F ${LIBB2}
 	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
-		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) ${OBJDIR}/libb25.a -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
-		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${OBJDIR}/libb25.a -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) ${LIBB2} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${LIBB2} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
+ifdef SOLPS_CPP
 ${OBJDIR}/libb25.a: ${MAKES} ${OBJDIR}/b2mod_dimensions.${MOD}
 	@ar uvr $@ ${OBJDIR}/b2mod_dimensions.o
 	ranlib $@
@@ -186,6 +188,7 @@ ${OBJDIR}/b2mod_dimensions.${MOD}: ${B2SRC}/modules/b2mod_dimensions.F
 	-${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+endif
 
 clean:
 	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
