@@ -82,7 +82,7 @@
         call resime(rdummy)
         lm_grcln = real(rdummy,rKind)
       case (8)
-!***  car_mode
+!***  crr_mode
         call resimi(carre_mode)
       case (9)
 !***  grd_mode
