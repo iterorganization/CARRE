@@ -36,7 +36,7 @@ c
         ex=.true.
         write (*,*) 'fcrprp: wrong value of repart',repart
       end if
-      if(pntrat.le.0.) then
+      if(pntrat.le.0.0_R8) then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of pntrat',pntrat
       end if
