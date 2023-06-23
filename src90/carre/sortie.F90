@@ -155,6 +155,15 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
                  end do
              end do
 
+             ! write info on degenerate faces
+             WRITE(10,"(a)") "'degenerate faces'"
+             DO j=1, grid%nr(ireg) - 1
+                 do i=1,grid%np1(ireg) - 1
+                     WRITE(10,"(4i4)") grid%cellFaceDegen(:,i,j,ireg)
+                 end do
+             end do
+
+
          end DO
 
          if(sellan(1:8).eq.'francais') then
