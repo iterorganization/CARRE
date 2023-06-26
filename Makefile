@@ -4,6 +4,7 @@ PROG      = carre.exe
 PROG_TRA  = traduit.exe
 PROG_FCRR = fcrr.exe
 B2SRC     = ${SOLPSTOP}/modules/B2.5/src
+MOD       = mod
 # Test whether necessary environment variables are defined; if not, exit
 ifndef HOST_NAME
 $(error HOST_NAME not defined)
@@ -102,8 +103,11 @@ ifdef SOLPS_CPP
 ALLTARGETS += ${OBJDIR}/${PROG_FCRR}
 DEFINES += -DSOLPS_CPP
 ifeq ($(shell [ -s ${B2SRC}/modules/b2mod_dimensions.F ] && echo yes || echo no ),yes)
+DIMSDIR = ${B2SRC}/modules
+ifeq ($(shell [ -s ${B2SRC}/modules.local/b2mod_dimensions.F ] && echo yes || echo no ),yes)
+DIMSDIR = ${B2SRC}/modules.local
+endif
 DEFINES += -DDIMENSIONS_MODULE
-LIBB2 = ${OBJDIR}/libb25.a
 else
 INCLUDE += -I${SOLPSTOP}/modules/B2.5/src/include.local -I${SOLPSTOP}/modules/B2.5/src/include
 endif
@@ -166,28 +170,25 @@ ${OBJDIR}/libgcarre.a: ${GDEST}
 	@ar rc $@ ${GDEST}
 	ranlib $@
 
-$(OBJDIR)/%.o : %.F ${LIBB2}
+$(OBJDIR)/%.o : %.F
 	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
-		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) ${LIBB2} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
-		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${LIBB2} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
+		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
-ifdef SOLPS_CPP
-${OBJDIR}/libb25.a: ${MAKES} ${OBJDIR}/b2mod_dimensions.${MOD}
-	@ar uvr $@ ${OBJDIR}/b2mod_dimensions.o
-	ranlib $@
-
-# how to make it do this only once?? what if ${B2SRC}/modules/b2mod_dimensions.F does not exist?
-${OBJDIR}/b2mod_dimensions.${MOD}: ${B2SRC}/modules/b2mod_dimensions.F
+ifeq ($(shell [ -s ${DIMSDIR}/b2mod_dimensions.F ] && echo yes || echo no ),yes)
+ifneq (${MOD},o)
+${OBJDIR}/b2mod_dimensions.${MOD}: ${OBJDIR}/b2mod_dimensions.o
+endif
+MODLIST = ${SRCDIR}/b25_links/*.F
+${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
-	if [ -s ${B2SRC}/modules/b2mod_dimensions.F ]; then ln -sf ${B2SRC}/modules/b2mod_dimensions.F ${SRCDIR}/b25_links/; fi
-	if [ ! -s ${SRCDIR}/b25_links/b2mod_dimensions.F ]; then touch ${SRCDIR}/b25_links/b2mod_dimensions.F; fi
-	-${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
+	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
-	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 endif
 
 clean:
@@ -210,6 +211,19 @@ depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${MAINLIST:.o=.F}
 	sed -e 's|${SRCDIR}/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
 	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
+	@echo '# 1' >> ${OBJDIR}/dependencies.${COMPILER}
+	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
+	@echo '# 2' >> ${OBJDIR}/dependencies.${COMPILER}
+ifneq (${MOD},o)
+	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}
+	@echo '# 3' >> ${OBJDIR}/dependencies.${COMPILER}
+	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
+	@echo '# 4' >> ${OBJDIR}/dependencies.${COMPILER}
+ifeq (${COMPILER},pgf90)
+	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}
+	@echo '# 5' >> ${OBJDIR}/dependencies.${COMPILER}
+endif
+endif
 
 listobj:
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \

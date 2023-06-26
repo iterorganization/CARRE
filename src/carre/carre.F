@@ -18,7 +18,7 @@ c*** parametrises the separatrices passing through them, and traces
 c*** them together with the real structures.
 c======================================================================
 #ifdef DIMENSIONS_MODULE
-      USE B2MOD_DIMENSIONS ! IGNORE
+      USE B2MOD_DIMENSIONS
 #endif
       IMPLICIT NONE
 
