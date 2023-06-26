@@ -111,6 +111,12 @@ FPATH      += :${SRCDIR}/trans:${SRCDIR}/fcrr
 VPATH      += :${SRCDIR}/trans:${SRCDIR}/fcrr
 ALLTARGETS += ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR}
 EXCLUDELIS += tradui.o fcrr.o fcrblkd.o
+ifeq ($(shell [ -s ${B2SRC}/modules/b2mod_dimensions.F ] && echo yes || echo no ),yes)
+DIMSDIR = ${B2SRC}/modules
+ifeq ($(shell [ -s ${B2SRC}/modules.local/b2mod_dimensions.F ] && echo yes || echo no ),yes)
+DIMSDIR = ${B2SRC}/modules.local
+endif
+endif
 endif
 
 MODLIST = ${SRCDIR}/carre_mod/*.F90 ${SRCDIR}/carre_shared/*.F90 ${SRCDIR}/usol/*.f90 ${SRCDIR}/itm_shared/*.f90 ${SRCDIR}/b2_shared_itm/*.F90
@@ -347,9 +353,9 @@ ${OBJDIR}/b2mod_grid_mapping.${MOD}: ${OBJDIR}/b2mod_grid_mapping.o
 ${OBJDIR}/b2mod_indirect.${MOD}: ${OBJDIR}/b2mod_indirect.o
 endif
 
-${OBJDIR}/b2mod_dimensions.${MOD}: ${B2SRC}/modules/b2mod_dimensions.F
+${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
-	ln -sf ${B2SRC}/modules/b2mod_dimensions.F ${SRCDIR}/b25_links/
+	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 
