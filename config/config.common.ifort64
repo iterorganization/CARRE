@@ -15,12 +15,17 @@ COMPILE   = ${FC} -c ${FFLAGS} -module ${OBJDIR}
 
 LDLIBS    = ${LD_MSCL}
 LDFLAGS  += ${LD_NCARG}
-LDEXTRA   = 
+LDEXTRA   =
 ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -le 12; echo $$?),0)
 LDFLAGS  += -i_dynamic
+endif
+
+ifeq (${FC},mpif90)
+INCMOD  = -B
+else
+INCMOD  = -I
 endif
 
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-

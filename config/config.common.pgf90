@@ -19,7 +19,8 @@ LDLIBS    = ${LD_MSCL}
 LDFLAGS   = ${LD_NCARG}
 LDEXTRA   =
 
+INCMOD   = -I
+
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-

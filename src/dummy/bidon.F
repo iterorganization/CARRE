@@ -18,6 +18,9 @@ c
       end
 c=======================================================================
       subroutine cntour(f1,f2,n1,n2,xmin,xmax,ymin,ymax)
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 #include <CARRETYPES.F>
 #include <CARREDIM.F>
@@ -31,6 +34,9 @@ c=======================================================================
       subroutine trace(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot,
      .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
      .        nivtot,nbniv,np1,npr,xmail,ymail,nreg,last)
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 #include <CARRETYPES.F>
 #include <CARREDIM.F>
@@ -51,6 +57,9 @@ c=======================================================================
       subroutine trace2(x1,x2,y1,y2,separx,separy,ptsep,npx,nptot,
      .        nstruc,npstru,xstruc,ystruc,nivx,nivy,
      .        nivtot,nbniv)
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 #include <CARRETYPES.F>
 #include <CARREDIM.F>
@@ -71,6 +80,9 @@ c=======================================================================
      .        pntrat,distxo,xn1,yn1,nn1,
      .        xfin,yfin,fctfin,
      .        psi,nx,ny,x,y)
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
       implicit none
 #include <CARRETYPES.F>
 #include <CARREDIM.F>
