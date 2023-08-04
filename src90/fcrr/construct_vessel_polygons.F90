@@ -23,6 +23,11 @@
       xstrv = 0.0_rKind
       ystrv = 0.0_rKind
 
+      xhead = 0.0_rKind
+      yhead = 0.0_rKind
+      xtail = 0.0_rKind
+      ytail = 0.0_rKind
+
       ! check for presence at least one vessel segment
       if (nvess.le.0) then
         ! no vessel elements present - nothing to be done
@@ -95,7 +100,7 @@
         xhead(1) = xsrt
         yhead(1) = ysrt
         xtail(1) = xend
-        xtail(1) = xend
+        ytail(1) = yend
 
         ! first pass: find end point of the polygon
         ldir = .true.
@@ -203,9 +208,6 @@
        
 
       write (*,*) 'construct_vessel_polygons -- built ', nstrv, ' vessel polygons'
-
-
-
 
 !======================================================================
       end 
