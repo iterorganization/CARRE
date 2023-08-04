@@ -11,7 +11,7 @@
       character*(8) nam
 !
       integer nnms
-      parameter (nnms=15)
+      parameter (nnms=16)
       integer(Short) :: i, j, lutrg
       real(Single) x(3), xarray(3,nxptm), rdummy, rarray(3,nmstr)
       character*8 name, unm(nnms)
@@ -22,7 +22,8 @@
       data unm / &
      &    'xptcntr ','xlpcntr ','trg_spcf','tgtgrd  ','lm_cnfg ', &
      &    'lm_pntrt','lm_grcln','crr_mode','grd_mode','equ_mode', &
-     &    'trgt_res','vess_elm','p1      ','p2      ','fclbl   '/
+     &    'trgt_res','vess_elm','p1      ','p2      ','fclbl   ', &
+     &    'pasmin  ' /
       data lutrg / 0 /
 !======================================================================
 !
@@ -123,6 +124,10 @@
       case (15)
 !***  fclbl
         call rearri(fclbl,nmstr,i)
+      case (16)
+!***  pasmin
+        call resime(rdummy)
+        pasmin = real(rdummy,rKind)
       case default
         call skipit
       end select
