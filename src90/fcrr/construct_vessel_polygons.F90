@@ -76,6 +76,14 @@
         nstrv = nstrv + 1
         ilbl  = ilbl + 1
 
+        if (ilbl .gt. (fclblmax - fclblmin + 1)) then
+          write (*,*) 'Not all vessel elements assigned to a polygon.'
+          write (*,*) 'Check for inconsistent fclbls of the elements.'
+          write (*,*) 'Elements with the same fclbl must form a single'
+          write (*,*) 'open or closed polygon (no gaps).'
+          stop ' ==> Check DG model'
+        endif
+
         ! find suitable unused element to start search
         lfound = .false.
         i = 0
