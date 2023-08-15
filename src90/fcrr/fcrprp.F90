@@ -12,6 +12,7 @@
       logical ex,uex
       real(rKind) u, dpi
       real(rKind) tgtgrd(4)
+      external construct_vessel_polygons
       parameter (dpi=2.*3.141592653589793238462643383280)
 !======================================================================
 !*** (lower single-null configuration)

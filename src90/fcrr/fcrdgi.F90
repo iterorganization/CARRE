@@ -16,7 +16,7 @@
       real(Single) x(3), xarray(3,nxptm), rdummy, rarray(3,nmstr)
       character*8 name, unm(nnms)
       logical carre_streql
-      external carre_streql, rearre, resimi, resime, skipit
+      external carre_streql, locase, rearre, rearri, resimi, resime, skipit
 !
 !*** List of the valid input keywords
       data unm / &

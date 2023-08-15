@@ -23,7 +23,7 @@
      &   'btor.dat'  ,'rzpsi.dat','structure.dat','carre.dat'/, & 
      &      chcslp   , chcvss    / & 
      &   'selptx.inf','vessel.dat'/
-      external fcraxn,fcrtrn,fcrdgi
+      external fcraxn,fcrtrn,fcrdgi,fcrdef
       external fcrchktp,fcrstri,fcrstro,fcrcrro,fcrfldi,fcrequo, &
      &         fcrfldo,fcrslpo,fcrprp
       external import
