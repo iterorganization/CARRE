@@ -8,9 +8,13 @@
       integer n
 #include <FCRCOM.F>
       parameter(n=nxptm*3)
-      data repart , nrelax  ,  relax, pasmin, rlcept,  tgarde / & 
-     &       2    ,  5000   ,   0.2 ,  0.001,  1.e-6, ntrgx*0./
-      data xptcntr,  xlpcntr, xpttol, nclstr,  nrgn , nsgm , ntrg / & 
-     &      n*-1. ,   3*-1. ,   0.1 ,   -1  ,    0  ,  0  ,   0  /
+      data repart , nrelax  / &
+     &       2    ,  5000   /
+      data   relax,      pasmin,      rlcept,  tgarde / &
+     &   0.2_rKind, 0.001_rKind, 1.e-6_rKind, ntrgx*0._rKind /
+      data xptcntr,     xlpcntr,    xpttol / &
+     & n*-1._rKind, 3*-1._rKind, 0.1_rKind /
+      data nclstr,  nrgn , nsgm , ntrg / &
+     &       -1  ,    0  ,  0  ,   0   /
 !======================================================================
       end

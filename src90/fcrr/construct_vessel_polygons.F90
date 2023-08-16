@@ -5,7 +5,7 @@
       use KindDefinitions
       implicit none
 #include <FCRCOM.F>
-      integer(Short) :: i, j, k, l, ipt, npts, npth, nptt, ilbl
+      integer(Short) :: i, ipt, npts, npth, nptt, ilbl
       integer(Short) :: fclblmin, fclblmax
       integer(Short), allocatable :: fclbls(:)
       real(rKind) :: xsrt, ysrt, xend, yend
@@ -38,7 +38,6 @@
       ! check which values of fclbl are present
       fclblmin = 1e5
       fclblmax = 0
-      j = 0
       do i = 1, nvess
         fclblmin = min(fclbl(vess_elm(i)),fclblmin)
         fclblmax = max(fclbl(vess_elm(i)),fclblmax)
@@ -64,8 +63,6 @@
 !      do i = 1,nvess
 !        write (*,*) 'segment i =',i,', label ',fclbl(vess_elm(i))
 !      end do
-
-      
 
       ! sort elements into polygons
       lused = .false.
