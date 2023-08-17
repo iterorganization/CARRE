@@ -309,7 +309,7 @@ program tradui
       ! assemble the connectivity arrays
       call init_connectivity (nx,ny, &
           & b2cflag(-1:nx,-1:ny,:), &
-          & periodic_bc,nncut,inseltop,inselbot,istyle)
+          & periodic_bc,nncut,ccut,inseltop,inselbot,istyle)
 
       ! compute the region arrays
       call init_region_extended(nx,ny,nncut,ncutmx, &
