@@ -113,8 +113,8 @@
         deltpn(1:i) = real(parray(1:i),rKind)
        end if
       case (7)
-        call rearre(rdummy,1,i)
-        pntrat = real(rdummy(1),rKind)
+       call rearre(rdummy,1,i)
+       pntrat = real(rdummy(1),rKind)
       case (8)
        call resimi(nclstr)
       case default
