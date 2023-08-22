@@ -99,10 +99,12 @@ INCLUDE = -I${SRCDIR}/include
 
 ALLTARGETS = ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
 # We can only build the dg-to-Carre converter fcrr when we have the SOLPS environment available
+USE_DIMENSIONS = 0
 ifdef SOLPS_CPP
 ALLTARGETS += ${OBJDIR}/${PROG_FCRR}
 DEFINES += -DSOLPS_CPP
 ifeq ($(shell [ -s ${B2SRC}/modules/b2mod_dimensions.F ] && echo yes || echo no ),yes)
+USE_DIMENSIONS = 1
 DIMSDIR = ${B2SRC}/modules
 ifeq ($(shell [ -s ${B2SRC}/modules.local/b2mod_dimensions.F ] && echo yes || echo no ),yes)
 DIMSDIR = ${B2SRC}/modules.local
@@ -179,22 +181,33 @@ $(OBJDIR)/%.o : %.F
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
-ifeq ($(shell [ -s ${DIMSDIR}/b2mod_dimensions.F ] && echo yes || echo no ),yes)
-MODLIST = ${SRCDIR}/b25_links/*.F
+ifeq (${USE_DIMENSIONS},1)
 ${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
-	ifneq ($(COMPILER),nag_f90)
-		@if [ -f ${OBJDIR}/b2mod_dimensions.${MOD} ] ; then touch ${OBJDIR}/b2mod_dimensions.${MOD} ; fi
-	endif
+ifneq ($(COMPILER),nag_f90)
+	@if [ -f ${OBJDIR}/b2mod_dimensions.${MOD} ] ; then touch ${OBJDIR}/b2mod_dimensions.${MOD} ; fi
+endif
 ifneq (${MOD},o)
 ${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
+	@if [ -f b2mod_dimensions.${MOD} ]; then /bin/mv b2mod_dimensions.${MOD} ${OBJDIR}; fi
+endif
+else
+${OBJDIR}/b2mod_dimensions.o:
+	@touch ${OBJDIR}/b2mod_dimensions.o
+ifneq ($(COMPILER),nag_f90)
+	@if [ -f ${OBJDIR}/b2mod_dimensions.${MOD} ] ; then touch ${OBJDIR}/b2mod_dimensions.${MOD} ; fi
+endif
+ifneq (${MOD},o)
+${OBJDIR}/b2mod_dimensions.${MOD}:
+	@touch ${OBJDIR}/b2mod_dimensions.o
+	@touch ${OBJDIR}/b2mod_dimensions.${MOD}
 	@if [ -f b2mod_dimensions.${MOD} ]; then /bin/mv b2mod_dimensions.${MOD} ${OBJDIR}; fi
 endif
 endif
@@ -222,16 +235,6 @@ depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${MAINLIST:.o=.F}
 	@echo '# 1' >> ${OBJDIR}/dependencies.${COMPILER}
 	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
 	@echo '# 2' >> ${OBJDIR}/dependencies.${COMPILER}
-ifneq (${MOD},o)
-	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 3' >> ${OBJDIR}/dependencies.${COMPILER}
-	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 4' >> ${OBJDIR}/dependencies.${COMPILER}
-ifeq (${COMPILER},pgf90)
-	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 5' >> ${OBJDIR}/dependencies.${COMPILER}
-endif
-endif
 
 listobj:
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
