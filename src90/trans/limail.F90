@@ -21,7 +21,8 @@
 !
 !  arguments
       integer nrid,nreg,nppol(*),nprad(*),npomax,nramax,nregmx,&
-           & cflag(npomax,nramax,nregmx,CARREOUT_NCELLFLAGS)
+           & cflag(npomax,nramax,nregmx,CARREOUT_NCELLFLAGS), &
+           & fdegen(npomax,nramax,nregmx,4)
       real(rKind) :: r(npomax,nramax,*),z(npomax,nramax,*),psi(npomax,nramax,*), &
      &     psidxm(npomax,nramax,*),psidym(npomax,nramax,*)
       character*8 carre_format
@@ -47,6 +48,10 @@
               read(nrid,*,end=99)ligne
               read(nrid,*,end=99) &
                    & ((cflag(ipol,irad,ireg,:), &
+                   & ipol=1,nppol(ireg)-1),irad=1,nprad(ireg)-1)
+              read(nrid,*,end=99)ligne
+              read(nrid,*,end=99) &
+                   & ((fdegen(ipol,irad,ireg,:), &
                    & ipol=1,nppol(ireg)-1),irad=1,nprad(ireg)-1)
           endif
       enddo

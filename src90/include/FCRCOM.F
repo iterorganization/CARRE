@@ -5,24 +5,35 @@
       parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=1000)
       integer(Short) :: repart,nrelax,nxpt, &
      &  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg, &
-     &  nstr,lstr(nnstr),nclstr, &
-     &  nr,nz
+     &  nstr,nstrv,lstr(nnstr),lstrv(nnstr),nclstr, &
+     &  nr,nz, &
+     &  lm_cnfg, &
+     &  carre_mode, grid_ext_mode, equ_ext_mode, &
+     &  vess_elm(nmstr), nvess, npp, fclbl(nmstr)
       logical ldgv2
-      real(Single) :: relax,pasmin,rlcept,pntrat, &
+      logical lclstr(nnstr), lclstrv(nnstr)
+      real(Single) :: lm_pntrt,lm_grcln
+      real(rKind) :: relax,pasmin,rlcept,pntrat, &
      &  deltp1(nsgmx),deltr1(nrgnx), &
      &  deltpn(nsgmx),deltrn(nrgnx),tgarde(ntrgx), &
      &  xstr(nmstr),ystr(nmstr),rbtor, &
-     &  xptcntr(3,nxptm),xlpcntr(3),xpttol
+     &  xptcntr(3,nxptm),xlpcntr(3),xpttol, &
+     &  p1(3,nmstr), p2(3,nmstr), xstrv(nmstr), ystrv(nmstr)
       real(rKind) :: pfm(ngpr,ngpz),rgr(ngpr),zgr(ngpz)
+      real(rKind) :: target_res
       common/fcrcom/pfm,rgr,zgr, &
      &  relax,pasmin,rlcept,pntrat, &
      &  deltp1,deltr1,deltpn,deltrn,tgarde, &
      &  xstr,ystr,rbtor, &
      &  xptcntr,xlpcntr,xpttol, &
+     &  lm_pntrt,lm_grcln, &
+     &  target_res, p1, p2, xstrv, ystrv, &
      &  repart,nrelax,nxpt, &
      &  nsgm,nptseg,nrgn,npr,ntrg, &
-     &  nstr,lstr,nclstr,nr,nz, &
-     &  ldgv2
+     &  nstr,nstrv,lstr,lstrv,nclstr,nr,nz, &
+     &  lm_cnfg, carre_mode, grid_ext_mode, equ_ext_mode, &
+     &  vess_elm, nvess, npp, fclbl, &
+     &  ldgv2, lclstr, lclstrv
 !
 !*** nnstr : maximum number of structures to be imported from dg
 !*** nmstr : maximum number of nodes in all the structures
@@ -41,6 +52,7 @@
 !*** ntrg  : number of targets
 !*** tgarde: guard length in front of targets
 !*** nstr  : number of the structures imported from dg
+!*** nstrv : number of additional vessel structures to be created/written for carre2
 !*** lstr  : array containing their lengths
 !*** nclstr: number of closed structures (they come first)
 !*** xstr,

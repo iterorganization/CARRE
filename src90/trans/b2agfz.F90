@@ -1114,7 +1114,7 @@
 !  construct the mesh for the bottom single-null geometry
 
         nx=nptseg(1)+nptseg(2)+nptseg(3)-3
-        ny=max(nprad(1)+nprad(2),nprad(3)+nprad(2))-2
+        ny=max(nprad(1)+nprad(2),nprad(1)+nprad(3))-2
         npol2g=nptseg(2)-1
         npol2d=nptseg(1)-1
         npol3=nptseg(3)-1

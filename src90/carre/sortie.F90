@@ -74,6 +74,12 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
          elseif(sellan(1:7).eq.'english') then
            write(10,*)'$parameters'
          endif
+
+        WRITE(10,'(A,I2)') 'carreMode =',par%carreMode
+        WRITE(10,'(A,I2)') 'gridExtensionMode =',par%gridExtensionMode
+        WRITE(10,'(A,I2)') 'equExtensionMode =',par%equExtensionMode
+        WRITE(10,'(A,I2)') 'nVirtualStructs =',par%nVirtualStructs
+
          WRITE(10,100)par%repart
   100    FORMAT('repart =',I2)
 
@@ -110,6 +116,8 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
          write(10,115)'nrelax=',nrelax,'relax=',relax,'pasmin=',pasmin, & 
      &     'rlcept=',rlcept
  115     format(a,i5/(a,1pe11.4))
+
+        WRITE(10,'(a,1pe11.4)') 'targetResolution =',par%targetRes
 
          if(sellan(1:8).eq.'francais') then
            WRITE(10,105)
@@ -154,6 +162,15 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
                                          & grid%cellFaceIStruct(:,i,j,ireg)
                  end do
              end do
+
+             ! write info on degenerate faces
+             WRITE(10,"(a)") "'degenerate faces'"
+             DO j=1, grid%nr(ireg) - 1
+                 do i=1,grid%np1(ireg) - 1
+                     WRITE(10,"(4i4)") grid%cellFaceDegen(:,i,j,ireg)
+                 end do
+             end do
+
 
          end DO
 

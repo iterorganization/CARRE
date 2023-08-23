@@ -274,6 +274,8 @@ module carre_types
       ! Structure index indicating the structure on which this face lies.
       ! If GRID_UNDEFINED, it is not on a structure
       integer :: cellFaceIStruct(1:4,npmamx-1,nrmamx-1,nregmx)
+      ! Integer indicating whether face is degenerate (1) or not (0)
+      integer :: cellFaceDegen(1:4,npmamx-1,nrmamx-1,nregmx)
 
       ! Point flags and point structure indices.
       ! pointFlagFinalCheck is for a sanity check to test the explicit knowledge

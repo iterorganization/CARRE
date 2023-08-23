@@ -15,7 +15,7 @@
 !*** nrscl : number of real scalar parameters in the Carre input
       integer i,j
       integer(Short) ::  iprmeq(niscl)
-      real(Single) :: rprmeq(nrscl)
+      real(rKind) :: rprmeq(nrscl)
       equivalence (iprmeq,repart), (rprmeq,relax)
       character*8 chiprm(niscl),chrprm(nrscl)
       data chiprm / 'repart  ','nrelax  '/
@@ -25,6 +25,14 @@
       open(2,file=ofile)
       rewind(2)
       write(2,'(a)') '$parameters'
+      write(2,700) 'carreMode',carre_mode
+      write(2,700) 'gridExtensionMode',grid_ext_mode
+      write(2,700) 'equExtensionMode',equ_ext_mode
+      if (nstrv.gt.0) then
+        ! If vessel structures are present, the first nstr
+        ! structures are assumed to be virtual ones
+        write(2,700) 'nVirtualStructs', nstr
+      endif
       do i=1,niscl
         write(2,700) chiprm(i),iprmeq(i)
       end do
@@ -44,6 +52,7 @@
       do j=1,ntrg
         write(2,730) 'tgarde',j,tgarde(j)
       end do
+      write(2,720) 'targetResolution',target_res
       write(2,'(a)') '$end'
       close(2)
 !======================================================================

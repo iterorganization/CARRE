@@ -410,6 +410,8 @@ contains
     subroutine categorizeCellsAndFaces(pasmin, finalized)
       double precision, intent(in) :: pasmin
       logical, intent(in) :: finalized
+      external :: dist
+      double precision :: dist
 
       ! internal
       integer, dimension(npmamx-1,nrmamx-1,nregmx) :: cellIntNodeCount, cellExtNodeCount
@@ -456,6 +458,7 @@ contains
       ! Identify boundary cells
       cellBndFaceCount = 0
       grid%cellFaceIStruct = GRID_UNDEFINED
+      grid%cellFaceDegen = 0
 
       do iReg = 1, grid%nreg
 
@@ -530,6 +533,16 @@ contains
                                            & cellBndFaceCount(iPol, iRad, iReg) + 1
                       end do
                   end if
+
+                  ! Check if faces are degenerate
+                  do iFace = 1, 4
+                      if (dist(grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 1), iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg), &
+                             & grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 1), iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg), &
+                             & grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 2), iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg), &
+                             & grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 2), iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)).lt.1.e-6) then
+                          grid%cellFaceDegen(iFace, iPol, iRad, iReg) = 1
+                      end if
+                  end do
 
               end do
           end do

@@ -15,15 +15,15 @@
       implicit none
 #include <impcon.inc>
       logical ex
-      character*14 chtrg,chstr,chequ,chaux,chdgo, & 
-     &             chcfld,chcequ,chcstr,chccrr,chcslp
+      character*15 chtrg,chstr,chequ,chaux,chdgo, & 
+     &             chcfld,chcequ,chcstr,chccrr,chcslp,chcvss
       data chtrg ,  chstr ,  chequ ,  chaux , chdgo  / & 
      &   'dg.trg','dg.str','dg.equ','dg.aux','dg.dgo'/, & 
      &     chcfld    ,  chcequ   ,     chcstr    ,  chccrr   / & 
      &   'btor.dat'  ,'rzpsi.dat','structure.dat','carre.dat'/, & 
-     &      chcslp   / & 
-     &   'selptx.inf'/
-      external fcraxn,fcrtrn,fcrdgi
+     &      chcslp   , chcvss    / & 
+     &   'selptx.inf','vessel.dat'/
+      external fcraxn,fcrtrn,fcrdgi,fcrdef
       external fcrchktp,fcrstri,fcrstro,fcrcrro,fcrfldi,fcrequo, &
      &         fcrfldo,fcrslpo,fcrprp
       external import
@@ -60,23 +60,31 @@
       promp(2) = repeat(' ',8)
       fixkey=.false.
 !
+!*** Set some defaults
+!
+      call fcrdef
+!
 !*** Read the data
 !
       open(1,file=chtrg)
       call fcrchktp(1)
       call import(fcrtrn)
+      close(1)
       open(1,file=chstr)
       call fcrstri(1)
+      close(1)
       open(1,file=chequ)
       call fcrfldi(1)
+      close(1)
       open(1,file=chdgo)
       call import(fcrdgi)
+      close(1)
       inquire(file=chaux,exist=ex)
       if(ex) then
         open(1,file=chaux)
         call import(fcraxn)
+        close(1)
       end if
-      close(1)
 !
 !*** ... make the necessary transformations
 !
@@ -85,7 +93,7 @@
 !*** ... and produce the files to be read by carre
 !
       call fcrequo(chcequ)
-      call fcrstro(chcstr)
+      call fcrstro(chcstr,chcvss)
       call fcrcrro(chccrr)
       call fcrfldo(chcfld)
       call fcrslpo(chcslp)
@@ -133,7 +141,7 @@ contains
         write(cpo % limiter_unit(j) % name(1),'(a,i4)') 'Structure ', j
         allocate( cpo % limiter_unit( j ) % closed(1) )
 
-        if(j.le.nclstr) then
+        if(lclstr(j)) then
             ! Closed structure
             cpo % limiter_unit( j ) % closed(1) = 'y'
         else
