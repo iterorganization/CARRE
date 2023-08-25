@@ -13,6 +13,8 @@ ifndef COMPILER
 $(error COMPILER not defined)
 endif
 
+MAKETAGS ?= ctags -e -f
+
 MAKES = Makefile
 DEFINES = ${CARRE_DEFINES} ${SOLPS_CPP}
 # Include global SOLPS compiler settings
@@ -225,7 +227,7 @@ local:
 TAGS:	tags
 
 tags:
-	rm -f TAGS ; ctags -e -f TAGS ${SRCDIR}/*/*.F || touch TAGS
+	rm -f TAGS ; ${MAKETAGS} TAGS ${SRCDIR}/*/*.F || touch TAGS
 
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${MAINLIST:.o=.F}
 	@makedepend ${DEFINES} -f- ${INCLUDE} $^ | \

@@ -4,7 +4,7 @@ ifndef LD_MSCL
 endif
 
 FC      = ifort
-CPP     = /lib/cpp -C -traditional
+CPP     = /lib/cpp -C -traditional -ffreestanding
 
 #!!!Local Variables:
 #!!! mode: Makefile
