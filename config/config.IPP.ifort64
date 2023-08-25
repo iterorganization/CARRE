@@ -13,6 +13,8 @@ FFLAGS  += -warn all -check noarg_temp_created -warn notruncated_source -warn no
 LDFLAGS += -check all -warn all -debug all # -gen-interfaces -warn interfaces
 endif
 
+MAKETAGS = etags -o
+
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
