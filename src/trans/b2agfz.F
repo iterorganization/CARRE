@@ -884,7 +884,11 @@ c*** Dimensions for one half of the grid
           write(*,*) 'Grid is too large in radial direction: ny=',
      ,                                             ny,' > nymax=',nymax
 #ifdef SOLPS_CPP
+#ifdef DIMENSIONS_MODULE
+          write(*,*) '==> Increase DEF_NYD in b2mod_dimensions.F'
+#else
           write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
+#endif
 #else
           write(*,*) '==> Increase nrmamx in CARREDIM.F'
 #endif
@@ -912,7 +916,11 @@ c*** Two halves of the grid...
             write(*,*) 'Grid is too large in poloidal direction: nx=',
      ,                                           nx+1,' > nxmax=',nxmax
 #ifdef SOLPS_CPP
+#ifdef DIMENSIONS_MODULE
+            write(*,*) '==> Increase DEF_NXD in b2mod_dimensions.F'
+#else
             write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
+#endif
 #else
             write(*,*) '==> Increase npmamx in CARREDIM.F'
 #endif
@@ -1057,7 +1065,11 @@ c  test values of nprad compared to nx and ny
           write(*,*) 'Grid is too large in radial direction: ny=',
      ,                                             ny,' > nymax=',nymax
 #ifdef SOLPS_CPP
+#ifdef DIMENSIONS_MODULE
+          write(*,*) '==> Increase DEF_NYD in b2mod_dimensions.F'
+#else
           write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
+#endif
 #else
           write(*,*) '==> Increase nrmamx in CARREDIM.F'
 #endif
@@ -1067,7 +1079,11 @@ c  test values of nprad compared to nx and ny
           write(*,*) 'Grid is too large in poloidal direction: nx=',
      ,                                         nx,' > nxmax=',nxmax
 #ifdef SOLPS_CPP
+#ifdef DIMENSIONS_MODULE
+          write(*,*) '==> Increase DEF_NXD in b2mod_dimensions.F'
+#else
           write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
+#endif
 #else
           write(*,*) '==> Increase npmamx in CARREDIM.F'
 #endif
@@ -1260,7 +1276,11 @@ c  test values of nprad compared to nx and ny
           write(*,*) 'Grid is too large in radial direction: ny=',
      ,                                             ny,' > nymax=',nymax
 #ifdef SOLPS_CPP
+#ifdef DIMENSIONS_MODULE
+          write(*,*) '==> Increase DEF_NYD in b2mod_dimensions.F'
+#else
           write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
+#endif
 #else
           write(*,*) '==> Increase nrmamx in CARREDIM.F'
 #endif
@@ -1270,7 +1290,11 @@ c  test values of nprad compared to nx and ny
           write(*,*) 'Grid is too large in poloidal direction: nx=',
      ,                                         nx,' > nxmax=',nxmax
 #ifdef SOLPS_CPP
+#ifdef DIMENSIONS_MODULE
+          write(*,*) '==> Increase DEF_NXD in b2mod_dimensions.F'
+#else
           write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
+#endif
 #else
           write(*,*) '==> Increase npmamx in CARREDIM.F'
 #endif
