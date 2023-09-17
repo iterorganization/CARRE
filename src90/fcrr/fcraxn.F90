@@ -16,6 +16,7 @@
       character*8 name, nms(nnm)
       integer i
       logical carre_streql
+      external locase
       data nms / & 
      &    'repart  ','nrelax  ','relax   ','pasmin  ','rlcept  ', & 
      &    'tgarde  ','xpttol  '/

@@ -77,11 +77,11 @@
       case (6)
 !***  lm_pntrt
         call resime(rdummy)
-        lm_pntrt = real(rdummy,rKind)
+        lm_pntrt = real(rdummy,Single)
       case (7)
 !***  lm_grcln
         call resime(rdummy)
-        lm_grcln = real(rdummy,rKind)
+        lm_grcln = real(rdummy,Single)
       case (8)
 !***  crr_mode
         call resimi(carre_mode)

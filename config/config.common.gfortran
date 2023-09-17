@@ -2,7 +2,7 @@ ifndef SOLPS_CPP
 DEFINES += -DGFORTRAN
 endif
 
-FFLAGS  += -J${OBJDIR} -ffree-line-length-none -fno-second-underscore -frecursive
+FFLAGS  += -ffree-line-length-none -fno-second-underscore -frecursive
 ifdef SOLPS_DEBUG
 FFLAGS  += -g -fcheck=all -ffpe-trap=denormal -ffpe-trap=invalid -ffpe-trap=zero -ftrapv -fsignaling-nans
 LDFLAGS	+= -Wall
@@ -20,6 +20,7 @@ B2INCLUDE += `pkg-config fundamental-constants --cflags`
 endif
 
 COMPILE  = ${FC} -c ${FFLAGS} ${FFLAGSEXTRA}
+OBJDEST  = -J${OBJDIR}
 
 MOD      = mod
 

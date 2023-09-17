@@ -22,7 +22,8 @@ endif
 
 DBLPAD    = -r8
 
-COMPILE   = ${FC} -c ${FFLAGS} -mdir ${OBJDIR} -I${OBJDIR} -compatible
+COMPILE   = ${FC} -c ${FFLAGS} -I${OBJDIR} -compatible
+OBJDEST   = -mdir ${OBJDIR}
 MOD       = mod
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG} ${LD_NAG}

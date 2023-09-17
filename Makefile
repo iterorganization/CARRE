@@ -161,14 +161,14 @@ standalone: ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA}
 $(OBJDIR)/%.o : %.F90
 	@- /bin/rm -f ${OBJDIR}/$*.F90 ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
-	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
+	$(COMPILE) $(INCLUDE) ${OBJDEST} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
 	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
 ifneq (${MOD},o)
 $(OBJDIR)/%.${MOD}: %.F90
 	@- /bin/rm -f ${OBJDIR}/$*.F90 ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
-	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
+	$(COMPILE) $(INCLUDE) ${OBJDEST} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
 	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
 endif
@@ -176,14 +176,14 @@ endif
 $(OBJDIR)/%.o : %.f90
 	@- /bin/rm -f ${OBJDIR}/$*.f90 ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
-	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
+	$(COMPILE) $(INCLUDE) ${OBJDEST} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
 	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 
 ifneq (${MOD},o)
 $(OBJDIR)/%.${MOD}: %.f90
 	@- /bin/rm -f ${OBJDIR}/$*.f90 ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
-	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
+	$(COMPILE) $(INCLUDE) ${OBJDEST} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
 	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
 endif
@@ -340,158 +340,325 @@ ${OBJDIR}/dependencies.${COMPILER}:
 
 ifdef SOLPS_CPP
 ifneq (${MOD},o)
-${OBJDIR}/b2mod_cellhelper.${MOD}: ${OBJDIR}/b2mod_cellhelper.o
-${OBJDIR}/b2mod_connectivity.${MOD}: ${OBJDIR}/b2mod_connectivity.o
-${OBJDIR}/b2mod_constants.${MOD}: ${OBJDIR}/b2mod_constants.o
-${OBJDIR}/b2mod_geo.${MOD}: ${OBJDIR}/b2mod_geo.o
-${OBJDIR}/b2mod_geo_corner.${MOD}: ${OBJDIR}/b2mod_geo_corner.o
-${OBJDIR}/b2mod_geometry.${MOD}: ${OBJDIR}/b2mod_geometry.o
-${OBJDIR}/b2mod_grid_mapping.${MOD}: ${OBJDIR}/b2mod_grid_mapping.o
-${OBJDIR}/b2mod_indirect.${MOD}: ${OBJDIR}/b2mod_indirect.o
-${OBJDIR}/b2mod_math.${MOD}: ${OBJDIR}/b2mod_math.o
-${OBJDIR}/b2mod_openmp.${MOD}: ${OBJDIR}/b2mod_openmp.o
-${OBJDIR}/b2mod_switches.${MOD}: ${OBJDIR}/b2mod_switches.o
-${OBJDIR}/b2us_geo.${MOD}: ${OBJDIR}/b2us_geo.o
-${OBJDIR}/b2us_map.${MOD}: ${OBJDIR}/b2us_map.o
-endif
-
 ${OBJDIR}/b2mod_ad.${MOD}: ${B2SRC}/modules/b2mod_ad.F ${OBJDIR}/b2mod_types.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_ad.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_ad.F ${OBJDIR}/b2mod_ad.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_ad.f
+	@rm -f ${OBJDIR}/b2mod_ad.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_ad.f
 
 ${OBJDIR}/b2mod_b2cmfs.${MOD}: ${B2SRC}/modules/b2mod_b2cmfs.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_b2cmfs.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_b2cmfs.F ${OBJDIR}/b2mod_b2cmfs.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmfs.f
+	@rm -f ${OBJDIR}/b2mod_b2cmfs.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmfs.f
 
-${OBJDIR}/b2mod_cellhelper.o: ${B2SRC}/ids/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_types.${MOD}
+${OBJDIR}/b2mod_cellhelper.${MOD}: ${B2SRC}/ids/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_types.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/ids/b2mod_cellhelper.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_cellhelper.f90
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_cellhelper.f90
+	@rm -f ${OBJDIR}/b2mod_cellhelper.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_cellhelper.f90
 
-${OBJDIR}/b2mod_connectivity.o: ${B2SRC}/ids/b2mod_connectivity.F90 ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_types.${MOD}
+${OBJDIR}/b2mod_connectivity.${MOD}: ${B2SRC}/ids/b2mod_connectivity.F90 ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_types.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/ids/b2mod_connectivity.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_connectivity.F90 ${OBJDIR}/b2mod_connectivity.f90
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_connectivity.f90
+	@rm -f ${OBJDIR}/b2mod_connectivity.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_connectivity.f90
 
-${OBJDIR}/b2mod_constants.o: ${B2SRC}/ids/b2mod_constants.F90
+${OBJDIR}/b2mod_constants.${MOD}: ${B2SRC}/ids/b2mod_constants.F90
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/ids/b2mod_constants.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_constants.F90 ${OBJDIR}/b2mod_constants.f90
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_constants.o ${OBJDIR}/b2mod_constants.f90
+	@rm -f ${OBJDIR}/b2mod_constants.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_constants.o ${OBJDIR}/b2mod_constants.f90
 
-${OBJDIR}/b2mod_geo.o: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_version.${MOD}
+${OBJDIR}/b2mod_geo.${MOD}: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_version.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_geo.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo.F ${OBJDIR}/b2mod_geo.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
+	@rm -f ${OBJDIR}/b2mod_geo.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
 
 ${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/carre_constants.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_geo2.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo2.F ${OBJDIR}/b2mod_geo2.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo2.f
+	@rm -f ${OBJDIR}/b2mod_geo2.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo2.f
 
-${OBJDIR}/b2mod_geo_corner.o: ${B2SRC}/modules/b2mod_geo_corner.F
+${OBJDIR}/b2mod_geo_corner.${MOD}: ${B2SRC}/modules/b2mod_geo_corner.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_geo_corner.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo_corner.F ${OBJDIR}/b2mod_geo_corner.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geo_corner.f
+	@rm -f ${OBJDIR}/b2mod_geo_corner.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geo_corner.f
 
-${OBJDIR}/b2mod_geometry.o: ${B2SRC}/ids/b2mod_geometry.F90 ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD}
+${OBJDIR}/b2mod_geometry.${MOD}: ${B2SRC}/ids/b2mod_geometry.F90 ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/ids/b2mod_geometry.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geometry.F90 ${OBJDIR}/b2mod_geometry.f90
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geometry.o ${OBJDIR}/b2mod_geometry.f90
+	@rm -f ${OBJDIR}/b2mod_geometry.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geometry.o ${OBJDIR}/b2mod_geometry.f90
 
-${OBJDIR}/b2mod_grid_mapping.o: ${B2SRC}/ids/b2mod_grid_mapping.F90 ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_types.${MOD}
+${OBJDIR}/b2mod_grid_mapping.${MOD}: ${B2SRC}/ids/b2mod_grid_mapping.F90 ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_types.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/ids/b2mod_grid_mapping.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_grid_mapping.F90 ${OBJDIR}/b2mod_grid_mapping.f90
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
+	@rm -f ${OBJDIR}/b2mod_grid_mapping.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
 
-${OBJDIR}/b2mod_indirect.o: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD}
+${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_indirect.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_indirect.F ${OBJDIR}/b2mod_indirect.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_indirect.f
+	@rm -f ${OBJDIR}/b2mod_indirect.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_indirect.f
 
 ${OBJDIR}/b2mod_ipmain.${MOD}: ${B2SRC}/utility/b2mod_ipmain.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/b2mod_ipmain.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_ipmain.F ${OBJDIR}/b2mod_ipmain.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/b2mod_ipmain.f
+	@rm -f ${OBJDIR}/b2mod_ipmain.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/b2mod_ipmain.f
 
 ${OBJDIR}/b2mod_lwimai.${MOD}: ${B2SRC}/utility/b2mod_lwimai.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/b2mod_lwimai.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_lwimai.F ${OBJDIR}/b2mod_lwimai.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwimai.f
+	@rm -f ${OBJDIR}/b2mod_lwimai.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwimai.f
 
 ${OBJDIR}/b2mod_lwmain.${MOD}: ${B2SRC}/utility/b2mod_lwmain.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/b2mod_lwmain.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_lwmain.F ${OBJDIR}/b2mod_lwmain.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_lwmain.f
+	@rm -f ${OBJDIR}/b2mod_lwmain.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_lwmain.f
 
-${OBJDIR}/b2mod_math.o: ${B2SRC}/modules/b2mod_math.F
+${OBJDIR}/b2mod_math.${MOD}: ${B2SRC}/modules/b2mod_math.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_math.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_math.F ${OBJDIR}/b2mod_math.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_math.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_math.f
 
-${OBJDIR}/b2mod_openmp.o: ${B2SRC}/modules/b2mod_openmp.F
+${OBJDIR}/b2mod_openmp.${MOD}: ${B2SRC}/modules/b2mod_openmp.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_openmp.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_openmp.F ${OBJDIR}/b2mod_openmp.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_openmp.f
+	@rm -f ${OBJDIR}/b2mod_openmp.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_openmp.f
 
-${OBJDIR}/b2mod_switches.o: ${B2SRC}/modules/b2mod_switches.F ${OBJDIR}/b2mod_constants.${MOD}
+${OBJDIR}/b2mod_switches.${MOD}: ${B2SRC}/modules/b2mod_switches.F ${OBJDIR}/b2mod_constants.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_switches.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_switches.F ${OBJDIR}/b2mod_switches.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_switches.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_switches.f
 
 ${OBJDIR}/b2mod_subsys.${MOD}: ${B2SRC}/utility/b2mod_subsys.F ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_openmp.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/b2mod_subsys.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_subsys.F ${OBJDIR}/b2mod_subsys.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_subsys.f
+	@rm -f ${OBJDIR}/b2mod_subsys.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_subsys.f
 
 ${OBJDIR}/b2mod_types.${MOD}: ${B2SRC}/modules/b2mod_types.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_types.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_types.F ${OBJDIR}/b2mod_types.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_types.f
+	@rm -f ${OBJDIR}/b2mod_types.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_types.f
 
 ${OBJDIR}/b2mod_version.${MOD}: ${B2SRC}/modules/b2mod_version.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_version.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_version.F ${OBJDIR}/b2mod_version.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_version.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_version.f
 
 ${OBJDIR}/b2mod_xerset.${MOD}: ${B2SRC}/utility/b2mod_xerset.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/b2mod_xerset.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_xerset.F ${OBJDIR}/b2mod_xerset.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2mod_xerset.f
+	@rm -f ${OBJDIR}/b2mod_xerset.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2mod_xerset.f
+
+${OBJDIR}/b2us_geo.${MOD}: ${B2SRC}/modules/b2us_geo.F ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2us_map.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2us_geo.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_geo.F ${OBJDIR}/b2us_geo.f
+	@rm -f ${OBJDIR}/b2us_geo.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_geo.f
+
+${OBJDIR}/b2us_map.${MOD}: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_version.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2us_map.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_map.F ${OBJDIR}/b2us_map.f
+	@rm -f ${OBJDIR}/b2us_map.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2us_map.f
+endif
+
+${OBJDIR}/b2mod_ad.o: ${B2SRC}/modules/b2mod_ad.F ${OBJDIR}/b2mod_types.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_ad.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_ad.F ${OBJDIR}/b2mod_ad.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_ad.f
+	@touch ${OBJDIR}/b2mod_ad.${MOD}
+
+${OBJDIR}/b2mod_b2cmfs.o: ${B2SRC}/modules/b2mod_b2cmfs.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_b2cmfs.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_b2cmfs.F ${OBJDIR}/b2mod_b2cmfs.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmfs.f
+	@touch ${OBJDIR}/b2mod_b2cmfs.${MOD}
+
+${OBJDIR}/b2mod_cellhelper.o: ${B2SRC}/ids/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_types.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_cellhelper.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_cellhelper.F90 ${OBJDIR}/b2mod_cellhelper.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_cellhelper.f90
+	@touch ${OBJDIR}/b2mod_cellhelper.${MOD}
+
+${OBJDIR}/b2mod_connectivity.o: ${B2SRC}/ids/b2mod_connectivity.F90 ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_types.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_connectivity.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_connectivity.F90 ${OBJDIR}/b2mod_connectivity.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_connectivity.f90
+	@touch ${OBJDIR}/b2mod_connectivity.${MOD}
+
+${OBJDIR}/b2mod_constants.o: ${B2SRC}/ids/b2mod_constants.F90
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_constants.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_constants.F90 ${OBJDIR}/b2mod_constants.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_constants.o ${OBJDIR}/b2mod_constants.f90
+	@touch ${OBJDIR}/b2mod_constants.${MOD}
+
+${OBJDIR}/b2mod_geo.o: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_version.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_geo.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo.F ${OBJDIR}/b2mod_geo.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
+	@touch ${OBJDIR}/b2mod_geo.${MOD}
+
+${OBJDIR}/b2mod_geo2.o: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/carre_constants.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_geo2.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo2.F ${OBJDIR}/b2mod_geo2.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo2.f
+	@touch ${OBJDIR}/b2mod_geo2.${MOD}
+
+${OBJDIR}/b2mod_geo_corner.o: ${B2SRC}/modules/b2mod_geo_corner.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_geo_corner.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo_corner.F ${OBJDIR}/b2mod_geo_corner.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geo_corner.f
+	@touch ${OBJDIR}/b2mod_geo_corner.${MOD}
+
+${OBJDIR}/b2mod_geometry.o: ${B2SRC}/ids/b2mod_geometry.F90 ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_geometry.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geometry.F90 ${OBJDIR}/b2mod_geometry.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_geometry.o ${OBJDIR}/b2mod_geometry.f90
+	@touch ${OBJDIR}/b2mod_geometry.${MOD}
+
+${OBJDIR}/b2mod_grid_mapping.o: ${B2SRC}/ids/b2mod_grid_mapping.F90 ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_types.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/ids/b2mod_grid_mapping.F90 ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_grid_mapping.F90 ${OBJDIR}/b2mod_grid_mapping.f90
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
+	@touch ${OBJDIR}/b2mod_grid_mapping.${MOD}
+
+${OBJDIR}/b2mod_indirect.o: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_indirect.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_indirect.F ${OBJDIR}/b2mod_indirect.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_indirect.f
+	@touch ${OBJDIR}/b2mod_indirect.${MOD}
+
+${OBJDIR}/b2mod_ipmain.o: ${B2SRC}/utility/b2mod_ipmain.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/b2mod_ipmain.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_ipmain.F ${OBJDIR}/b2mod_ipmain.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/b2mod_ipmain.f
+	@touch ${OBJDIR}/b2mod_ipmain.${MOD}
+
+${OBJDIR}/b2mod_lwimai.o: ${B2SRC}/utility/b2mod_lwimai.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/b2mod_lwimai.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_lwimai.F ${OBJDIR}/b2mod_lwimai.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwimai.f
+	@touch ${OBJDIR}/b2mod_lwimai.${MOD}
+
+${OBJDIR}/b2mod_lwmain.o: ${B2SRC}/utility/b2mod_lwmain.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/b2mod_lwmain.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_lwmain.F ${OBJDIR}/b2mod_lwmain.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_lwmain.f
+	@touch ${OBJDIR}/b2mod_lwmain.${MOD}
+
+${OBJDIR}/b2mod_math.o: ${B2SRC}/modules/b2mod_math.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_math.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_math.F ${OBJDIR}/b2mod_math.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_math.f
+	@touch ${OBJDIR}/b2mod_math.${MOD}
+
+${OBJDIR}/b2mod_openmp.o: ${B2SRC}/modules/b2mod_openmp.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_openmp.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_openmp.F ${OBJDIR}/b2mod_openmp.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_openmp.f
+	@touch ${OBJDIR}/b2mod_openmp.${MOD}
+
+${OBJDIR}/b2mod_switches.o: ${B2SRC}/modules/b2mod_switches.F ${OBJDIR}/b2mod_constants.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_switches.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_switches.F ${OBJDIR}/b2mod_switches.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_switches.f
+	@touch ${OBJDIR}/b2mod_switches.${MOD}
+
+${OBJDIR}/b2mod_subsys.o: ${B2SRC}/utility/b2mod_subsys.F ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_openmp.${MOD}
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/b2mod_subsys.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_subsys.F ${OBJDIR}/b2mod_subsys.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_subsys.f
+	@touch ${OBJDIR}/b2mod_subsys.${MOD}
+
+${OBJDIR}/b2mod_types.o: ${B2SRC}/modules/b2mod_types.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_types.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_types.F ${OBJDIR}/b2mod_types.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_types.f
+	@touch ${OBJDIR}/b2mod_types.${MOD}
+
+${OBJDIR}/b2mod_version.o: ${B2SRC}/modules/b2mod_version.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2mod_version.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_version.F ${OBJDIR}/b2mod_version.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_version.f
+	@touch ${OBJDIR}/b2mod_version.${MOD}
+
+${OBJDIR}/b2mod_xerset.o: ${B2SRC}/utility/b2mod_xerset.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/utility/b2mod_xerset.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_xerset.F ${OBJDIR}/b2mod_xerset.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2mod_xerset.f
+	@touch ${OBJDIR}/b2mod_xerset.${MOD}
 
 ${OBJDIR}/b2us_geo.o: ${B2SRC}/modules/b2us_geo.F ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2us_geo.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_geo.F ${OBJDIR}/b2us_geo.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_geo.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_geo.f
+	@touch ${OBJDIR}/b2us_geo.${MOD}
 
 ${OBJDIR}/b2us_map.o: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_version.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2us_map.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_map.F ${OBJDIR}/b2us_map.f
-	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2us_map.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) ${OBJDEST} -o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2us_map.f
+	@touch ${OBJDIR}/b2us_map.${MOD}
 
 ${OBJDIR}/b2xbzb.o: ${B2SRC}/b2aux/b2xbzb.F
 	@mkdir -p ${SRCDIR}/b25_links/
