@@ -3,6 +3,7 @@
 PROG      = carre.exe
 PROG_TRA  = traduit.exe
 PROG_FCRR = fcrr.exe
+CRRDIR    = ${SOLPSTOP}/modules/Carre
 B2SRC     = ${SOLPSTOP}/modules/B2.5/src
 MOD       = mod
 # Test whether necessary environment variables are defined; if not, exit
@@ -59,8 +60,8 @@ ifdef SOLPS_DEBUG
 EXT_DEBUG = .debug
 endif
 
-OBJDIR = $(PWD)/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
-SRCLOCAL = $(PWD)/src.local
+OBJDIR = ${CRRDIR}/builds/$(HOST_NAME).$(COMPILER)$(EXT_DEBUG)
+SRCLOCAL = ${CRRDIR}/src.local
 
 SHELL = /bin/sh
 CPP = /usr/lib/cpp
@@ -275,6 +276,9 @@ ${OBJDIR}/dependencies.${COMPILER}:
 	${MAKE} depend
 
 include ${OBJDIR}/dependencies.${COMPILER}
+ifeq ($(shell [ -e ${CRRDIR}/config/dependencies.local ] && echo yes || echo no ),yes)
+include ${CRRDIR}/config/dependencies.local
+endif
 
 echo:
 	@echo INCLUDE=${INCLUDE}
