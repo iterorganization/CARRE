@@ -3,7 +3,11 @@
 PROG      = carre.exe
 PROG_TRA  = traduit.exe
 PROG_FCRR = fcrr.exe
+ifdef SOLPS_CPP
 CRRDIR    = ${SOLPSTOP}/modules/Carre
+else
+CRRDIR    = $(PWD)
+endif
 B2SRC     = ${SOLPSTOP}/modules/B2.5/src
 MOD       = mod
 # Test whether necessary environment variables are defined; if not, exit
