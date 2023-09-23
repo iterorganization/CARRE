@@ -1,4 +1,4 @@
-      subroutine rdeqdg(lun,ngpr,ngpz,iret, nr,nz, & 
+      subroutine rdeqdg(lun,ngpr,ngpz,iret,nr,nz, &
      &                                             btf,rtf,rgr,zgr,pfm)
 !=====================================================
 !*** Read the equilibrium data written in the dg-compatible format.

@@ -16,7 +16,8 @@
       real(Single) :: rdummy(1), rarray(nrgnx), parray(nsgmx)
       character*8 name, unm(nnms)
       logical carre_streql
-      external carre_streql, rearre, rearri, resime, resimi, scipit
+      external carre_streql, rearre, rearri, resime, resimi, scipit, &
+     &         locase
 !
 !*** List of the valid input keywords
       data unm / & 
