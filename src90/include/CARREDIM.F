@@ -1,10 +1,20 @@
 !  version : 07.07.97 20:52
 !
-      integer, parameter :: nxmax=1025,  nymax=1025, npstmx=1200, &
-     &          npnimx=5000, &
-     &          npxmx=4   , strumx=60  ,  nivmx=8  , nbdmx=8 , &
-     &          gradmx=100  , npmamx=2000 , nrmamx=200, nregmx=6, &
-     &          nsepsegmx = 10
+! This file must be formatted in a F77-compatible way as it included in Uinp
+!
+      integer, parameter :: nxmax=1025
+      integer, parameter :: nymax=1025
+      integer, parameter :: npstmx=1200
+      integer, parameter :: npnimx=5000
+      integer, parameter :: npxmx=4
+      integer, parameter :: strumx=60
+      integer, parameter :: nivmx=8
+      integer, parameter :: nbdmx=8
+      integer, parameter :: gradmx=100
+      integer, parameter :: npmamx=2000
+      integer, parameter :: nrmamx=200
+      integer, parameter :: nregmx=6
+      integer, parameter :: nsepsegmx = 10
 
 !     AUTOCONTINUE=.true. will skip questions when failing to converge
 #ifdef EUITM
