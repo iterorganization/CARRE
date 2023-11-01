@@ -15,7 +15,7 @@ c  r, z(ipol,irad,ireg): coordonnees
 c  psi, psidxm, psidym: fonction psi, d(psi)/dx, et d(psi)/dy sur la
 c                       maille
 c  npomax: dimension declaree dans la direction poloidale
-c  nramax: dimention declaree dans la direction radiale
+c  nramax: dimension declaree dans la direction radiale
 c
 c  arguments
       integer nrid,nreg,nppol(*),nprad(*),npomax,nramax
