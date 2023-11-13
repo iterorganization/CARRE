@@ -457,6 +457,7 @@ ${OBJDIR}/b2mod_switches.${MOD}: ${B2SRC}/modules/b2mod_switches.F ${OBJDIR}/b2m
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_switches.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_switches.F ${OBJDIR}/b2mod_switches.f
+	@rm -f ${OBJDIR}/b2mod_switches.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_switches.f
 
 ${OBJDIR}/b2mod_subsys.${MOD}: ${B2SRC}/utility/b2mod_subsys.F ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_openmp.${MOD}
