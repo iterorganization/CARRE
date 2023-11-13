@@ -443,6 +443,7 @@ ${OBJDIR}/b2mod_math.${MOD}: ${B2SRC}/modules/b2mod_math.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_math.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_math.F ${OBJDIR}/b2mod_math.f
+	@rm -f ${OBJDIR}/b2mod_math.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_math.f
 
 ${OBJDIR}/b2mod_openmp.${MOD}: ${B2SRC}/modules/b2mod_openmp.F
@@ -476,6 +477,7 @@ ${OBJDIR}/b2mod_version.${MOD}: ${B2SRC}/modules/b2mod_version.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_version.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_version.F ${OBJDIR}/b2mod_version.f
+	@rm -f ${OBJDIR}/b2mod_version.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_version.f
 
 ${OBJDIR}/b2mod_xerset.${MOD}: ${B2SRC}/utility/b2mod_xerset.F
