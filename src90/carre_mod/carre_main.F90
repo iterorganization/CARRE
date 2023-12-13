@@ -78,18 +78,18 @@ contains
          & equ%pty,equ%iptx,equ%jptx,equ%xpto,equ%ypto,equ%racord,equ%limcfg,&
          & par)
 
-    ! Short sanity check: virtual structures supplied by user only make sense in CARRE_EXTENDED mode
-    if (par%nVirtualStructs > 0 .and. par%carreMode /= CARRE_EXTENDED) then
+    ! Short sanity check: virtual structures supplied by user only make sense in CARRE_EXTENDED(_UNSTRUCTURED) mode
+    if (par%nVirtualStructs > 0 .and. par%carreMode /= CARRE_EXTENDED .and. par%carreMode /= CARRE_EXTENDED_UNSTRUCTURED) then
         stop "carre_main: you cannot submit virtual structures when not doing extended grid"
     end if
 
     ! In CARRE_STANDARD mode, we use the real structures and do one pass - no special setup required
     ! In CARRE_STANDARD_VIRTUALSTRUCT mode, we use the real structures and do two passes - no special setup required
-    ! In CARRE_EXTENDED mode
+    ! In CARRE_EXTENDED(_UNSTRUCTURED) mode
     ! -if virtual structures supplied, use these and only do one pass
     ! -if no virtual structures supplied, use real structure and do two passes
 
-    if (par%nVirtualStructs > 0 .and. par%carreMode == CARRE_EXTENDED) then
+    if (par%nVirtualStructs > 0 .and. (par%carreMode == CARRE_EXTENDED .or. par%carreMode == CARRE_EXTENDED_UNSTRUCTURED)) then
         ! set up virtual structures for first pass
         struct%nstruc = struct%vnstruc
         struct%npstru(1:struct%vnstruc) = struct%vnpstru(1:struct%vnstruc)
@@ -240,7 +240,7 @@ contains
           end if
 
           ! They are only actually used in extended grid mode
-          if ( par%carreMode == CARRE_EXTENDED ) then
+          if ( par%carreMode == CARRE_EXTENDED .or. par%carreMode == CARRE_EXTENDED_UNSTRUCTURED ) then
              struct%nstruc = struct%vnstruc
              struct%npstru = struct%vnpstru
              struct%xstruc = struct%vxstruc

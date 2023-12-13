@@ -13,7 +13,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       use carre_types
       use KindDefinitions, only : rKind
       use CarreDiagnostics, only : CarreDiag
-      use carre_target, only : Carre_Extended, Grid_Extension_Off, drctio, plqdst
+      use carre_target, only : Carre_Extended, Carre_Extended_Unstructured, Grid_Extension_Off, drctio, plqdst
       use carre_equilibrium, only : compute_psi_on_grid
       use CarreSiloIO, only : csIOSetRegion
       use Logging
@@ -105,7 +105,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
       grid%radLineSepSeg = 0
 
-      extended_grid = ( par%carreMode == CARRE_EXTENDED )
+      extended_grid = ( par%carreMode == CARRE_EXTENDED .or. &
+     &                  par%carreMode == CARRE_EXTENDED_UNSTRUCTURED)
 
 !..On procede au cas par cas selon la configuration des separatrices.
 

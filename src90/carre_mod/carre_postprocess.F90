@@ -58,8 +58,11 @@ contains
     integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
     double precision :: lPasMin
 
-    ! Only do postprocessing when doing grid extension
-    if (par%carreMode == CARRE_EXTENDED) then
+
+    if (par%carreMode == CARRE_EXTENDED .or. par%carreMode == CARRE_EXTENDED_UNSTRUCTURED) then
+
+       ! Postprocessing for 'structured' grid extension
+       ! Only allow for triangles / quads
 
         call logmsg( LOGINFO, "carre_postprocess_computation: doing cut-cell type grid (grid extension)" )
 

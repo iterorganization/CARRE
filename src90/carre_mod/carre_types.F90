@@ -26,6 +26,8 @@ module carre_types
   integer, parameter, public :: CARRE_STANDARD_VIRTUALSTRUCTS = 1
   ! extended grid mode
   integer, parameter, public :: CARRE_EXTENDED = 2
+  ! extended grid mode, without adaption of cut cells
+  integer, parameter, public :: CARRE_EXTENDED_UNSTRUCTURED = 3
 
   ! Orientations
   integer, parameter, public :: STRUCT_LEFT = 1
