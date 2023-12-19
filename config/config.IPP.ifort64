@@ -2,7 +2,7 @@
 NCARG_ROOT ?= /tokp/work/dpc/SOLPS-ITER/NCARG
 MSCL_ROOT  ?= /tokp/work/dpc/SOLPS-ITER/mscl
 LD_MSCL    ?= -L${MSCL_ROOT} -lmscl
-LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/afs/.ipp/tok/soft/cairo/1.16.0/lib -lcairo -L/afs/.ipp/tok/soft/freetype/2.11.1/lib -lfreetype -L/usr/X11R6/lib64 -lX11 -lm
+LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/tokp/work/software/TOK_2019/software/cairo/1.16.0/lib -lcairo -L/tokp/work/software/TOK_2019/software/freetype/2.11.1/lib -lfreetype -L/usr/X11R6/lib64 -lX11 -lm
 
 FC       = ifort
 CPP      = /lib/cpp -traditional -ffreestanding
