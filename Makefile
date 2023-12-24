@@ -449,9 +449,9 @@ ${OBJDIR}/b2mod_grid_mapping.${MOD}: ${B2SRC}/ids/b2mod_grid_mapping.F90 ${OBJDI
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
 
 ifeq (${USE_DIMENSIONS},1)
-${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_dimensions.${MOD}
+${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_dimensions.${MOD} ${OBJDIR}/b2mod_math.${MOD}
 else
-${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD}
+${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_math.${MOD}
 endif
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_indirect.F ${SRCDIR}/b25_links/
@@ -614,7 +614,7 @@ ${OBJDIR}/b2mod_grid_mapping.o: ${B2SRC}/ids/b2mod_grid_mapping.F90 ${OBJDIR}/b2
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
 	@touch ${OBJDIR}/b2mod_grid_mapping.${MOD}
 
-${OBJDIR}/b2mod_indirect.o: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD}
+${OBJDIR}/b2mod_indirect.o: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_math.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_indirect.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_indirect.F ${OBJDIR}/b2mod_indirect.f
