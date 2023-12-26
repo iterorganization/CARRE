@@ -181,19 +181,25 @@ ${OBJDIR}/libgcarre.a: ${GDEST}
 
 $(OBJDIR)/%.o : %.F
 	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
+ifeq ($(strip ${DBLPAD}),)
+	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f; \
+	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+else
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+endif
 
 ifeq (${USE_DIMENSIONS},1)
 ${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
-	$(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
+	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 ifneq ($(COMPILER),nag_f90)
 	@if [ -f ${OBJDIR}/b2mod_dimensions.${MOD} ] ; then touch ${OBJDIR}/b2mod_dimensions.${MOD} ; fi
 endif
@@ -202,7 +208,7 @@ ${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
-	$(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
+	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 	@if [ -f b2mod_dimensions.${MOD} ]; then /bin/mv b2mod_dimensions.${MOD} ${OBJDIR}; fi
 endif
 else
