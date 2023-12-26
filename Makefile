@@ -144,12 +144,18 @@ LIBRARIES = $(LDFLAGS:-l%=${LIBSOLDIR}/lib%.a)
 
 $(OBJDIR)/%.o : %.F
 	- /bin/rm -f ${OBJDIR}/$*.f
+ifeq ($(strip ${DBLPAD}),)
+	${CPP} ${SOLPS_CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f; \
+	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+else
 	${CPP} ${SOLPS_CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		${SRCDIR}/trans/* ) $(COMPILE) $(DBLPAD) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 	esac; \
 	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+endif
 
 all: VERSION ${OBJDIR}/${PROG}
 ifdef LD_NCARG
@@ -1137,7 +1143,7 @@ echo:
 	@echo VPATH=${VPATH}
 	@echo SOLPS_LIB=${SOLPS_LIB}
 	@echo GOBJS=${GOBJS}
-	@echo DEST =${DEST}
+	@echo DEST=${DEST}
 	@echo OBJS=$(OBJS)
 	@echo OBJSL90=$(OBJSL90)
 	@echo OBJSU90=$(OBJSU90)
