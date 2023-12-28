@@ -1140,6 +1140,7 @@ include ${OBJDIR}/dependencies.${COMPILER}
 echo:
 	@echo INCLUDE=${INCLUDE}
 	@echo DEFINES=${DEFINES}
+	@echo FFLAGSEXTRA=${FFLAGSEXTRA}
 	@echo VPATH=${VPATH}
 	@echo SOLPS_LIB=${SOLPS_LIB}
 	@echo GOBJS=${GOBJS}
