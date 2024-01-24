@@ -7,13 +7,7 @@
 *!!   The text of this routine is case-sensitive.
 *     ------------------------------------------------------------------
       integer len0, len1, k
-      character ch0, ch1
       intrinsic len, ichar
-      logical upcase, chreql
-      upcase(ch0,ch1) =
-     &  ichar('a').le.ichar(ch0).and.ichar(ch0).le.ichar('z').and.
-     &  ichar(ch1)-ichar(ch0).eq.ichar('A')-ichar('a')
-      chreql(ch0,ch1) = ch0.eq.ch1.or.upcase(ch0,ch1).or.upcase(ch1,ch0)
 *     ------------------------------------------------------------------
 *   ..test installation
 *     (protection against errors of case conversion.)
@@ -42,4 +36,23 @@
       endif
       return
 *     ------------------------------------------------------------------
+      contains
+
+      logical function upcase(ch0,ch1)
+      implicit none
+      character ch0, ch1
+      intrinsic ichar
+      upcase =
+     &  ichar('a').le.ichar(ch0).and.ichar(ch0).le.ichar('z').and.
+     &  ichar(ch1)-ichar(ch0).eq.ichar('A')-ichar('a')
+      return
+      end function upcase
+
+      logical function chreql(ch0,ch1)
+      implicit none
+      character ch0, ch1
+      chreql = ch0.eq.ch1.or.upcase(ch0,ch1).or.upcase(ch1,ch0)
+      return
+      end function chreql
+
       end

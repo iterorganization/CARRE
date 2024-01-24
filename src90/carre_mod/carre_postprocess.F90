@@ -605,10 +605,14 @@ contains
 
                   ! Check if faces are degenerate
                   do iFace = 1, 4
-                      if (dist(grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 1), iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg), &
-                             & grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 1), iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg), &
-                             & grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 2), iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg), &
-                             & grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 2), iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)).lt.1.e-6) then
+                      if (dist(grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                                        & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg), &
+                             & grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                                        & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg), &
+                             & grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                                        & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg), &
+                             & grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                                        & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)).lt.1.e-6) then
                           grid%cellFaceDegen(iFace, iPol, iRad, iReg) = 1
                       end if
                   end do
