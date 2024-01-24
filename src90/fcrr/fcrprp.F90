@@ -128,7 +128,7 @@
       end if
       lclstr(1:nclstr) = .true.
 !
-      if(carre_mode.lt.0.or.carre_mode.gt.2)then
+      if(carre_mode.lt.0.or.carre_mode.gt.3)then
         ex=.true.
         write (*,*) 'fcrprp: wrong value of Carre2 mode, carre_mode=',carre_mode
       endif
@@ -215,7 +215,7 @@
 !*** For Carre2 extended grids modes, construct the polygons of the
 !*** real vessel wall
 !
-      if (carre_mode.eq.2) then
+      if (carre_mode.ge.2) then
         ! construct polygons out of the vessel segments
         call construct_vessel_polygons
 
