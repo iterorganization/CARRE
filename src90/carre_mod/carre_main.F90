@@ -133,7 +133,19 @@ contains
              call resetGeometryAndTopologyData()
 
              ! TODO: output modified equilibrium (use service routines from dg tools)
+
           end if
+
+          if (.not. (par%equExtensionMode == EQU_EXTENSION_OFF)) then
+             ! If equilibrium has been extended then we re-write it
+             open(2,file='rzpsi_ext.dat')
+             call wreqvr(2,nxmax,iret,equ%nx,equ%ny,equ%x,equ%y,equ%psi)
+             if(iret.ne.0) then
+                write(*,*) 'carre_main: error writing the extended Carre equilibrium file'
+                stop
+             end if
+             close(2)
+          endif
 
           !..8.0  Parametrise the separatrices
           IF (equ%npx.GT.0 .and. equ%limcfg.eq.0) THEN
@@ -266,16 +278,6 @@ contains
 
     end if
 
-    if (.not. (par%equExtensionMode == EQU_EXTENSION_OFF)) then
-       ! If equilibrium has been extended then we re-write it
-       open(2,file='rzpsi_ext.dat')
-       call wreqvr(2,nxmax,iret,equ%nx,equ%ny,equ%x,equ%y,equ%psi)
-       if(iret.ne.0) then
-          write(*,*) 'carre_main: error writing the extended Carre equilibrium file'
-          stop
-       end if
-       close(2)
-    endif
 
     call carre_postprocess_computation(par, equ, grid, struct)
 
