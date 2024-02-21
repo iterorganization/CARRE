@@ -38,8 +38,10 @@ c
 c     save relax,pasmin,rlcept,nrelax
 
 *  procedures
+#ifndef GFORTRAN
       INTEGER lnblnk
       EXTERNAL lnblnk
+#endif
       INTRINSIC INDEX, MIN
 
 c=========================
@@ -387,6 +389,7 @@ c-langue
       RETURN
       END
 
+#ifndef GFORTRAN
       integer function lnblnk(string)
       implicit none
       integer i
@@ -404,3 +407,4 @@ c
       lnblnk=1
       return
       end function lnblnk
+#endif
