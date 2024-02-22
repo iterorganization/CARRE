@@ -20,7 +20,7 @@ else
 FFLAGS    = -O
 endif
 
-DBLPAD    = -r8
+DBLPAD    =
 
 COMPILE   = ${FC} -c ${FFLAGS}
 
