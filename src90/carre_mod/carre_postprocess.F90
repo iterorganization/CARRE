@@ -2402,7 +2402,6 @@ contains
   end subroutine finalizeCells
 
 
-
   !> Finalize grid by moving external points of intersected faces onto the boundary.
   !> Allow for internal orthogonal faces to become nonorthogonal w.r.t. the field (but aligned faces remain aligned).
   subroutine finalizeCellsNonorthogonal(grid)
@@ -2414,10 +2413,8 @@ contains
 
     integer :: iPass, dx, dy, nInt, ipFix, irFix, ipNb, irNb
     integer :: ipFace, irFace
-    integer :: ipPolFace, irPolFace,  ipRadFace, irRadFace
-    integer :: ipNbRad, irNbRad, ipNbPol, irNbPol
     logical :: pointOk
-    double precision :: dIntRad, dIntPol, x0, y0, x1, y1
+    double precision :: x0, y0, x1, y1
 
     logical :: pointWasMoved(npmamx,nrmamx,nregmx)
 
