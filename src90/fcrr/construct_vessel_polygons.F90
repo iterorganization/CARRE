@@ -6,8 +6,8 @@
       implicit none
 #include <FCRCOM.F>
       integer(Short) :: i, ipt, npts, npth, nptt, ilbl
-      integer(Short) :: fclblmin, fclblmax
-      integer(Short), allocatable :: fclbls(:)
+      integer(Short) :: fcLblmin, fcLblmax
+      integer(Short), allocatable :: fcLbls(:)
       real(rKind) :: xsrt, ysrt, xend, yend
       real(rKind) :: xhead(nmstr), yhead(nmstr), xtail(nmstr), ytail(nmstr)
       logical lfound, ldir, lused(nvess)
@@ -35,34 +35,37 @@
         return
       end if
 
-      ! check which values of fclbl are present
-      fclblmin = 1e5
-      fclblmax = 0
+      ! check which values of fcLbl are present
+      fcLblmin = 1e5
+      fcLblmax = 0
       do i = 1, nvess
-        fclblmin = min(fclbl(vess_elm(i)),fclblmin)
-        fclblmax = max(fclbl(vess_elm(i)),fclblmax)
+        fcLblmin = min(fcLbl(vess_elm(i)),fcLblmin)
+        fcLblmax = max(fcLbl(vess_elm(i)),fcLblmax)
       end do
 
       ! consistency checks
-      if (fclblmin.ne.1.and..not.(fclblmin.eq.0.and.fclblmax.eq.0)) then
-        write (*,*) 'Warning: possibly inconsistent fclbl definition in DG model'
+      if (fcLblmin.ne.1.and..not.(fcLblmin.eq.0.and.fcLblmax.eq.0)) then
+        write (*,*) 'Warning: possibly inconsistent fcLbl definition in DG model'
         do i = 1, nvess
-          if (fclbl(vess_elm(i)).eq.0) then
-            write (*,*) 'Element ', vess_elm(i), ' has fclbl 0.'
+          if (fcLbl(vess_elm(i)).eq.0) then
+            write (*,*) 'Element ', vess_elm(i), ' has fcLbl 0.'
           endif
         end do
         stop
-      elseif (fclblmin.eq.0.and.fclblmax.eq.0) then
-        write (*,*) 'All vessel elements have fclbl = 0. Labels will be automatically assigned to individual polygon pieces.'
+      elseif (fcLblmin.eq.0.and.fcLblmax.eq.0) then
+        write (*,*) 'All vessel elements have fcLbl = 0.'
+        write (*,*) 'Labels will be automatically assigned to individual polygon pieces.'
       end if
-      allocate(fclbls(fclblmax-fclblmin+1))
-      fclbls = [(i, i = fclblmin, fclblmax)]
+      allocate(fcLbls(fcLblmax-fcLblmin+1))
+      fcLbls = [(i, i = fcLblmin, fcLblmax)]
 
-!      write (*,*) 'construct_vessel_polygons: fclbl'
-!      write (*,*) 'min and max label: ', fclblmin, fclblmax
-!      do i = 1,nvess
-!        write (*,*) 'segment i =',i,', label ',fclbl(vess_elm(i))
-!      end do
+#ifdef DBG
+      write (*,*) 'construct_vessel_polygons: fcLbl'
+      write (*,*) 'min and max labels: ', fcLblmin, fcLblmax
+      do i = 1,nvess
+        write (*,*) 'segment i =',i,', label ',fcLbl(vess_elm(i))
+      end do
+#endif
 
       ! sort elements into polygons
       lused = .false.
@@ -73,11 +76,12 @@
         nstrv = nstrv + 1
         ilbl  = ilbl + 1
 
-        if (ilbl .gt. (fclblmax - fclblmin + 1)) then
+        if (ilbl .gt. (fcLblmax - fcLblmin + 1)) then
           write (*,*) 'Not all vessel elements assigned to a polygon.'
-          write (*,*) 'Check for inconsistent fclbls of the elements.'
-          write (*,*) 'Elements with the same fclbl must form a single'
+          write (*,*) 'Check for inconsistent fcLbls of the elements.'
+          write (*,*) 'Elements with the same fcLbl must form a single'
           write (*,*) 'open or closed polygon (no gaps).'
+          write (*,*) ilbl, fcLblmax, fcLblmax
           stop ' ==> Check DG model'
         endif
 
@@ -86,11 +90,11 @@
         i = 0
         do while (.not.lfound)
           i = i + 1
-          if (.not.lused(i).and.fclbl(vess_elm(i)).eq.fclbls(ilbl)) lfound = .true.
+          if (.not.lused(i).and.fcLbl(vess_elm(i)).eq.fcLbls(iLbl)) lfound = .true.
           if (i.gt.nvess) then
-            write (*,*) 'Found no elements with fclbl = ',fclbls(ilbl), '.'
-            write (*,*) 'Min fclbl = ', fclblmin
-            write (*,*) 'Max fclbl = ', fclblmax
+            write (*,*) 'Found no elements with fcLbl = ',fcLbls(iLbl), '.'
+            write (*,*) 'Min fcLbl = ', fcLblmin
+            write (*,*) 'Max fcLbl = ', fcLblmax
             stop ' ==> Check DG model'
           end if
         end do
