@@ -62,7 +62,7 @@
 #ifdef DBG
       write (*,*) 'construct_vessel_polygons: fcLbl'
       write (*,*) 'min and max labels: ', fcLblmin, fcLblmax
-      do i = 1,nvess
+      do i = 1, nvess
         write (*,*) 'segment i =',i,', label ',fcLbl(vess_elm(i))
       end do
 #endif
@@ -70,18 +70,18 @@
       ! sort elements into polygons
       lused = .false.
       npts  = 0
-      ilbl  = 0
+      iLbl  = 0
       do while (.not.all(lused))
 
         nstrv = nstrv + 1
-        ilbl  = ilbl + 1
+        iLbl  = iLbl + 1
 
         if (ilbl .gt. (fcLblmax - fcLblmin + 1)) then
           write (*,*) 'Not all vessel elements assigned to a polygon.'
           write (*,*) 'Check for inconsistent fcLbls of the elements.'
           write (*,*) 'Elements with the same fcLbl must form a single'
           write (*,*) 'open or closed polygon (no gaps).'
-          write (*,*) ilbl, fcLblmax, fcLblmax
+          write (*,*) ilbl, fcLblmin, fcLblmax
           stop ' ==> Check DG model'
         endif
 
@@ -123,7 +123,7 @@
                ! no further point found in this direction
                ! switch to other side
                ldir = .false.
-            elseif (.not.lused(i).and.fclbl(vess_elm(i)).eq.fclbls(ilbl)) then
+            elseif (.not.lused(i).and.fcLbl(vess_elm(i)).eq.fcLbls(ilbl)) then
               if (points_match (xend, yend, p1(1,vess_elm(i)), p1(2,vess_elm(i)))) then
                 lfound   = .true.
                 lused(i) = .true.
@@ -183,7 +183,7 @@
         ! stitch pieces together
         if (points_match(xhead(npth), yhead(npth), xtail(nptt), ytail(nptt))) then
           ! closed polygon; remove duplicate start/end point here
-          ! (will be added again during writing structure.dat file)
+          ! (will be added again during writing of structure.dat file)
           lclstrv(nstrv) = .true.
           lstrv(nstrv) = nptt + npth - 1
           xstrv(npts+1:npts+npth) = xhead(npth:1:-1)
@@ -207,21 +207,21 @@
 
       ! Some consistency checks
       ! To be added: check that complete vessel is closed in case of multiple (open) polygons
-      if (fclblmin.eq.0.and.fclblmax.eq.0) then
+      if (fcLblmin.eq.0.and.fcLblmax.eq.0) then
         !if (nstrv.ne.1) then
-        !  write (*,*) 'Problem with definition vessel elements.'
+        !  write (*,*) 'Problem with definition of vessel elements.'
         !elseif (.not.lclstrv(1)) then
         !  write (*,*) 'Vessel polygon not closed'
         !end if
       end if
        
-
       write (*,*) 'construct_vessel_polygons -- built ', nstrv, ' vessel polygons'
 
 !======================================================================
+      return
       end 
 
-      real(rKind) function points_dist( x1, y1, x2, y2)
+      real(rKind) function points_dist(x1, y1, x2, y2)
         use KindDefinitions
         implicit none
         real(rKind), intent(in) :: x1, y1, x2, y2
