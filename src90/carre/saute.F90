@@ -108,13 +108,13 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
                   if (ind2 == 0) then
                       x2 = xst(1)
                       y2 = yst(1)
-                      call logmsg(LOGWARNING, "saute: fell of structure at first point (repart=1)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at first point (repart=1)")
                       return
                   end if
                   if (ind2 > npst) then
                       x2 = xst(npst)
                       y2 = yst(npst)
-                      call logmsg(LOGWARNING, "saute: fell of structure at last point (repart=1)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at last point (repart=1)")
                       return
                   end if
               end if
@@ -306,13 +306,13 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
                   if (ind2 == 0) then
                       x2 = xst(1)
                       y2 = yst(1)
-                      call logmsg(LOGWARNING, "saute: fell of structure at first point (repart=2)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at first point (repart=2)")
                       return
                   end if
                   if (ind2 > npst) then
                       x2 = xst(npst)
                       y2 = yst(npst)
-                      call logmsg(LOGWARNING, "saute: fell of structure at last point (repart=2)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at last point (repart=2)")
                       return
                   end if
               end if
