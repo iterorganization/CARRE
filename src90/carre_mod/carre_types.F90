@@ -153,7 +153,11 @@ module carre_types
       integer :: refineAtStructs(strumx) = 0
 
       ! Log level (see Logging.f90)
+#ifdef DBG
+      integer :: logLevel = LOGDEBUG
+#else
       integer :: logLevel = LOGWARNING
+#endif
 
       ! Output format
       character(len=8) :: carre_format = CARRE_VERSION
