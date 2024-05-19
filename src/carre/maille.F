@@ -6,8 +6,11 @@
      .     a,gdr,r,ra,rho,somort,somortp,
      .     gdsomortp,somortpur,somortpurp,gdsomortpurp,sompropo,
      .     sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
-     .     somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
-     .     ymini,ymaxi,distxo,pntrat,nprsb,tgarde)
+     .     somtot,somtotp,gdsomtotp,segt,ireg,modif,
+#ifdef MODIF
+     .     xmini,xmaxi,ymini,ymaxi,
+#endif
+     .     distxo,pntrat,nprsb,tgarde)
 c
 c  version : 23.06.98 19:53
 c
@@ -58,7 +61,10 @@ cank-970707: dimensions from the file
      .  gdsomvarrp(nregmx),
      .  somtot(nrmamx,nregmx),somtotp(nrmamx,nregmx),
      .  gdsomtotp(nregmx),segt(nrmamx,nregmx),
-     .  xmini,xmaxi,ymini,ymaxi,distxo,pntrat,tgarde(4)
+#ifdef MODIF
+     .  xmini,xmaxi,ymini,ymaxi,
+#endif
+     .  distxo,pntrat,tgarde(4)
 
 
 *  variables en common
@@ -473,10 +479,14 @@ c---
      .              gdsompropop(ireg),
      .              somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .              somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .              segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .              ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .              nivx,nivy,
-     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .              segt(1,ireg),ireg,
+#ifdef MODIF
+     .              modif,
+     .              xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .              separx,separy,ptsep,
+     .              nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .              npr,nreg,nprsb)
 
 c
 c  1.3.2  region 2
@@ -570,10 +580,14 @@ c---
      .              sompropo(1,ireg),sompropop(1,ireg),
      .              gdsompropop(ireg),somvarr(1,ireg),somvarrp(1,ireg),
      .              gdsomvarrp(ireg),somtot(1,ireg),somtotp(1,ireg),
-     .              gdsomtotp(ireg),segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .              ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .              nivx,nivy,
-     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .              gdsomtotp(ireg),segt(1,ireg),ireg,
+#ifdef MODIF
+     .              modif,
+     .              xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .              separx,separy,ptsep,
+     .              nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .              npr,nreg,nprsb)
 
          modif=0
 c
@@ -1004,10 +1018,14 @@ c---
      .               gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -1105,10 +1123,14 @@ c---
      .               gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -1221,10 +1243,14 @@ c---
      .               gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -1324,10 +1350,14 @@ c---
      .               sompropop(1,ireg),gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 *
@@ -2061,10 +2091,14 @@ c---
      .               sompropop(1,ireg),gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -2200,10 +2234,14 @@ c---
      .               sompropop(1,ireg),gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -2301,10 +2339,14 @@ c---
      .               sompropop(1,ireg),gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -2426,10 +2468,14 @@ c---
      .               sompropop(1,ireg),gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -2526,10 +2572,14 @@ c---
      .               sompropop(1,ireg),gdsompropop(ireg),
      .               somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .               somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .               segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .               ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .               nivx,nivy,
-     .               nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .               segt(1,ireg),ireg,
+#ifdef MODIF
+     .               modif,
+     .               xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .               separx,separy,ptsep,
+     .               nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .               npr,nreg,nprsb)
 
          modif=0
 
@@ -2888,10 +2938,14 @@ c---
      .              sompropop(1,ireg),gdsompropop(ireg),
      .              somvarr(1,ireg),somvarrp(1,ireg),gdsomvarrp(ireg),
      .              somtot(1,ireg),somtotp(1,ireg),gdsomtotp(ireg),
-     .              segt(1,ireg),ireg,modif,xmini,xmaxi,
-     .              ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .              nivx,nivy,
-     .              nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .              segt(1,ireg),ireg,
+#ifdef MODIF
+     .              modif,
+     .              xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .              separx,separy,ptsep,
+     .              nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .              npr,nreg,nprsb)
 
 *..4.3.2  Region 2
 

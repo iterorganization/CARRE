@@ -166,7 +166,7 @@ c
         call b2agbb (nx,ny,fpsi,ffbz,bb,
      .   crx,cry,psidx,psidy,nxmx,nymx)
 c jdemod - added fpsi to call to ecrim5
-        call ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmx,nymx)
+        call ecrim5(nfin,nx,ny,crx,cry,bb,fpsi,nxmx,nymx)
 c
       else
         write(6,*) 'Wrong value (must be 1 to 5): isel=',isel

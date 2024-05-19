@@ -6,10 +6,14 @@
      .            racpsi,a,gdr,r,ra,rho,somort,somortp,gdsomortp,
      .            somortpur,somortpurp,gdsomortpurp,sompropo,
      .            sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
-     .            somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
-     .            ymini,ymaxi,separx,separy,ptsep,npx,nptot,
-     .            nivx,nivy,
-     .            nivtot,nbniv,np1,npr,xmail,ymail,nreg,nprsb)
+     .            somtot,somtotp,gdsomtotp,segt,ireg,
+#ifdef MODIF
+     .            modif,
+     .            xmini,xmaxi,ymini,ymaxi,xmail,ymail,
+     .            separx,separy,ptsep,
+     .            nbniv,nivx,nivy,nivtot,npx,nptot,np1,
+#endif
+     .            npr,nreg,nprsb)
 c
 c
 c  version : 07.07.97 19:11
@@ -31,9 +35,8 @@ cank-970707: dimensions from the file
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad,
-     .        plaque,repart,nbcrb,npcrb2,nnlast,sol,ireg,modif,
-     .        npx,nptot(4,npxmx),nbniv,
-     .        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg,
+     .        plaque,repart,nbcrb,npcrb2,nnlast,sol,ireg,
+     .        npr(*),nreg,
      .        nprsb(nregmx)
 
       REAL(kind=R8)
@@ -50,12 +53,17 @@ cank-970707: dimensions from the file
      .     somortpur(nrmamx),somortpurp(nrmamx),gdsomortpurp,
      .     sompropo(nrmamx),sompropop(nrmamx),gdsompropop,
      .     somvarr(nrmamx),somvarrp(nrmamx),gdsomvarrp,
-     .     somtot(nrmamx),somtotp(nrmamx),gdsomtotp,segt(nrmamx),
-     .     xmini,xmaxi,ymini,ymaxi,separx(npnimx,4,npxmx),
-     .     separy(npnimx,4,npxmx),
-     .     nivx(npnimx,nbniv),nivy(npnimx,nbniv),
-     .     xmail(npmamx,nrmamx,nregmx),ymail(npmamx,nrmamx,nregmx)
+     .     somtot(nrmamx),somtotp(nrmamx),gdsomtotp,segt(nrmamx)
 
+#ifdef MODIF
+      INTEGER modif,nbniv,npx,
+     .     nptot(4,npxmx),ptsep(4,npx),nivtot(nbniv),np1(*)
+      REAL(kind=R8)
+     .     xmini,xmaxi,ymini,ymaxi,
+     .     separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),
+     .     xmail(npmamx,nrmamx,nregmx),ymail(npmamx,nrmamx,nregmx),
+     .     nivx(npnimx,nbniv),nivy(npnimx,nbniv)
+#endif
       LOGICAL nuldec
 
 *  variables en common

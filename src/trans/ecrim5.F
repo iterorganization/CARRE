@@ -1,5 +1,5 @@
 c=======================================================================
-      subroutine ecrim5(nfin,nx,ny,crx,cry,bb,b0r0,fpsi,nxmax,nymax)
+      subroutine ecrim5(nfin,nx,ny,crx,cry,bb,fpsi,nxmax,nymax)
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
@@ -19,7 +19,7 @@ c  arguments
       integer nfin,nx,ny,nxmax,nymax
       real(kind=R8) 
      .  crx(-1:nxmax,-1:nymax,0:3),cry(-1:nxmax,-1:nymax,0:3),
-     .  bb(-1:nxmax,-1:nymax,0:3),b0r0
+     .  bb(-1:nxmax,-1:nymax,0:3)
       real(kind=R8) fpsi(-1:nxmax,-1:nymax,0:3)
 c
 c  local variables
@@ -162,9 +162,6 @@ c
      >          (cry(ix,iy,0)+cry(ix,iy,2))/2.0
 
       end do 
-
-
-
 
       return
       end

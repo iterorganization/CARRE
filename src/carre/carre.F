@@ -67,8 +67,11 @@ cank-970702: moved dimensions to the CARREDIM.F
      .   gdr(nrmamx,nregmx),
      .   r(nrmamx,nregmx), ra(nrmamx,nregmx), rho(nrmamx,nregmx),
      .   somort(nrmamx,nregmx), somortp(nrmamx,nregmx),
-     .   gdsomortp(nregmx), xmini,
-     .   xmaxi, ymini, ymaxi, somortpur(nrmamx,nregmx),
+     .   gdsomortp(nregmx),
+#if ( defined(MODIF) || defined(EXTRA_GRAPHS) )
+     .   xmini, xmaxi, ymini, ymaxi,
+#endif
+     .   somortpur(nrmamx,nregmx),
      .   somortpurp(nrmamx,nregmx), gdsomortpurp(nregmx),
      .   sompropo(nrmamx,nregmx), sompropop(nrmamx,nregmx),
      .   gdsompropop(nregmx),
@@ -470,8 +473,11 @@ c>>>
      .    gdsomortp,somortpur,somortpurp,gdsomortpurp,
      .    sompropo,
      .    sompropop,gdsompropop,somvarr,somvarrp,gdsomvarrp,
-     .    somtot,somtotp,gdsomtotp,segt,ireg,modif,xmini,xmaxi,
-     .    ymini,ymaxi,distxo,pntrat,nprsb,tgarde)
+     .    somtot,somtotp,gdsomtotp,segt,ireg,modif,
+#ifdef MODIF
+     .    xmini,xmaxi,ymini,ymaxi,
+#endif
+     .    distxo,pntrat,nprsb,tgarde)
 
 c*
 c* WARNINGS CALCULATION AND OUTPUT
