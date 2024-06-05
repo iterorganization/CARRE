@@ -226,10 +226,10 @@ endif
 endif
 
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/*.${MOD} ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
 
 neat:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/*.${MOD}
 
 local:
 	-rm rzpsi.mtv rzpsi.ps map loadmap gnuplot.data gnuplot.cmd
