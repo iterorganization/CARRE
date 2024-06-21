@@ -2,8 +2,8 @@
 
 c  version : 21.07.2000 16:18
 c=======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 
 c*** Calculate the x and y coordinates of a point located on a curve v 
 c*** at a distance d from the origin of the curve

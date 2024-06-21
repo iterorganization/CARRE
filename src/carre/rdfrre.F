@@ -1,7 +1,7 @@
       subroutine rdfrre(iunit,vari,rr,ierror)
 c  version : 03.07.2000 23:01
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 c  read a real number from a chain of characters vari
 c
 c  arguments

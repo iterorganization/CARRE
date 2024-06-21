@@ -5,8 +5,8 @@
 c
 c  version : 18.06.98 20:20
 c
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
       real(kind=R8) plqdst
 
 *..Cette sous-routine calcule la distance entre deux points sur une meme

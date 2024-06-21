@@ -5,10 +5,10 @@ c
 c======================================================================
 c*** Create the structure file for Carre
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
       character chcstr*(*)
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
       integer i,j,k,l
 c======================================================================
 c

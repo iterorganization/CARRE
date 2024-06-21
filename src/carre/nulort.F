@@ -6,22 +6,17 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comort
       IMPLICIT NONE
 
 *..  Cette fonction
 
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
       REAL(kind=R8) nulort
 
 * arguments
       REAL(kind=R8) d
-
-*  variables en common
-
-#include <COMORT.F>
 
 *  variables locales
       REAL(kind=R8) x2,y2,ux2,uy2,x12,y12,zlong,dd

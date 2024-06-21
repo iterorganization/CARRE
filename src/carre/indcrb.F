@@ -2,8 +2,8 @@
 ************************************************************************
       INTEGER FUNCTION indcrb(vx,vy,n,x,y,d)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction renvoie l'indice du point du debut du segment entre
 *  2 points parametrises sur lequel se trouve le point x,y. On effectue

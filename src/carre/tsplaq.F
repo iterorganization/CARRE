@@ -2,8 +2,9 @@
 ************************************************************************
       LOGICAL FUNCTION tsplaq(vx,vy,k,npx,px,py)
 ************************************************************************
+      use carre_types
+      use comort
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction verifie si l'accroissement d'une courbe est monotone
 
@@ -13,8 +14,7 @@
 
 *  variables locales
       INTEGER i
-      REAL(kind=R8) dist1,dist2,eps_Xpt
-      common /geom/ eps_Xpt
+      REAL(kind=R8) dist1,dist2
 cxpb      PARAMETER (eps=0.015)
 c!!!  attention a ce facteur de 0.05. Xavier a du l'augmenter dans
 c     certains cas.

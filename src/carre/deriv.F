@@ -2,8 +2,8 @@
 ************************************************************************
       SUBROUTINE DERIV(nmax, r, f, fp, n)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..   Cette sous-routine calcule la derivee fp en chaque point r d'un
 *  vecteur f.

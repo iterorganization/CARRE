@@ -2,8 +2,8 @@
 ************************************************************************
       LOGICAL FUNCTION milieu(f1, f2, niv)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *    Cette fonction verifie si la valeur d'une fonction niv est presente
 *  entre deux valeurs de fonction: f1 et f2.

@@ -6,11 +6,11 @@ c======================================================================
 c*** Write the coordinates of the x- and o-points for Carre
 c*** At present, always a single-null configuration
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
       integer i
       character ofile*(*)
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
 c======================================================================
 c
       if(xptcntr(1,1).ge.0. .and. xlpcntr(1).ge.0.) then

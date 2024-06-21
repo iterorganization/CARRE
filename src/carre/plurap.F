@@ -2,8 +2,8 @@
 ************************************************************************
       subroutine plurap(tx1,ty1,n1,tx2,ty2,n2,x0,y0,ind0)
 ************************************************************************
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 
 c  Determination des coordonnees (x0,y0) et de l'indice de segment ind0
 c  du point de la structure parametrisee par [tx1, ty1, n1], qui est

@@ -6,8 +6,8 @@ c
 c======================================================================
 c*** This routine apparently creates the "guard cells" around the mesh
 c======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 c
 c  arguments
       integer nx,ny,nxmax,nymax

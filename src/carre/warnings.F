@@ -10,13 +10,17 @@ c****************************************************************
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
+      use carre_dimensions
+      use carre_types
+      implicit none
       REAL(KIND=R8)
      & nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo
       REAL(KIND=R8)
      & separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto,
      & distnv
+      INTEGER i,j
+      REAL(KIND=R8)
+     & adz,adzu,adzo,bdzu,bdzo,distsn,dz,rs,rn,sxo,syo,sxu,syu,z
       
       open (33,file='warnings.dat')
       rewind 33
@@ -40,7 +44,6 @@ c****************************************************************
                sxo=separx(i,j,1)
                syo=separy(i,j,1)
                endif
-      
             endif
           enddo
       if (nivx(i,1).GT.xpto) then

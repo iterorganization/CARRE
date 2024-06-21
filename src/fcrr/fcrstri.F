@@ -5,10 +5,10 @@ c
 c======================================================================
 c*** Read the structure file from dg
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
       integer lun
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
       integer i,j,k,l,n
       real(kind=R4) x, y
 c======================================================================

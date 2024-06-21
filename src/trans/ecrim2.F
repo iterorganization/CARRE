@@ -7,8 +7,8 @@ c======================================================================
 c*** This routine writes the grid from carre directly in the B2.5 format
 c by Heimo Buerbaumer
 c======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 c
 c  arguments
       integer nfin,nx,ny,nxmax,nymax

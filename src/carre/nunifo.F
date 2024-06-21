@@ -2,8 +2,8 @@
 ************************************************************************
       SUBROUTINE NUNIFO(npoint,l,d1,dn,interv,dmin,dmax)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette sous-routine repartit les points de facon non uniforme sur
 *  une courbe en faisant passer une parabole par les premier et

@@ -1,8 +1,8 @@
 ************************************************************************
       INTEGER FUNCTION indsgm(xst,yst,n,xx,yy)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction trouve le segment d'une structure auquel est associe
 *  un point de contact (xx,yy). Les erreurs numeriques font que ce point

@@ -12,9 +12,9 @@ c*** and indexes them in correct order
 *..  Cette sous-routine arrange les separatrices de la facon demandee
 *  et les ordonnes selon un ordre precis.
 c======================================================================
+      use carre_types
+      use comlan
       IMPLICIT NONE
-#include <CARRETYPES.F>
-#include <COMLAN.F>
 
 *  arguments
       INTEGER npnimx,npx,indplq(4,npx),nptot(4,npx),ptsep(4,npx),

@@ -3,8 +3,9 @@
       subroutine clort(x1,y1,x2,y2,ort,nppol,pasmin,g1,g2,l0,l2,
      .        	ortpur,propo,varr,tot)
 ************************************************************************
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
+
 c  calcul des fonctions qui s'annulent quand deux series de points sont
 c  disposees de facon "orthogonale".
 c

@@ -4,9 +4,11 @@ c  version : 05.04.97 15:51
 c
 c======================================================================
 C
+      use comqua
+      implicit none
+      INTEGER IFLG,LNNO
       CHARACTER*(*) LBNM
-c  variables en common
-#include <COMQUA.F>
+      INTEGER ICAR
       external gstxfp
 c======================================================================
 C The routine AGCHIL is called by AGLBLS just before and just after each

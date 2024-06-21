@@ -6,21 +6,16 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use perim
       implicit none
 c  lignes de niveau pour les deux fonctions f1=0 et f2=0
 c
 
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
-
 c  arguments
       integer n1,n2
       real(kind=R8) f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
-c
-c  variables en common
-#include <PERIM.F>
 c
 c  variables locales
       integer iwrk(1000),i1,i2,ll

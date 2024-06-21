@@ -4,8 +4,8 @@
 c
 c  version : 12.05.97 14:05
 c
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 c*** This subroutine calculates the positions of the successive points 
 c*** on a specified level line. It stops when the line crosses a 

@@ -1,8 +1,8 @@
 ************************************************************************
       LOGICAL FUNCTION chgdir(nivox,nivoy,nivxtm,nivytm)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction verifie si 2 vecteurs sont de sens inverse ou non.
 

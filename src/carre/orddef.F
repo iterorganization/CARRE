@@ -9,15 +9,13 @@ c*** right, fourth bottom left. If there is only one X-point, then 1 is
 c*** the right and 2 is the left.
 c***  	NB: the O-point coordinates are in ptx(npx+1), pty(npx+1).
 c=======================================================================
+      use carre_types
+      use comlan
       implicit none
-#include <CARRETYPES.F>
+
 *  arguments
       integer nbdef, inddef(nbdef),npx
       real(kind=R8) xst(*),yst(*),ptx(npx+1),pty(npx+1)
-
-*  variables en common
-
-#include <COMLAN.F>
 
 *  variables locales
       integer n
