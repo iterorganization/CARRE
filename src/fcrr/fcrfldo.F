@@ -5,10 +5,10 @@ c
 c======================================================================
 c*** Create the toroidal field file for Carre
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
       character ofile*(*)
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
 c======================================================================
 c
       open(2,file=ofile)

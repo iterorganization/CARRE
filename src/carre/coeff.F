@@ -1,8 +1,8 @@
 ************************************************************************
       SUBROUTINE COEFF(n1max,n2max,nx,ny,x,y,f,a00,a10,a01,a11)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..   Cette sous-routine calcule les coefficients a00, a10, a01 et a11
 *  pour chaque carre de coordonnees (i,j) de l'equation :

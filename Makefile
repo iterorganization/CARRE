@@ -98,9 +98,9 @@ VHEAD   =
 ifeq ($(shell [ -d ${SRCLOCAL} ] && echo yes || echo no ),yes)
 VHEAD   =${SRCLOCAL}:
 endif
-FPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy
+FPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/include:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy
 GPATH   = ${SRCDIR}/cntour:${SRCDIR}/graphe
-VPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/cntour:${SRCDIR}/dummy:${SRCDIR}/graphe
+VPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/include:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/cntour:${SRCDIR}/dummy:${SRCDIR}/graphe
 
 INCLUDE = -I${SRCDIR}/include
 
@@ -183,15 +183,26 @@ $(OBJDIR)/%.o : %.F
 	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
 ifeq ($(strip ${DBLPAD}),)
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
-	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f; \
-	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f
 else
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
-	esac; \
-	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+	esac
+endif
+	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+ifneq (${MOD},o)
+	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
+endif
+
+ifneq (${MOD},o)
+$(OBJDIR)/%.${MOD} : %.F
+	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
+	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f
+	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
 endif
 
 ifeq (${USE_DIMENSIONS},1)
@@ -226,10 +237,10 @@ endif
 endif
 
 clean:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/*.${MOD} ${OBJDIR}/libcarre.a ${OBJDIR}/libgcarre.a ${OBJDIR}/${PROG} ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR} ${SRCDIR}/include/git_version_Carre.h ${OBJDIR}/dependencies* ${OBJDIR}/LISTOBJ
 
 neat:
-	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f
+	rm -rf ${OBJDIR}/*.o ${OBJDIR}/*.f ${OBJDIR}/*.${MOD}
 
 local:
 	-rm rzpsi.mtv rzpsi.ps map loadmap gnuplot.data gnuplot.cmd

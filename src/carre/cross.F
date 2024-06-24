@@ -2,8 +2,8 @@
 ************************************************************************
       LOGICAL FUNCTION cross(ind,xx,yy,xst,yst,n)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction verifie si un segment traverse un segment de
 *  structure autre que celui sur lequel on est en train de marcher.

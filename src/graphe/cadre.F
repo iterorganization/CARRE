@@ -3,12 +3,11 @@ c
 c  version : 05.04.97 15:53
 c
 c======================================================================
+      use perim
       implicit none
 c  on definit les dimensions du cadre dans lequel qui sert a tracer les
 c  graphiques.
 c
-c  variables en common
-#include <PERIM.F>
 c======================================================================
 c  calculs
 c

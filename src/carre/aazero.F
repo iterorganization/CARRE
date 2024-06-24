@@ -2,8 +2,8 @@
 ************************************************************************
       FUNCTION aazero(fcn,x0,dx0,dxmin,fmin,xmin,xmax,itmax)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
       REAL(kind=R8) aazero
 c
 c  Purpose: find the zero of a REAL function fcn by the secant method.

@@ -1,8 +1,8 @@
 ************************************************************************
       INTEGER FUNCTION ifind(x,t,n,inc)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction retourne l'indice i tel que t(i)<=x<t(i+1) sur un
 *  tableau t d'indice 1, ..., n par bonds de inc.

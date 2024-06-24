@@ -10,8 +10,8 @@ cank-19990801: the data for isolating cut added to the header
 cxpb-20070424: removed the abs() of brat so the helicity information 
 c              is kept !
 c======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 c
 c  arguments
       integer i,nfin,nx,ny,nxmax,nymax,ncut,nxcut(ncut),nycut(ncut),

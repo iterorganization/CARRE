@@ -2,8 +2,8 @@
 ************************************************************************
       LOGICAL FUNCTION trvers(x1,y1,x2,y2,vx,vy,n)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction nous dit si le segment de 1 a 2 traverse la courbe v
 

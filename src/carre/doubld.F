@@ -16,6 +16,10 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comort
+      use comrlx
       IMPLICIT NONE
 
 c======================================================================
@@ -29,11 +33,6 @@ c       presently used is considered to be the best one in practice.
 c       The code between c--- has also been commented with "crlx".
 c======================================================================
 
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
-
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),
      .        nn1,nprad,plaque,repart,npcrb2
@@ -45,11 +44,6 @@ cank-970707: dimensions from the file
      .     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3),
      .     xcrb2(npcrb2),ycrb2(npcrb2),
      .     xpto,ypto
-
-*  variables en common
-
-#include <COMORT.F>
-#include <COMRLX.F>
 
 *  variables locales
       INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,i,nn(2),crbnmx,

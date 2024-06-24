@@ -1,7 +1,8 @@
 c=======================================================================
       subroutine ecrim3(nfin,nx,ny,crx,cry,bb,nxmax,nymax)
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
+
 c  cette routine ecrit la maille sous format DIVIMP. elle est identique
 c  a la routine mhdvmp de b2ag.F
 cxpb-20070424: removed the abs() of brat so the helicity information 

@@ -9,17 +9,16 @@ c
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comrlx
+      use comlan
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette sous-routine remplace la valeur d'une variable par une
 *  nouvelle valeur desiree. Elle est appelee pour la lecture des parame-
 *  tres dans un fichier (unite d'entree correspond a l'unite du fichier)
 *  ainsi que pour la modification au clavier (unite d'entree = 5).
-
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARREDIM.F>
 
 *  arguments
       INTEGER nptseg(10),repart,npr(nregmx),ient,isor,ifail
@@ -30,12 +29,6 @@ cank-970707: dimensions from the file
       INTEGER ieg,ierror,ipx,npx
       REAL(KIND=R8) x, y
       CHARACTER*80 vari, novlan
-
-*  variables en common
-c
-#include <COMLAN.F>
-#include <COMRLX.F>
-c     save relax,pasmin,rlcept,nrelax
 
 *  procedures
 #ifndef GFORTRAN

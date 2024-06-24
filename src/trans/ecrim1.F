@@ -1,8 +1,9 @@
 c=======================================================================
       subroutine ecrim1(nfin,rm,zm,nptseg,nreg,nppol,nprad,
      .  npmamx,nrmamx)
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
+
 c  cette sous-routine ecrit une maille curviligne orthogonale produite
 c  par le programme carre, sous un format particulier.
 c

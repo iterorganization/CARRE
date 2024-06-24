@@ -2,8 +2,8 @@
 ************************************************************************
       SUBROUTINE COORD1(vx,vy,n,d,x,y,period)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..Cette sous-routine renvoit les coordonnees x et y d'un point situe
 *  sur une courbe v, et a une distance d du debut de celle-ci.

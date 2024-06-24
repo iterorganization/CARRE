@@ -8,16 +8,15 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comrlx
+      use comlan
       IMPLICIT NONE
 
 *..  Cette sous-routine imprime a l'ecran un tableau contenant tous les
 *  parametres choisis, ainsi que quelques resultats intermediaires.
 *  nouvelle valeur desiree.
-
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
 
 *  arguments
       INTEGER nptseg(*),repart,npr(*),nreg,nsep,npx,iusor
@@ -26,11 +25,6 @@ cank-970707: dimensions from the file
      .       distnv(5,*),difpsi,dpmin(*),dpmax(*),drmin(*),drmax(*),
      .       tgarde(4),distxo
       LOGICAL correct
-
-*  variables en common
-
-#include <COMRLX.F>
-#include <COMLAN.F>
 
 *  variables locales
       INTEGER i

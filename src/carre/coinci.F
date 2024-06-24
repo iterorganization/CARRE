@@ -20,8 +20,8 @@ c***  const   the tolerance
 c*** Output:
 c***  The function value gives the index of the point found
 
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 
 *  arguments
       integer n

@@ -22,8 +22,8 @@ c=====================================================
 c
 c  version : 25.02.98 20:54
 c
+      use carre_types
       implicit none
-#include "CARRETYPES.F"
       integer lun, ngpr, ngpz, iret, nr, nz
       real(kind=R8) :: rgr(*), zgr(*), pfm(ngpr, *)
 c... toroidal field in tesla, radius in m

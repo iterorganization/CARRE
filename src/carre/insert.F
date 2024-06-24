@@ -6,9 +6,9 @@ c=======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
 
 *.. This routine creates a vector of indices of the divertor targets
 

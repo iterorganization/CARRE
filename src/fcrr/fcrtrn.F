@@ -5,9 +5,9 @@ c
 c======================================================================
 c*** Input of target data for Carre
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
       character*8 nam
 c
       integer nnms
@@ -126,9 +126,9 @@ c----------------------------------------------------------------------
 c======================================================================
       subroutine fcrchktp(lun)
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
       integer lun
       character*80 uline
 

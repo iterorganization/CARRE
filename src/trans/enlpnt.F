@@ -1,7 +1,8 @@
 c=======================================================================
       subroutine enlpnt(v,nelem,xmail,ymail,ncoord,i1,i2)
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
+
 c  on retire un point i1 de la liste des noeuds et on le remplace par le
 c  point d'indice i2
 c

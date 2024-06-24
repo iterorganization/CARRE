@@ -5,6 +5,7 @@ c
 c  version : 04.07.97 19:39
 c
 * Start a new plot
+      use perim
       implicit none
 c
 c  donnees
@@ -17,10 +18,6 @@ c  echx, echy: echelles des axes x et y respectivement.
 c
       real xmin,xmax,ymin,ymax
       character*(*) xlab,ylab,title,echx,echy
-c
-c  variables en common
-c
-#include <PERIM.F>
 c
 c  variables locales
       integer ll

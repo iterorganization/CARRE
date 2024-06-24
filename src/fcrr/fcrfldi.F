@@ -6,10 +6,10 @@ c======================================================================
 c*** Read the field data from dg equilibrium file or from a separate
 c*** file 'field.dg'
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
       integer lun
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
       integer i
       real(kind=R8) btf,rtf
       logical ex

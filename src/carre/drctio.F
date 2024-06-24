@@ -3,8 +3,8 @@ c
 c  version : 30.06.98 17:18
 c
 c======================================================================
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..Determination de la direction anti-horaire (dir=+1) ou horaire (-1)
 *  qui correspond a un deplacement vers la droite ou vers la gauche

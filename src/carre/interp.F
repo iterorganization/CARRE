@@ -2,8 +2,8 @@
 ************************************************************************
       FUNCTION interp(r1, r2, f1, f2, f)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
       REAL(kind=R8) interp
 
 *    Cette fonction renvoie la valeur de l'interpolation lineaire entre
