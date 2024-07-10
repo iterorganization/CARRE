@@ -42,6 +42,12 @@ ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local ] && 
   MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
 endif
 
+ifdef IMAS_PREFIX
+ifeq ($(shell test ${GGD_MAJOR_VERSION} -eq 0; echo $$?),0)
+$(warning Asking for an IMAS build but missing a GGD module: build may be incomplete)
+endif
+endif
+
 # Extensions for object directories when various options are used
 ifdef SOLPS_OPENMP
 EXT_OPENMP = .openmp

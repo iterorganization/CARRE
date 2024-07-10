@@ -9,7 +9,11 @@ ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -le 12; echo $$?),0)
 FFLAGS   += -vec_report0
 endif
 ifdef IMAS_VERSION
-B2INCLUDE += `pkg-config imas-ifort ggd --cflags`
+B2INCLUDE += `pkg-config imas-ifort --cflags`
+GGD_MAJOR_VERSION ?= $(shell echo ${GGD_VERSION} | cut -d '.' -f1 )
+ifeq ($(shell test ${GGD_MAJOR_VERSION} -gt 0; echo $$?),0)
+B2INCLUDE += `pkg-config ggd --cflags`
+endif
 endif
 ifdef AMNS_PREFIX
 B2INCLUDE += `pkg-config amns --cflags`
