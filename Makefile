@@ -308,7 +308,11 @@ ${SRCDIR}/include/git_version_Carre.h: force
 	@echo "     . '`git describe --tags --dirty --always | cut -c 1-32`'" >> ${SRCDIR}/include/git_version_new.h
 	@if cmp -s ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; then rm ${SRCDIR}/include/git_version_new.h; else mv ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; fi
 
+ifeq (${USE_DIMENSIONS},1)
+${OBJDIR}/dependencies.${COMPILER}: ${B2SRC}/modules/.new_modules
+else
 ${OBJDIR}/dependencies.${COMPILER}:
+endif
 	-mkdir -p ${OBJDIR}
 	touch ${OBJDIR}/dependencies.${COMPILER}
 	${MAKE} VERSION
