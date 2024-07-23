@@ -206,7 +206,7 @@ $(OBJDIR)/%.${MOD} : %.F
 endif
 
 ifeq (${USE_DIMENSIONS},1)
-${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F
+${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
@@ -215,7 +215,7 @@ ifneq ($(COMPILER),nag_f90)
 	@if [ -f ${OBJDIR}/b2mod_dimensions.${MOD} ] ; then touch ${OBJDIR}/b2mod_dimensions.${MOD} ; fi
 endif
 ifneq (${MOD},o)
-${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
+${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
