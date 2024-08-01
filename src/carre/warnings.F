@@ -40,7 +40,6 @@ c****************************************************************
                sxo=separx(i,j,1)
                syo=separy(i,j,1)
                endif
-      
             endif
           enddo
       if (nivx(i,1).GT.xpto) then

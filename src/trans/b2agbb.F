@@ -72,7 +72,7 @@ c======================================================================
 
 *   ..local variables
       integer ix, iy
-      real(kind=R8) t0,psdx,psdy,babs,pi,r0,b0
+      real(kind=R8) t0,psdx,psdy,babs,pi
 *   ..procedures
       intrinsic sqrt,sign
 *-----------------------------------------------------------------------
@@ -81,9 +81,6 @@ c======================================================================
 * ..compute magnetic field
       pi=4.*atan(1.)
 *   ..loop over cells
-
-      r0=0.86
-      b0=2.
 
       do iy = -1, ny
 c***

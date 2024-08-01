@@ -116,7 +116,6 @@ C    Il faut donc specifier HIT et LOT si on ne desire aucun texte.
       CALL CPSETC ('HIT',' ')
       CALL CPSETC ('LOT',' ')
 
-
 C     ON TROUVE LE MINIMUM DES VALEURS DE Z
       DO I=1,NX
        DO J=1,NY
@@ -134,7 +133,6 @@ C  ON DIVISE L'INTERVALLE ENTRE LE MAX. ET LE MIN. PAR LE NOMBRE DE LIGNES
 C  DE NIVEAU.
 
       ECART=(ZMAX-ZMIN)/REAL(INCL)
-
 
 C  ON CALCULE LA VALEUR DE CHAQUE LIGNE DE NIVEAU EN SPECIFIANT LES PARA-
 C  METRES QUI L'ACCOMPAGNENT
@@ -205,7 +203,6 @@ C         point. A vous de creer votre propre ligne!
         CALL CPSETI ('CLU - CONTOUR LEVEL USE',ICLU)
         CALL CPSETI ('CLD - CONTOUR LINE DASH PATTERN',ICLD)
 
-
 C  - AIA,AIB: Ces deux parametres specifient les niveaux superieur et
 C             inferieur au niveau courant; si le niveau AIA et le niveau
 C             AIB sont egaux a 0, la ligne courante est ignoree par CON-
@@ -215,7 +212,6 @@ C             PACK.
         CALL CPSETI ('AIA - AREA IDENTIFIER ABOVE LEVEL',I+1)
 
 103   CONTINUE
-
 
 C
 C  CALCUL DES LIGNES DE NIVEAU

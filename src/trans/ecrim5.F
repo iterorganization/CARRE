@@ -220,7 +220,6 @@ c
       psimin_carre = 1e20
       do i = 1,nx
          do j = 1,ny
-            
            psimin_carre=min(psi(i,j),psimin_carre)
         end do 
       end do

@@ -19,7 +19,6 @@ c======================================================================
       IMPLICIT NONE
 
 *..  Cette sous-routine fait le maillage curviligne orthogonal dans
-
 *  la region centrale.
 
 *  variables en common

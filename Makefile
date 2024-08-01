@@ -183,19 +183,30 @@ $(OBJDIR)/%.o : %.F
 	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o
 ifeq ($(strip ${DBLPAD}),)
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
-	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f; \
-	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f
 else
 	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
 	case $< in \
 		${SRCDIR}/trans/* ) $(COMPILE) ${FFLAGSEXTRA} $(DBLPAD) $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
 		       *    ) $(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f;; \
-	esac; \
-	if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+	esac
+endif
+	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+ifneq (${MOD},o)
+	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
+endif
+
+ifneq (${MOD},o)
+$(OBJDIR)/%.${MOD} : %.F
+	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
+	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
+	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f
+	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
 endif
 
 ifeq (${USE_DIMENSIONS},1)
-${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F
+${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
@@ -204,7 +215,7 @@ ifneq ($(COMPILER),nag_f90)
 	@if [ -f ${OBJDIR}/b2mod_dimensions.${MOD} ] ; then touch ${OBJDIR}/b2mod_dimensions.${MOD} ; fi
 endif
 ifneq (${MOD},o)
-${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
+${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
@@ -297,7 +308,11 @@ ${SRCDIR}/include/git_version_Carre.h: force
 	@echo "     . '`git describe --tags --dirty --always | cut -c 1-32`'" >> ${SRCDIR}/include/git_version_new.h
 	@if cmp -s ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; then rm ${SRCDIR}/include/git_version_new.h; else mv ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; fi
 
+ifeq (${USE_DIMENSIONS},1)
+${OBJDIR}/dependencies.${COMPILER}: ${B2SRC}/modules/.new_modules
+else
 ${OBJDIR}/dependencies.${COMPILER}:
+endif
 	-mkdir -p ${OBJDIR}
 	touch ${OBJDIR}/dependencies.${COMPILER}
 	${MAKE} VERSION
