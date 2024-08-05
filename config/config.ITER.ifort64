@@ -5,7 +5,12 @@ ifdef NCARG_ROOT
 LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lm -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
 endif
 
-FC        = ifort
+OS = $(shell grep -m1 NAME /etc/os-release | cut -d '"' -f 2 | cut -d ' ' -f 1 )
+ifeq (,$(findstring CentOS,$(OS)))
+FC       ?= ifort
+else
+FC       ?= ifx
+endif
 CPP       = /lib/cpp -C -traditional -ffreestanding
 
 #!!!Local Variables:

@@ -1,7 +1,10 @@
 COMPILER_MAJOR_VERSION = $(shell ${FC} -V 2>&1 | grep -o "Version [0-9]*" | cut -d ' ' -f 2 )
 
 ifdef SOLPS_DEBUG
-FFLAGS   += -g -C -debug all -traceback -check all
+FFLAGS   += -g -C -debug all -traceback -check all -diag-disable:10440 -diag-disable:10182
+ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -ge 2023; echo $$?),0)
+FFLAGS   += -check nouninit
+endif
 else
 FFLAGS   += -O
 ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -ge 15; echo $$?),0)
