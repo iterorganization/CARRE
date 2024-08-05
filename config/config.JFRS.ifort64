@@ -4,7 +4,7 @@ LD_NCARG ?= `pkg-config ncarg --libs`
 endif
 LD_MSCL  ?= -L${SOLPSLIB} -lmscl
 
-FC        = ftn
+FC       ?= ftn
 CPP       = /lib/cpp -traditional -ffreestanding
 
 LDFLAGS   = -dynamic
