@@ -10,7 +10,16 @@ else
 FFLAGS  += -O
 endif
 ifdef IMAS_VERSION
+ifdef AL_VERSION
+AL_MAJOR_VERSION ?= $(shell echo ${AL_VERSION} | cut -d '.' -f1 )
+else
+AL_MAJOR_VERSION ?= $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
+endif
+ifeq ($(shell test ${AL_MAJOR_VERSION} -ge 5; echo $$?),0)
+B2INCLUDE += `pkg-config al-fortran --cflags`
+else
 B2INCLUDE += `pkg-config imas-gfortran --cflags`
+endif
 GGD_MAJOR_VERSION ?= $(shell echo ${GGD_VERSION} | cut -d '.' -f1 )
 ifeq ($(shell test ${GGD_MAJOR_VERSION} -gt 0; echo $$?),0)
 B2INCLUDE += `pkg-config ggd --cflags`
