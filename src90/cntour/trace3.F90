@@ -37,6 +37,7 @@
 !
 !  procedures
       integer ifind
+      external ifind
       external agcurv,newpag,endpag
 !
 !  calculs
