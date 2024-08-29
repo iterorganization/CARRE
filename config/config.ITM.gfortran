@@ -2,10 +2,10 @@
 NCARG_ROOT ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG
 MSCL_ROOT ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/mscl
 GLI_HOME ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/gks
-LD_NCARG ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm
+LD_NCARG ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 LD_MSCL ?= -L${MSCL_ROOT}/lib -lmscl
 
-FC      = gfortran
+FC     ?= gfortran
 CPP     = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG

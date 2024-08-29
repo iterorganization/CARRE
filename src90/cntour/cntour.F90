@@ -4,6 +4,7 @@
 !
 !======================================================================
       use KindDefinitions
+      use perimtr
       implicit none
 !  lignes de niveau pour les deux fonctions f1=0 et f2=0
 !
@@ -15,9 +16,6 @@
 !  arguments
       integer n1,n2
       real(rKind) :: f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
-!
-!  variables en common
-#include <PERIM.F>
 !
 !  variables locales
       integer iwrk(1000),i1,i2,ll

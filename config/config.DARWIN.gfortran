@@ -4,10 +4,11 @@ ifndef LD_MSCL
 endif
 
 FC     ?= gfortran
-CPP     = /lib/cpp -traditional -ffreestanding
+CPP     = /usr/bin/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS  = -C -Wall -fbounds-check -fbacktrace
+FFLAGS  = -fbacktrace
+endif
 
 DBLPAD  =
 
