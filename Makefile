@@ -308,6 +308,7 @@ endif
 endif
 
 listobj:
+ifneq ($(shell uname),Darwin)
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
 	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${FPATH}" | tr : \ `; do \
@@ -345,6 +346,33 @@ listobj:
 		E="$$E -e 's/ $$f//'"; \
 	done; \
 	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+else
+	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
+	l="OBJS ="; \
+	for d in `echo "${FPATH}" | tr : \ `; do \
+		l="$$l `find $$d -name '*.F' -exec basename {} \; | tr '\n' ' '`"; \
+	done; \
+	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
+		E="$$E -e 's/ $$f//'"; \
+	done; \
+	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ
+	@ll="GOBJS ="; \
+	for d in `echo "$(GPATH)" | tr : \ `; do \
+		ll="$$ll `find $$d -name '*.F' -exec basename {} \; | tr '\n' ' '`"; \
+	done; \
+	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
+		E="$$E -e 's/ $$f//'"; \
+	done; \
+	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+	@lll="B2OBJS ="; \
+	for d in `echo "$(B2PATH)" | tr : \ `; do \
+		lll="$$lll `find $$d -name '*.F90' -exec basename {} \; | tr '\n' ' '`"; \
+	done; \
+	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
+		E="$$E -e 's/ $$f//'"; \
+	done; \
+	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+endif
 
 ${OBJDIR}/LISTOBJ: listobj ${ITM_SRC_PREREQS}
 
