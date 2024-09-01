@@ -10,14 +10,11 @@
 !***  	NB: the O-point coordinates are in ptx(npx+1), pty(npx+1).
 !=======================================================================
       use KindDefinitions
+      use comlan
       implicit none
 !  arguments
       integer nbdef, inddef(nbdef),npx
       real(rKind) :: xst(*),yst(*),ptx(npx+1),pty(npx+1)
-
-!  variables en common
-
-#include <COMLAN.F>
 
 !  variables locales
       integer n

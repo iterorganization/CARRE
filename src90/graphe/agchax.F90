@@ -3,12 +3,11 @@
 !  version : 05.04.97 15:50
 !
 !======================================================================
+      use comqua
       implicit none
       integer iflg,iaxs,iprt
       real vils
       external gslwsc
-!  variables en common
-#include <COMQUA.F>
 !======================================================================
 ! The routine AGCHAX is called by AGAXIS just before and just after each
 ! of a selected set of objects on the axes are drawn.  A user may supply

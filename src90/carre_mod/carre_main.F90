@@ -1,6 +1,7 @@
 module carre_main
 
   use KindDefinitions
+  use carre_dimensions
   use carre_types
   use CarreDiagnostics
   use Helper
@@ -13,8 +14,6 @@ module carre_main
 #endif
   use CarreSiloIO
   implicit none
-
-#include <CARREDIM.F>
 
   private
 

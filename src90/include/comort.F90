@@ -1,0 +1,9 @@
+      module comort
+      use KindDefinitions
+      use carre_dimensions
+
+      INTEGER npni2
+      REAL(rKind) :: ux1,uy1,x1,y1,d1,xn2(npnimx),yn2(npnimx),period,garde1, &
+     &       garde2,ll1
+
+      end module comort

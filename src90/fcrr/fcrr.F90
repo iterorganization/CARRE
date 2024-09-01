@@ -120,10 +120,8 @@
 contains
 
   subroutine fillLimiterCpo( cpo )
+    use fcrcom
     type(type_limiter), intent(inout) :: cpo
-
-    ! DG common block
-#include <FCRCOM.F>
 
     ! internal
     integer :: k, j, l, i
@@ -164,9 +162,8 @@ contains
 
 
   subroutine fillEquilibriumCpo( cpo )
+    use fcrcom
     type(type_equilibrium), intent(inout) :: cpo
-
-#include <FCRCOM.F>
 
     ! general information
     allocate(cpo%datainfo%dataprovider(1))

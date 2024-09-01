@@ -9,14 +9,13 @@ module itmcarre
   use carre_main
   use carre_types
   use carre_constants
+  use carre_dimensions
   use CarreDiagnostics
   use b2mod_grid_mapping
   use carre_parameter_io
 
   implicit none
 
-#include <CARREDIM.F>
-  
 contains
 
   subroutine itmcarre_main(equcpo, limcpo, edgecpo)

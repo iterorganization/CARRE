@@ -1,6 +1,7 @@
 module carre_virtualstructures
 
   use KindDefinitions
+  use carre_dimensions
   use carre_types
   use itm_assert
   use Logging
@@ -12,8 +13,6 @@ module carre_virtualstructures
   use carre_equilibrium
 
   implicit none
-
-#include <CARREDIM.F>
 
   private
   public :: setupVirtualStructures, writeVirtualStructuresToFile, setupVirtualLimiterGeometry

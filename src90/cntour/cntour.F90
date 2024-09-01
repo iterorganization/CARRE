@@ -4,14 +4,11 @@
 !
 !======================================================================
       use KindDefinitions
+      use carre_dimensions
       use perimtr
       implicit none
 !  lignes de niveau pour les deux fonctions f1=0 et f2=0
 !
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
 
 !  arguments
       integer n1,n2

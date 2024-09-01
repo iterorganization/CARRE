@@ -4,8 +4,8 @@
 !
 !=======================================================================
       use KindDefinitions
+      use carre_dimensions
       implicit none
-#include <CARREDIM.F>
 
 !.. This routine creates a vector of indices of the divertor targets
 
@@ -76,8 +76,8 @@
 !***  mm  - number of "private" targets for each X-point
 !=======================================================================
       use KindDefinitions
+      use carre_dimensions
       implicit none
-#include <CARREDIM.F>
 ! arguments
       integer nbdef,inddef(nbdmx),indxpt(nbdmx),npx
       real(rKind) :: xst(nbdmx),yst(nbdmx)

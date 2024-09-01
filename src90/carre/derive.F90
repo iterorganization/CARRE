@@ -9,13 +9,10 @@
 !======================================================================
 
       use KindDefinitions
+      use carre_dimensions
       use carre_types
 
       IMPLICIT NONE
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
 
 !  arguments
       type(CarreEquilibrium), intent(inout) :: equ

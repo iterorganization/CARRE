@@ -1,7 +1,10 @@
 SUBROUTINE SORTIE(equ, grid, diag, par, numero)
   use KindDefinitions
   use CarreDiagnostics
+  use carre_dimensions
   use carre_types
+  use comlan
+  use comrlx
   
   IMPLICIT NONE
   
@@ -15,12 +18,6 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
 
 !..  Cette sous-routine imprime les resultats dans un fichier de sortie:
 !  maille.sor
-
-#include <CARREDIM.F>
-     
-!  variables en common
-#include <COMRLX.F>
-#include <COMLAN.F>
 
 !  variables locales
       INTEGER i,j,isep,ireg

@@ -22,12 +22,9 @@ program tradui
 #if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
   use carre_constants
 #endif
+  use carre_dimensions
 
   implicit none
-
-  !ank-970707: dimensions from the file
-  !  dimensions
-#include <CARREDIM.F>
 
   !  variables locales
   integer :: nxmx, nymx, ncutmx

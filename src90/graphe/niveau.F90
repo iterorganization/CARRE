@@ -7,6 +7,7 @@
 !  ROUTINE POUR TRACER DES LIGNES DE NIVEAU SUR UNE MAILLE RECTANGULAIRE
 !  UNIFORME.
       use KindDefinitions
+      use comqua
       use perimtr
       IMPLICIT NONE
 !
@@ -22,9 +23,6 @@
 !
       INTEGER NX,NY,NXMAX,IWRK(*),NRW,NIW
       REAL XMIN,XMAX,YMIN,YMAX,Z(NXMAX,NY),RWRK(*)
-!
-!  VARIABLES EN COMMON
-#include <COMQUA.F>
 !
 !  VARIABLES LOCALES
       INTEGER LL,I,J

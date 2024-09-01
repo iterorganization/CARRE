@@ -17,7 +17,10 @@
       use KindDefinitions, only : rKind
       use carre_target, only : drctio, indsgm, inStruct
       use carre_niveau, only : crbniv
+      use carre_dimensions
       use trc_stk_mod
+      use comrlx
+      use comort
 
       IMPLICIT NONE
 
@@ -32,10 +35,6 @@
 !       The code between c--- has also been commented with "crlx".
 !======================================================================
 
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
-
 !  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc), &
      &        nn1,nprad,plaque,repart,npcrb2
@@ -46,11 +45,6 @@
      &     a10(nxmax,nymax,3),a01(nxmax,nymax,3),a11(nxmax,nymax,3), &
      &     xcrb2(npcrb2),ycrb2(npcrb2), &
      &     xpto,ypto
-
-!  variables en common
-
-#include <COMORT.F>
-#include <COMRLX.F>
 
 !  variables locales
       INTEGER ipas,indstr,ianc,inouv,ind,ii,jj,ir,dir,i,nn(2),crbnmx, &

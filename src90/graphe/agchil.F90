@@ -4,12 +4,11 @@
 !
 !======================================================================
 !
+      use comqua
       IMPLICIT NONE
       INTEGER IFLG, LNNO
       CHARACTER*(*) LBNM
       EXTERNAL GSTXFP
-!  variables en common
-#include <COMQUA.F>
       INTEGER ICAR
 !======================================================================
 ! The routine AGCHIL is called by AGLBLS just before and just after each

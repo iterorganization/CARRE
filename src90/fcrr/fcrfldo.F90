@@ -6,9 +6,9 @@
 !*** Create the toroidal field file for Carre
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
       character ofile*(*)
-#include <FCRCOM.F>
 !======================================================================
 !
       open(2,file=ofile)

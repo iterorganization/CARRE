@@ -4,21 +4,15 @@
 !
 !======================================================================
       use KindDefinitions
+      use carre_dimensions
+      use comort
       IMPLICIT NONE
       REAl(rKind) :: nulort
 
 !..  Cette fonction
 
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
-
 ! arguments
       REAL(rKind) :: d
-
-!  variables en common
-
-#include <COMORT.F>
 
 !  variables locales
       REAL(rKind) :: x2,y2,ux2,uy2,x12,y12,zlong,dd
