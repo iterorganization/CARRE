@@ -21,12 +21,12 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 #ifndef CARRE_NONINTERACTIVE
       use carre_parameter_io, only : change
 #endif
+      use carre_dimensions
+      use comlan
+      use comrlx
       use trc_stk_mod
 
       IMPLICIT NONE
-
-      !  dimensions
-#include <CARREDIM.F>
 
       !  arguments
       type(CarreDiag), intent(inout) :: diag
@@ -34,10 +34,6 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       type(CarreEquilibrium), intent(inout) :: equ
       type(CarreGrid), intent(inout) :: grid
       type(CarreStructures), intent(inout) :: struct
-
-      !  variables en common
-#include <COMLAN.F>
-#include <COMRLX.F>
 
       !  variables locales
       INTEGER isep,ipas,ireg,ipx,sens,nn,idef, &

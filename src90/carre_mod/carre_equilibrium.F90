@@ -1,5 +1,6 @@
 module carre_equilibrium
 
+  use carre_dimensions
   use carre_types
   use itm_assert
   use carre_intersect
@@ -12,8 +13,6 @@ module carre_equilibrium
   use CarreSiloIO
 
   implicit none
-
-#include <CARREDIM.F>
 
   private
   public extend_equilibrium, insideEquGrid, compute_psi_on_grid

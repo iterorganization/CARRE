@@ -16,6 +16,10 @@
       use CarreSiloIO, only : csIOSetSurface, csIOSetRelax
       use carre_niveau, only : crbniv
       use carre_criteria, only : clort
+      use carre_dimensions
+      use comlan
+      use comrlx
+      use comort
 
       IMPLICIT NONE
 #ifdef USE_SILO
@@ -24,16 +28,6 @@
 
 !..  Cette sous-routine fait le maillage curviligne orthogonal dans
 !  la region centrale.
-
-!  variables en common
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
-
-#include <COMORT.F>
-#include <COMLAN.F>
-#include <COMRLX.F>
 
 !  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc), &

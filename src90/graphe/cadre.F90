@@ -4,12 +4,10 @@
 !
 !======================================================================
       use KindDefinitions
+      use perimtr
       implicit none
 !  on definit les dimensions du cadre dans lequel qui sert a tracer les
 !  graphiques.
-!
-!  variables en common
-#include <PERIM.F>
 !======================================================================
 !  calculs
 !

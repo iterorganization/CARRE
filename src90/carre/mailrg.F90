@@ -19,6 +19,10 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 #ifdef USE_SILO
       use SiloIO
 #endif
+      use carre_dimensions
+      use comlan
+      use comrlx
+      use comort
 
       IMPLICIT NONE
 #ifdef USE_SILO
@@ -31,8 +35,6 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
       ! nuldec: if .true., indicates we are gridding the inner SOL of a disconnected double null
       ! xpind: poloidal grid point index of the outer X-point
       ! xpx,ypx: coordinates of outer X-point
-
-#include <CARREDIM.F>
 
 !  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad &
@@ -53,12 +55,6 @@ SUBROUTINE MAILRG(mailx,maily,xn1,yn1,nn1,sens,pas,nppol,nprad, &
 
       type(CarreDiag), intent(inout) :: diag
       type(CarreStructures), intent(in) :: struct
-
-!  variables en common
-
-#include <COMORT.F>
-#include <COMLAN.F>
-#include <COMRLX.F>
 
 !  variables locales
       INTEGER indstr,ianc,inouv,ind,ii,jj,ir,dir,ipol,i,nn(2), &

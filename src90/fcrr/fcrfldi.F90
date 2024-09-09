@@ -7,9 +7,9 @@
 !*** file 'field.dg'
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
       integer(Short) :: lun
-#include <FCRCOM.F>
       integer(Short) :: i
       real(rKind) :: btf,rtf
       logical ex

@@ -7,6 +7,7 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
   use carre_target
   use trc_stk_mod
   use Logging
+  use comlan
 
   IMPLICIT NONE
 
@@ -14,10 +15,6 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
   INTEGER npst,sens,repart,nx,ny,nm1,nm2
   REAL(rKind) :: x1,y1,psi1,x2,y2,pas,xst(npst),yst(npst),x(nx),y(ny), &
        &       a00(nm1,nm2,3),a10(nm1,nm2,3),a01(nm1,nm2,3),a11(nm1,nm2,3)
-
-  !  variables en common
-
-#include <COMLAN.F>
 
   !  variables locales
   INTEGER ind1,ind2,ii,jj, compt
@@ -108,13 +105,13 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
                   if (ind2 == 0) then
                       x2 = xst(1)
                       y2 = yst(1)
-                      call logmsg(LOGWARNING, "saute: fell of structure at first point (repart=1)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at first point (repart=1)")
                       return
                   end if
                   if (ind2 > npst) then
                       x2 = xst(npst)
                       y2 = yst(npst)
-                      call logmsg(LOGWARNING, "saute: fell of structure at last point (repart=1)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at last point (repart=1)")
                       return
                   end if
               end if
@@ -306,13 +303,13 @@ SUBROUTINE SAUTE(xst,yst,npst,x1,y1,psi1,x2,y2,pas,sens,repart, &
                   if (ind2 == 0) then
                       x2 = xst(1)
                       y2 = yst(1)
-                      call logmsg(LOGWARNING, "saute: fell of structure at first point (repart=2)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at first point (repart=2)")
                       return
                   end if
                   if (ind2 > npst) then
                       x2 = xst(npst)
                       y2 = yst(npst)
-                      call logmsg(LOGWARNING, "saute: fell of structure at last point (repart=2)")
+                      call logmsg(LOGWARNING, "saute: fell off structure at last point (repart=2)")
                       return
                   end if
               end if

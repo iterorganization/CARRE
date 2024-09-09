@@ -6,12 +6,8 @@
 !  version : 07.07.97 20:15
 !
       use KindDefinitions
+      use carre_dimensions
       implicit none
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
-
 !
 !  arguments
       integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
@@ -21,7 +17,6 @@
      &       xstruc(npstmx,strumx), ystruc(npstmx,strumx), &
      &       nivx(npnimx,nbniv),nivy(npnimx,nbniv), &
      &       xmail(npmamx,nrmamx,*),ymail(npmamx,nrmamx,*)
-
 !
 !  variables locales
       integer i,j,k,nin

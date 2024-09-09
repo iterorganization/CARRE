@@ -6,9 +6,9 @@
 !*** Create the equilibrium file for Carre
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
       character ofile*(*)
-#include <FCRCOM.F>
       integer(Short) :: i
       external wreqvr
 !======================================================================

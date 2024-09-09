@@ -5,7 +5,7 @@ NCARG_ROOT ?= ${IRISLIB}/ncarg-6.0.0
 LD_MSCL    ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/lib64 -lX11 -lm
 
-FC      = gfortran
+FC     ?= gfortran
 CPP     = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG

@@ -6,20 +6,17 @@ module carre_parameter_io
   ! the code (maille, lecle, change, ...). Collect them here.
 
   use KindDefinitions
+  use carre_dimensions
   use carre_types
   use Logging
   use Helper
+  use comlan
+  use comrlx
 
   implicit none
 
   private
   public read_code_parameters_noninteractive, change
-
-!  dimensions
-#include <CARREDIM.F>
-!  variables en common
-#include <COMLAN.F>
-#include <COMRLX.F>
 
 CONTAINS
 
@@ -62,6 +59,7 @@ CONTAINS
 !
 !***********************************************************************
       use carre_types
+      use comlan
       IMPLICIT NONE
 
 !ank-970707: dimensions from the file
@@ -527,7 +525,5 @@ CONTAINS
 99    ierror=1
       return
     end subroutine rdfrinarray
-
-
 
 end module carre_parameter_io

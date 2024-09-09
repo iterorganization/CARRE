@@ -3,11 +3,9 @@
 !  version : 05.04.97 16:00
 !
 !======================================================================
+      use comqua
       implicit none
 ! Initialization routine for GRAFLIB
-!
-!  variables en common
-#include <COMQUA.F>
 !
 !  variables locales
       character titre*20

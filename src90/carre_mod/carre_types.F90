@@ -4,12 +4,11 @@ module carre_types
   use Logging
   use Helper
   use carre_constants
+  use carre_dimensions
 
   implicit none
 
   private
-
-#include <CARREDIM.F>
 
   ! forward from carre_constants
   public GRID_UNDEFINED, GRID_INTERNAL, GRID_EXTERNAL, &
@@ -153,7 +152,11 @@ module carre_types
       integer :: refineAtStructs(strumx) = 0
 
       ! Log level (see Logging.f90)
+#ifdef DBG
+      integer :: logLevel = LOGDEBUG
+#else
       integer :: logLevel = LOGWARNING
+#endif
 
       ! Output format
       character(len=8) :: carre_format = CARRE_VERSION
