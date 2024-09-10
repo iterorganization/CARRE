@@ -11,7 +11,7 @@ ifeq ($(shell `pkg-config --exists fundamental-constants`; echo $$?),0)
 B2INCLUDE += `pkg-config fundamental-constants --cflags`
 endif
 
-FC       ?= nagfor
+FC        = nagfor
 CPP       = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG

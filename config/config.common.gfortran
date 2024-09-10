@@ -1,3 +1,6 @@
+ifeq (${FC},f77)
+FC      = gfortran
+endif
 ifndef SOLPS_CPP
 DEFINES += -DGFORTRAN
 endif
