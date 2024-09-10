@@ -11,7 +11,7 @@ ifndef SOLPS_CPP
 DEFINES  += -DNAGFOR
 endif
 
-FC       ?= nagfor
+FC        = nagfor
 CPP       = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
