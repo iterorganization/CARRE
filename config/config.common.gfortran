@@ -1,3 +1,6 @@
+ifeq (${FC},f77)
+FC       = gfortran
+endif
 ifndef SOLPS_CPP
 DEFINES += -DGFORTRAN
 endif
@@ -14,7 +17,7 @@ LDLIBS   = ${LD_MSCL}
 LDFLAGS += ${LD_NCARG}
 LDEXTRA  =
 
-INCMOD    = -I
+INCMOD   = -I
 
 #!!!Local Variables:
 #!!! mode: Makefile
