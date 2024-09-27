@@ -27,7 +27,7 @@ c======================================================================
       LOGICAL correct
 
 *  variables locales
-      INTEGER i
+      INTEGER i, nprtot
 c======================================================================
 *.. Impression des donnees se rapportant aux separatrices.
 
@@ -190,16 +190,16 @@ cxpb  Verifier que les valeurs presentees sont correctes
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,281) i, dpmin(i), dpmax(i), lg(i)
-  281       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'//
+  281       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'/
      .   T2,
-     .   'Les nombres dpmin, dpmax et lg doivent avoir le meme signe.'//
-     .   T2,'Modifiez deltp1 et deltpn en consequence.'//
+     .   'Les nombres dpmin, dpmax et lg doivent avoir le meme signe.'/
+     .   T2,'Modifiez deltp1 et deltpn en consequence.'/
      .   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,280) i, dpmin(i), dpmax(i), lg(i)
-  280       FORMAT(//T2,'Invalid data for segment',i2,'!'//
-     .   T2,'The numbers dpmin, dpmax and lg must have the same sign.'//
-     .   T2,'Modify deltp1 and deltpn accordingly.'//
+  280       FORMAT(//T2,'Invalid data for segment',i2,'!'/
+     .   T2,'The numbers dpmin, dpmax and lg must have the same sign.'/
+     .   T2,'Modify deltp1 and deltpn accordingly.'/
      .   T2,'dpmin,dpmax,lg = ',1p,3(1e11.4,1x))
           endif
         endif 
@@ -207,11 +207,11 @@ cxpb  Verifier que les valeurs presentees sont correctes
           correct=.false.
           if(sellan(1:8).eq.'francais') then
             write(6,2811) i
- 2811       format(//T2,'Donnees invalides pour le segment',i2,'!'//
+ 2811       format(//T2,'Donnees invalides pour le segment',i2,'!'/
      .        T2,'Il faut plus de deux points sur ce segment!')
           elseif(sellan(1:7).eq.'english') then
             write(6,2810) i
- 2810       format(//T2,'Invalid data for segment',i2,'!'//
+ 2810       format(//T2,'Invalid data for segment',i2,'!'/
      .        T2,'You need more than 2 points on this segment!')
           endif
         endif
@@ -219,11 +219,11 @@ cxpb  Verifier que les valeurs presentees sont correctes
           correct=.false.
           if(sellan(1:8).eq.'francais') then
             write(6,2831) i, npmamx
- 2831       format(//T2,'Donnees invalides pour le segment',i2,'!'//
+ 2831       format(//T2,'Donnees invalides pour le segment',i2,'!'/
      .        T2,'Le nombre de points depasse le maximum de ',i4,'!')
           elseif(sellan(1:7).eq.'english') then
             write(6,2830) i, npmamx
- 2830       format(//T2,'Invalid data for segment',i2,'!'//
+ 2830       format(//T2,'Invalid data for segment',i2,'!'/
      .        T2,'The maximum allowed number of points is ',i4,'!')
           endif
         endif
@@ -232,22 +232,48 @@ cxpb  Verifier que les valeurs presentees sont correctes
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,2821) i, dpmin(i), dpmax(i), pasmin
- 2821       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'//
+ 2821       FORMAT(//T2,'Donnees invalides pour le segment',i2,'!'/
      .   T2,
-     .   'Les nombres dpmin et dpmax doivent etre superieurs a pasmin'//
-     .   ' en valeur absolue.'//
-     .   T2,'Modifiez deltp1, deltpn or pasmin en consequence.'//
+     .   'Les nombres dpmin et dpmax doivent etre superieurs a pasmin'/
+     .   ' en valeur absolue.'/
+     .   T2,'Modifiez deltp1, deltpn or pasmin en consequence.'/
      .   T2,'dpmin,dpmax,pasmin = ',1p,3(1e11.4,1x))
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,2820) i, dpmin(i), dpmax(i), pasmin
- 2820       FORMAT(//T2,'Invalid data for segment',i2,'!'//
-     .   T2,'The numbers dpmin and dpmax must be larger than pasmin'//
-     .      ' in absolute value.'//
-     .   T2,'Modify deltp1, deltpn or pasmin accordingly.'//
+ 2820       FORMAT(//T2,'Invalid data for segment',i2,'!'/
+     .   T2,'The numbers dpmin and dpmax must be larger than pasmin'/
+     .      ' in absolute value.'/
+     .   T2,'Modify deltp1, deltpn or pasmin accordingly.'/
      .   T2,'dpmin,dpmax,pasmin = ',1p,3(1e11.4,1x))
           endif
         endif
       enddo
+      if (sum(nptseg(1:nsep)).gt.npmamx) then
+        correct=.false.
+        if(sellan(1:8).eq.'francais') then
+          write(6,2841) npmamx, sum(nptseg(1:nsep))
+ 2841     format(//T2,'Donnees invalides pour les segments!'/
+     .   T2,'Le nombre total de points depasse le maximum de ',i4,'.'/
+     .   T2,'Modifiez nptseg ici ou ',
+#ifdef DIMENSIONS_MODULE
+     .      'DEF_NXD dans b2mod_dimensions en consequence.'/
+#else
+     .      'npmamx dans carre_dimensions en consequence.'/
+#endif
+     .   T2,'Le nombre de points requis est actuellement de ',i4,'.')
+        elseif(sellan(1:7).eq.'english') then
+          write(6,2840) npmamx, sum(nptseg(1:nsep))
+ 2840     format(//T2,'Invalid data for separatrix segments!'/
+     .   T2,'The maximum allowed number of total points is ',i4,'.'/
+     .   T2,'Modify nptseg here or ',
+#ifdef DIMENSIONS_MODULE
+     .      'DEF_NXD in b2mod_dimensions accordingly.'/
+#else
+     .      'npmamx in carre_dimensions accordingly.'/
+#endif
+     .   T2,'The requested number of points currently is ',i4,'.')
+        endif
+      endif
       do i = 1, nreg-1
         if (drmin(i)*drmax(i).le.0.0 .or.
      .      drmin(i)*distnv(repart,i).le.0.0 .or.
@@ -255,17 +281,17 @@ cxpb  Verifier que les valeurs presentees sont correctes
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,291) i, drmin(i), drmax(i), distnv(repart,i)
-  291       FORMAT(//T2,'Donnees invalides pour la region',i2,'!'//
+  291       FORMAT(//T2,'Donnees invalides pour la region',i2,'!'/
      .   T2,'Les nombres drmin, drmax et difference doivent ',
-     .   'avoir le meme signe.'//
-     .   T2,'Modifiez deltr1 et deltrn en consequence.'//
+     .   'avoir le meme signe.'/
+     .   T2,'Modifiez deltr1 et deltrn en consequence.'/
      .   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,290) i, drmin(i), drmax(i), distnv(repart,i)
-  290       FORMAT(//T2,'Invalid data for region',i2,'!'//
+  290       FORMAT(//T2,'Invalid data for region',i2,'!'/
      .   T2,
-     .   'The numbers drmin, drmax and width must have the same sign.'//
-     .   T2,'Modify deltr1 and deltrn accordingly.'//
+     .   'The numbers drmin, drmax and width must have the same sign.'/
+     .   T2,'Modify deltr1 and deltrn accordingly.'/
      .   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
           endif
         endif
@@ -277,17 +303,17 @@ cxpb  Verifier que les valeurs presentees sont correctes
         correct = .false.
         if(sellan(1:8).eq.'francais') then
           WRITE(6,2911) i, drmin(i), drmax(i), difpsi
- 2911     FORMAT(//T2,'Donnees invalides pour la region',i2,'!'//
+ 2911     FORMAT(//T2,'Donnees invalides pour la region',i2,'!'/
      .   T2,'Les nombres drmin, drmax et difference doivent ',
-     .   'avoir le meme signe.'//
-     .   T2,'Modifiez deltr1 et deltrn en consequence.'//
+     .   'avoir le meme signe.'/
+     .   T2,'Modifiez deltr1 et deltrn en consequence.'/
      .   T2,'drmin,drmax,difference = ',1p,3(1e11.4,1x))
         elseif(sellan(1:7).eq.'english') then
           WRITE(6,2900) i, drmin(i), drmax(i), difpsi
- 2900     FORMAT(//'Invalid data for region',i2,'!'//
+ 2900     FORMAT(//'Invalid data for region',i2,'!'/
      .   T2,
-     .   'The numbers drmin, drmax and width must have the same sign.'//
-     .   T2,'Modify deltr1 and deltrn accordingly.'//
+     .   'The numbers drmin, drmax and width must have the same sign.'/
+     .   T2,'Modify deltr1 and deltrn accordingly.'/
      .   T2,'drmin,drmax,width = ',1p,3(1e11.4,1x))
         endif
       endif
@@ -296,29 +322,67 @@ cxpb  Verifier que les valeurs presentees sont correctes
           correct=.false.
           if(sellan(1:8).eq.'francais') then
             write(6,2921) i, nrmamx
- 2921       format(//T2,'Donnees invalides pour la region',i2,'!'//
+ 2921       format(//T2,'Donnees invalides pour la region',i2,'!'/
      .        T2,'Le nombre de points depasse le maximum de ',i4,'!')
           elseif(sellan(1:7).eq.'english') then
             write(6,2920) i, nrmamx
- 2920       format(//T2,'Invalid data for region',i2,'!'//
+ 2920       format(//T2,'Invalid data for region',i2,'!'/
      .        T2,'The maximum allowed number of points is ',i4,'!')
           endif
         endif
       end do
+      select case (nreg)
+      case (2)
+        nprtot = npr(1)+npr(2)-2
+      case (3)
+        nprtot = npr(1)+max(npr(2),npr(3))-2
+      case (5)
+        nprtot = max(npr(1),npr(3))+max(npr(2),npr(4),npr(5))-2
+      case (6)
+        nprtot = npr(1)+max(npr(2),npr(4))+npr(6)-3
+      case default
+        nprtot = sum(npr(1:nreg))-nreg
+      end select
+      if (nprtot.gt.nrmamx) then
+        correct=.false.
+        if(sellan(1:8).eq.'francais') then
+          write(6,2941) nrmamx, nprtot
+ 2941     format(//T2,'Donnees invalides pour les regions!'/
+     .   T2,'Le nombre total de points depasse le maximum de ',i4,'.'/
+     .   T2,'Modifiez npr ici ou ',
+#ifdef DIMENSIONS_MODULE
+     .      'DEF_NYD dans b2mod_dimensions en consequence.'/
+#else
+     .      'nrmamx dans carre_dimensions en consequence.'/
+#endif
+     .   T2,'Le nombre de points requis est actuellement de ',i4,'.')
+        elseif(sellan(1:7).eq.'english') then
+          write(6,2940) nrmamx, nprtot
+ 2940     format(//T2,'Invalid data for regions!'/
+     .   T2,'The maximum allowed number of total points is ',i4,'.'/
+     .   T2,'Modify npr here or ',
+#ifdef DIMENSIONS_MODULE
+     .      'DEF_NYD in b2mod_dimensions accordingly.'/
+#else
+     .      'nrmamx in carre_dimensions accordingly.'/
+#endif
+     .   T2,'The requested number of points currently is ',i4,'.')
+        endif
+      endif
       do i = 1, 2*max(1,npx)
         if (tgarde(i).lt.0.0) then
           correct = .false.
           if(sellan(1:8).eq.'francais') then
             WRITE(6,3011) i, tgarde(i)
- 3011       FORMAT(//T2,'Donnees invalides pour la plaque',i2,'!'//
-     .     T2,'La longueur tgarde doit etre positive ou nulle.'//
-     .     T2,'Modifiez tgarde en consequence.'//
+ 3011       FORMAT(//T2,'Donnees invalides pour la plaque',i2,'!'/
+     .     T2,'La longueur tgarde doit etre positive ou nulle.'/
+     .     T2,'Modifiez tgarde en consequence.'/
      .     T2,'tgarde = ',1pe11.4)
           elseif(sellan(1:7).eq.'english') then
             WRITE(6,3000) i, tgarde(i)
- 3000       FORMAT(//'Invalid data for plate',i2,'!'//
-     .     T2,'The length tgarde must be positive or zero.'//
-     .     T2,'Modify tgarde accordingly.'//
+ 3000       FORMAT(//'Invalid data for plate',i2,'!'/
+     .     T2,'The length tgarde must be positive or zero.'/
+     .     T2,'Modify tgarde accordingly.'/
      .     T2,'tgarde = ',1pe11.4)
           endif
         endif
@@ -329,22 +393,22 @@ cxpb  Verifier que les valeurs presentees sont correctes
         if(sellan(1:8).eq.'francais') then
           WRITE(6,3111) nrelax, relax, pasmin, rlcept
  3111     FORMAT(//
-     .   T2,'Donnees invalides pour l''algorithme de relaxation!'//
-     .   T2,'Il faut au moins une iteration.'//
+     .   T2,'Donnees invalides pour l''algorithme de relaxation!'/
+     .   T2,'Il faut au moins une iteration.'/
      .   T2,'Les parametres relax, pasmin, et rlcept ',
-     .      'doivent etre positifs.'//
-     .   T2,'Le parametre relax ne doit pas exceder 1.'//
-     .   T2,'Modifiez-les en consequence.'//
+     .      'doivent etre positifs.'/
+     .   T2,'Le parametre relax ne doit pas exceder 1.'/
+     .   T2,'Modifiez-les en consequence.'/
      .   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
         elseif(sellan(1:7).eq.'english') then
           WRITE(6,3100) nrelax, relax, pasmin, rlcept
- 3100     FORMAT(//T2,'Invalid data for relaxation algorithm!'//
-     .   T2,'The length tgarde must be positive or zero.'//
-     .   T2,'At least one iteration is needed.'//
+ 3100     FORMAT(//T2,'Invalid data for relaxation algorithm!'/
+     .   T2,'The length tgarde must be positive or zero.'/
+     .   T2,'At least one iteration is needed.'/
      .   T2,'The relax, pasmin, and rlcept parameters ',
-     .      'must be positive.'//
-     .   T2,'The relax parameter must not exceed 1.'//
-     .   T2,'Modify these accordingly.'//
+     .      'must be positive.'/
+     .   T2,'The relax parameter must not exceed 1.'/
+     .   T2,'Modify these accordingly.'/
      .   T2,'nrelax, relax, pasmin, rlcept = ',i6,1p,3(1e11.4,1x))
         endif
       endif
