@@ -36,6 +36,7 @@
 
 !======================================================================
 !
+      call fcrblkd
       inquire(file=chtrg,exist=ex)
       if(.not.ex) then
         write(*,*) 'fcrr: the file ',chtrg,' must be present!'
