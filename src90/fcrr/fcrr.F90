@@ -25,7 +25,7 @@
      &   'selptx.inf','vessel.dat'/
       external fcraxn,fcrtrn,fcrdgi,fcrdef
       external fcrchktp,fcrstri,fcrstro,fcrcrro,fcrfldi,fcrequo, &
-     &         fcrfldo,fcrslpo,fcrprp
+     &         fcrblkd,fcrfldo,fcrslpo,fcrprp
       external import
 
 #if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
