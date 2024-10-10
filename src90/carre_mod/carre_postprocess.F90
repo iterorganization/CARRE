@@ -2493,7 +2493,7 @@ contains
                 & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
                 & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
 
-                if (dIntPol < dExtPol .and. dIntPol < 0.01) then
+                if (dIntPol < dExtPol .and. dIntPol < 0.05) then
                     call movePoint( &
                         & grid%xmail(ipFix,irFix,iReg), &
                         & grid%ymail(ipFix,irFix,iReg), &
@@ -2503,7 +2503,7 @@ contains
                     pointWasMoved(ipFix,irFix,iReg) = .true.
                     grid%cellflag(ip, ir, iReg) = GRID_BOUNDARY
                     grid%pointFlag(ipFix,irFix,iReg) = GRID_BOUNDARY
-                elseif(dExtPol < 0.01) then
+                elseif(dExtPol < 0.05) then
                     call movePoint( &
                     & grid%xmail(ipNbPol,irNbPol,iReg), &
                     & grid%ymail(ipNbPol,irNbPol,iReg), &
