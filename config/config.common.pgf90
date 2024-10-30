@@ -3,7 +3,7 @@ DEFINES  += -DPGF90
 FFLAGS   += -Mnorpath
 endif
 
-FC        = pgf90
+FC       ?= pgf90
 
 ifdef SOLPS_DEBUG
 FFLAGS   += -g -C

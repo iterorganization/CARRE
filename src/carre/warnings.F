@@ -10,6 +10,7 @@ c****************************************************************
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      implicit none
 #include <CARRETYPES.F>
 #include <CARREDIM.F>
       REAL(KIND=R8)
@@ -17,6 +18,9 @@ c****************************************************************
       REAL(KIND=R8)
      & separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto,
      & distnv
+      INTEGER i,j
+      REAL(KIND=R8)
+     & adz,adzu,adzo,bdzu,bdzo,distsn,dz,rs,rn,sxo,syo,sxu,syu,z
       
       open (33,file='warnings.dat')
       rewind 33

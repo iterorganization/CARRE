@@ -7,7 +7,7 @@ LD_NCARG  ?= -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 endif
 LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
 
-FC      = gfortran
+FC     ?= gfortran
 CPP     = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG

@@ -3,6 +3,9 @@ c
 c  version : 05.04.97 15:49
 c
 c======================================================================
+      implicit none
+      integer iflg,kdsh
+      integer icar
 c  variables en common
 #include <COMQUA.F>
       external gstxfp,gslwsc

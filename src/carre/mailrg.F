@@ -25,7 +25,7 @@ c======================================================================
       IMPLICIT NONE
 
 *..  Cette sous-routine fait le maillage curviligne orthogonal dans
-*  une region.
+*    une region.
 
 
 cank-970707: dimensions from the file

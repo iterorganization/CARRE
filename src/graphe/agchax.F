@@ -3,6 +3,9 @@ c
 c  version : 05.04.97 15:50
 c
 c======================================================================
+      implicit none
+      integer iflg,iaxs,iprt
+      real vils
 c  variables en common
 #include <COMQUA.F>
       external gslwsc

@@ -4,7 +4,10 @@ c  version : 05.04.97 15:51
 c
 c======================================================================
 C
+      implicit none
+      INTEGER IFLG,LNNO
       CHARACTER*(*) LBNM
+      INTEGER ICAR
 c  variables en common
 #include <COMQUA.F>
       external gstxfp
