@@ -6,8 +6,8 @@ c
 c  version : 04.04.97 21:00
 c
 c======================================================================
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette sous-routine permet a l'utilisateur d'entrer tous les parame-
 *  tres au clavier, en considerant chaque configuration.

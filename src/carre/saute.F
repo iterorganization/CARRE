@@ -9,18 +9,15 @@ cank -- The comments are translated from French, sorry for errors!
 c*** This subroutine finds the next point on the structure for a
 c*** starting point and the step value
 c======================================================================
+      use carre_types
+      use comlan
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *  arguments
       INTEGER npst,sens,repart,nx,ny,nm1,nm2
       REAL(KIND=R8)
      .       x1,y1,psi1,x2,y2,pas,xst(npst),yst(npst),x(nx),y(ny),
      .       a00(nm1,nm2,3),a10(nm1,nm2,3),a01(nm1,nm2,3),a11(nm1,nm2,3)
-
-*  variables en common
-
-#include <COMLAN.F>
 
 *  variables locales
       INTEGER n,ind1,ind2,ii,jj, compt

@@ -20,6 +20,10 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       USE B2MOD_DIMENSIONS
 #endif
+      USE CARRE_DIMENSIONS
+      USE CARRE_TYPES
+      USE COMLAN
+      USE COMORT
       IMPLICIT NONE
 
 c  a modifier pour generaliser la geometrie:
@@ -32,15 +36,9 @@ c  a faire:
 c        1. permettre l'imposition de points fixes ou de coins
 
 *  variables.
-
-cank-970702: moved dimensions to the CARREDIM.F
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
-#include <COMLAN.F>
 #include <git_version_Carre.h>
 
-      REAL(kind=R8) cstlin,zero,eps_Xpt,rmax,zmax
-      common /geom/ eps_Xpt
+      REAL(kind=R8) cstlin,zero,rmax,zmax
       PARAMETER (cstlin=0.00, zero=0.)
       INTEGER i, j, nx, ny, nstruc, npstru(strumx),
      .   ii(gradmx), jj(gradmx), iptx(npxmx), jptx(npxmx),

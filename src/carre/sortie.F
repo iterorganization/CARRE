@@ -13,15 +13,14 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comrlx
+      use comlan
       IMPLICIT NONE
 
 *..  Cette sous-routine imprime les resultats dans un fichier de sortie:
 *  maille.sor
-
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
 
 *  arguments
       INTEGER nsep,nreg,repart,nptseg(nsep),npr(nreg),np1(nreg),
@@ -48,10 +47,6 @@ cank-970707: dimensions from the file
      .     gdsomtotp(nregmx),segt(nrmamx,nregmx)
     
       logical racord
-
-*  variables en common
-#include <COMRLX.F>
-#include <COMLAN.F>
 
 *  variables locales
       INTEGER i,j,isep,ireg,ii,jj

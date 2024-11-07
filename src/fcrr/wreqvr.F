@@ -17,8 +17,8 @@ c***
 c*** Output:
 c***  iret    return code (0 means OK)
 c======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
       integer lun,ngpr,iret,nr,nz
       real(kind=R8) pfm(ngpr,*),rgr(ngpr),zgr(*)
 c

@@ -6,12 +6,9 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
 
 c  arguments
       integer nstruc,npstru(strumx)

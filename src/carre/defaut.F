@@ -6,20 +6,15 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comrlx
+      use comlan
       implicit none
 c..  Definition de certaines variables par defaut
 c
 c  arguments: aucun
 c
-c  variables en common
-c
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
-
-#include <COMLAN.F>
-#include <COMRLX.F>
 c======================================================================
 c  calcul
 c

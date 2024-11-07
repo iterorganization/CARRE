@@ -3,8 +3,9 @@ c=======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
+
 c  cette routine ecrit la maille sous format DIVIMP. elle est identique
 c  a la routine mhdvmp de b2ag.F
 c
@@ -173,9 +174,9 @@ c
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
       real(kind=R8) psimin_carre
       
       character lign80*80

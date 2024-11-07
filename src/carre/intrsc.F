@@ -2,8 +2,8 @@
 ************************************************************************
       subroutine intrsc(x1,y1,x2,y2,vx,vy,n,x,y,iint,nint,sens)
 ************************************************************************
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 
 *..  cette routine determine le point d'intersection entre un segment
 c    1-2 et une courbe parametrisee de n points de coordonnees vx vy.

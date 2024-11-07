@@ -24,13 +24,11 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comrlx
+      use comlan
       IMPLICIT NONE
-
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
-
 
 *  arguments
       INTEGER nx,ny,npx,ptsep(4,npx),nptot(4,npx),ptxint,
@@ -65,11 +63,6 @@ cank-970707: dimensions from the file
      .  xmini,xmaxi,ymini,ymaxi,
 #endif
      .  distxo,pntrat,tgarde(4)
-
-
-*  variables en common
-#include <COMLAN.F>
-#include <COMRLX.F>
 
 *  variables locales
       INTEGER nptseg(10),isep,ipas,ipx,sens,nn,idef,

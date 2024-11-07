@@ -2,8 +2,8 @@
 ************************************************************************
       FUNCTION ruban(xn,yn,n,x1,y1,d)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
       REAL(KIND=R8) ruban
 
 *..  Cette fonction retourne la distance entre le debut de la courbe et

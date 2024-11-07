@@ -2,8 +2,8 @@
 ************************************************************************
       FUNCTION long(vx,vy,n)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
       real(kind=R8) long
 
 *..  Cette fonction calcule la distance totale que parcourt une courbe v

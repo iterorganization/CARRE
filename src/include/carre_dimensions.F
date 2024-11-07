@@ -1,5 +1,8 @@
-c  version : 07.07.97 20:52
-c
+      module carre_dimensions
+#ifdef DIMENSIONS_MODULE
+      use b2mod_dimensions
+#endif
+
       integer nxmax, nymax , npstmx, npnimx, npxmx , strumx, nivmx,
      .        nbdmx, gradmx, npmamx, nrmamx, nregmx
       parameter (nxmax=1025,  nymax=1025, npstmx=360, npnimx=5000,
@@ -28,3 +31,5 @@ c***  npnimx      : max. number of points in tracing curves
 c***  nbdmx       : max. number of divertor plate structures
 c***
 c======================================================================
+
+      end module carre_dimensions

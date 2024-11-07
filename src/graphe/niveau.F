@@ -6,6 +6,8 @@ c
 c======================================================================
 C  ROUTINE POUR TRACER DES LIGNES DE NIVEAU SUR UNE MAILLE RECTANGULAIRE
 C  UNIFORME.
+      USE COMQUA
+      USE PERIM
       IMPLICIT NONE
 C
 C  DONNEES:
@@ -20,12 +22,6 @@ C  NRW, NIW:   DIMENSIONS DES TABLEAUX DE TRAVAIL
 C
       INTEGER NX,NY,NXMAX,IWRK(*),NRW,NIW
       REAL XMIN,XMAX,YMIN,YMAX,Z(NXMAX,NY),RWRK(*)
-C
-C  VARIABLES EN COMMON
-#include <PERIM.F>
-#include <COMQUA.F>
-      real xa,xb,ya,yb
-      equivalence (xa,x1a), (xb,x1b), (ya,x2a), (yb,x2b)
 C
 C  VARIABLES LOCALES
       INTEGER LL,I,J
@@ -49,25 +45,25 @@ c======================================================================
       endif
 
 C  FRACTION DU CADRE CHOISI
-      CALL GETSET(XA,XB,YA,YB,XMINP,XMAXP,YMINP,YMAXP,LL)
+      CALL GETSET(X1A,X1B,X2A,X2B,XMINP,XMAXP,YMINP,YMAXP,LL)
 C  CALCUL DU CADRE
       if(ll.eq.1 .or. ll.eq.2) then
-        XAP=XA+(XMIN-XMINP)/(XMAXP-XMINP)*(XB-XA)
-        XBP=XA+(XMAX-XMINP)/(XMAXP-XMINP)*(XB-XA)
+        XAP=X1A+(XMIN-XMINP)/(XMAXP-XMINP)*(X1B-X1A)
+        XBP=X1A+(XMAX-XMINP)/(XMAXP-XMINP)*(X1B-X1A)
       else
-        XAP=XA+(log10(XMIN)-log10(XMINP))/
-     .    (log10(XMAXP)-log10(XMINP))*(XB-XA)
-        XBP=XA+(log10(XMAX)-log10(XMINP))/
-     .    (log10(XMAXP)-log10(XMINP))*(XB-XA)
+        XAP=X1A+(log10(XMIN)-log10(XMINP))/
+     .    (log10(XMAXP)-log10(XMINP))*(X1B-X1A)
+        XBP=X1A+(log10(XMAX)-log10(XMINP))/
+     .    (log10(XMAXP)-log10(XMINP))*(X1B-X1A)
       endif
       if(ll.eq.1 .or. ll.eq.3) then
-        YAP=YA+(YMIN-YMINP)/(YMAXP-YMINP)*(YB-YA)
-        YBP=YA+(YMAX-YMINP)/(YMAXP-YMINP)*(YB-YA)
+        YAP=X2A+(YMIN-YMINP)/(YMAXP-YMINP)*(X2B-X2A)
+        YBP=X2A+(YMAX-YMINP)/(YMAXP-YMINP)*(X2B-X2A)
       else
-        YAP=YA+(log10(YMIN)-log10(YMINP))/
-     .    (log10(YMAXP)-log10(YMINP))*(YB-YA)
-        YBP=YA+(log10(YMAX)-log10(YMINP))/
-     .    (log10(YMAXP)-log10(YMINP))*(YB-YA)
+        YAP=X2A+(log10(YMIN)-log10(YMINP))/
+     .    (log10(YMAXP)-log10(YMINP))*(X2B-X2A)
+        YBP=X2A+(log10(YMAX)-log10(YMINP))/
+     .    (log10(YMAXP)-log10(YMINP))*(X2B-X2A)
       endif
 C
       CALL CPSETI('SET',1)

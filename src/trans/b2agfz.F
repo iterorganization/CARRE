@@ -23,8 +23,8 @@ c***  - connected double null fixed
 c***  - guard cells for disconnected double fixed
 c***  - data on grid size and cuts added to the grid header
 c======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 
       integer npolmx,nradmx,nxmax,nymax,ncutmx,nisomx
       integer nx,ny,nreg,nppol(nreg),nprad(nreg),nptseg(10),
@@ -890,7 +890,7 @@ c*** Dimensions for one half of the grid
           write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
 #endif
 #else
-          write(*,*) '==> Increase nrmamx in CARREDIM.F'
+          write(*,*) '==> Increase nrmamx in carre_dimensions.F'
 #endif
           errenc=.true.     ! }
         end if
@@ -922,7 +922,7 @@ c*** Two halves of the grid...
             write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
 #endif
 #else
-            write(*,*) '==> Increase npmamx in CARREDIM.F'
+            write(*,*) '==> Increase npmamx in carre_dimensions.F'
 #endif
             stop
           end if
@@ -1071,7 +1071,7 @@ c  test values of nprad compared to nx and ny
           write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
 #endif
 #else
-          write(*,*) '==> Increase nrmamx in CARREDIM.F'
+          write(*,*) '==> Increase nrmamx in carre_dimensions.F'
 #endif
           stop
         end if
@@ -1085,7 +1085,7 @@ c  test values of nprad compared to nx and ny
           write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
 #endif
 #else
-          write(*,*) '==> Increase npmamx in CARREDIM.F'
+          write(*,*) '==> Increase npmamx in carre_dimensions.F'
 #endif
           stop
         end if
@@ -1282,7 +1282,7 @@ c  test values of nprad compared to nx and ny
           write(*,*) '==> Increase DEF_NYD in DIMENSIONS.F'
 #endif
 #else
-          write(*,*) '==> Increase nrmamx in CARREDIM.F'
+          write(*,*) '==> Increase nrmamx in carre_dimensions.F'
 #endif
           stop
         end if
@@ -1296,7 +1296,7 @@ c  test values of nprad compared to nx and ny
           write(*,*) '==> Increase DEF_NXD in DIMENSIONS.F'
 #endif
 #else
-          write(*,*) '==> Increase npmamx in CARREDIM.F'
+          write(*,*) '==> Increase npmamx in carre_dimensions.F'
 #endif
           stop
         end if

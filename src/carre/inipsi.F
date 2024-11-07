@@ -3,8 +3,8 @@
       SUBROUTINE INIPSI(psi,psidx,psidy,x,y,nxmax,nymax,nx,ny,
      .  a00,a10,a01,a11)
 ************************************************************************
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 c
 c  initialisation des coefficients d'interpolation pour psi et ses
 c  derivees par rapport a x et a y

@@ -1,8 +1,8 @@
 c=======================================================================
       subroutine limail(nrid,nreg,nppol,nprad,r,z,psi,psidxm,psidym,
      .  npomax,nramax)
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 c
 c  lecture de la maille produite par le programme carre pour traitement
 c  ulterieur

@@ -3,11 +3,10 @@ c
 c  version : 05.04.97 15:50
 c
 c======================================================================
+      use comqua
       implicit none
       integer iflg,iaxs,iprt
       real vils
-c  variables en common
-#include <COMQUA.F>
       external gslwsc
 c======================================================================
 C The routine AGCHAX is called by AGAXIS just before and just after each

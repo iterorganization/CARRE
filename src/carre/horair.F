@@ -2,8 +2,8 @@
 ************************************************************************
       integer function horair(xpto,ypto,x0,y0,xstruc,ystruc,npst,sens)
 ************************************************************************
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 c  Determination du sens de parcours "sens" sur une structure donnee,
 c  a partir d'un point de depart x0, y0, pour que le trajet initial
 c  soit dans le sens horaire (sens=-1) ou anti-horaire (sens=1) tel que

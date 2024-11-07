@@ -4,8 +4,8 @@ c
 c  version : 24.06.98 14:25
 c
 c======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
 
 c======================================================================
 *   ..input arguments (unchanged on exit)

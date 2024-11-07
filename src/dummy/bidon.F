@@ -21,9 +21,9 @@ c=======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
 c  arguments
       integer n1,n2
       real(kind=R8) f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
@@ -37,9 +37,10 @@ c=======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
+
 c  arguments
       integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv,
      .        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg
@@ -60,9 +61,10 @@ c=======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
+
 c  arguments
       integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv,
      .      nivtot(nbniv),ptsep(4,npx)
@@ -83,9 +85,10 @@ c=======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
+
 c  arguments
       integer nstruc,npstru(strumx),nn1,nx,ny
 

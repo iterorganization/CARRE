@@ -18,12 +18,10 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comlan
       IMPLICIT NONE
-
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(strumx),
@@ -41,10 +39,6 @@ cank-970707: dimensions from the file
       INTEGER ipx,idniv,fraplq,i,j,idef,nbcrb,sens,nt(2),ii,jj,
      .  ptxext,indlim
       REAL(kind=R8) x0,y0,x2,y2,psi0,psi2,xt(npnimx,2),yt(npnimx,2)
-
-*  variables en common
-c
-#include <COMLAN.F>
 
 *  procedures
       INTEGER drctio,ifind
@@ -125,12 +119,12 @@ c======================================================================
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -145,12 +139,12 @@ c======================================================================
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -165,12 +159,12 @@ c======================================================================
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -249,12 +243,12 @@ c======================================================================
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -269,12 +263,12 @@ c======================================================================
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -407,12 +401,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -427,12 +421,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -449,12 +443,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -536,12 +530,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -556,12 +550,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -643,12 +637,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -663,12 +657,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -685,12 +679,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -772,12 +766,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -792,12 +786,12 @@ cc>>>
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -940,12 +934,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -960,12 +954,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -1045,12 +1039,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -1065,12 +1059,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -1154,12 +1148,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -1174,12 +1168,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -1259,12 +1253,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif
@@ -1279,12 +1273,12 @@ cank
                 write(0,*) 'Trop de points pour la courbe'
                 write(0,*) 'Nombre maximum de points prevu : ', npnimx
                 write(0,*) 'Veuillez augmenter la valeur de npnimx '//
-     &           'dans CARREDIM.F et recompiler !'
+     &           'dans carre_dimensions.F et recompiler !'
               elseif(sellan(1:7).eq.'english') then
                 write(0,*) 'Too many points along curve'
                 write(0,*) 'Maximum number of points allowed : ', npnimx
                 write(0,*) 'Please increase the value of npnimx '//
-     &           'in CARREDIM.F and recompile !'
+     &           'in carre_dimensions.F and recompile !'
               endif
               stop 'Increase npnimx'
             endif

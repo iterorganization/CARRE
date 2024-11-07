@@ -1,5 +1,6 @@
-c  version : 05.02.99 13:35
-c
+      module fcrcom
+      use carre_types
+
       integer nnstr,nmstr,nsgmx,nrgnx,ntrgx,ngpr,ngpz,nxptm
       parameter (nsgmx=6, nrgnx=6, ntrgx=4, nxptm=2)
       parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=1000)
@@ -15,17 +16,6 @@ c
      ,  xstr(nmstr),ystr(nmstr),xptcntr(3,nxptm),xlpcntr(3),
      ,  rbtor,relax,rlcept,pasmin,xpttol,pntrat,tgarde(ntrgx)
       real(kind=R8) pfm(ngpr,ngpz),rgr(ngpr),zgr(ngpz)
-      common/fcrcom/pfm,rgr,zgr,
-     ,  relax,pasmin,rlcept,pntrat,
-     ,  deltp1,deltr1,deltpn,deltrn,tgarde,
-     ,  xstr,ystr,rbtor,
-     ,  xptcntr,xlpcntr,xpttol,
-     ,  lm_pntrt,lm_grcln,
-     i  repart,nrelax,nxpt,
-     ,  nsgm,nptseg,nrgn,npr,ntrg,
-     ,  nstr,lstr,nclstr,nr,nz,
-     ,  lm_cnfg,
-     l  ldgv2  
 c
 c*** nnstr : maximum number of structures to be imported from dg
 c*** nmstr : maximum number of nodes in all the structures
@@ -65,3 +55,5 @@ c*** xptcntr: coordinates of the x-points
 c*** xlpcntr: coordinates of the o-point
 c*** xpttol : tolerance parameter for distinguishing the x-points
 c*** ldgv2  : true if the input from DG v.2.0 or later
+
+      end module fcrcom

@@ -9,8 +9,8 @@ c*** The area is negative if the nodes are listed clockwise.
 c*** The area is calculated via decomposition of the polygon into a set
 c*** of triangles having a common node at the first node of the polygon. 
 c=======================================================================
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
       real(kind=R8) aire
       integer n
       real(kind=R8) x(n),y(n)

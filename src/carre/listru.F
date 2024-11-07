@@ -4,9 +4,10 @@ c
 c  version : 05.04.97 16:19
 c
 c======================================================================
+      use carre_types
+      use comlan
       implicit none
-#include <CARRETYPES.F>
-#include <COMLAN.F>
+
 c  read data concerning structures
 c
 c  arguments
@@ -66,7 +67,7 @@ c       call rdfrin(11,line,npstru(nstr),ifail)
             write(6,'(a,i4)') 'Nombre maximum de points prevu : ',
      .       npstmx
             write(6,'(a)') 'Veuillez augmenter la valeur de npstmx '//
-     &       'dans CARREDIM.F et recompiler !'
+     &       'dans carre_dimensions.F et recompiler !'
           elseif(sellan(1:7).eq.'english') then
             write(6,'(a,i2,a)') 
      .       'Too many points in structure ',nstr,' !'
@@ -75,7 +76,7 @@ c       call rdfrin(11,line,npstru(nstr),ifail)
             write(6,'(a,i4)') 'Maximum number of points allowed : ',
      .       npstmx
             write(6,'(a)') 'Please increase the value of npstmx '//
-     &       'in CARREDIM.F and recompile !'
+     &       'in carre_dimensions.F and recompile !'
           endif
           stop
         else if(abs(npstru(nstr)).le.1) then

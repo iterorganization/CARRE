@@ -10,9 +10,9 @@ c****************************************************************
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
       implicit none
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
       REAL(KIND=R8)
      & nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo
       REAL(KIND=R8)

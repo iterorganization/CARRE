@@ -7,6 +7,9 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comlan
       IMPLICIT NONE
 
 *..  Cette sous-routine imprime la liste des points ou le gradient
@@ -16,20 +19,12 @@ c======================================================================
 *  dans le cas ou il y a 2 points X, si on desire qu'ils soient
 *  raccordes.
 
-cank-970702: moved dimensions into a separate file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
-
 *  arguments
       INTEGER npxtot,npx,ii(gradmx),jj(gradmx),iptx(npxmx),
      .        jptx(npxmx),limcfg
       REAL(kind=R8) pointx(gradmx),pointy(gradmx),ptx(npxmx),pty(npxmx),
      .       xpto,ypto
       LOGICAL racord
-
-*  variables en common
-#include <COMLAN.F>
 
 *  variables locales
       INTEGER i, j, k, ipx, ipo, iptxtm, jptxtm

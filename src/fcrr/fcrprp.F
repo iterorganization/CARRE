@@ -5,9 +5,9 @@ c
 c======================================================================
 c*** Data transformation from DG to Carre
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
       integer i, j
       logical ex,uex
       real(kind=R8) u, dpi

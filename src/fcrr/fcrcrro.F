@@ -5,18 +5,17 @@ c
 c======================================================================
 c*** Create the input file for Carre
 c======================================================================
+      use carre_types
+      use fcrcom
       implicit none
       character ofile*(*)
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
       integer(kind=I4) niscl,nrscl
       parameter (niscl=2, nrscl=4)
+      integer iprmeq(niscl)
+      real(kind=R8) rprmeq(nrscl)
 c*** niscl : number of integer scalar parameters in the Carre input
 c*** nrscl : number of real scalar parameters in the Carre input
       integer i,j
-      integer iprmeq(niscl)
-      real(kind=R8) rprmeq(nrscl)
-      equivalence (iprmeq,repart), (rprmeq,relax)
       character*8 chiprm(niscl),chrprm(nrscl)
       data chiprm / 'repart  ','nrelax  '/
       data chrprm / 'relax   ','pasmin  ','rlcept  ','pntrat  ' /
@@ -24,10 +23,16 @@ c======================================================================
 c
       open(2,file=ofile)
       rewind(2)
+      iprmeq(1)=repart
+      iprmeq(2)=nrelax
       write(2,'(a)') '$parameters'
       do i=1,niscl
         write(2,700) chiprm(i),iprmeq(i)
       end do
+      rprmeq(1)=relax
+      rprmeq(2)=pasmin
+      rprmeq(3)=rlcept
+      rprmeq(4)=pntrat
       do i=1,nrscl
         write(2,720) chrprm(i),rprmeq(i)
       end do

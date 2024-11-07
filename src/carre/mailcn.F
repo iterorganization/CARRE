@@ -16,21 +16,15 @@ c======================================================================
 #ifdef DIMENSIONS_MODULE
       use b2mod_dimensions
 #endif
+      use carre_dimensions
+      use carre_types
+      use comort
+      use comrlx
+      use comlan
       IMPLICIT NONE
 
 *..  Cette sous-routine fait le maillage curviligne orthogonal dans
 *  la region centrale.
-
-*  variables en common
-
-cank-970707: dimensions from the file
-*  dimensions
-#include <CARRETYPES.F>
-#include <CARREDIM.F>
-
-#include <COMORT.F>
-#include <COMLAN.F>
-#include <COMRLX.F>
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),

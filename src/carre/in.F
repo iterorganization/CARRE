@@ -1,8 +1,8 @@
 ************************************************************************
       LOGICAL FUNCTION in(x,y,xstr,ystr,n)
 ************************************************************************
+      use carre_types
       IMPLICIT NONE
-#include <CARRETYPES.F>
 
 *..  Cette fonction determine si un point est a l'interieur d'une
 *  structure fermee.

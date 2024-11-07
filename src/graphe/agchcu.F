@@ -3,11 +3,10 @@ c
 c  version : 05.04.97 15:49
 c
 c======================================================================
+      use comqua
       implicit none
       integer iflg,kdsh
       integer icar
-c  variables en common
-#include <COMQUA.F>
       external gstxfp,gslwsc
 c======================================================================
 C The routine AGCHCU is called by AGCURV just before and just after each

@@ -5,9 +5,9 @@ c
 c======================================================================
 c*** Converts the dg data into the input files for Carre
 c======================================================================
-c      implicit none
-#include <CARRETYPES.F>
-#include <FCRCOM.F>
+      use carre_types
+      use fcrcom
+      implicit none
 #include <impcon.inc>
       logical ex
       character*14 chtrg,chstr,chequ,chaux,chdgo,
@@ -21,6 +21,7 @@ c      implicit none
       external fcraxn,fcrtrn,fcrdgi
 c======================================================================
 c
+      call fcrblkd
       inquire(file=chtrg,exist=ex)
       if(.not.ex) then
         write(*,*) 'fcrr: the file ',chtrg,' must be present!'

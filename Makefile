@@ -29,7 +29,7 @@ ifndef SOLPS_CPP
     include ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}
     MAKES += ${SOLPSTOP}/SETUP/setup.csh.${HOST_NAME}.${COMPILER} ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}
   else
-    $(warning ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER} not found.)
+    $(warning ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER} not found. Assuming stand-alone compilation.)
   endif
   ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.common.${COMPILER} ] && echo yes || echo no ),yes)
     include ${SOLPSTOP}/SETUP/config.common.${COMPILER}
@@ -98,9 +98,9 @@ VHEAD   =
 ifeq ($(shell [ -d ${SRCLOCAL} ] && echo yes || echo no ),yes)
 VHEAD   =${SRCLOCAL}:
 endif
-FPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy
+FPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/include:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/dummy
 GPATH   = ${SRCDIR}/cntour:${SRCDIR}/graphe
-VPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/cntour:${SRCDIR}/dummy:${SRCDIR}/graphe
+VPATH   = ${VHEAD}${SRCDIR}/carre:${SRCDIR}/include:${SRCDIR}/trans:${SRCDIR}/fcrr:${SRCDIR}/cntour:${SRCDIR}/dummy:${SRCDIR}/graphe
 
 INCLUDE = -I${SRCDIR}/include
 
