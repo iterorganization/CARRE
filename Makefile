@@ -206,7 +206,7 @@ $(OBJDIR)/%.${MOD} : %.F
 endif
 
 ifeq (${USE_DIMENSIONS},1)
-${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F
+${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
@@ -215,7 +215,7 @@ ifneq ($(COMPILER),nag_f90)
 	@if [ -f ${OBJDIR}/b2mod_dimensions.${MOD} ] ; then touch ${OBJDIR}/b2mod_dimensions.${MOD} ; fi
 endif
 ifneq (${MOD},o)
-${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
+${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
@@ -258,7 +258,10 @@ depend: ${OBJS:.o=.F} ${GOBJS:.o=.F} ${MAINLIST:.o=.F}
 	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
 	@echo '# 1' >> ${OBJDIR}/dependencies.${COMPILER}
 	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
+ifneq (${MOD},o)
 	@echo '# 2' >> ${OBJDIR}/dependencies.${COMPILER}
+	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
+endif
 
 listobj:
 ifneq ($(shell uname),Darwin)
@@ -308,7 +311,11 @@ ${SRCDIR}/include/git_version_Carre.h: force
 	@echo "     . '`git describe --tags --dirty --always | cut -c 1-32`'" >> ${SRCDIR}/include/git_version_new.h
 	@if cmp -s ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; then rm ${SRCDIR}/include/git_version_new.h; else mv ${SRCDIR}/include/git_version_new.h ${SRCDIR}/include/git_version_Carre.h; fi
 
+ifeq (${USE_DIMENSIONS},1)
+${OBJDIR}/dependencies.${COMPILER}: ${B2SRC}/modules/.new_modules
+else
 ${OBJDIR}/dependencies.${COMPILER}:
+endif
 	-mkdir -p ${OBJDIR}
 	touch ${OBJDIR}/dependencies.${COMPILER}
 	${MAKE} VERSION

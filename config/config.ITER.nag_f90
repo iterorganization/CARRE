@@ -15,7 +15,7 @@ FC        = nagfor
 CPP       = /lib/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS    = -g -C
+FFLAGS    = -g
 else
 FFLAGS    = -O
 endif

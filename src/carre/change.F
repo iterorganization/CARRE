@@ -54,11 +54,12 @@ c=========================
 
       if(isor.eq.6) then
 c-langue
+        write(isor,1028)
         if(sellan(1:8).eq.'francais') then
-          WRITE(isor,*)'Entrez le nom de la variable que vous voulez',
+          write(isor,*)'Entrez le nom de la variable que vous voulez',
      .        ' changer ainsi que sa nouvelle valeur.'
-          WRITE(isor,*)'Exemple: nptseg(2) = 32 (enter)'
-          WRITE(isor,*)'Pour arreter, inscrivez "fin".'
+          write(isor,*)'Exemple: nptseg(2) = 32 (enter)'
+          write(isor,*)'Pour arreter, inscrivez "fin".'
         elseif(sellan(1:7).eq.'english') then
           write(isor,*)'Type the name of the variable to be changed',
      .    ' followed by ''='', and its numerical value.'

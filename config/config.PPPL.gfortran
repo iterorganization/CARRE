@@ -4,7 +4,6 @@ GLI_HOME ?= /u/eemdee/linux_gfortran
 LD_MSCL  ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG ?= -L/usr/pppl/gcc/9.3-pkgs/ncl-6.6.2/lib/ -lncarg -lncarg_gks -lncarg_c -lX11 -lm -lgcc_s -lfreetype -lcairo -L/usr/pppl/gcc/9.3.0/lib/../lib64 -lgfortran
 
-FC        = gfortran
 CPP       = /lib/cpp -traditional
 
 # DBLPAD  = -r8 -i4

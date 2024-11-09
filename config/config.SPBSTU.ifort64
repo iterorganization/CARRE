@@ -2,7 +2,6 @@
 LD_MSCL  ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER/}mscl -lmscl
 LD_NCARG ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lxcb
 
-FC      = ifort
 CPP     = /lib/cpp -C -traditional -ffreestanding
 
 #!!!Local Variables:
