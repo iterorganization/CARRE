@@ -30,7 +30,7 @@ c======================================================================
       IMPLICIT NONE
 
 *..  Cette sous-routine fait le maillage curviligne orthogonal dans
-*    une region.
+*  une region.
 
 *  arguments
       INTEGER nx,ny,nstruc,npstru(nstruc),nn1,sens,nppol,nprad,
