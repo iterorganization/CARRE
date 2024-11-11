@@ -158,7 +158,7 @@ contains
     type(type_edge), intent(out) :: edgecpo
 
     ! internal
-    integer, parameter :: nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1
+    integer, parameter :: nxmx=npmamx,nymx=nrmamx,ncutmx=max(1,DEF_NCUT),nisomx=1
 
     ! connectivity and cut arrays
     integer :: nncut

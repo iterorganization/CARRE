@@ -28,7 +28,7 @@ program tradui
 
   !  variables locales
   integer :: nxmx, nymx, ncutmx
-  parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=4)
+  parameter(nxmx=npmamx,nymx=nrmamx,ncutmx=max(1,DEF_NCUT))
   integer nin,nout,nfin,nreg,isel,nppol(nregmx),nprad(nregmx), &
       & ifail,nx,ny,nnx,nny, &
       & ncut,nxcut(ncutmx),nycut(ncutmx),niso,nxiso(nisomx+1), &
