@@ -72,7 +72,7 @@ contains
           ! Orthogonality
           lOrtpur(i) = cs2+cs3-cs1-cs4
           ! Maintain point distribution of separatrix
-          lPropo(i) = - ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2) &
+          lPropo(i) = - ((g1/l2(i))**2+(g2/(l2(nppol)-l2(i)))**2) &
                & *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
           ! Point distance
           lVarr(i)= (pasmin/(l2(i)-l2(i-1)))**2 &
@@ -83,7 +83,7 @@ contains
           ! Old code for reference:
 !!$          ort(i)= &
 !!$               &       cs2+cs3-cs1-cs4 &
-!!$               &      -((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2) &
+!!$               &      -((g1/l2(i))**2+(g2/(l2(nppol)-l2(i)))**2) &
 !!$               &      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2) &
 !!$               &      +(pasmin/(l2(i)-l2(i-1)))**2-(pasmin/(l2(i+1)-l2(i)))**2
 
@@ -111,7 +111,7 @@ contains
 
           lOrtpur(i)=cs2+cs3-cs1-cs4
 
-!!$          propo(i)=  ((g1/l0(i))**2+(g2/(l0(nppol)-l0(i)))**2) &
+!!$          propo(i)=  ((g1/l2(i))**2+(g2/(l2(nppol)-l2(i)))**2) &
 !!$     &      *(l2(i)-l0(i)/l0(nppol)*l2(nppol))/(pasmin+g1+g2)
           lPropo(i) = 0.0
 
