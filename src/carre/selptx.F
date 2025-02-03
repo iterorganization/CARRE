@@ -84,7 +84,7 @@ c                  points X.
 c======================================================================
 *..Initialisation
 
-  2   npx = 0
+    2 npx = 0
       do i=1,nptxm
         kptx(i)=0
       enddo
@@ -102,7 +102,7 @@ c*** Check whether the point specification file is present
         lun=0
         ex=.false.
         go to 20
- 10     continue
+   10   continue
         open(lun,file='selptx.inf',err=12)
         rewind(lun)
         read(lun,*,err=14) xpttol
@@ -117,11 +117,11 @@ c*** Check whether the point specification file is present
 c*** lconn>0 means "connect x-points")
           read(lun,*,end=11, err=111) lconn
           go to 11
- 111      lconn=-1
+  111     lconn=-1
 
 c*** Set the absolute tolerance for each candidate point
 
- 11       do j=1,npxtot
+   11     do j=1,npxtot
             x1=1.e30
             do i=1,npxtot
               if(i.ne.j) then
@@ -251,12 +251,12 @@ c
         close(lun)
       end if
       go to 20
- 12   write(*,*) 'selptx: error opening the file selptx.inf'
+   12 write(*,*) 'selptx: error opening the file selptx.inf'
       ex=.false.
       go to 20
- 14   write(*,*) 'selptx: error reading the data from selptx.inf'
+   14 write(*,*) 'selptx: error reading the data from selptx.inf'
       ex=.false.
- 20   continue
+   20 continue
       if(.not.ex) then
 cank>>>
 *..Affichage des points ou le gradient s'annule.
