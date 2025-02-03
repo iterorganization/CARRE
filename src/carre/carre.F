@@ -292,11 +292,11 @@ c  2.1  specify output format
 
 *
 *..3.0  Read the data
-101   CONTINUE
+  101 CONTINUE
 
 *..Read the values of x
 
-100   format(a)
+  100 format(a)
 
       iflag=-1
       rewind(7)
