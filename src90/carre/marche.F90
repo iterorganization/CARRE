@@ -13,14 +13,13 @@
 ! final level line which goes from one target to another without
 ! hitting a structure.
 !======================================================================
+      use carre_dimensions
       use carre_niveau
       use Logging
       use Helper
       use carre_target
 
       IMPLICIT NONE
-
-#include <CARREDIM.F>
 
 !  arguments
       INTEGER nx,ny,nstruc,npstru(strumx),indlim, &

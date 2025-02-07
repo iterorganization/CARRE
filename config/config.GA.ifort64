@@ -5,7 +5,6 @@ NCARG_ROOT ?= ${IRISLIB}/NCARG
 LD_MSCL    ?= -L${MSCL_ROOT} -lmscl
 LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lm
 
-FC      = ifort
 CPP     = /lib/cpp -traditional -ffreestanding
 
 FFLAGS  = -module ${OBJDIR}

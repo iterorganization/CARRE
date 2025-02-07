@@ -25,7 +25,7 @@
      &   'selptx.inf','vessel.dat'/
       external fcraxn,fcrtrn,fcrdgi,fcrdef
       external fcrchktp,fcrstri,fcrstro,fcrcrro,fcrfldi,fcrequo, &
-     &         fcrfldo,fcrslpo,fcrprp
+     &         fcrblkd,fcrfldo,fcrslpo,fcrprp
       external import
 
 #if defined(USE_ITMCARRE) && defined(ITM_ENVIRONMENT_LOADED)
@@ -36,6 +36,7 @@
 
 !======================================================================
 !
+      call fcrblkd
       inquire(file=chtrg,exist=ex)
       if(.not.ex) then
         write(*,*) 'fcrr: the file ',chtrg,' must be present!'
@@ -120,10 +121,8 @@
 contains
 
   subroutine fillLimiterCpo( cpo )
+    use fcrcom
     type(type_limiter), intent(inout) :: cpo
-
-    ! DG common block
-#include <FCRCOM.F>
 
     ! internal
     integer :: k, j, l, i
@@ -164,9 +163,8 @@ contains
 
 
   subroutine fillEquilibriumCpo( cpo )
+    use fcrcom
     type(type_equilibrium), intent(inout) :: cpo
-
-#include <FCRCOM.F>
 
     ! general information
     allocate(cpo%datainfo%dataprovider(1))

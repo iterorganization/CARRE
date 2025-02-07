@@ -1,7 +1,13 @@
+ifeq (${FC},f77)
+FC        = ifort
+endif
 COMPILER_MAJOR_VERSION = $(shell ${FC} -V 2>&1 | grep -o "Version [0-9]*" | cut -d ' ' -f 2 )
 
 ifdef SOLPS_DEBUG
-FFLAGS   += -g -C -debug all -traceback -check all
+FFLAGS   += -g -C -debug all -traceback -check all -diag-disable:10182
+ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -ge 2023; echo $$?),0)
+FFLAGS   += -diag-disable:10440 -check nouninit
+endif
 else
 FFLAGS   += -O -fp-model=precise
 endif
@@ -9,7 +15,20 @@ ifeq ($(shell test ${COMPILER_MAJOR_VERSION} -le 12; echo $$?),0)
 FFLAGS   += -vec_report0
 endif
 ifdef IMAS_VERSION
-B2INCLUDE += `pkg-config imas-ifort ggd --cflags`
+ifdef AL_VERSION
+AL_MAJOR_VERSION ?= $(shell echo ${AL_VERSION} | cut -d '.' -f1 )
+else
+AL_MAJOR_VERSION ?= $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
+endif
+ifeq ($(shell test ${AL_MAJOR_VERSION} -ge 5; echo $$?),0)
+B2INCLUDE += `pkg-config al-fortran --cflags`
+else
+B2INCLUDE += `pkg-config imas-ifort --cflags`
+endif
+GGD_MAJOR_VERSION ?= $(shell echo ${GGD_VERSION} | cut -d '.' -f1 )
+ifeq ($(shell test ${GGD_MAJOR_VERSION} -gt 0; echo $$?),0)
+B2INCLUDE += `pkg-config ggd --cflags`
+endif
 endif
 ifdef AMNS_PREFIX
 B2INCLUDE += `pkg-config amns --cflags`

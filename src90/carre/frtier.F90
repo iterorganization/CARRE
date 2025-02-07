@@ -15,16 +15,13 @@
 !*** direction of the search along the target and then calls MARCHE to
 !*** find and parametrise the limiting level line.
 !======================================================================
+      use carre_dimensions
       use carre_target
       use trc_stk_mod
       use Logging
       use Helper
 
       IMPLICIT NONE
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
 
 !  arguments
       INTEGER nx,ny,nstruc,npstru(strumx), &

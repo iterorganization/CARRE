@@ -3,10 +3,11 @@ ifndef LD_MSCL
   $(error LD_MSCL not defined)
 endif
 
-CPP     = /lib/cpp -traditional -ffreestanding
+CPP     = /usr/bin/cpp -traditional
 
 ifdef SOLPS_DEBUG
-FFLAGS  = -C -Wall -fbounds-check -fbacktrace
+FFLAGS  = -fbacktrace
+endif
 
 DBLPAD  =
 

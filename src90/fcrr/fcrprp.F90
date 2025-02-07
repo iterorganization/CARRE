@@ -6,8 +6,8 @@
 !*** Data transformation from DG to Carre
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
-#include <FCRCOM.F>
       integer(Short) :: i, j, k, l
       logical ex,uex
       real(rKind) u, dpi

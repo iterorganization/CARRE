@@ -6,9 +6,9 @@
 !*** Create the structure file for Carre
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
       character chcstr*(*), chcvss*(*)
-#include <FCRCOM.F>
       integer i,j,k,l
 !======================================================================
 !

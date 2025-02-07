@@ -7,10 +7,10 @@
 !*** At present, always a single-null configuration
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
       integer i
       character ofile*(*)
-#include <FCRCOM.F>
 !======================================================================
 !
       if(xptcntr(1,1).ge.0. .and. xlpcntr(1).ge.0.) then

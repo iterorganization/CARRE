@@ -2,9 +2,9 @@
 !======================================================================
 !*** Set some fcrr defaults
 !======================================================================
-      use KindDefinitions
-      implicit none
-#include <FCRCOM.F>
+     use KindDefinitions
+     use fcrcom
+     implicit none
 !======================================================================
      ! standard carre operating mode
      carre_mode = 0
@@ -17,7 +17,6 @@
      ! 
      lclstr = .false.
 
-
+     end
 
 !======================================================================
-end 

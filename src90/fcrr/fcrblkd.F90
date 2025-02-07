@@ -1,20 +1,25 @@
-      block data fcrblkd
+      subroutine fcrblkd
 !
 !  version : 27.07.99 23:28
 !
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
-      integer n
-#include <FCRCOM.F>
-      parameter(n=nxptm*3)
-      data repart , nrelax  / &
-     &       2    ,  5000   /
-      data   relax,      pasmin,      rlcept,  tgarde / &
-     &   0.2_rKind, 0.001_rKind, 1.e-6_rKind, ntrgx*0._rKind /
-      data xptcntr,     xlpcntr,    xpttol / &
-     & n*-1._rKind, 3*-1._rKind, 0.1_rKind /
-      data nclstr,  nrgn , nsgm , ntrg / &
-     &       -1  ,    0  ,  0  ,   0   /
+
+      repart = 2
+      nrelax = 5000
+      relax = 0.2_RKind
+      pasmin = 0.001_RKind
+      rlcept = 1.e-6_RKind
+      tgarde(1:ntrgx) = 0.0_RKind
+      xptcntr(1:3,1:nxptm) = -1.0_RKind
+      xlpcntr(1:3) = -1.0_RKind
+      xpttol = 0.1_RKind
+      nclstr = -1
+      nrgn = 0
+      nsgm = 0
+      ntrg = 0
 !======================================================================
+      return
       end

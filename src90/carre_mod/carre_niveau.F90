@@ -1,6 +1,7 @@
 module carre_niveau
 
   use KindDefinitions
+  use carre_dimensions
   use carre_types
   use Helper
   use Logging
@@ -10,8 +11,6 @@ module carre_niveau
 #endif
 
   implicit none
-
-#include <CARREDIM.F>
 
   private
 

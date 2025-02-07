@@ -6,8 +6,8 @@
 !*** Input of auxiliary data for Carre
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
-#include <FCRCOM.F>
       character*8 nam
 !
       integer nnm

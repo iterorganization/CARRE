@@ -1,5 +1,6 @@
 module carre_postprocess
 
+  use carre_dimensions
   use carre_types
   use CarreDiagnostics
   use carre_niveau
@@ -16,11 +17,9 @@ module carre_postprocess
   use SiloIO
 #endif
   use CarreSiloIO
+  use comrlx
 
   implicit none
-
-#include <CARREDIM.F>
-#include <COMRLX.F>
 
   private
 

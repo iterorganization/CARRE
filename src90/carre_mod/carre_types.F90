@@ -4,12 +4,11 @@ module carre_types
   use Logging
   use Helper
   use carre_constants
+  use carre_dimensions
 
   implicit none
 
   private
-
-#include <CARREDIM.F>
 
   ! forward from carre_constants
   public GRID_UNDEFINED, GRID_INTERNAL, GRID_EXTERNAL, &

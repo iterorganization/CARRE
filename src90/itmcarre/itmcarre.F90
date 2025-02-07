@@ -9,14 +9,13 @@ module itmcarre
   use carre_main
   use carre_types
   use carre_constants
+  use carre_dimensions
   use CarreDiagnostics
   use b2mod_grid_mapping
   use carre_parameter_io
 
   implicit none
 
-#include <CARREDIM.F>
-  
 contains
 
   subroutine itmcarre_main(equcpo, limcpo, edgecpo)
@@ -159,7 +158,7 @@ contains
     type(type_edge), intent(out) :: edgecpo
 
     ! internal
-    integer, parameter :: nxmx=npmamx,nymx=nrmamx,ncutmx=4,nisomx=1
+    integer, parameter :: nxmx=npmamx,nymx=nrmamx,ncutmx=max(1,DEF_NCUT),nisomx=1
 
     ! connectivity and cut arrays
     integer :: nncut

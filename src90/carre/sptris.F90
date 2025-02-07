@@ -13,14 +13,12 @@ subroutine sptris(nx,ny,x,y,psi,npx,ptx,pty, &
   !*** according to the CARRE conventions, i.e. from right to left, from
   !*** top to bottom.
   !=======================================================================
+  use carre_dimensions
   use carre_niveau
   use carre_target
   use carre_types
 
   implicit none
-  !ank-970707: dimensions from the file
-  !  dimensions
-#include <CARREDIM.F>
 
   !  arguments
   integer nx,ny,npx,iptx(npxmx),jptx(npxmx), &

@@ -1,7 +1,5 @@
-!  version : 07.07.97 20:52
-!
-! This file must be formatted in a F77-compatible way as it included in Uinp
-!
+      module carre_dimensions
+
       integer, parameter :: nxmax=1025
       integer, parameter :: nymax=1025
       integer, parameter :: npstmx=1200
@@ -41,3 +39,4 @@
 !***  nsepsegmx   : max. number of separatrix segments
 !***
 !======================================================================
+      end module carre_dimensions

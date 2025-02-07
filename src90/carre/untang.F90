@@ -3,6 +3,7 @@
       SUBROUTINE UNTANG(xn,yn,npni,x,y,ux,uy,d,period)
 !***********************************************************************
       use KindDefinitions
+      use comlan
       IMPLICIT NONE
 
 !..  Cette sous-routine calcule le vecteur unite tangent a la courbe
@@ -12,10 +13,6 @@
 ! arguments
       INTEGER npni
       REAL(rKind) :: xn(npni), yn(npni), x, y, ux, uy,d,period
-
-!  variables en common
-
-#include <COMLAN.F>
 
 !  variables locales
       INTEGER indp1, ind, jnd, jndp, ipp

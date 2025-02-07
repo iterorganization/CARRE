@@ -6,6 +6,7 @@
 !
 ! Start a new plot
       use KindDefinitions
+      use perimtr
       implicit none
 !
 !  donnees
@@ -18,10 +19,6 @@
 !
       real(Single) :: xmin,xmax,ymin,ymax
       character*(*) xlab,ylab,title,echx,echy
-!
-!  variables en common
-!
-#include <PERIM.F>
 !
 !  variables locales
       integer ll

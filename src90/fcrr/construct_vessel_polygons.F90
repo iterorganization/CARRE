@@ -3,8 +3,8 @@
 !***  Contructs vessel polygons
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
-#include <FCRCOM.F>
       integer(Short) :: i, ipt, npts, npth, nptt, ilbl
       integer(Short) :: fcLblmin, fcLblmax
       integer(Short), allocatable :: fcLbls(:)

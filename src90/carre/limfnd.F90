@@ -11,14 +11,11 @@
 !  that point. Finally, it parametrises the separatrix (the flux surface
 !  which goes through (ptx,pty) in curve nivx(*,1,1),nivy(*,1,1).
 !======================================================================
+      use carre_dimensions
       use carre_niveau
       use carre_target
 
       implicit none
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
 
 !  arguments
       INTEGER nivtot(*),nbniv, &
