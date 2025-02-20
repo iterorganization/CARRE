@@ -5,9 +5,9 @@
       use KindDefinitions
       use fcrcom
       implicit none
-      integer(Short) :: i, ipt, npts, npth, nptt, ilbl
+      integer(Short) :: i, ipt, npts, npth, nptt, ilbl, isgn
       integer(Short) :: fcLblmin, fcLblmax
-      integer(Short), allocatable :: fcLbls(:)
+      integer(Short), allocatable :: fcLbls(:), fcLblsgn(:)
       real(rKind) :: xsrt, ysrt, xend, yend
       real(rKind) :: xhead(nmstr), yhead(nmstr), xtail(nmstr), ytail(nmstr)
       logical lfound, ldir, lused(nvess)
@@ -19,6 +19,7 @@
       ! init
       nstrv = 0
       lstrv = 0
+      sstrv = 0
       lclstrv = .false.
       xstrv = 0.0_rKind
       ystrv = 0.0_rKind
@@ -39,25 +40,61 @@
       fcLblmin = 1e5
       fcLblmax = 0
       do i = 1, nvess
-        fcLblmin = min(fcLbl(vess_elm(i)),fcLblmin)
-        fcLblmax = max(fcLbl(vess_elm(i)),fcLblmax)
+        fcLblmin = min(abs(fcLbl(vess_elm(i))),fcLblmin)
+        fcLblmax = max(abs(fcLbl(vess_elm(i))),fcLblmax)
       end do
 
       ! consistency checks
-      if (fcLblmin.ne.1.and..not.(fcLblmin.eq.0.and.fcLblmax.eq.0)) then
-        write (*,*) 'Warning: possibly inconsistent fcLbl definition in DG model'
+      if (fcLblmin.eq.0.and.fcLblmax.eq.0) then
+        write (*,*) 'All vessel elements have fcLbl = 0.'
+        stop ' ==> Check DG model'
+      elseif (fcLblmin.eq.0) then
         do i = 1, nvess
           if (fcLbl(vess_elm(i)).eq.0) then
-            write (*,*) 'Element ', vess_elm(i), ' has fcLbl 0.'
+            write (*,*) 'Vessel element ', vess_elm(i), ' has fcLbl = 0.'
           endif
         end do
-        stop
-      elseif (fcLblmin.eq.0.and.fcLblmax.eq.0) then
-        write (*,*) 'All vessel elements have fcLbl = 0.'
-        write (*,*) 'Labels will be automatically assigned to individual polygon pieces.'
+        stop ' ==> Check DG model'
       end if
+
+      ! build full range of abs(fcLbl) values
       allocate(fcLbls(fcLblmax-fcLblmin+1))
+      allocate(fcLblsgn(fcLblmax-fcLblmin+1))
       fcLbls = [(i, i = fcLblmin, fcLblmax)]
+
+      ! check nature of the boundaries based on sign fcLbl
+      ! positive fcLbl: assume material boundary
+      ! negative fcLbl: assume void boundary
+      fcLblsgn = 1
+      lused = .false.
+      do i = 1, nvess
+        ilbl = fcLbl(vess_elm(i))
+        isgn = ilbl/abs(ilbl)
+        if (.not.lused(abs(ilbl))) then
+          ! found new fcLbl => store sign
+          lused(abs(ilbl)) = .true.
+          fcLblsgn(abs(ilbl)) = isgn
+        else
+          ! fcLbl already found on other element
+          ! check whether sign is the same
+          if (fcLblsgn(abs(ilbl)).ne.isgn) then
+            write (*,*) 'Found both positive and negative value of fcLbl = ', abs(ilbl), ' among vessel elements.'
+            write (*,*)
+            stop ' ==> Check DG model'
+          endif
+        endif
+      enddo
+      do ilbl = fcLblmin, fcLblmax
+        if (.not.lused(ilbl)) then
+          write (*,*) 'No vessel element with abs(fcLbl) = ', ilbl, '.'
+          write (*,*) 'Values of abs(fcLbl) not continuous.'
+          stop ' ==> Check DG model'
+        endif
+        if (fcLblsgn(ilbl).ne.1 .and. fcLblsgn(ilbl).ne.-1) then
+          write (*,*) 'Problem with sign of fcLbl ', ilbl, '.'
+          stop
+        endif
+      enddo
 
 #ifdef DBG
       write (*,*) 'construct_vessel_polygons: fcLbl'
@@ -78,7 +115,7 @@
 
         if (ilbl .gt. (fcLblmax - fcLblmin + 1)) then
           write (*,*) 'Not all vessel elements assigned to a polygon.'
-          write (*,*) 'Check for inconsistent fcLbls of the elements.'
+          write (*,*) 'Check for inconsistent fcLbl of the elements.'
           write (*,*) 'Elements with the same fcLbl must form a single'
           write (*,*) 'open or closed polygon (no gaps).'
           write (*,*) ilbl, fcLblmin, fcLblmax
@@ -90,9 +127,9 @@
         i = 0
         do while (.not.lfound)
           i = i + 1
-          if (.not.lused(i).and.fcLbl(vess_elm(i)).eq.fcLbls(iLbl)) lfound = .true.
+          if (.not.lused(i).and.abs(fcLbl(vess_elm(i))).eq.fcLbls(iLbl)) lfound = .true.
           if (i.gt.nvess) then
-            write (*,*) 'Found no elements with fcLbl = ',fcLbls(iLbl), '.'
+            write (*,*) 'Found no elements with abs(fcLbl) = ', fcLbls(iLbl), '.'
             write (*,*) 'Min fcLbl = ', fcLblmin
             write (*,*) 'Max fcLbl = ', fcLblmax
             stop ' ==> Check DG model'
@@ -111,6 +148,8 @@
         xtail(1) = xend
         ytail(1) = yend
 
+        sstrv(nstrv) = fcLbl(vess_elm(i))/abs(fcLbl(vess_elm(i)))
+
         ! first pass: find end point of the polygon
         ldir = .true.
         ipt = 1
@@ -123,7 +162,7 @@
                ! no further point found in this direction
                ! switch to other side
                ldir = .false.
-            elseif (.not.lused(i).and.fcLbl(vess_elm(i)).eq.fcLbls(ilbl)) then
+            elseif (.not.lused(i).and.abs(fcLbl(vess_elm(i))).eq.fcLbls(ilbl)) then
               if (points_match (xend, yend, p1(1,vess_elm(i)), p1(2,vess_elm(i)))) then
                 lfound   = .true.
                 lused(i) = .true.
@@ -157,7 +196,7 @@
                ! no further point found in this direction
                ! terminate search for this polygon
                ldir = .true.
-            elseif (.not.lused(i).and.fclbl(vess_elm(i)).eq.fclbls(ilbl)) then
+            elseif (.not.lused(i).and.abs(fcLbl(vess_elm(i))).eq.fclbls(ilbl)) then
               if (points_match (xsrt, ysrt, p1(1,vess_elm(i)), p1(2,vess_elm(i)))) then
                 lfound   = .true.
                 lused(i) = .true.
@@ -204,6 +243,7 @@
       end do
 
       deallocate(fclbls)
+      deallocate(fclblsgn)
 
       ! Some consistency checks
       ! To be added: check that complete vessel is closed in case of multiple (open) polygons

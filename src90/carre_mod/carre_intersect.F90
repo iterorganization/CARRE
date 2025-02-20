@@ -385,7 +385,8 @@ contains
     integer, intent(out), optional :: iStruct
 
     ! internal
-    integer :: iSeg, is
+    integer :: iSeg, is, iistruct
+    character*80 :: nomstr
 
     ! This tolerance parameter is basically used for floating point
     ! equivalence tests. Increase it will increase the tolerance at
@@ -398,7 +399,16 @@ contains
             if (on_segment( struct%rxstruc(iSeg, is), struct%rystruc(iSeg, is), &
                  & struct%rxstruc(iSeg+1, is), struct%rystruc(iSeg+1, is), &
                  & x, y, TOLERANCE)) then
-                if (present(iStruct)) iStruct = is
+                if (present(iStruct)) then
+                    iStruct = is
+                    ! Check for void boundary:
+                    ! If (real) structure name is negative of (real) structure number, assume void boundary
+                    write (nomstr,'(a)') struct%nomstr(is+struct%vnstruc)
+                    read  (nomstr(11:14),'(i4)') iistruct
+                    if(iistruct.eq.-(is+struct%vnstruc)) then
+                        iStruct = -is
+                    endif
+                endif
                 onStructure = .true.
                 return
             end if

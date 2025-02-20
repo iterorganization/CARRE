@@ -18,7 +18,11 @@
       write(2,'(a)') '$structures'
       k=0
       do j=1,nstr + nstrv
-      write(2,'(a,i4)') 'Structure ',j
+        if (j.le.nstr) then
+          write(2,'(a,i4)') 'Structure ',j
+        else
+          write(2,'(a,i4)') 'Structure ',sstrv(j-nstr)*j
+        endif
         if(j.eq.1) then
 !*** This is for structures in "Sonnet" format:
 !*** the first one contains the closing box which should be removed
@@ -52,7 +56,7 @@
       write(2,'(a)') '$structures'
       k=sum(lstr(1:nstr))
       do j=nstr+1,nstr+nstrv
-        write(2,'(a,i4)') 'Structure ',j-nstr
+        write(2,'(a,i4)') 'Structure ',sstrv(j-nstr)*(j-nstr)
         l=lstr(j)
         if(lclstr(j)) then
           write(2,*) l+1

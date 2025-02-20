@@ -6,7 +6,7 @@
       parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=1000)
       integer(Short) :: repart,nrelax,nxpt, &
      &  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg, &
-     &  nstr,nstrv,lstr(nnstr),lstrv(nnstr),nclstr, &
+     &  nstr,nstrv,lstr(nnstr),lstrv(nnstr),sstrv(nnstr),nclstr, &
      &  nr,nz, &
      &  lm_cnfg, &
      &  carre_mode, grid_ext_mode, equ_ext_mode, &
@@ -41,6 +41,7 @@
 !*** tgarde: guard length in front of targets
 !*** nstr  : number of the structures imported from dg
 !*** nstrv : number of additional vessel structures to be created/written for carre2
+!*** sstrv : sign for structure identifier of additional vessel structures to be created/written for carre2
 !*** lstr  : array containing their lengths
 !*** nclstr: number of closed structures (they come first)
 !*** xstr,
