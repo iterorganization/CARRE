@@ -12,6 +12,7 @@ else
 FFLAGS  = -O
 endif
 
+INCMOD  = -I
 DBLPAD  = -r8
 
 COMPILE = ${FC} -c ${FFLAGS}
