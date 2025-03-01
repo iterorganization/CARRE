@@ -1,7 +1,4 @@
 # check if necessary variables are correctly defined
-ifndef MSCL_ROOT
-  $(error MSCL_ROOT not defined)
-endif
 ifdef NCARG_ROOT
 LD_NCARG  ?= -L${NCARG_ROOT} -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 endif

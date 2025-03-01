@@ -368,79 +368,80 @@ cc>>>
 
 c*** Find the targets not connected to the inner X-point
 
-          i1=0
-          i2=0
-          ipi=mod(ipx,2)+1
-          do i=1,nbdef
-            k=inddef(i)
-            do j=1,4
-              if(k.eq.indplq(j,ipi)) k=0
-            end do
-            if(k.ne.0) then
-              if(i1.eq.0) then
-                i1=k
-              else if(i2.eq.0) then
-                i2=k
-              else
-                write(0,*) 'Error detected in argsep: more than two ',
+            i1=0
+            i2=0
+            ipi=mod(ipx,2)+1
+            do i=1,nbdef
+              k=inddef(i)
+              do j=1,4
+                if(k.eq.indplq(j,ipi)) k=0
+              end do
+              if(k.ne.0) then
+                if(i1.eq.0) then
+                  i1=k
+                else if(i2.eq.0) then
+                  i2=k
+                else
+                  write(0,*) 'Error detected in argsep: more than two ',
      ,                  'targets not intersecting the inner separatrix'
-                call pltend
-                STOP
+                  call pltend
+                  STOP
+                end if
               end if
+            end do
+            if(i2.eq.0) then
+              write(0,*) 'Error detected in argsep: less than two (',i1,
+     ,            ' ) targets not intersecting the inner separatrix'
+              call pltend
+              STOP
             end if
-          end do
-          if(i2.eq.0) then
-            write(0,*) 'Error detected in argsep: less than two (',i1,
-     ,               ' ) targets not intersecting the inner separatrix'
-            call pltend
-            STOP
-          end if
 
-          j1=0
-          j2=0
-          do i=1,4
-            if(i1.eq.indplq(i,ipx)) j1=i
-            if(i2.eq.indplq(i,ipx)) j2=i
-          end do
-          if(j1.eq.0 .or. j2.eq.0) then
-            write(0,*) 'Error detected in argsep: primary targets for',
-     ,                                ' the outer separatrix not found'
-            write(0,*) 'i1,i2,inddef: ',i1,i2,' ',inddef
-            write(0,*) 'indplq :',indplq
-            call pltend
-            STOP
-          end if
+            j1=0
+            j2=0
+            do i=1,4
+              if(i1.eq.indplq(i,ipx)) j1=i
+              if(i2.eq.indplq(i,ipx)) j2=i
+            end do
+            if(j1.eq.0 .or. j2.eq.0) then
+              write(0,*)
+     ,         'Error detected in argsep: primary targets for',
+     ,         ' the outer separatrix not found'
+              write(0,*) 'i1,i2,inddef: ',i1,i2,' ',inddef
+              write(0,*) 'indplq :',indplq
+              call pltend
+              STOP
+            end if
 
-          k1=0
-          k2=0
-          do i=1,4
-            if(i.ne.j1 .and. i.ne.j2) then
-              if(k1.eq.0) then
-                k1=i
-              else
-                k2=i
+            k1=0
+            k2=0
+            do i=1,4
+              if(i.ne.j1 .and. i.ne.j2) then
+                if(k1.eq.0) then
+                  k1=i
+                else
+                  k2=i
+                end if
               end if
-            end if
-          end do
-          l1=0
-          l2=0
-          do i=1,4
-            k=inddef(i)
-            if(k.eq.indplq(k1,ipx)) then
-              if(l1.eq.0) then
-                l1=k1
-              else
-                l2=k1
+            end do
+            l1=0
+            l2=0
+            do i=1,4
+              k=inddef(i)
+              if(k.eq.indplq(k1,ipx)) then
+                if(l1.eq.0) then
+                  l1=k1
+                else
+                  l2=k1
+                end if
               end if
-            end if
-            if(k.eq.indplq(k2,ipx)) then
-              if(l1.eq.0) then
-                l1=k2
-              else
-                l2=k2
+              if(k.eq.indplq(k2,ipx)) then
+                if(l1.eq.0) then
+                  l1=k2
+                else
+                  l2=k2
+                end if
               end if
-            end if
-          end do
+            end do
 cc<<<
 c          write(0,*) 'i1,i2, j1,j2, k1,k2, l1,l2: ',
 c     ,                              i1,i2,' ',j1,j2,' ',k1,k2,' ',l1,l2
@@ -449,11 +450,11 @@ c
 c*** Index the curves which skirt the inner separatrix
 c*** (each of them must intersect a target)
 
-          ptsep(1,ipx) = j1
-          ptsep(2,ipx) = j2
+            ptsep(1,ipx) = j1
+            ptsep(2,ipx) = j2
 
-          ptsep(3,ipx) = l1
-          ptsep(4,ipx) = l2
+            ptsep(3,ipx) = l1
+            ptsep(4,ipx) = l2
 cank
 c----------------------------------------------------------------------
          end if
