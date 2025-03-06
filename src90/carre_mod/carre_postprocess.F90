@@ -2510,7 +2510,7 @@ contains
     ! Now catch special case of internal cells with three external points and one internal point
     ! (no boundary point). Make sure the external point not connected to the internal
     ! point via a face is placed on one of the other external points. If this is not
-    ! the case, move it to the external neighbour along the radial face.
+    ! the case, move it to the external neighbour along the poloidal face.
 
     do iReg = 1, grid%nReg
         do ip = 1, grid%np1(iReg) - 1
@@ -2540,10 +2540,10 @@ contains
                 ! Check whether the point is already positioned on another corner
                 pointOk = .false.
 
-                ! compare with neighbour in poloidal direction
-                ipNb = ipFix + 1
-                irNb = irFix
-                if (ipNb > ip+1) ipNb = ip
+                ! compare with neighbour in radial direction
+                ipNb = ipFix
+                irNb = irFix + 1
+                if (irNb > ir+1) irNb = ir
                 if ( pointsIdentical( &
                      & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
                      & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
@@ -2552,10 +2552,10 @@ contains
                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
                 end if
 
-                ! compare with neighbour in radial direction
-                ipNb = ipFix
-                irNb = irFix + 1
-                if (irNb > ir+1) irNb = ir
+                ! compare with neighbour in poloidal direction
+                ipNb = ipFix + 1
+                irNb = irFix
+                if (ipNb > ip+1) ipNb = ip
                 if ( pointsIdentical( &
                      & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
                      & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
@@ -2576,6 +2576,8 @@ contains
                     call movePoint( x0, y0, x1, y1, markFixed = .false. )
                     ! The point that was moved is marked as a boundary point in movePoint.
                     ! We also have to mark the point it was moved on as a boundary point.
+                    grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
                 end if
 
             end do
