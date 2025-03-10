@@ -199,7 +199,7 @@
           xstrv(npts+npth+1:npts+lstrv(nstrv)) = xtail(1:nptt)
           ystrv(npts+npth+1:npts+lstrv(nstrv)) = ytail(1:nptt)
         endif
-        npts = npts + nptt + npth
+        npts = npts + lstrv(nstrv)
 
       end do
 
