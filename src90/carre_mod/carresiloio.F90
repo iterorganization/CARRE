@@ -21,7 +21,9 @@ module CarreSiloIO
   character(5), save :: filenameBase = FILENAMEBASE_DEFAULT, filenameBaseSave
 
   character(5+3+4+3), save :: filename = 'carre0010001001'
+#ifdef USE_SILO
   character(*), parameter :: FILENAME_EXTENSION = '.silo'
+#endif
   character(*), parameter :: FILENAME_FORMAT = '(a5,i3.3,i4.4,i3.3)' ! ireg, isurf, irelax
 
   integer :: csioStrucNSeg
