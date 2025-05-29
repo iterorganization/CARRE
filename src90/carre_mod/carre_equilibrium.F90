@@ -44,7 +44,7 @@ contains
     if (par%equExtensionMode == EQU_EXTENSION_OFF) return
 
     call assert( equ%nx + par%addLeft + par%addRight <= nxmax )
-    call assert( equ%ny + par%addTop + par%addBottom <= nxmax )
+    call assert( equ%ny + par%addTop + par%addBottom <= nymax )
 
     newPsi = equ%psi
 

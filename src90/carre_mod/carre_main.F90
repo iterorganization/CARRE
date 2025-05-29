@@ -53,7 +53,7 @@ contains
 
     ! external routines
     external derive, inipsi, grad0, sptris, argsep, limfnd, frtier, maille
-    external trace2, selptx, wreqvr
+    external trace2, selptx, wreqdg, wreqvr
 
     !
     !..4.0  Calculate the first partial derivatives in x and y and store
@@ -132,7 +132,24 @@ contains
              ! we have to reset the related state variables
              call resetGeometryAndTopologyData()
 
-             ! TODO: output modified equilibrium (use service routines from dg tools)
+             if (.not. (par%equExtensionMode == EQU_EXTENSION_OFF)) then
+             ! If equilibrium has been extended then we re-write it
+                open(2,file='rzpsi_ext.dat')
+                call wreqvr(2,nxmax,iret,equ%nx,equ%ny,equ%x,equ%y,equ%psi)
+                if(iret.ne.0) then
+                   write(*,*) 'carre_main: error writing the extended Carre equilibrium file'
+                   stop
+                end if
+                close(2)
+                open(2,file='rzpsi_ext.equ')
+                call wreqdg(2,nxmax,iret,equ%nx,equ%ny,equ%x,equ%y,equ%psi)
+                if(iret.ne.0) then
+                   write(*,*) 'carre_main: error writing the extended DivGeo equilibrium file'
+                   stop
+                end if
+                close(2)
+             endif
+
           end if
 
           !..8.0  Parametrise the separatrices
