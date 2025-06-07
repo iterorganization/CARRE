@@ -21,7 +21,7 @@
       integer(Short) lun, ngpr, iret, nr, nz
       real(rKind) :: rgr(ngpr), zgr(*), pfm(ngpr,*)
 !... toroidal field in Tesla, radius in m
-      real(rKind) :: btf, rtf
+      real(rKind) :: btf
       integer i, j
       logical ex
 
