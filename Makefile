@@ -351,19 +351,31 @@ ifneq ($(shell uname),Darwin)
 	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
 else
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
-	l="OBJS ="; \
+	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${FPATH}" | tr : \ `; do \
 		l="$$l `find $$d -name '*.F' -exec basename {} \; | tr '\n' ' '`"; \
+		ll90="$$ll90 `find -L $$d -name '*.f90' -exec basename {} \; | tr '\n' ' '`"; \
+		lu90="$$lu90 `find -L $$d -name '*.F90' -exec basename {} \; | tr '\n' ' '`"; \
 	done; \
-	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
+	E="-e 's/\*.F//g' -e 's/\.F/\.o/g'" ; \
+	EL90="-e 's/\*.f90//g' -e 's/\.f90/\.o/g'" ; \
+	EU90="-e 's/\*.F90//g' -e 's/\.F90/\.o/g'" ; \
+	for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
+		EL90="$$EL90 -e 's/ $$f//'"; \
+		EU90="$$EU90 -e 's/ $$f//'"; \
 	done; \
-	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ
+	E="$$E -e 's/[ ]*//'"; \
+	EL90="$$EL90 -e 's/[ ]*//'"; \
+	EU90="$$EU90 -e 's/[ ]*//'"; \
+	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ; \
+	echo "$$ll90" | eval sed "$$EL90" >> ${OBJDIR}/LISTOBJ; \
+	echo "$$lu90" | eval sed "$$EU90" >> ${OBJDIR}/LISTOBJ
 	@ll="GOBJS ="; \
 	for d in `echo "$(GPATH)" | tr : \ `; do \
-		ll="$$ll `find $$d -name '*.F' -exec basename {} \; | tr '\n' ' '`"; \
+		ll="$$ll `find $$d -name '*.F90' -exec basename {} \; | tr '\n' ' '`"; \
 	done; \
-	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
+	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
 	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
