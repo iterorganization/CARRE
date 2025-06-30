@@ -1,7 +1,7 @@
 # check if necessary variables are correctly defined
-NCARG_ROOT ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG
-MSCL_ROOT  ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/mscl_1.2.4
-GLI_HOME   ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/gks
+NCARG_ROOT ?= /pitagora/pub/userexternal/dcoster0/SOLPS-ITER/${COMPILER}/NCARG
+MSCL_ROOT  ?= /pitagora/pub/userexternal/dcoster0/SOLPS-ITER/${COMPILER}/mscl_1.2.4
+GLI_HOME   ?= /pitagora/pub/userexternal/dcoster0/SOLPS-ITER/${COMPILER}/gks_3.0.9-540
 LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
 LD_MSCL    ?= -L${MSCL_ROOT}/lib -lmscl
 
