@@ -289,7 +289,6 @@ c======================================================================
 c
 c  2.1  specify output format
       write(10,*)'output format: carre70; version : ', git_version_Carre
-
 *
 *..3.0  Read the data
   101 CONTINUE
