@@ -102,6 +102,12 @@ ifdef SOLPS_DEBUG
 DEFINES  += -DDBG
 endif
 
+ifdef IMAS_PREFIX
+ifeq ($(shell test ${GGD_MAJOR_VERSION} -eq 0; echo $$?),0)
+$(warning Asking for an IMAS build but missing a GGD module: build may be incomplete)
+endif
+endif
+
 # Source form: src is old fixed form source (used by Carre), src90 is current free form source (used by Carre2)
 SRCDIR = src90
 
