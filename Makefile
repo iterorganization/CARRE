@@ -12,8 +12,6 @@ ifndef COMPILER
 $(error COMPILER not defined)
 endif
 
-MAKETAGS ?= ctags -e -f
-
 MAKES = Makefile
 # Include global SOLPS compiler settings
 ifndef SOLPS_CPP
@@ -41,6 +39,8 @@ ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local ] && 
   include ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
   MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
 endif
+
+MAKETAGS ?= ctags -e -f
 
 # Extensions for object directories when various options are used
 ifdef SOLPS_OPENMP
@@ -418,7 +418,7 @@ ifneq (${MOD},o)
 ifeq (${USE_DIMENSIONS},1)
 ${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
-	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
+	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/b2mod_dimensions.F
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 else
