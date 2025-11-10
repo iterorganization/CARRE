@@ -1,0 +1,12 @@
+CPP     = /lib/cpp -traditional -ffreestanding
+
+FFLAGS  = -module ${OBJDIR}
+ifdef SOLPS_DEBUG
+FFLAGS += -warn all -check noarg_temp_created -warn notruncated_source -warn nounused -p -gen-interfaces -warn interfaces
+LDFLAGS =
+endif
+
+#!!!Local Variables:
+#!!! mode: Makefile
+#!!! End:
+

@@ -3,7 +3,7 @@
 
       integer nnstr,nmstr,nsgmx,nrgnx,ntrgx,ngpr,ngpz,nxptm
       parameter (nsgmx=6, nrgnx=6, ntrgx=4, nxptm=2)
-      parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=1000)
+      parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=2000)
       integer(Short) :: repart,nrelax,nxpt, &
      &  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg, &
      &  nstr,nstrv,lstr(nnstr),lstrv(nnstr),nclstr, &

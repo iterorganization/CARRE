@@ -21,8 +21,8 @@
 
 !  procedures
       integer ifind
+      external ifind
 !=======================================================================
-
 
       ix = ifind( px, x, nx, 1 )
       jx = ifind( py, y, ny, 1 )
@@ -31,4 +31,5 @@
      &     + a01(ix,jx)*py &
      &     + a11(ix,jx)*px*py
 
+      return
       end

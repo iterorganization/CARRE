@@ -12,8 +12,6 @@ ifndef COMPILER
 $(error COMPILER not defined)
 endif
 
-MAKETAGS ?= ctags -e -f
-
 MAKES = Makefile
 # Include global SOLPS compiler settings
 ifndef SOLPS_CPP
@@ -42,11 +40,7 @@ ifeq ($(shell [ -e ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local ] && 
   MAKES += ${SOLPSTOP}/SETUP/config.${HOST_NAME}.${COMPILER}.local
 endif
 
-ifdef IMAS_PREFIX
-ifeq ($(shell test ${GGD_MAJOR_VERSION} -eq 0; echo $$?),0)
-$(warning Asking for an IMAS build but missing a GGD module: build may be incomplete)
-endif
-endif
+MAKETAGS ?= ctags -e -f
 
 # Extensions for object directories when various options are used
 ifdef SOLPS_OPENMP
@@ -106,6 +100,12 @@ endif
 DEFINES  += ${SOLPS_CPP}
 ifdef SOLPS_DEBUG
 DEFINES  += -DDBG
+endif
+
+ifdef IMAS_PREFIX
+ifeq ($(shell test ${GGD_MAJOR_VERSION} -eq 0; echo $$?),0)
+$(warning Asking for an IMAS build but missing a GGD module: build may be incomplete)
+endif
 endif
 
 # Source form: src is old fixed form source (used by Carre), src90 is current free form source (used by Carre2)
@@ -357,19 +357,31 @@ ifneq ($(shell uname),Darwin)
 	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
 else
 	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
-	l="OBJS ="; \
+	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${FPATH}" | tr : \ `; do \
 		l="$$l `find $$d -name '*.F' -exec basename {} \; | tr '\n' ' '`"; \
+		ll90="$$ll90 `find -L $$d -name '*.f90' -exec basename {} \; | tr '\n' ' '`"; \
+		lu90="$$lu90 `find -L $$d -name '*.F90' -exec basename {} \; | tr '\n' ' '`"; \
 	done; \
-	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
+	E="-e 's/\*.F//g' -e 's/\.F/\.o/g'" ; \
+	EL90="-e 's/\*.f90//g' -e 's/\.f90/\.o/g'" ; \
+	EU90="-e 's/\*.F90//g' -e 's/\.F90/\.o/g'" ; \
+	for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
+		EL90="$$EL90 -e 's/ $$f//'"; \
+		EU90="$$EU90 -e 's/ $$f//'"; \
 	done; \
-	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ
+	E="$$E -e 's/[ ]*//'"; \
+	EL90="$$EL90 -e 's/[ ]*//'"; \
+	EU90="$$EU90 -e 's/[ ]*//'"; \
+	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ; \
+	echo "$$ll90" | eval sed "$$EL90" >> ${OBJDIR}/LISTOBJ; \
+	echo "$$lu90" | eval sed "$$EU90" >> ${OBJDIR}/LISTOBJ
 	@ll="GOBJS ="; \
 	for d in `echo "$(GPATH)" | tr : \ `; do \
-		ll="$$ll `find $$d -name '*.F' -exec basename {} \; | tr '\n' ' '`"; \
+		ll="$$ll `find $$d -name '*.F90' -exec basename {} \; | tr '\n' ' '`"; \
 	done; \
-	E="-e 's/\.F/\.o/g'" ; for f in $(EXCLUDELIST); do \
+	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
 	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
@@ -406,7 +418,7 @@ ifneq (${MOD},o)
 ifeq (${USE_DIMENSIONS},1)
 ${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
-	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
+	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/b2mod_dimensions.F
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 else
@@ -483,7 +495,7 @@ ${OBJDIR}/b2mod_geo_corner.${MOD}: ${B2SRC}/modules/b2mod_geo_corner.F
 	@rm -f ${OBJDIR}/b2mod_geo_corner.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geo_corner.f
 
-${OBJDIR}/b2mod_geometry.${MOD}: ${B2SRC}/ids/b2mod_geometry.F90 ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD}
+${OBJDIR}/b2mod_geometry.${MOD}: ${B2SRC}/ids/b2mod_geometry.F90 ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/ids/b2mod_geometry.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geometry.F90 ${OBJDIR}/b2mod_geometry.f90
@@ -656,7 +668,7 @@ ${OBJDIR}/b2mod_geo_corner.o: ${B2SRC}/modules/b2mod_geo_corner.F
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geo_corner.f
 	@touch ${OBJDIR}/b2mod_geo_corner.${MOD}
 
-${OBJDIR}/b2mod_geometry.o: ${B2SRC}/ids/b2mod_geometry.F90 ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD}
+${OBJDIR}/b2mod_geometry.o: ${B2SRC}/ids/b2mod_geometry.F90 ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/ids/b2mod_geometry.F90 ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geometry.F90 ${OBJDIR}/b2mod_geometry.f90

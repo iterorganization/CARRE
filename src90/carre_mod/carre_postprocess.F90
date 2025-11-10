@@ -2675,6 +2675,8 @@ contains
                     call movePoint( x0, y0, x1, y1, markFixed = .false. )
                     ! The point that was moved is marked as a boundary point in movePoint.
                     ! We also have to mark the point it was moved on as a boundary point.
+                    grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
                 end if
 
             end do
