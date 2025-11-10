@@ -2434,7 +2434,7 @@ contains
     ! First loop over all external points and check if they can be moved onto the structure in the poloidal direction.
     ! This also removes any pentagonal cells, by creating a nonorthogonal interal face.
     ! Secondly loop over all remaining external points and move them radially onto the structure.
-    ! First pass: if the other endpoint is an internal point, they are connected 
+    ! First pass: if the other endpoint is an internal point, they are connected
     ! by an intersected face. Move point onto the intersection.
     ! Second pass: if the other endpoint is a boundary point, move the point onto it.
     ! Only move every point once.
@@ -2454,7 +2454,7 @@ contains
                     call findPoint( ip, ir, iReg, GRID_INTERNAL, ipFix, irFix )
                     if ((grid%xmail(ipFix,irFix,iReg)+grid%ymail(ipFix,irFix,iReg)) < 1e-6) cycle
                     ! print *, "External point:", grid%xmail(ipFix,irFix,iReg),grid%ymail(ipFix,irFix,iReg)
-                else 
+                else
                     cycle
                 endif
                 ! cycle
@@ -2492,7 +2492,7 @@ contains
                 & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
                 & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
 
-                if (dIntPol < dExtPol .and. dIntPol < 0.05) then
+                if (dIntPol < dExtPol .and. dIntPol < dpol1max) then
                     call movePoint( &
                         & grid%xmail(ipFix,irFix,iReg), &
                         & grid%ymail(ipFix,irFix,iReg), &
@@ -2502,7 +2502,7 @@ contains
                     pointWasMoved(ipFix,irFix,iReg) = .true.
                     grid%cellflag(ip, ir, iReg) = GRID_BOUNDARY
                     grid%pointFlag(ipFix,irFix,iReg) = GRID_BOUNDARY
-                elseif(dExtPol < 0.05) then
+                elseif(dExtPol < dpol2max) then
                     call movePoint( &
                     & grid%xmail(ipNbPol,irNbPol,iReg), &
                     & grid%ymail(ipNbPol,irNbPol,iReg), &
@@ -2603,7 +2603,7 @@ contains
                     end do
                 end do
             end do
-        end do 
+        end do
     end do  ! strategy loop
 
     ! Now catch special case of internal cells with three external points and one internal point

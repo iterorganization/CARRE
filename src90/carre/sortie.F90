@@ -111,7 +111,7 @@ SUBROUTINE SORTIE(equ, grid, diag, par, numero)
    26       CONTINUE
          ENDIF
          write(10,115)'nrelax=',nrelax,'relax=',relax,'pasmin=',pasmin, & 
-     &     'rlcept=',rlcept
+     &     'rlcept=',rlcept,'dpol2max=',dpol2max,'dpol1max=',dpol1max
  115     format(a,i5/(a,1pe11.4))
 
         WRITE(10,'(a,1pe11.4)') 'targetResolution =',par%targetRes

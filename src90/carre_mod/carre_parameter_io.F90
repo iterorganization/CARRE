@@ -366,6 +366,16 @@ CONTAINS
          call rdfrre(vari(ieg+1:80),rlcept,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:8) .EQ. 'dpol1max') THEN
+!        READ(vari(ieg+1:80),*,err=98)deltrn(6)
+         call rdfrre(vari(ieg+1:80),dpol1max,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
+      ELSE IF (vari(1:8) .EQ. 'dpol2max') THEN
+!        READ(vari(ieg+1:80),*,err=98)deltrn(6)
+         call rdfrre(vari(ieg+1:80),dpol2max,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('carreMode')) .EQ. 'carreMode') THEN
          call rdfrin(vari(ieg+1:80),par%carreMode,ierror)
          if(ierror.eq.1) go to 98
