@@ -21,7 +21,7 @@
       relax=0.2
       pasmin=0.001
       dpol1max=0.01
-      dpol2max=0.000
+      dpol2max=0.01
       rlcept=1.e-6
 !
 !  2.   langue de travail

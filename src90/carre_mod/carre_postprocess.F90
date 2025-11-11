@@ -2415,10 +2415,9 @@ contains
     logical :: pointOk
     double precision :: x0, y0, x1, y1
 
-    logical :: pointWasMoved(npmamx,nrmamx,nregmx), isiternal, one_boundary
-    integer :: ipNbPol, irNbPol, ipPolFace, irPolFace, ipNbRad, irRadFace, &
-    & irNbRad, ipRadFace
-    double precision :: dIntPol, dExtPol, dMin
+    logical :: pointWasMoved(npmamx,nrmamx,nregmx), one_boundary
+    integer :: ipNbPol, irNbPol, ipPolFace, irPolFace
+    double precision :: dIntPol, dExtPol
 
     external :: dist
     double precision :: dist
@@ -2431,40 +2430,21 @@ contains
     ! an external point on the other side, move the external point
     ! to the structure intersection
 
-    ! First loop over all external points and check if they can be moved onto the structure in the poloidal direction.
-    ! This also removes any pentagonal cells, by creating a nonorthogonal interal face.
-    ! Secondly loop over all remaining external points and move them radially onto the structure.
-    ! First pass: if the other endpoint is an internal point, they are connected
-    ! by an intersected face. Move point onto the intersection.
-    ! Second pass: if the other endpoint is a boundary point, move the point onto it.
-    ! Only move every point once.
-
     do iReg = 1, grid%nReg
         do ip = 1, grid%np1(iReg) - 1
             do ir = 1, grid%nr(iReg) - 1
                 nInt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_INTERNAL )
                 nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
                 if ((nInt == 3) .and. (nExt == 1))  then
-                    isiternal = .false.
                     call findPoint( ip, ir, iReg, GRID_EXTERNAL, ipFix, irFix )
                     if ((grid%xmail(ipFix,irFix,iReg)+grid%ymail(ipFix,irFix,iReg)) < 1e-6) cycle
-                    ! print *, "External point:", grid%xmail(ipFix,irFix,iReg),grid%ymail(ipFix,irFix,iReg)
                 elseif((nInt == 1) .and. (nExt == 3))  then
-                    isiternal = .true.
                     call findPoint( ip, ir, iReg, GRID_INTERNAL, ipFix, irFix )
                     if ((grid%xmail(ipFix,irFix,iReg)+grid%ymail(ipFix,irFix,iReg)) < 1e-6) cycle
-                    ! print *, "External point:", grid%xmail(ipFix,irFix,iReg),grid%ymail(ipFix,irFix,iReg)
                 else
                     cycle
                 endif
                 ! cycle
-                ipNbRad = ipFix
-                irNbRad = irFix + 1
-                if (irNbRad > ir + 1) irNbRad = ir
-
-                ! figure out indices of the radial face this point is on
-                ipRadFace = min(ipFix, ipNbRad)
-                irRadFace = min(irFix, irNbRad)
 
                 ! poloidal face
                 ! neighbour point
@@ -2475,10 +2455,6 @@ contains
                 ! figure out indices and type of face this point is on
                 ipPolFace = min(ipFix, ipNbPol)
                 irPolFace = min(irFix, irNbPol)
-
-                ! print *, "point was moved from ",grid%xmail(ipFix,irFix,iReg), &
-                ! &   grid%ymail(ipFix,irFix,iReg), 'to', grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
-                ! &  grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg)
 
                 dIntPol = dist( &
                 & grid%xmail(ipFix,irFix,iReg), &
@@ -2517,6 +2493,14 @@ contains
             enddo
         enddo
     enddo
+
+    ! First loop over all external points and check if they can be moved onto the structure in the poloidal direction.
+    ! This also removes any pentagonal cells, by creating a nonorthogonal interal face.
+    ! Secondly loop over all remaining external points and move them radially onto the structure.
+    ! First pass: if the other endpoint is an internal point, they are connected
+    ! by an intersected face. Move point onto the intersection.
+    ! Second pass: if the other endpoint is a boundary point, move the point onto it.
+    ! Only move every point once.
 
     ! apply correction strategies one after anothe
     do iPass = 1, 2
@@ -2572,20 +2556,22 @@ contains
                             call movePoint( x0, y0, x1, y1, markFixed = .true. )
                             grid%pointFlagFinalCheck(ip, ir, iReg) = GRID_BOUNDARY
                         end if
-                        
+
                         ! Second pass: move onto boundary point
                         one_boundary = .true.
                         do dy2 = -1, 1
                             do dx2 = -1, 1
-                                if (dx2 == dx) cycle
-                                if (dy2 == dy) cycle
+                                if (dx2 == dx .and. dy2 == dy) cycle
                                 if(grid%pointFlag(ip+dx2, ir+dy2, iReg) == GRID_BOUNDARY) then
                                     one_boundary = .false.
                                     exit
                                 endif
                             enddo
                         enddo
-                        
+
+                        ! We allow to move point (ip, ir) to (ip2,ir2) only if
+                        ! this point has only one boundary neighbour or this neighbour
+                        ! is placed in poloidal direction.
                         if ( (iPass==2) .and. (one_boundary .or. (ip == ip2)) .and. &
                         & (grid%pointFlag(ip2, ir2, iReg) == GRID_BOUNDARY)) then
 
@@ -2598,7 +2584,6 @@ contains
                             call movePoint( x0, y0, x1, y1, markFixed = .false. )
                             grid%pointFlagFinalCheck(ip, ir, iReg) = GRID_BOUNDARY
                             grid%pointFlagFinalCheck(ip2, ir2, iReg) = GRID_BOUNDARY
-                            ! print *, "point moved from",x0,y0, "to", x1,y1
                         end if
                     end do
                 end do
