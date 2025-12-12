@@ -625,6 +625,18 @@ contains
       where ( (cellBndFaceCount > 0) .and. (grid%cellFlag == GRID_INTERNAL) ) &
           & grid%cellflag = GRID_BOUNDARY
 
+      ! Identify remaining continuous pieces of flux-surface boundaries
+      ! Assign a unique (negative) label to each segment
+      if (finalized) then
+
+          if ( par%carreMode == CARRE_EXTENDED_NONORTHOGONAL .or. par%carreMode == CARRE_EXTENDED) then
+
+              call identifyFluxSurfaceBoundaries()
+
+          endif
+
+      endif
+
       ! If grid is finalized we are done now
       if (finalized) return
 
@@ -779,6 +791,279 @@ contains
       end do
 
     end subroutine computeConnectionInformation
+
+
+
+    subroutine identifyFluxSurfaceBoundaries()
+
+      integer :: iLbl, iDum, iFace, iPol, iRad, iReg, nVoid, iFc
+      real(rKind) :: xsrt, ysrt, xend, yend, x1, y1, x2, y2
+      logical lfound, lcore, ldir, lused(1:4,npmamx-1,nrmamx-1,nregmx)
+      logical points_match
+      external points_match
+
+      !! Identify remainig vacuum boundaries (BOUNDARY_NOSTRUCTURE) and give unique negative label
+      !! Closed vacuum boundary => assume core: label
+      !! Open vacuum boundary => negative label
+      !! NOTE: no need to actually build the list of coordinates => just loop over all faces and label them. Store end points/coords in case needed for Uinp.
+      !!       skip degenerate faces initially (give dummy label?) (label in a second pass if need)
+      !!       in case closed loop is detected => assume core, label as -21 (and allow only single core - check on this)
+
+
+      ! Only need to consider non-degenerate void boundary faces
+      lused = .true.
+      where (grid%cellFaceIStruct == BOUNDARY_NOSTRUCTURE) lused = .false.
+      where (grid%cellFaceDegen == 1) lused = .true.
+
+      ! Initialize label for void boundaries to (negative of) number of real structures
+      nVoid = 0
+      lcore = .false.
+      iLbl = -struct%rnstruc
+      iDum  = -9999
+
+      write (*,*) 'number of void faces: ', count(.not.lused)
+      write (*,*) 'npmamx, nrmamx, nregmx: ', npmamx, nrmamx, nregmx
+      iFc = 0
+      do while (.not.all(lused))
+
+        nVoid = nVoid + 1
+
+        write (*,*) 'Working on void boundary ', nVoid
+
+        ! find suitable unused element to start search
+        lfound = .false.
+        iFace = 0
+        iPol = 0
+        iRad = 0
+        iReg = 0
+        do while (.not.lfound)
+
+            ! Loop to the next face
+            iFace = mod(iFace + 1, 4)
+            if (iFace == 0) iFace = 4
+            if (iFace == 1) then
+                iPol = mod(iPol + 1, npmamx - 1)
+                if (iPol == 0) iPol = npmamx - 1
+                if (iPol == 1) then
+                    iRad = mod(iRad + 1, nrmamx - 1)
+                    if (iRad == 0) iRad = nrmamx - 1
+                    if (iRad == 1) then
+                        iReg = iReg + 1
+                        if (iReg .gt. nregmx) then
+                            write (*,*) 'Starting void face not found.'
+                            write (*,*) 'npmamx, nrmamx, nregmx: ', npmamx, nrmamx, nregmx
+                            write (*,*) 'iFace, iPol, iRad, iReg ', iFace, iPol, iRad, iReg
+                            stop        '==> Check grid.'
+                        end if
+                    end if
+                end if
+            end if
+
+            if (.not.lused(iFace, iPol, iRad, iReg)) lfound = .true.
+
+        end do
+
+        write (*,*) 'Starting face iFace, iPol, iRad, iReg ', iFace, iPol, iRad, iReg
+ 
+        ! set the initial element of the void boundary
+        iFc = iFc + 1
+        lused(iFace,iPol,iRad,iReg) = .true.
+        grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = iDum
+        xsrt = grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                        & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg)
+        ysrt = grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                        & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg)
+        xend = grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                        & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)
+        yend = grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                        & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)
+
+        write(*,*) 'Starting pass 1'
+
+        ! first pass: find end point of the polygon
+        ldir = .true.
+        do while (ldir.and..not.all(lused))
+
+            lfound = .false.
+            iFace = 0
+            iPol = 0
+            iRad = 0
+            iReg = 0
+
+            do while (ldir.and..not.lfound)
+
+                ! Loop to the next face
+                iFace = mod(iFace + 1, 4)
+                if (iFace == 0) iFace = 4
+                if (iFace == 1) then
+                    iPol = mod(iPol + 1, npmamx - 1)
+                    if (iPol == 0) iPol = npmamx - 1
+                    if (iPol == 1) then
+                        iRad = mod(iRad + 1, nrmamx - 1)
+                        if (iRad == 0) iRad = nrmamx - 1
+                        if (iRad == 1) then
+                            iReg = iReg + 1
+                        end if
+                    end if
+                end if
+
+                if (iReg .gt. nregmx) then
+
+                   ! no further point found in this direction
+                   ! switch to other side
+                   ldir = .false.
+
+                elseif (.not.lused(iFace, iPol, iRad, iReg)) then
+
+                    x1 = grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                                  & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg)
+                    y1 = grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                                  & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg)
+                    x2 = grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                                  & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)
+                    y2 = grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                                 & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)
+
+                    if (points_match (xend, yend, x1, y1)) then
+
+                        lfound   = .true.
+                        iFc = iFc + 1
+                        lused(iFace, iPol, iRad, iReg) = .true.
+                        grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = iDum
+                        xend = x2
+                        yend = y2
+
+                    elseif (points_match (xend, yend, x2, y2)) then
+
+                        lfound   = .true.
+                        iFc = iFc + 1
+                        lused(iFace, iPol, iRad, iReg) = .true.
+                        grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = iDum
+                        xend = x1
+                        yend = y1
+
+                    end if
+
+                endif
+
+            end do
+
+        end do
+
+        write(*,*) 'Starting pass 2'
+
+        ! second pass: find start point of polygon
+        do while (.not.ldir.and..not.all(lused))
+
+            lfound = .false.
+            iFace = 0
+            iPol = 0
+            iRad = 0
+            iReg = 0
+
+            do while (.not.ldir.and..not.lfound)
+
+                ! Loop to the next face
+                iFace = mod(iFace + 1, 4)
+                if (iFace == 0) iFace = 4
+                if (iFace == 1) then
+                    iPol = mod(iPol + 1, npmamx - 1)
+                    if (iPol == 0) iPol = npmamx - 1
+                    if (iPol == 1) then
+                        iRad = mod(iRad + 1, nrmamx - 1)
+                        if (iRad == 0) iRad = nrmamx - 1
+                        if (iRad == 1) then
+                            iReg = iReg + 1
+                        end if
+                    end if
+                end if
+
+                if (iReg .gt. nregmx) then
+
+                   ! no further point found in this direction
+                   ! switch to other side
+                   ldir = .true.
+
+                elseif (.not.lused(iFace, iPol, iRad, iReg)) then
+
+                    x1 = grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                                  & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg)
+                    y1 = grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 1), &
+                                  & iRad + CELL_FACE_POINT_DIR(iFace, 1), iReg)
+                    x2 = grid%xmail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                                  & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)
+                    y2 = grid%ymail(iPol + CELL_FACE_POINT_DIP(iFace, 2), &
+                                 & iRad + CELL_FACE_POINT_DIR(iFace, 2), iReg)
+
+                    if (points_match (xsrt, ysrt, x1, y1)) then
+
+                        lfound   = .true.
+                        iFc = iFc + 1
+                        lused(iFace, iPol, iRad, iReg) = .true.
+                        grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = iDum
+                        xsrt = x2
+                        ysrt = y2
+
+                    elseif (points_match (xsrt, ysrt, x2, y2)) then
+
+                        lfound   = .true.
+                        iFc = iFc + 1
+                        lused(iFace, iPol, iRad, iReg) = .true.
+                        grid%cellFaceIStruct(iFace, iPol, iRad, iReg) = iDum
+                        xsrt = x1
+                        ysrt = y1
+
+                    end if
+
+                endif
+
+            end do
+
+        end do
+
+        ! Find new label and assign
+        if (points_match(xsrt, ysrt, xend, yend)) then
+
+            if (lcore) then
+                write (*,*) 'Found second core boundary.'
+                stop        '==> Check grid.'
+            end if
+
+            lcore = .true.
+            where (grid%cellFaceIStruct == iDum) grid%cellFaceIStruct = BOUNDARY_CORE
+
+            write(*,*) 'Assigned label ', BOUNDARY_CORE
+
+        else
+
+            iLbl = iLbl - 1
+
+            ! Avoid clash with standard core label
+            if (iLbl == BOUNDARY_CORE) iLbl = iLbl - 1
+
+            where (grid%cellFaceIStruct == iDum) grid%cellFaceIStruct = iLbl
+
+            write(*,*) 'Assigned label ', iLbl
+
+        end if
+
+        write(*,*) 'Treated ', iFc, ' void faces. ', count(.not.lused), ' remaining.'
+
+      end do
+
+      if (.not.all(lused)) then
+          write (*,*) 'Remaining void boundaries...'
+      end if
+
+      if (lcore) then
+          write (*,*) 'Identified ', nVoid, ' flux surface boundary segments, including core boundary.'
+      else
+          write (*,*) 'Identified ', nVoid, ' flux surface boundary segments, no core boundary.'
+      endif
+ 
+      return
+
+    end subroutine identifyFluxSurfaceBoundaries
 
   end subroutine carre_postprocess_computation
 
@@ -2540,18 +2825,6 @@ contains
                 ! Check whether the point is already positioned on another corner
                 pointOk = .false.
 
-                ! compare with neighbour in radial direction
-                ipNb = ipFix
-                irNb = irFix + 1
-                if (irNb > ir+1) irNb = ir
-                if ( pointsIdentical( &
-                     & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
-                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
-                   pointOk = .true.
-                   grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
-                   grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
-                end if
-
                 ! compare with neighbour in poloidal direction
                 ipNb = ipFix + 1
                 irNb = irFix
@@ -2564,7 +2837,19 @@ contains
                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
                 end if
 
-                ! if not ok, set it to neighbour in radial direction
+                ! compare with neighbour in radial direction
+                ipNb = ipFix
+                irNb = irFix + 1
+                if (irNb > ir+1) irNb = ir
+                if ( pointsIdentical( &
+                     & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
+                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
+                   pointOk = .true.
+                   grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                   grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
+                end if
+
+                ! if not ok, set it to neighbour in poloidal direction
                 if (.not. pointOk) then
                     call logmsg(LOGDEBUG, 'finalizeCells: cell '//int2str(ip)//' '//int2str(ir)&
                          &//' '//int2str(iReg)//', fixing node '//int2str(ipFix)//' '&
@@ -2576,8 +2861,8 @@ contains
                     call movePoint( x0, y0, x1, y1, markFixed = .false. )
                     ! The point that was moved is marked as a boundary point in movePoint.
                     ! We also have to mark the point it was moved on as a boundary point.
-                    grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
-                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
+!                    grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+!                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
                 end if
 
             end do

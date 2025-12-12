@@ -33,6 +33,9 @@ module carre_constants
   ! do not touch the wall.
   integer, parameter, public :: BOUNDARY_NOSTRUCTURE = -1
 
+  ! Face number marking core boundary (i.e. flux surface aligned, closed)
+  integer, parameter, public :: BOUNDARY_CORE = -21
+
   real(rkind), parameter, public :: geom_match_dist = 1.0e-6_rKind
 
 end module carre_constants
