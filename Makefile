@@ -420,11 +420,8 @@ ${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/b2mod_dimensions.F
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
+	@rm -f ${OBJDIR}/b2mod_dimensions.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
-else
-#${OBJDIR}/b2mod_dimensions.${MOD}:
-#	@touch ${OBJDIR}/b2mod_dimensions.o
-#	@touch ${OBJDIR}/b2mod_dimensions.{MOD}
 endif
 
 ifeq (${USE_DIMENSIONS},1)
