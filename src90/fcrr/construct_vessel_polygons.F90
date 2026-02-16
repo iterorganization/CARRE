@@ -81,7 +81,7 @@
           write (*,*) 'Check for inconsistent fcLbls of the elements.'
           write (*,*) 'Elements with the same fcLbl must form a single'
           write (*,*) 'open or closed polygon (no gaps).'
-          write (*,*) ilbl, fcLblmin, fcLblmax
+          write (*,*) iLbl, fcLblmin, fcLblmax
           stop ' ==> Check DG model'
         endif
 
@@ -123,7 +123,7 @@
                ! no further point found in this direction
                ! switch to other side
                ldir = .false.
-            elseif (.not.lused(i).and.fcLbl(vess_elm(i)).eq.fcLbls(ilbl)) then
+            elseif (.not.lused(i).and.fcLbl(vess_elm(i)).eq.fcLbls(iLbl)) then
               if (points_match (xend, yend, p1(1,vess_elm(i)), p1(2,vess_elm(i)))) then
                 lfound   = .true.
                 lused(i) = .true.

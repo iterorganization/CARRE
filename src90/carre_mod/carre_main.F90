@@ -282,6 +282,16 @@ contains
 
     end if
 
+    if (.not. (par%equExtensionMode == EQU_EXTENSION_OFF)) then
+       ! If equilibrium has been extended then we re-write it
+       open(2,file='rzpsi_ext.dat')
+       call wreqvr(2,nxmax,iret,equ%nx,equ%ny,equ%x,equ%y,equ%psi)
+       if(iret.ne.0) then
+          write(*,*) 'carre_main: error writing the extended Carre equilibrium file'
+          stop
+       end if
+       close(2)
+    endif
 
     call carre_postprocess_computation(par, equ, grid, struct)
 
