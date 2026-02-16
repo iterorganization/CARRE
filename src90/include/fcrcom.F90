@@ -1,8 +1,9 @@
-!  version : 05.02.99 13:35
-!
+      module fcrcom
+      use KindDefinitions
+
       integer nnstr,nmstr,nsgmx,nrgnx,ntrgx,ngpr,ngpz,nxptm
       parameter (nsgmx=6, nrgnx=6, ntrgx=4, nxptm=2)
-      parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=1000)
+      parameter (ngpr=1025,ngpz=1025, nnstr=60, nmstr=2000)
       integer(Short) :: repart,nrelax,nxpt, &
      &  nsgm,nptseg(nsgmx),nrgn,npr(nrgnx),ntrg, &
      &  nstr,nstrv,lstr(nnstr),lstrv(nnstr),nclstr, &
@@ -21,19 +22,6 @@
      &  p1(3,nmstr), p2(3,nmstr), xstrv(nmstr), ystrv(nmstr)
       real(rKind) :: pfm(ngpr,ngpz),rgr(ngpr),zgr(ngpz)
       real(rKind) :: target_res
-      common/fcrcom/pfm,rgr,zgr, &
-     &  relax,pasmin,rlcept,pntrat, &
-     &  deltp1,deltr1,deltpn,deltrn,tgarde, &
-     &  xstr,ystr,rbtor, &
-     &  xptcntr,xlpcntr,xpttol, &
-     &  lm_pntrt,lm_grcln, &
-     &  target_res, p1, p2, xstrv, ystrv, &
-     &  repart,nrelax,nxpt, &
-     &  nsgm,nptseg,nrgn,npr,ntrg, &
-     &  nstr,nstrv,lstr,lstrv,nclstr,nr,nz, &
-     &  lm_cnfg, carre_mode, grid_ext_mode, equ_ext_mode, &
-     &  vess_elm, nvess, npp, fclbl, &
-     &  ldgv2, lclstr, lclstrv
 !
 !*** nnstr : maximum number of structures to be imported from dg
 !*** nmstr : maximum number of nodes in all the structures
@@ -74,3 +62,5 @@
 !*** xlpcntr: co-ordinates of the O-point
 !*** xpttol : tolerance parameter for distinguishing the X-points
 !*** ldgv2  : true if the input from DG v.2.0 or later
+
+      end module fcrcom

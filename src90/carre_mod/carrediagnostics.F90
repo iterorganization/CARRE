@@ -1,14 +1,13 @@
 module CarreDiagnostics
 
   use KindDefinitions
+  use carre_dimensions
 
   implicit none
 
   private 
   public CarreDiag, cdClearRegion, cdClear
 
-#include <CARREDIM.F>
-  
   !> Derived type holding carre diagnostic output
   type CarreDiag
 

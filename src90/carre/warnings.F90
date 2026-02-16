@@ -8,8 +8,8 @@
 ! for the use in the automatic grid generator AGG
 !****************************************************************
       use KindDefinitions
+      use carre_dimensions
       IMPLICIT NONE
-#include <CARREDIM.F>
       INTEGER i, j
       REAL(rKind) :: nivx(npnimx,nivmx),nivy(npnimx,nivmx),nxu,nyu,nxo,nyo,rn
       REAL(rKind) :: separx(npnimx,4,npxmx),separy(npnimx,4,npxmx),xpto,ypto, &
@@ -17,9 +17,6 @@
 
       open (33,file='warnings.dat')
       rewind 33
-
-
-
       adzu=100.
       adzo=100.
       bdzu=100.

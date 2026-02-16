@@ -1,5 +1,6 @@
 module carre_postprocess
 
+  use carre_dimensions
   use carre_types
   use CarreDiagnostics
   use carre_niveau
@@ -16,11 +17,9 @@ module carre_postprocess
   use SiloIO
 #endif
   use CarreSiloIO
+  use comrlx
 
   implicit none
-
-#include <CARREDIM.F>
-#include <COMRLX.F>
 
   private
 
@@ -58,8 +57,77 @@ contains
     integer :: ipx, xipol(MAX_POINT_OCCUR), xirad(MAX_POINT_OCCUR), npoint, ipoint
     double precision :: lPasMin
 
-    ! Only do postprocessing when doing grid extension
-    if (par%carreMode == CARRE_EXTENDED) then
+
+    if ( par%carreMode == CARRE_EXTENDED_NONORTHOGONAL ) then
+
+       ! Postprocessing for grid extension
+       ! Only allow for triangles / quads. Allow for misaligned internal poloidal faces. All internal radial faces aligned.
+
+        call logmsg( LOGINFO, "carre_postprocess_computation: doing cut-cell type grid (grid extension), nonorthogonal." )
+
+        ! Initialize grid line flags
+        grid%lineFlagRad = GRIDLINE_BASELINE
+        do iReg = 1, grid%nreg
+
+            ! first and last radial line is required
+            call setRadialLineFlag(grid, iReg, 1, GRIDLINE_BOUNDARY)
+            call setRadialLineFlag(grid, iReg, grid%np1(iReg), GRIDLINE_BOUNDARY)
+
+            ! first and last radial line is required
+
+            ! The grid lines going into the X-point are also required...
+            do ipx = 1, equ%npx
+                call findPointInRegion(grid, iReg, equ%ptx(ipx), equ%pty(ipx), &
+                   & npoint, xipol, xirad, findAll = .true.)
+                do ipoint = 1, npoint
+                    call logmsg(LOGDEBUG, 'carre_postprocess_computation: '// &
+                        & 'marking radial line required due to X-point #'// &
+                        &  int2str(ipx)//" in region "//int2str(iReg))
+                    call setRadialLineFlag(grid, iReg, xipol(ipoint), GRIDLINE_XPOINT)
+                end do
+            end do
+        end do
+
+        ! Mark structures on which the grid is to be refined
+        do iStruc = 1, par%nRefineAtStructs
+            struct%refineAtStructure(par%refineAtStructs(iStruc)) = .true.
+        end do
+
+        ! Compute face/structure intersections
+        call computeFaceStructureIntersections(struct, grid, finalized = .false.)
+
+        ! Mark points to be inside/outside of vessel
+        call labelPointsInsideOutside(equ, struct, grid, finalized = .false.)
+
+        ! Compute the object categorization
+        call categorizeCellsAndFaces(pasmin, finalized = .false.)
+
+        ! Compute connection information between regions
+        call computeConnectionInformation()
+
+        ! Finalize grid cells by moving external points
+        ! of faces onto boundary intersections
+        call finalizeCellsNonorthogonal(grid)
+
+        ! Compute connection information between regions
+        call computeConnectionInformation()
+
+        ! Compute face/structure intersections
+        call computeFaceStructureIntersections(struct, grid, finalized = .true.)
+
+        ! Mark points to be inside/outside of vessel
+        call labelPointsInsideOutside(equ, struct, grid, finalized = .true.)
+
+        ! Recompute the object categorization
+        call categorizeCellsAndFaces(pasmin, finalized = .true.)
+
+        ! Recompute psi on grid
+        call compute_psi_on_grid( equ, grid )
+
+    elseif (par%carreMode == CARRE_EXTENDED ) then
+
+       ! Postprocessing for grid extension
+       ! Only allow for triangles / quads. All internal faces orthogonal or aligned.
 
         call logmsg( LOGINFO, "carre_postprocess_computation: doing cut-cell type grid (grid extension)" )
 
@@ -2331,5 +2399,339 @@ contains
     end subroutine movePoint
 
   end subroutine finalizeCells
+
+
+  !> Finalize grid by moving external points of intersected faces onto the boundary.
+  !> Allow for internal orthogonal faces to become nonorthogonal w.r.t. the field (but aligned faces remain aligned).
+  subroutine finalizeCellsNonorthogonal(grid)
+    type(CarreGrid), intent(inout) :: grid
+
+    ! internal
+    integer :: iReg, ir, ip, iFace, ip2, ir2, ii
+    integer :: nExt
+
+    integer :: iPass, dx, dy, nInt, ipFix, irFix, ipNb, irNb, dy2, dx2
+    integer :: ipFace, irFace
+    logical :: pointOk
+    double precision :: x0, y0, x1, y1
+
+    logical :: pointWasMoved(npmamx,nrmamx,nregmx), one_boundary
+    integer :: ipNbPol, irNbPol, ipPolFace, irPolFace
+    double precision :: dIntPol, dExtPol
+
+    external :: dist
+    double precision :: dist
+
+
+    pointWasMoved = .false.
+    grid%pointFlagFinalCheck = GRID_UNDEFINED
+
+    ! For all intersected faces with an internal point on one and
+    ! an external point on the other side, move the external point
+    ! to the structure intersection
+
+    do iReg = 1, grid%nReg
+        do ip = 1, grid%np1(iReg) - 1
+            do ir = 1, grid%nr(iReg) - 1
+                nInt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_INTERNAL )
+                nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
+                if ((nInt == 3) .and. (nExt == 1))  then
+                    call findPoint( ip, ir, iReg, GRID_EXTERNAL, ipFix, irFix )
+                    if ((grid%xmail(ipFix,irFix,iReg)+grid%ymail(ipFix,irFix,iReg)) < 1e-6) cycle
+                elseif((nInt == 1) .and. (nExt == 3))  then
+                    call findPoint( ip, ir, iReg, GRID_INTERNAL, ipFix, irFix )
+                    if ((grid%xmail(ipFix,irFix,iReg)+grid%ymail(ipFix,irFix,iReg)) < 1e-6) cycle
+                else
+                    cycle
+                endif
+                ! cycle
+
+                ! poloidal face
+                ! neighbour point
+                ipNbPol = ipFix + 1
+                irNbPol = irFix
+                if (ipNbPol > ip + 1) ipNbPol = ip
+
+                ! figure out indices and type of face this point is on
+                ipPolFace = min(ipFix, ipNbPol)
+                irPolFace = min(irFix, irNbPol)
+
+                dIntPol = dist( &
+                & grid%xmail(ipFix,irFix,iReg), &
+                & grid%ymail(ipFix,irFix,iReg), &
+                & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
+
+                dExtPol = dist( &
+                & grid%xmail(ipNbPol,irNbPol,iReg), &
+                & grid%ymail(ipNbPol,irNbPol,iReg), &
+                & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg) )
+
+                if (dIntPol < dExtPol .and. dIntPol < dpol1max) then
+                    call movePoint( &
+                        & grid%xmail(ipFix,irFix,iReg), &
+                        & grid%ymail(ipFix,irFix,iReg), &
+                        & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                        & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                        & markFixed = .true. )
+                    pointWasMoved(ipFix,irFix,iReg) = .true.
+                    grid%cellflag(ip, ir, iReg) = GRID_BOUNDARY
+                    grid%pointFlag(ipFix,irFix,iReg) = GRID_BOUNDARY
+                elseif(dExtPol < dpol2max) then
+                    call movePoint( &
+                    & grid%xmail(ipNbPol,irNbPol,iReg), &
+                    & grid%ymail(ipNbPol,irNbPol,iReg), &
+                    & grid%faceISecPx(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                    & grid%faceISecPy(FACE_POLOIDAL,ipPolFace,irPolFace,iReg), &
+                    & markFixed = .true. )
+                    pointWasMoved(ipNbPol,irNbPol,iReg) = .true.
+                    grid%cellflag(ip, ir, iReg) = GRID_BOUNDARY
+                    grid%pointFlag(ipNbPol,irNbPol,iReg) = GRID_BOUNDARY
+                endif
+
+            enddo
+        enddo
+    enddo
+
+    ! First loop over all external points and check if they can be moved onto the structure in the poloidal direction.
+    ! This also removes any pentagonal cells, by creating a nonorthogonal interal face.
+    ! Secondly loop over all remaining external points and move them radially onto the structure.
+    ! First pass: if the other endpoint is an internal point, they are connected
+    ! by an intersected face. Move point onto the intersection.
+    ! Second pass: if the other endpoint is a boundary point, move the point onto it.
+    ! Only move every point once.
+
+    ! apply correction strategies one after anothe
+    do iPass = 1, 2
+        do ii = 1,4
+
+            ! first visit neighbors (connected faces) in poloidal direction, then radial
+            if (ii.eq.1) then
+                dx = -1
+                dy = 0
+            elseif (ii.eq.2) then
+                dx = 1
+                dy = 0
+            elseif (ii.eq.3) then
+                dx = 0
+                dy = -1
+            else
+                dx = 0
+                dy = 1
+            endif
+
+            ! loop over all points
+            do iReg = 1, grid%nReg
+                do ip = 1, grid%np1(iReg)
+                    do ir = 1, grid%nr(iReg)
+
+                        ! Only consider external points
+                        if (grid%pointFlag(ip, ir, iReg) /= GRID_EXTERNAL) cycle
+
+
+                        if (pointWasMoved(ip, ir, iReg)) cycle
+
+                        ! Compute indices of neighbour point
+                        ip2 = ip + dx
+                        ir2 = ir + dy
+
+                        ! make sure neighbour point is in region
+                        if ( (ip2 < 1) .or. (ip2 > grid%np1(iReg)) ) cycle
+                        if ( (ir2 < 1) .or. (ir2 > grid%nr(iReg)) ) cycle
+
+                        ! figure out indices and type of face this point is on
+                        ipFace = ip + min(dx, 0)
+                        irFace = ir + min(dy, 0)
+                        if (dx /= 0) iFace = FACE_POLOIDAL
+                        if (dy /= 0) iFace = FACE_RADIAL
+
+                        ! First pass: move onto intersection
+                        if ( (iPass==1) .and. &
+                             & (grid%pointFlag(ip2, ir2, iReg) == GRID_INTERNAL) ) then
+                            x0 = grid%xmail(ip,ir,iReg)
+                            y0 = grid%ymail(ip,ir,iReg)
+                            x1 = grid%faceISecPx(iFace,ipFace,irFace,iReg)
+                            y1 = grid%faceISecPy(iFace,ipFace,irFace,iReg)
+                            call movePoint( x0, y0, x1, y1, markFixed = .true. )
+                            grid%pointFlagFinalCheck(ip, ir, iReg) = GRID_BOUNDARY
+                        end if
+
+                        ! Second pass: move onto boundary point
+                        one_boundary = .true.
+                        do dy2 = -1, 1
+                            do dx2 = -1, 1
+                                if (dx2 == dx .and. dy2 == dy) cycle
+                                if(grid%pointFlag(ip+dx2, ir+dy2, iReg) == GRID_BOUNDARY) then
+                                    one_boundary = .false.
+                                    exit
+                                endif
+                            enddo
+                        enddo
+
+                        ! We allow to move point (ip, ir) to (ip2,ir2) only if
+                        ! this point has only one boundary neighbour or this neighbour
+                        ! is placed in poloidal direction.
+                        if ( (iPass==2) .and. (one_boundary .or. (ip == ip2)) .and. &
+                        & (grid%pointFlag(ip2, ir2, iReg) == GRID_BOUNDARY)) then
+
+                            ! external and boundary point:
+                            ! move external point onto boundary point (-> triangle cell)
+                            x0 = grid%xmail(ip,ir,iReg)
+                            y0 = grid%ymail(ip,ir,iReg)
+                            x1 = grid%xmail(ip2,ir2,iReg)
+                            y1 = grid%ymail(ip2,ir2,iReg)
+                            call movePoint( x0, y0, x1, y1, markFixed = .false. )
+                            grid%pointFlagFinalCheck(ip, ir, iReg) = GRID_BOUNDARY
+                            grid%pointFlagFinalCheck(ip2, ir2, iReg) = GRID_BOUNDARY
+                        end if
+                    end do
+                end do
+            end do
+        end do
+    end do  ! strategy loop
+
+    ! Now catch special case of internal cells with three external points and one internal point
+    ! (no boundary point). Make sure the external point not connected to the internal
+    ! point via a face is placed on one of the other external points. If this is not
+    ! the case, move it to the external neighbour along the radial face.
+
+    do iReg = 1, grid%nReg
+        do ip = 1, grid%np1(iReg) - 1
+            do ir = 1, grid%nr(iReg) - 1
+
+                ! we are interested in internal cells
+                if (grid%cellflag(ip, ir, iReg) == GRID_EXTERNAL) cycle
+
+                ! ...with 1 internal and 3 external points
+                nInt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_INTERNAL )
+                nExt = count( grid%pointflag(ip:ip+1, ir:ir+1, iReg) == GRID_EXTERNAL )
+                if (.not. ((nInt == 1) .and. (nExt == 3)) ) cycle
+
+
+                call logmsg(LOGDEBUG, 'finalizeCells: candidate cell '//int2str(ip)&
+                     &//', '//int2str(ir)//', '//int2str(iReg) )
+
+                ! find the internal point
+                call findPoint( ip, ir, iReg, GRID_INTERNAL, ipFix, irFix )
+
+                ! the external point we are interested in is on the opposite corner
+                ipFix = ipFix + 1
+                irFix = irFix + 1
+                if (ipFix > ip+1) ipFix = ip
+                if (irFix > ir+1) irFix = ir
+
+                ! Check whether the point is already positioned on another corner
+                pointOk = .false.
+
+                ! compare with neighbour in poloidal direction
+                ipNb = ipFix + 1
+                irNb = irFix
+                if (ipNb > ip+1) ipNb = ip
+                if ( pointsIdentical( &
+                     & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
+                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
+                   pointOk = .true.
+                   grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                   grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
+                end if
+
+                ! compare with neighbour in radial direction
+                ipNb = ipFix
+                irNb = irFix + 1
+                if (irNb > ir+1) irNb = ir
+                if ( pointsIdentical( &
+                     & grid%xmail(ipFix,irFix,iReg), grid%ymail(ipFix,irFix,iReg), &
+                     & grid%xmail(ipNb,irNb,iReg), grid%ymail(ipNb,irNb,iReg) ) ) then
+                   pointOk = .true.
+                   grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                   grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
+                end if
+
+                ! if not ok, set it to neighbour in radial direction
+                if (.not. pointOk) then
+                    call logmsg(LOGDEBUG, 'finalizeCells: cell '//int2str(ip)//' '//int2str(ir)&
+                         &//' '//int2str(iReg)//', fixing node '//int2str(ipFix)//' '&
+                         &//int2str(irFix)//' with node '//int2str(ipNb)//' '//int2str(irNb) )
+                    x0 = grid%xmail(ipFix,irFix,iReg)
+                    y0 = grid%ymail(ipFix,irFix,iReg)
+                    x1 = grid%xmail(ipNb,irNb,iReg)
+                    y1 = grid%ymail(ipNb,irNb,iReg)
+                    call movePoint( x0, y0, x1, y1, markFixed = .false. )
+                    ! The point that was moved is marked as a boundary point in movePoint.
+                    ! We also have to mark the point it was moved on as a boundary point.
+                    grid%pointFlagFinalCheck(ipFix, irFix, iReg) = GRID_BOUNDARY
+                    grid%pointFlagFinalCheck(ipNb, irNb, iReg) = GRID_BOUNDARY
+                end if
+
+            end do
+        end do
+    end do
+
+  contains
+
+    !> In cell (ip, ir, iReg), find a point with given flag
+    subroutine findPoint( ip, ir, iReg, flag, ipFix, irFix )
+      integer, intent(in) :: ip, ir, iReg, flag
+      integer, intent(out) :: ipFix, irFix
+
+      ! internal
+      integer :: ipL, irL
+
+      ! find the internal point
+      ipFix = GRID_UNDEFINED
+      irFix = GRID_UNDEFINED
+      do ipL = 0, 1
+          do irL = 0, 1
+              if ( grid%pointflag(ip + ipL, ir + irL, iReg) == flag ) then
+                  ipFix = ip + ipL
+                  irFix = ir + irL
+              end if
+          end do
+      end do
+      call assert( ipFix /= GRID_UNDEFINED )
+
+    end subroutine findPoint
+
+
+    subroutine movePoint( xFrom, yFrom, xTo, yTo, markFixed )
+      double precision, intent(in) :: xFrom, yFrom, xTo, yTo
+      logical, intent(in) :: markFixed
+
+      ! internal
+      integer :: iReg, ip(MAX_POINT_OCCUR), ir(MAX_POINT_OCCUR), npoint, ipoint
+
+      do iReg = 1, grid%nreg
+          ip = GRID_UNDEFINED
+          call findPointInRegion(grid, iReg, xFrom, yFrom, npoint, ip, ir, findAll = .true.)
+          ! if no point found, go to next region
+          if (npoint == 0) cycle
+
+          do ipoint = 1, npoint
+              if (.not. pointWasMoved(ip(ipoint), ir(ipoint), iReg)) then
+                  grid%xmail(ip(ipoint), ir(ipoint), iReg) = xTo
+                  grid%ymail(ip(ipoint), ir(ipoint), iReg) = yTo
+                  pointWasMoved(ip(ipoint), ir(ipoint), iReg) = .true.
+                  grid%pointFlagFinalCheck(ip(ipoint), ir(ipoint), iReg) = GRID_BOUNDARY
+
+                  if (markFixed) then
+                      ! Mark as boundary point
+                      grid%pointFlag(ip(ipoint), ir(ipoint), iReg) = GRID_BOUNDARY
+
+                      ! Mark all faces connected to this point as not intersected
+                      grid%faceISec(FACE_RADIAL,ip(ipoint),ir(ipoint),iReg) = .false.
+                      grid%faceISec(FACE_POLOIDAL,ip(ipoint),ir(ipoint),iReg) = .false.
+                      if (ir(ipoint)-1 > 0) grid%faceISec(FACE_RADIAL,ip(ipoint),ir(ipoint)-1,iReg) = .false.
+                      if (ip(ipoint)-1 > 0) grid%faceISec(FACE_POLOIDAL,ip(ipoint)-1,ir(ipoint),iReg) = .false.
+                  end if
+
+              end if
+          end do
+      end do
+
+    end subroutine movePoint
+
+  end subroutine finalizeCellsNonorthogonal
+
 
 end module carre_postprocess

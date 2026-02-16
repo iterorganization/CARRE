@@ -4,11 +4,8 @@
 !
 !======================================================================
       use KindDefinitions
+      use carre_dimensions
       implicit none
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
 
 !  arguments
       integer nstruc,npstru(strumx)

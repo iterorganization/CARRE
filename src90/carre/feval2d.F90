@@ -6,11 +6,9 @@
 !*** Evaluate a function given on a 2d grid at point px,py
 !=======================================================================
       use KindDefinitions
+      use carre_dimensions
       implicit none
       real(rKind) :: feval2d
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
 
 !  arguments
       integer nx,ny
@@ -19,13 +17,12 @@
      &     a01(nxmax,nymax),a11(nxmax,nymax)
 
 !  variables locales
-
       integer ix, jx
 
 !  procedures
       integer ifind
+      external ifind
 !=======================================================================
-
 
       ix = ifind( px, x, nx, 1 )
       jx = ifind( py, y, ny, 1 )
@@ -34,4 +31,5 @@
      &     + a01(ix,jx)*py &
      &     + a11(ix,jx)*px*py
 
+      return
       end

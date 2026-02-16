@@ -5,17 +5,16 @@
 !
 !======================================================================
       use KindDefinitions
+      use carre_dimensions
       use carre_types
+      use comlan
+      use comrlx
 
       IMPLICIT NONE
 
 !..  Cette sous-routine imprime a l'ecran un tableau contenant tous les
 !  parametres choisis, ainsi que quelques resultats intermediaires.
 !  nouvelle valeur desiree.
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
 
 !  arguments
       type(CarreParameters), intent(in) :: par
@@ -24,11 +23,6 @@
      &       distnv(5,*),difpsi,dpmin(*),dpmax(*),drmin(*),drmax(*), &
      &       distxo
       LOGICAL correct
-
-!  variables en common
-
-#include <COMRLX.F>
-#include <COMLAN.F>
 
 !  variables locales
       INTEGER i

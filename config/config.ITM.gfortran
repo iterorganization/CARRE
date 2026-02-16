@@ -1,11 +1,10 @@
 # check if necessary variables are correctly defined
-NCARG_ROOT ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG
-MSCL_ROOT  ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/mscl_1.2.4
-GLI_HOME   ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/gks
-LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lm
-LD_MSCL    ?= -L${MSCL_ROOT}/lib -lmscl
+NCARG_ROOT ?= ${EBROOTNCL}
+MSCL_ROOT  ?= ${EBROOTMSCL}
+GLI_HOME   ?= ${EBROOTGLI}
+LD_NCARG   ?= -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -lm -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpthread -lXrender
+LD_MSCL    ?= `pkg-config mscl --libs`
 
-FC     ?= gfortran
 CPP     = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG

@@ -6,8 +6,8 @@
 !*** Input of target data for Carre
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
-#include <FCRCOM.F>
       character*(8) nam
 !
       integer nnms
@@ -128,8 +128,8 @@
       subroutine fcrchktp(lun)
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
-#include <FCRCOM.F>
       integer lun
       character*80 uline
 

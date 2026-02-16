@@ -23,11 +23,13 @@ PROGRAM CARRE
   use CarreSiloIO
   use carre_types
   use carre_main
+  use carre_dimensions
   use carre_postprocess
   use carre_equilibrium
   use carre_parameter_io
   use Logging
   use Helper
+  use comlan
 
   IMPLICIT NONE
 
@@ -40,14 +42,7 @@ PROGRAM CARRE
   !  a faire:
   !        1. permettre l'imposition de points fixes ou de coins
 
-
   !  variables.
-
-  !ank-970702: moved dimensions to the CARREDIM.F
-#include <CARREDIM.F>
-#include <COMLAN.F>
-
-
   type(CarreParameters) :: par
   type(CarreEquilibrium) :: equ
   type(CarreStructures) :: struct

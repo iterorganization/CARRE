@@ -931,7 +931,7 @@
         if(ny.gt.nymax) then     ! {
           write(*,*) 'Grid is too large in radial direction: ny=', &
      &                                             ny,' > nymax=',nymax
-          write(*,*) '==> Increase nrmamx in CARREDIM.F'
+          write(*,*) '==> Increase nrmamx in carre_dimensions.F90'
           errenc=.true.     ! }
         end if
 
@@ -961,7 +961,7 @@
           if(nx.ge.nxmax) then
             write(*,*) 'Grid is too large in poloidal direction: nx=', &
      &                                           nx+1,' > nxmax=',nxmax
-            write(*,*) '==> Increase npmamx in CARREDIM.F'
+            write(*,*) '==> Increase npmamx in carre_dimensions.F90'
             stop
           end if
 !*** Three poloidal zones

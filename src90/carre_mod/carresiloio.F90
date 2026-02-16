@@ -9,10 +9,9 @@ module CarreSiloIO
 #ifdef USE_SILO           
   use SiloIO
 #endif
+  use carre_dimensions
   implicit none
 
-#include <CARREDIM.F>
-  
   integer :: iReg = 0, iSurf = 0, iRelax = 0
   integer :: iRegSave = 0, iSurfSave = 0, iRelaxSave = 0
   integer :: csioDbfile

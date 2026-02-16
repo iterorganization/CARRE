@@ -13,7 +13,7 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       use carre_types
       use KindDefinitions, only : rKind
       use CarreDiagnostics, only : CarreDiag
-      use carre_target, only : Carre_Extended, Grid_Extension_Off, drctio, plqdst
+      use carre_target, only : Carre_Extended, Carre_Extended_Nonorthogonal, Grid_Extension_Off, drctio, plqdst
       use carre_equilibrium, only : compute_psi_on_grid
       use CarreSiloIO, only : csIOSetRegion
       use Logging
@@ -21,12 +21,12 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 #ifndef CARRE_NONINTERACTIVE
       use carre_parameter_io, only : change
 #endif
+      use carre_dimensions
+      use comlan
+      use comrlx
       use trc_stk_mod
 
       IMPLICIT NONE
-
-      !  dimensions
-#include <CARREDIM.F>
 
       !  arguments
       type(CarreDiag), intent(inout) :: diag
@@ -34,10 +34,6 @@ subroutine MAILLE(equ,struct,grid,diag,par)
       type(CarreEquilibrium), intent(inout) :: equ
       type(CarreGrid), intent(inout) :: grid
       type(CarreStructures), intent(inout) :: struct
-
-      !  variables en common
-#include <COMLAN.F>
-#include <COMRLX.F>
 
       !  variables locales
       INTEGER isep,ipas,ireg,ipx,sens,nn,idef, &
@@ -105,7 +101,8 @@ subroutine MAILLE(equ,struct,grid,diag,par)
 
       grid%radLineSepSeg = 0
 
-      extended_grid = ( par%carreMode == CARRE_EXTENDED )
+      extended_grid = ( par%carreMode == CARRE_EXTENDED .or. &
+     &                  par%carreMode == CARRE_EXTENDED_NONORTHOGONAL)
 
 !..On procede au cas par cas selon la configuration des separatrices.
 

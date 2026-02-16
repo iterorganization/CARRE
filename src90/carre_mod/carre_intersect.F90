@@ -240,7 +240,7 @@ contains
     !  variables locales
     INTEGER i
     double precision :: tmpIpx, tmpIpy, closestIpx, closestIpy, closestDist
-    integer :: closestSegment
+    integer :: closestSegment, nIntersections
 
     double precision :: dist
     external :: dist
@@ -250,11 +250,14 @@ contains
     closestDist = huge(closestDist)
     closestSegment = GRID_UNDEFINED
 
+    nIntersections = 0
+
     !..Boucle sur la structure.
     DO i=1, size(xst)-1
         call intersection(xx, yy, xst(i:i+1), yst(i:i+1), tmpDoesIntersect, tmpIpx, tmpIpy, testEndPoints)
 
         if (tmpDoesIntersect) then
+            nIntersections = nIntersections + 1
             if (present(oldipx)) then
                 ! if old intersection point given, do all segments to make sure we ge the closest intersection
                 if (dist(tmpIpx, tmpIpy, oldipx, oldipy) < closestDist ) then
@@ -274,7 +277,9 @@ contains
 
     END DO
 
-    if (closestSegment /= GRID_UNDEFINED) then
+    ! Catch the case of multiple intersections
+    ! In case of even number of intersections => assume no intersections
+    if (closestSegment /= GRID_UNDEFINED .and. mod(nIntersections,2) == 1) then
         doesIntersect = .true.
         if (present(ipx)) ipx = closestIpx
         if (present(ipy)) ipy = closestIpy

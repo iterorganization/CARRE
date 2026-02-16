@@ -7,14 +7,10 @@
 !
 !  version : 07.07.97 20:15
       use KindDefinitions
+      use carre_dimensions
       use carre_niveau
 !
       implicit none
-
-!ank-970707: dimensions from the file
-!  dimensions
-#include <CARREDIM.F>
-
 !
 !  arguments
       integer nstruc,npstru(strumx),nn1,nx,ny
@@ -24,7 +20,6 @@
      &       pntrat,distxo, &
      &       xn1(nn1),yn1(nn1),fctini,xfin,yfin,fctfin, &
      &       psi(nxmax,nymax),x(nxmax),y(nymax)
-
 !
 !  variables locales
       integer i,nin,nn(2),inouv,npcrb(2),ii,jj,dir,indstr,plaque

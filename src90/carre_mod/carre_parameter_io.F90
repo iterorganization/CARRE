@@ -6,20 +6,17 @@ module carre_parameter_io
   ! the code (maille, lecle, change, ...). Collect them here.
 
   use KindDefinitions
+  use carre_dimensions
   use carre_types
   use Logging
   use Helper
+  use comlan
+  use comrlx
 
   implicit none
 
   private
   public read_code_parameters_noninteractive, change
-
-!  dimensions
-#include <CARREDIM.F>
-!  variables en common
-#include <COMLAN.F>
-#include <COMRLX.F>
 
 CONTAINS
 
@@ -62,6 +59,7 @@ CONTAINS
 !
 !***********************************************************************
       use carre_types
+      use comlan
       IMPLICIT NONE
 
 !ank-970707: dimensions from the file
@@ -368,6 +366,16 @@ CONTAINS
          call rdfrre(vari(ieg+1:80),rlcept,ierror)
          if(ierror.eq.1) go to 98
          GO TO 10
+      ELSE IF (vari(1:8) .EQ. 'dpol1max') THEN
+!        READ(vari(ieg+1:80),*,err=98)deltrn(6)
+         call rdfrre(vari(ieg+1:80),dpol1max,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
+      ELSE IF (vari(1:8) .EQ. 'dpol2max') THEN
+!        READ(vari(ieg+1:80),*,err=98)deltrn(6)
+         call rdfrre(vari(ieg+1:80),dpol2max,ierror)
+         if(ierror.eq.1) go to 98
+         GO TO 10
       ELSE IF (vari(1:len('carreMode')) .EQ. 'carreMode') THEN
          call rdfrin(vari(ieg+1:80),par%carreMode,ierror)
          if(ierror.eq.1) go to 98
@@ -528,7 +536,5 @@ CONTAINS
 99    ierror=1
       return
     end subroutine rdfrinarray
-
-
 
 end module carre_parameter_io

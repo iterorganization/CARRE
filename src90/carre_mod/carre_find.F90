@@ -6,7 +6,7 @@ module carre_find
   use itm_assert
 
   ! maximum allowed occurrence count for a point in a region
-  integer, parameter, public :: MAX_POINT_OCCUR = 2
+  integer, parameter, public :: MAX_POINT_OCCUR = 3
 
 contains
 

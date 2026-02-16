@@ -17,8 +17,8 @@
 !=======================================================================
       subroutine cntour(f1,f2,n1,n2,xmin,xmax,ymin,ymax)
         use KindDefinitions
+        use carre_dimensions
         implicit none
-#include <CARREDIM.F>
         !  arguments
         integer n1,n2
         real(rKind) :: f1(nxmax,n2),f2(nxmax,n2),xmin,xmax,ymin,ymax
@@ -30,8 +30,8 @@
      &        nstruc,npstru,xstruc,ystruc,nivx,nivy, &
      &        nivtot,nbniv,np1,npr,xmail,ymail,nreg)
         use KindDefinitions
+        use carre_dimensions
         implicit none
-#include <CARREDIM.F>
         !  arguments
         integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
              &        nivtot(nbniv),ptsep(4,npx),npr(*),np1(*),nreg
@@ -46,8 +46,8 @@
            &        nstruc,npstru,xstruc,ystruc,nivx,nivy, &
            &        nivtot,nbniv)
         use KindDefinitions
+        use carre_dimensions
         implicit none
-#include <CARREDIM.F>
         !  arguments
         integer npx,nptot(4,npxmx),nstruc,npstru(strumx),nbniv, &
              &      nivtot(nbniv),ptsep(4,npx)
@@ -66,8 +66,8 @@
            &        fctini,xfin,yfin,fctfin, &
            &        psi,nx,ny,x,y)
         use KindDefinitions
+        use carre_dimensions
         implicit none
-#include <CARREDIM.F>
         !  arguments
         integer nstruc,npstru(strumx),nn1,nx,ny
 

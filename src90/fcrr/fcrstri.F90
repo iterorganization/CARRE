@@ -6,9 +6,9 @@
 !*** Read the structure file from dg
 !======================================================================
       use KindDefinitions
+      use fcrcom
       implicit none
       integer lun
-#include <FCRCOM.F>
       integer(Short) :: i,j,k,l,n
       real(Single) x, y
 !======================================================================

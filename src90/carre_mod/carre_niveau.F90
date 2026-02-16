@@ -1,6 +1,7 @@
 module carre_niveau
 
   use KindDefinitions
+  use carre_dimensions
   use carre_types
   use Helper
   use Logging
@@ -10,8 +11,6 @@ module carre_niveau
 #endif
 
   implicit none
-
-#include <CARREDIM.F>
 
   private
 
@@ -192,6 +191,7 @@ contains
        if ( k == npnimx ) then
           ! Cannot store more points. Warn and return.
           call logmsg(LOGWARNING, "crbniv: too many points in level line, returning incomplete line.")
+          call logmsg(LOGWARNING, "Increase npnimx to avoid this message.")
 #ifdef USE_SILO
              if (DEBUGFILES_CRBNIV) then
                 call csioOpenFile('carreCrbnivEndP')
