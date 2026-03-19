@@ -118,7 +118,7 @@
           write (*,*) 'Check for inconsistent fcLbl of the elements.'
           write (*,*) 'Elements with the same fcLbl must form a single'
           write (*,*) 'open or closed polygon (no gaps).'
-          write (*,*) ilbl, fcLblmin, fcLblmax
+          write (*,*) iLbl, fcLblmin, fcLblmax
           stop ' ==> Check DG model'
         endif
 
