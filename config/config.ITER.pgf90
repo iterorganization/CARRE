@@ -1,8 +1,8 @@
 # check if necessary variables are correctly defined
 GLI_HOME ?= ${EBROOTGLI}
-LD_MSCL  ?= `pkg-config mscl --libs` -lgfortran
+LD_MSCL  ?= $(shell pkg-config mscl --libs) -lgfortran
 ifdef NCARG_ROOT
-LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext `pkg-config cairo --libs` -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
+LD_NCARG ?= -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lXext $(shell pkg-config cairo --libs) -lfontconfig -lfreetype -lpng -lz -lpthread -lXrender -lbz2
 endif
 
 CPP       = /lib/cpp -traditional
