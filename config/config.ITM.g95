@@ -30,4 +30,3 @@ LDEXTRA = ${LD_UAL}
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-

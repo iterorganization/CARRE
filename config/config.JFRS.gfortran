@@ -18,4 +18,3 @@ LDFLAGS = -dynamic
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-

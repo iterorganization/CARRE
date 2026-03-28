@@ -16,4 +16,3 @@ LD_UAL   += -lxml2 -lstdc++
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-
