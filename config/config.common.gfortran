@@ -19,20 +19,20 @@ else
 AL_MAJOR_VERSION ?= $(shell echo ${UAL_VERSION} | cut -d '.' -f1 )
 endif
 ifeq ($(shell test ${AL_MAJOR_VERSION} -ge 5; echo $$?),0)
-B2INCLUDE += `pkg-config al-fortran --cflags`
+B2INCLUDE += $(shell pkg-config al-fortran --cflags)
 else
-B2INCLUDE += `pkg-config imas-gfortran --cflags`
+B2INCLUDE += $(shell pkg-config imas-gfortran --cflags)
 endif
 GGD_MAJOR_VERSION ?= $(shell echo ${GGD_VERSION} | cut -d '.' -f1 )
 ifeq ($(shell test ${GGD_MAJOR_VERSION} -gt 0; echo $$?),0)
-B2INCLUDE += `pkg-config ggd --cflags`
+B2INCLUDE += $(shell pkg-config ggd --cflags)
 endif
 endif
 ifdef AMNS_PREFIX
-B2INCLUDE += `pkg-config amns --cflags`
+B2INCLUDE += $(shell pkg-config amns --cflags)
 endif
 ifeq ($(shell `pkg-config --exists fundamental-constants`; echo $$?),0)
-B2INCLUDE += `pkg-config fundamental-constants --cflags`
+B2INCLUDE += $(shell pkg-config fundamental-constants --cflags)
 endif
 
 COMPILE  = ${FC} -c ${FFLAGS} ${FFLAGSEXTRA}
@@ -47,4 +47,3 @@ LDEXTRA  = ${LD_UAL}
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-

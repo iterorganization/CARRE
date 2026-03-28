@@ -3,7 +3,7 @@ CPP     = /lib/cpp -traditional -ffreestanding
 FFLAGS  = -tp=amd64
 
 ifdef LD_NETCDF
-B2INCLUDE += `nf-config --cflags`
+B2INCLUDE += $(shell nf-config --cflags)
 endif
 
 #!!!Local Variables:

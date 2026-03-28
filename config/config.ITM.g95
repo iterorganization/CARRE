@@ -1,6 +1,7 @@
 # check if necessary variables are correctly defined
 LD_MSCL  ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/mscl -lmscl
 LD_NCARG ?= -L/pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/NCARG/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lxcb
+GLI_HOME ?= /pfs/work/g2dpc/SOLPS-ITER/${COMPILER}/gks
 
 FC      = g95
 CPP     = /lib/cpp -traditional -ffreestanding
@@ -14,7 +15,7 @@ FFLAGS += -O
 endif
 
 ifeq ($(shell `pkg-config --exists fundamental-constants`; echo $$?),0)
-B2INCLUDE += `pkg-config fundamental-constants --cflags`
+B2INCLUDE += $(shell pkg-config fundamental-constants --cflags)
 endif
 
 DBLPAD  = -r8
@@ -23,7 +24,7 @@ COMPILE = ${FC} -c ${FFLAGS} ${FFLAGSEXTRA}
 MOD     = mod
 
 LDLIBS  = ${LD_MSCL} ${LD_NCARG} ${LD_NAG}
-LDFLAGS = 
+LDFLAGS =
 LDEXTRA = ${LD_UAL}
 
 #!!!Local Variables:

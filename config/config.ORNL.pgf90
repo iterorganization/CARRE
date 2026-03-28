@@ -10,7 +10,7 @@ LD_MSCL   ?= -L${MSCL_ROOT} -lmscl
 CPP        = /lib/cpp -traditional -ffreestanding
 
 ifdef LD_NETCDF
-B2INCLUDE += `nf-config --cflags`
+B2INCLUDE += $(shell nf-config --cflags)
 endif
 
 #!!!Local Variables:

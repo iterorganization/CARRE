@@ -9,14 +9,14 @@ else
 DEFINES   = -DNAGFOR
 endif
 ifeq ($(shell `pkg-config --exists fundamental-constants`; echo $$?),0)
-B2INCLUDE += `pkg-config fundamental-constants --cflags`
+B2INCLUDE += $(shell pkg-config fundamental-constants --cflags)
 endif
 
 FC        = nagfor
 CPP       = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG
-FFLAGS    = -g -C 
+FFLAGS    = -g -C
 else
 FFLAGS    = -O
 endif
@@ -28,7 +28,7 @@ OBJDEST   = -mdir ${OBJDIR}
 MOD       = mod
 
 LDLIBS    = ${LD_MSCL} ${LD_NCARG} ${LD_NAG}
-LDFLAGS   = 
+LDFLAGS   =
 LDEXTRA   = ${LD_UAL}
 
 #!!!Local Variables:
