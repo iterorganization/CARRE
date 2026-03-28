@@ -33,4 +33,3 @@ LDEXTRA = -bloadmap:loadmap -bmap:map
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-
