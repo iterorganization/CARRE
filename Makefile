@@ -18,8 +18,6 @@ ifndef COMPILER
 $(error COMPILER not defined)
 endif
 
-MAKETAGS ?= ctags -e -f
-
 MAKES = Makefile
 DEFINES = ${CARRE_DEFINES} ${SOLPS_CPP}
 # Include global SOLPS compiler settings
@@ -130,6 +128,7 @@ else
 INCLUDE += -I${SOLPSTOP}/modules/B2.5/src/include.local -I${SOLPSTOP}/modules/B2.5/src/include
 endif
 endif
+MAKETAGS ?= ctags -e -f
 
 MAINLIST = carre.o tradui.o fcrr.o bidon.o fcrblkd.o
 
@@ -217,7 +216,7 @@ endif
 ifeq (${USE_DIMENSIONS},1)
 ${OBJDIR}/b2mod_dimensions.o: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
-	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
+	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/b2mod_dimensions.F
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 ifneq ($(COMPILER),nag_f90)
@@ -226,7 +225,7 @@ endif
 ifneq (${MOD},o)
 ${OBJDIR}/b2mod_dimensions.${MOD}: ${DIMSDIR}/b2mod_dimensions.F ${B2SRC}/modules/.new_modules
 	@mkdir -p ${SRCDIR}/b25_links/
-	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/
+	ln -sf ${DIMSDIR}/b2mod_dimensions.F ${SRCDIR}/b25_links/b2mod_dimensions.F
 	${CPP} ${DEFINES} ${EQUIVS} -P ${INCLUDE} ${SRCDIR}/b25_links/b2mod_dimensions.F ${OBJDIR}/b2mod_dimensions.f
 	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) -o ${OBJDIR}/b2mod_dimensions.o ${OBJDIR}/b2mod_dimensions.f
 	@if [ -f b2mod_dimensions.${MOD} ]; then /bin/mv b2mod_dimensions.${MOD} ${OBJDIR}; fi

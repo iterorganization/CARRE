@@ -1,6 +1,6 @@
 # check if necessary variables are correctly defined
 ifdef NCARG_ROOT
-LD_NCARG ?= `pkg-config ncarg --libs`
+LD_NCARG ?= $(shell pkg-config ncarg --libs)
 endif
 LD_MSCL ?= -L${SOLPSLIB} -lmscl
 
@@ -18,4 +18,3 @@ LDFLAGS = -dynamic
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-
