@@ -205,12 +205,13 @@ ifneq (${MOD},o)
 endif
 
 ifneq (${MOD},o)
-$(OBJDIR)/%.${MOD} : %.F
-	@/bin/rm -f ${OBJDIR}/$*.f ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
-	${CPP} ${DEFINES} -P ${INCLUDE} $< ${OBJDIR}/$*.f; \
-	$(COMPILE) ${FFLAGSEXTRA} $(INCLUDE) ${INCMOD}${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f
-	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
-	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
+# The compiler writes the .mod file as a side effect of producing the .o,
+# so make .mod depend on .o (no recipe).  This avoids a parallel-make race
+# where the duplicate "%.${MOD}: %.F" rule and the "%.o: %.F" rule above
+# would both compile the same source concurrently and clobber the .mod
+# during gfortran's atomic .mod0 -> .mod rename.
+$(OBJDIR)/%.${MOD} : $(OBJDIR)/%.o
+	@true
 endif
 
 ifeq (${USE_DIMENSIONS},1)
