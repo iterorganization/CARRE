@@ -1,4 +1,4 @@
-CPP     = /lib/cpp -traditional
+CPP     = /lib/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG
 FFLAGS  = -fbacktrace
@@ -9,4 +9,3 @@ DBLPAD  =
 #!!!Local Variables:
 #!!! mode: Makefile
 #!!! End:
-

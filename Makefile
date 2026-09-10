@@ -111,22 +111,12 @@ endif
 # Source form: src is old fixed form source (used by Carre), src90 is current free form source (used by Carre2)
 SRCDIR = src90
 
-VHEAD   =
-ifeq ($(shell [ -d ${SRCLOCAL} ] && echo yes || echo no ),yes)
-VHEAD   =${SRCLOCAL}:
-endif
-FPATH   = ${VHEAD}${SRCDIR}/carre_mod:${SRCDIR}/carre:${SRCDIR}/dummy:${SRCDIR}/include:${SRCDIR}/usol:${SRCDIR}/itm_shared
-GPATH   = ${SRCDIR}/cntour:${SRCDIR}/graphe
-B2PATH  = ${SRCDIR}/b2_shared_itm:${SRCDIR}/carre_shared
-VPATH   = ${VHEAD}${FPATH}:${GPATH}:${B2PATH}
-
 ALLTARGETS = ${OBJDIR}/${PROG}
 EXCLUDELIS = carre.o bidon.o
 # We can only build the dg-to-Carre converter fcrr when we have the SOLPS environment available
 USE_DIMENSIONS = 0
 ifdef SOLPS_CPP
-FPATH      += :${SRCDIR}/trans:${SRCDIR}/fcrr
-VPATH      += :${SRCDIR}/trans:${SRCDIR}/fcrr
+FCPATH      =:${SRCDIR}/trans:${SRCDIR}/fcrr
 ALLTARGETS += ${OBJDIR}/${PROG_TRA} ${OBJDIR}/${PROG_FCRR}
 EXCLUDELIS += tradui.o fcrr.o fcrblkd.o
 DIMMOD =
@@ -142,6 +132,15 @@ endif
 endif
 endif
 
+VHEAD   =
+ifeq ($(shell [ -d ${SRCLOCAL} ] && echo yes || echo no ),yes)
+VHEAD   =${SRCLOCAL}:
+endif
+FPATH   =${VHEAD}${SRCDIR}/carre_mod:${SRCDIR}/carre:${SRCDIR}/dummy:${SRCDIR}/include:${SRCDIR}/usol:${SRCDIR}/itm_shared${FCPATH}
+GPATH   =${SRCDIR}/cntour:${SRCDIR}/graphe
+B2PATH  =${SRCDIR}/b2_shared_itm:${SRCDIR}/carre_shared
+VPATH   =${VHEAD}${FPATH}:${GPATH}:${B2PATH}
+
 MODLIST = ${SRCDIR}/carre_mod/*.F90 ${SRCDIR}/carre_shared/*.F90 ${SRCDIR}/usol/*.f90 ${SRCDIR}/itm_shared/*.f90 ${SRCDIR}/b2_shared_itm/*.F90
 
 DEFINES += -DBUILDING_CARRE ${CARRE_NONINTERACTIVE}
@@ -149,6 +148,14 @@ COMPILE += ${OBJDEST}
 
 INCLUDE = -I${SRCDIR}/include
 
+# Discard a truncated/corrupt LISTOBJ (e.g. left behind by an interrupted
+# build) so it looks *missing* to GNU Make below. The include stays
+# unconditional so Make's normal "remake missing included makefile"
+# mechanism regenerates it via the ${OBJDIR}/LISTOBJ rule before any other
+# target is considered, instead of silently building with an empty/corrupt
+# object list.
+$(shell awk 'FNR==1{if(!/^OBJS *=/){e=1;exit}} END{exit e}' \
+        ${OBJDIR}/LISTOBJ 2>/dev/null || rm -f ${OBJDIR}/LISTOBJ)
 include ${OBJDIR}/LISTOBJ
 
 DEST = $(OBJS:%.o=$(OBJDIR)/%.o) $(OBJSL90:%.o=$(OBJDIR)/%.o) $(OBJSU90:%.o=$(OBJDIR)/%.o)
@@ -197,13 +204,7 @@ $(OBJDIR)/%.o : %.F90
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
 	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
 	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
-
 ifneq (${MOD},o)
-$(OBJDIR)/%.${MOD}: %.F90
-	@- /bin/rm -f ${OBJDIR}/$*.F90 ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
-	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
-	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
-	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
 	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
 endif
 
@@ -212,14 +213,29 @@ $(OBJDIR)/%.o : %.f90
 	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
 	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
 	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
+ifneq (${MOD},o)
+	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
+endif
+
+# bidon.F90 is a collection of dummy/stub routines (to satisfy NCARG link
+# references) whose arguments are intentionally unused. This overrides the
+# generic .F90 pattern rule above for that single file so the compiler's
+# unused-dummy-argument warning is silenced there without disabling it
+# project-wide.
+ifeq ($(COMPILER),gfortran)
+${OBJDIR}/bidon.o : ${SRCDIR}/dummy/bidon.F90
+	@- /bin/rm -f ${OBJDIR}/bidon.F90 ${OBJDIR}/bidon.o ${OBJDIR}/bidon.${MOD}
+	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/bidon.f90
+	$(COMPILE) $(INCLUDE) -Wno-unused-dummy-argument -o ${OBJDIR}/bidon.o ${OBJDIR}/bidon.f90
+	@if [ -f bidon.o ]; then /bin/mv bidon.o ${OBJDIR}; fi
+ifneq (${MOD},o)
+	@if [ -f bidon.${MOD} ]; then /bin/mv bidon.${MOD} ${OBJDIR}; fi
+endif
+endif
 
 ifneq (${MOD},o)
-$(OBJDIR)/%.${MOD}: %.f90
-	@- /bin/rm -f ${OBJDIR}/$*.f90 ${OBJDIR}/$*.o ${OBJDIR}/$*.${MOD}
-	${CPP} ${DEFINES} -P -C ${INCLUDE} $< ${OBJDIR}/$*.f90
-	$(COMPILE) $(INCLUDE) -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f90
-	@if [ -f $*.o ]; then /bin/mv $*.o ${OBJDIR}; fi
-	@if [ -f $*.${MOD} ]; then /bin/mv $*.${MOD} ${OBJDIR}; fi
+$(OBJDIR)/%.${MOD}: $(OBJDIR)/%.o
+	@true
 endif
 
 # compile an executable
@@ -265,11 +281,11 @@ ${OBJDIR}/libgcarre.a: ${GDEST} ${MAKES}
 	ranlib $@
 
 ifdef ITM_ENVIRONMENT_LOADED
-${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${DIMMOD} ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2mod_anomalous_transport.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_b2cmpa.${MOD} ${OBJDIR}/b2mod_b2cmpb.${MOD} ${OBJDIR}/b2mod_b2cmrc.${MOD} ${OBJDIR}/b2mod_b2plot.${MOD} ${OBJDIR}/b2mod_b2plot_wall_loading.${MOD} ${OBJDIR}/b2mod_balance.${MOD} ${OBJDIR}/b2mod_boundary_namelist.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_diag.${MOD} ${OBJDIR}/b2mod_eirdiag.${MOD} ${OBJDIR}/b2mod_eirene_globals.${MOD} ${OBJDIR}/b2mod_elements.${MOD} ${OBJDIR}/b2mod_external.${MOD} ${OBJDIR}/b2mod_feedback.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo2.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_interp.${MOD} ${OBJDIR}/b2mod_ipmain.${MOD} ${OBJDIR}/b2mod_layer.${MOD} ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_mwti.${MOD} ${OBJDIR}/b2mod_neutr_src_scaling.${MOD} ${OBJDIR}/b2mod_neutrals_namelist.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_plasma.${MOD} ${OBJDIR}/b2mod_ppout.${MOD} ${OBJDIR}/b2mod_rates.${MOD} ${OBJDIR}/b2mod_residuals.${MOD} ${OBJDIR}/b2mod_running_average.${MOD} ${OBJDIR}/b2mod_sources.${MOD} ${OBJDIR}/b2mod_stack.${MOD} ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_tallies.${MOD} ${OBJDIR}/b2mod_transport.${MOD} ${OBJDIR}/b2mod_transport_nspecies.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_ual.${MOD} ${OBJDIR}/b2mod_ual_io.${MOD} ${OBJDIR}/b2mod_ual_io_data.${MOD} ${OBJDIR}/b2mod_ual_io_grid.${MOD} ${OBJDIR}/b2mod_user_namelist.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_wall.${MOD} ${OBJDIR}/b2mod_work.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD} ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
-	@ar rucv $@ ${B2DEST} ${DIMOBJ} ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_anomalous_transport.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmpa.o ${OBJDIR}/b2mod_b2cmpb.o ${OBJDIR}/b2mod_b2cmrc.o ${OBJDIR}/b2mod_b2plot.o ${OBJDIR}/b2mod_b2plot_wall_loading.o ${OBJDIR}/b2mod_balance.o ${OBJDIR}/b2mod_boundary_namelist.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_constants.o ${OBJDIR}/b2mod_diag.o ${OBJDIR}/b2mod_eirdiag.o ${OBJDIR}/b2mod_eirene_globals.o ${OBJDIR}/b2mod_elements.o ${OBJDIR}/b2mod_feedback.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geometry.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_interp.o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/b2mod_layer.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_mwti.o ${OBJDIR}/b2mod_neutr_src_scaling.o ${OBJDIR}/b2mod_neutrals_namelist.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_plasma.o ${OBJDIR}/b2mod_ppout.o ${OBJDIR}/b2mod_rates.o ${OBJDIR}/b2mod_residuals.o ${OBJDIR}/b2mod_running_average.o ${OBJDIR}/b2mod_sources.o ${OBJDIR}/b2mod_stack.o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_tallies.o ${OBJDIR}/b2mod_transport.o ${OBJDIR}/b2mod_transport_nspecies.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2mod_ual_io.o ${OBJDIR}/b2mod_ual_io_data.o ${OBJDIR}/b2mod_ual_io_grid.o ${OBJDIR}/b2mod_user_namelist.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_wall.o ${OBJDIR}/b2mod_work.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${DIMMOD} ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2mod_anomalous_transport.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_b2cmpa.${MOD} ${OBJDIR}/b2mod_b2cmpb.${MOD} ${OBJDIR}/b2mod_b2cmrc.${MOD} ${OBJDIR}/b2mod_b2plot.${MOD} ${OBJDIR}/b2mod_b2plot_wall_loading.${MOD} ${OBJDIR}/b2mod_balance.${MOD} ${OBJDIR}/b2mod_boundary_namelist.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_diag.${MOD} ${OBJDIR}/b2mod_eirdiag.${MOD} ${OBJDIR}/b2mod_eirene_globals.${MOD} ${OBJDIR}/b2mod_elements.${MOD} ${OBJDIR}/b2mod_external.${MOD} ${OBJDIR}/b2mod_feedback.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo2.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_interp.${MOD} ${OBJDIR}/b2mod_ipmain.${MOD} ${OBJDIR}/b2mod_layer.${MOD} ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_mwti.${MOD} ${OBJDIR}/b2mod_neutr_src_scaling.${MOD} ${OBJDIR}/b2mod_neutrals_namelist.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_plasma.${MOD} ${OBJDIR}/b2mod_ppout.${MOD} ${OBJDIR}/b2mod_rates.${MOD} ${OBJDIR}/b2mod_residuals.${MOD} ${OBJDIR}/b2mod_running_average.${MOD} ${OBJDIR}/b2mod_sources.${MOD} ${OBJDIR}/b2mod_stack.${MOD} ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_tallies.${MOD} ${OBJDIR}/b2mod_transport.${MOD} ${OBJDIR}/b2mod_transport_nspecies.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_ual.${MOD} ${OBJDIR}/b2mod_ual_io.${MOD} ${OBJDIR}/b2mod_ual_io_data.${MOD} ${OBJDIR}/b2mod_ual_io_grid.${MOD} ${OBJDIR}/b2mod_user_namelist.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_wall.${MOD} ${OBJDIR}/b2mod_work.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/b2us_debug.${MOD} ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD} ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/tradui_constants.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
+	@ar rucv $@ ${B2DEST} ${DIMOBJ} ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_anomalous_transport.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_b2cmpa.o ${OBJDIR}/b2mod_b2cmpb.o ${OBJDIR}/b2mod_b2cmrc.o ${OBJDIR}/b2mod_b2plot.o ${OBJDIR}/b2mod_b2plot_wall_loading.o ${OBJDIR}/b2mod_balance.o ${OBJDIR}/b2mod_boundary_namelist.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_constants.o ${OBJDIR}/b2mod_diag.o ${OBJDIR}/b2mod_eirdiag.o ${OBJDIR}/b2mod_eirene_globals.o ${OBJDIR}/b2mod_elements.o ${OBJDIR}/b2mod_feedback.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geometry.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_interp.o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/b2mod_layer.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_mwti.o ${OBJDIR}/b2mod_neutr_src_scaling.o ${OBJDIR}/b2mod_neutrals_namelist.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_plasma.o ${OBJDIR}/b2mod_ppout.o ${OBJDIR}/b2mod_rates.o ${OBJDIR}/b2mod_residuals.o ${OBJDIR}/b2mod_running_average.o ${OBJDIR}/b2mod_sources.o ${OBJDIR}/b2mod_stack.o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_tallies.o ${OBJDIR}/b2mod_transport.o ${OBJDIR}/b2mod_transport_nspecies.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_ual.o ${OBJDIR}/b2mod_ual_io.o ${OBJDIR}/b2mod_ual_io_data.o ${OBJDIR}/b2mod_ual_io_grid.o ${OBJDIR}/b2mod_user_namelist.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_wall.o ${OBJDIR}/b2mod_work.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2us_debug.o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/ipgetr.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/smax.o ${OBJDIR}/smin.o ${OBJDIR}/streql.o ${OBJDIR}/tradui_constants.o ${OBJDIR}/xertst.o ${OBJDIR}/xerrab.o
 else
-${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${DIMMOD} ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo2.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_ipmain.${MOD} ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_stack.${MOD} ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD} ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
-	@ar rucv $@ ${B2DEST} ${DIMOBJ} ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_constants.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geometry.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_stack.o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
+${OBJDIR}/libb25.a: ${B2DEST} ${MAKES} ${DIMMOD} ${OBJDIR}/b2mod_ad.${MOD} ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geo.${MOD} ${OBJDIR}/b2mod_geo2.${MOD} ${OBJDIR}/b2mod_geo_corner.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/b2mod_ipmain.${MOD} ${OBJDIR}/b2mod_lwimai.${MOD} ${OBJDIR}/b2mod_lwmain.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/b2mod_openmp.${MOD} ${OBJDIR}/b2mod_stack.${MOD} ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2mod_subsys.${MOD} ${OBJDIR}/b2mod_types.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2mod_xerset.${MOD} ${OBJDIR}/b2us_debug.${MOD} ${OBJDIR}/b2us_geo.${MOD} ${OBJDIR}/b2us_map.${MOD} ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/tradui_constants.${MOD} ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
+	@ar rucv $@ ${B2DEST} ${DIMOBJ} ${OBJDIR}/b2mod_ad.o ${OBJDIR}/b2mod_b2cmfs.o ${OBJDIR}/b2mod_cellhelper.o ${OBJDIR}/b2mod_connectivity.o ${OBJDIR}/b2mod_constants.o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo2.o ${OBJDIR}/b2mod_geo_corner.o ${OBJDIR}/b2mod_geometry.o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_indirect.o ${OBJDIR}/b2mod_ipmain.o ${OBJDIR}/b2mod_lwimai.o ${OBJDIR}/b2mod_lwmain.o ${OBJDIR}/b2mod_math.o ${OBJDIR}/b2mod_openmp.o ${OBJDIR}/b2mod_stack.o ${OBJDIR}/b2mod_switches.o ${OBJDIR}/b2mod_subsys.o ${OBJDIR}/b2mod_types.o ${OBJDIR}/b2mod_version.o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2us_debug.o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xvsg.o ${OBJDIR}/cfruin.o ${OBJDIR}/cfrure.o ${OBJDIR}/cfvers.o ${OBJDIR}/cfwuin.o ${OBJDIR}/cfwure.o ${OBJDIR}/chcase.o ${OBJDIR}/ifill.o ${OBJDIR}/intface.o ${OBJDIR}/intvertex.o ${OBJDIR}/ipgeti.o ${OBJDIR}/machsfr.o ${OBJDIR}/my_out_us.o ${OBJDIR}/nagsubst.o ${OBJDIR}/open_file.o ${OBJDIR}/prvrt.o ${OBJDIR}/prvrti.o ${OBJDIR}/sfill.o ${OBJDIR}/streql.o ${OBJDIR}/tradui_constants.o ${OBJDIR}/xerrab.o ${OBJDIR}/xertst.o
 endif
 	ranlib $@
 
@@ -291,34 +307,45 @@ TAGS:	tags
 tags:
 	rm -f TAGS ; ${MAKETAGS} TAGS ${SRCDIR}/*/*.F `find -L ${SRCDIR}/ -name '*.[Ff]90' -not -name ".*"` || touch TAGS
 
+# dependencies.${COMPILER} is (re)built into a temporary file and only
+# renamed into place once complete (see the atomic-rename rationale on the
+# listobj rule above), so an interrupted `make depend` can never leave a
+# partial/empty dependencies file that a later parallel build would
+# silently trust, dropping module-use dependency edges (e.g. KindDefinitions)
+# and racing compilation order.
 depend: ${OBJS:.o=.F} ${GOBJS:.o=.F90} ${B2OBJS:.o=.F90} ${EXCLUDELIS:.o=.F90} ${OBJSL90:.o=.f90} ${OBJSU90:.o=.F90}
 	@makedepend ${DEFINES} -f- ${INCLUDE} $^ | \
 	sed -e 's|${SRCDIR}/[^ ]*/|${OBJDIR}/|' | \
 	sed -e 's,^${OBJDIR}/,\$${OBJDIR}/,' | \
-	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 1' >> ${OBJDIR}/dependencies.${COMPILER}
+	sed -e 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}.tmp
+	@echo '# 1' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
 ifneq (${MOD},o)
 	@makedepend -p'$${OBJDIR}/' ${DEFINES} -f- ${INCLUDE} ${MODLIST} -o.${MOD} | \
 	sed 's,^$${OBJDIR}/[^ ][^ ]*/,\$${OBJDIR}/,' | \
-        sed 's,: ${SOLPSTOP},: $${SOLPSTOP},' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 2' >> ${OBJDIR}/dependencies.${COMPILER}
+        sed 's,: ${SOLPSTOP},: $${SOLPSTOP},' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
+	@echo '# 2' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
 endif
-	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 3' >> ${OBJDIR}/dependencies.${COMPILER}
+	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
+	@echo '# 3' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
 ifneq (${MOD},o)
-	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 4' >> ${OBJDIR}/dependencies.${COMPILER}
-	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 5' >> ${OBJDIR}/dependencies.${COMPILER}
+	@egrep -aiH '^ {0,}use ' $^ | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".o:",$$1);sub("\\.F90:",".o:",$$1);sub("\\.f90:",".o:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
+	@echo '# 4' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
+	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".${MOD}"}' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
+	@echo '# 5' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
 ifeq (${COMPILER},pgf90)
-	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}
-	@echo '# 6' >> ${OBJDIR}/dependencies.${COMPILER}
+	@egrep -aiH '^ {0,}use ' ${MODLIST} | grep -v 'IGNORE' | tr , ' ' | awk '{sub("\\.F:",".${MOD}:",$$1);sub("\\.f:",".${MOD}:",$$1);sub("\\.F90:",".${MOD}:",$$1);sub("\\.f90:",".${MOD}:",$$1);sub("^.*/","$${OBJDIR}/",$$1); print $$1,"$${OBJDIR}/"tolower($$3)".o"}' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
+	@echo '# 6' >> ${OBJDIR}/dependencies.${COMPILER}.tmp
 endif
 endif
+	@mv -f ${OBJDIR}/dependencies.${COMPILER}.tmp ${OBJDIR}/dependencies.${COMPILER}
 
+# LISTOBJ is (re)built into a temporary file and only renamed into place
+# once complete, so a killed/interrupted `make listobj` (or two concurrent
+# invocations racing on the same OBJDIR) can never leave a partial/corrupt
+# LISTOBJ behind that a later build would silently treat as valid.
 listobj:
 ifneq ($(shell uname),Darwin)
-	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
+	@rm -f ${OBJDIR}/LISTOBJ.tmp; touch ${OBJDIR}/LISTOBJ.tmp; \
 	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${FPATH}" | tr : \ `; do \
 		l="$$l `find $$d -name '*.F' -printf "%f "`"; \
@@ -336,9 +363,9 @@ ifneq ($(shell uname),Darwin)
 	E="$$E -e 's/[ ]*//'"; \
 	EL90="$$EL90 -e 's/[ ]*//'"; \
 	EU90="$$EU90 -e 's/[ ]*//'"; \
-	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ; \
-	echo "$$ll90" | eval sed "$$EL90" >> ${OBJDIR}/LISTOBJ; \
-	echo "$$lu90" | eval sed "$$EU90" >> ${OBJDIR}/LISTOBJ
+	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ.tmp; \
+	echo "$$ll90" | eval sed "$$EL90" >> ${OBJDIR}/LISTOBJ.tmp; \
+	echo "$$lu90" | eval sed "$$EU90" >> ${OBJDIR}/LISTOBJ.tmp
 	@ll="GOBJS ="; \
 	for d in `echo "$(GPATH)" | tr : \ `; do \
 		ll="$$ll `find $$d -name '*.F90' -printf "%f "`"; \
@@ -346,7 +373,7 @@ ifneq ($(shell uname),Darwin)
 	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
-	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ.tmp
 	@lll="B2OBJS ="; \
 	for d in `echo "$(B2PATH)" | tr : \ `; do \
 		lll="$$lll `find $$d -name '*.F90' -printf "%f "`"; \
@@ -354,9 +381,9 @@ ifneq ($(shell uname),Darwin)
 	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
-	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ.tmp
 else
-	@rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
+	@rm -f ${OBJDIR}/LISTOBJ.tmp; touch ${OBJDIR}/LISTOBJ.tmp; \
 	l="OBJS ="; ll90="OBJSL90 = "; lu90="OBJSU90 = "; \
 	for d in `echo "${FPATH}" | tr : \ `; do \
 		l="$$l `find $$d -name '*.F' -exec basename {} \; | tr '\n' ' '`"; \
@@ -374,9 +401,9 @@ else
 	E="$$E -e 's/[ ]*//'"; \
 	EL90="$$EL90 -e 's/[ ]*//'"; \
 	EU90="$$EU90 -e 's/[ ]*//'"; \
-	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ; \
-	echo "$$ll90" | eval sed "$$EL90" >> ${OBJDIR}/LISTOBJ; \
-	echo "$$lu90" | eval sed "$$EU90" >> ${OBJDIR}/LISTOBJ
+	echo "$$l" | eval sed "$$E" > ${OBJDIR}/LISTOBJ.tmp; \
+	echo "$$ll90" | eval sed "$$EL90" >> ${OBJDIR}/LISTOBJ.tmp; \
+	echo "$$lu90" | eval sed "$$EU90" >> ${OBJDIR}/LISTOBJ.tmp
 	@ll="GOBJS ="; \
 	for d in `echo "$(GPATH)" | tr : \ `; do \
 		ll="$$ll `find $$d -name '*.F90' -exec basename {} \; | tr '\n' ' '`"; \
@@ -384,7 +411,7 @@ else
 	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
-	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+	echo "$$ll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ.tmp
 	@lll="B2OBJS ="; \
 	for d in `echo "$(B2PATH)" | tr : \ `; do \
 		lll="$$lll `find $$d -name '*.F90' -exec basename {} \; | tr '\n' ' '`"; \
@@ -392,10 +419,21 @@ else
 	E="-e 's/\.F90/\.o/g'" ; for f in $(MAINLIST); do \
 		E="$$E -e 's/ $$f//'"; \
 	done; \
-	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ
+	echo "$$lll" | eval sed "$$E" >> ${OBJDIR}/LISTOBJ.tmp
 endif
+	@mv -f ${OBJDIR}/LISTOBJ.tmp ${OBJDIR}/LISTOBJ
 
-${OBJDIR}/LISTOBJ: listobj ${ITM_SRC_PREREQS}
+# Rebuild LISTOBJ only when missing (no prerequisites → always up-to-date
+# once built).  Use explicit `make listobj` to force a rebuild when sources change.
+# A valid placeholder is written first so that, if this recipe is invoked by
+# Make's own "remake missing included makefile" mechanism, the recursive
+# `$(MAKE) listobj` sub-process sees an existing, well-formed (if empty)
+# LISTOBJ and does not itself try to remake it again, which is what caused
+# the unbounded recursive-make loop.
+${OBJDIR}/LISTOBJ:
+	-mkdir -p ${OBJDIR}
+	printf 'OBJS =\nOBJSL90 =\nOBJSU90 =\nGOBJS =\nB2OBJS =\n' > ${OBJDIR}/LISTOBJ
+	$(MAKE) listobj
 
 VERSION: ${SRCDIR}/include/git_version_Carre.h
 
@@ -406,7 +444,7 @@ ${SRCDIR}/include/git_version_Carre.h: force
 
 ${OBJDIR}/dependencies.${COMPILER}:
 	-mkdir -p ${OBJDIR}
-	touch ${OBJDIR}/dependencies.${COMPILER}
+	printf '# Dummy dependencies file for Carre2\n' > ${OBJDIR}/dependencies.${COMPILER}
 	${MAKE} VERSION
 	${MAKE} tags
 	${MAKE} listobj
@@ -475,9 +513,9 @@ ${OBJDIR}/b2mod_geo.${MOD}: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_cellhel
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
 
 ifeq (${USE_DIMENSIONS},1)
-${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/carre_constants.${MOD} ${OBJDIR}/b2mod_dimensions.${MOD}
+${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_dimensions.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/carre_constants.${MOD}
 else
-${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/carre_constants.${MOD}
+${OBJDIR}/b2mod_geo2.${MOD}: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/carre_constants.${MOD}
 endif
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_geo2.F ${SRCDIR}/b25_links/
@@ -507,9 +545,9 @@ ${OBJDIR}/b2mod_grid_mapping.${MOD}: ${B2SRC}/ids/b2mod_grid_mapping.F90 ${OBJDI
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
 
 ifeq (${USE_DIMENSIONS},1)
-${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_dimensions.${MOD} ${OBJDIR}/b2mod_math.${MOD}
+${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_dimensions.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/tradui_constants.${MOD}
 else
-${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_math.${MOD}
+${OBJDIR}/b2mod_indirect.${MOD}: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/tradui_constants.${MOD}
 endif
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_indirect.F ${SRCDIR}/b25_links/
@@ -594,6 +632,13 @@ ${OBJDIR}/b2mod_xerset.${MOD}: ${B2SRC}/utility/b2mod_xerset.F
 	@rm -f ${OBJDIR}/b2mod_xerset.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2mod_xerset.f
 
+${OBJDIR}/b2us_debug.${MOD}: ${B2SRC}/modules/b2us_debug.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2us_debug.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_debug.F ${OBJDIR}/b2us_debug.f
+	@rm -f ${OBJDIR}/b2us_debug.${MOD}
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_debug.o ${OBJDIR}/b2us_debug.f
+
 ${OBJDIR}/b2us_geo.${MOD}: ${B2SRC}/modules/b2us_geo.F ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2us_geo.F ${SRCDIR}/b25_links/
@@ -601,7 +646,7 @@ ${OBJDIR}/b2us_geo.${MOD}: ${B2SRC}/modules/b2us_geo.F ${OBJDIR}/b2mod_switches.
 	@rm -f ${OBJDIR}/b2us_geo.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_geo.f
 
-${OBJDIR}/b2us_map.${MOD}: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_version.${MOD}
+${OBJDIR}/b2us_map.${MOD}: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2us_debug.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2us_map.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_map.F ${OBJDIR}/b2us_map.f
@@ -651,7 +696,7 @@ ${OBJDIR}/b2mod_geo.o: ${B2SRC}/modules/b2mod_geo.F ${OBJDIR}/b2mod_cellhelper.$
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_geo.o ${OBJDIR}/b2mod_geo.f
 	@touch ${OBJDIR}/b2mod_geo.${MOD}
 
-${OBJDIR}/b2mod_geo2.o: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/carre_constants.${MOD}
+${OBJDIR}/b2mod_geo2.o: ${B2SRC}/modules/b2mod_geo2.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_constants.${MOD} ${OBJDIR}/b2mod_geometry.${MOD} ${OBJDIR}/b2mod_grid_mapping.${MOD} ${OBJDIR}/b2mod_indirect.${MOD} ${OBJDIR}/carre_constants.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_geo2.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_geo2.F ${OBJDIR}/b2mod_geo2.f
@@ -679,7 +724,7 @@ ${OBJDIR}/b2mod_grid_mapping.o: ${B2SRC}/ids/b2mod_grid_mapping.F90 ${OBJDIR}/b2
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_grid_mapping.o ${OBJDIR}/b2mod_grid_mapping.f90
 	@touch ${OBJDIR}/b2mod_grid_mapping.${MOD}
 
-${OBJDIR}/b2mod_indirect.o: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_math.${MOD}
+${OBJDIR}/b2mod_indirect.o: ${B2SRC}/modules/b2mod_indirect.F ${OBJDIR}/b2mod_cellhelper.${MOD} ${OBJDIR}/b2mod_connectivity.${MOD} ${OBJDIR}/b2mod_math.${MOD} ${OBJDIR}/tradui_constants.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2mod_indirect.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2mod_indirect.F ${OBJDIR}/b2mod_indirect.f
@@ -763,6 +808,13 @@ ${OBJDIR}/b2mod_xerset.o: ${B2SRC}/utility/b2mod_xerset.F
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2mod_xerset.o ${OBJDIR}/b2mod_xerset.f
 	@touch ${OBJDIR}/b2mod_xerset.${MOD}
 
+${OBJDIR}/b2us_debug.o: ${B2SRC}/modules/b2us_debug.F
+	@mkdir -p ${SRCDIR}/b25_links/
+	ln -sf ${B2SRC}/modules/b2us_debug.F ${SRCDIR}/b25_links/
+	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_debug.F ${OBJDIR}/b2us_debug.f
+	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_debug.o ${OBJDIR}/b2us_debug.f
+	@touch ${OBJDIR}/b2us_debug.${MOD}
+
 ${OBJDIR}/b2us_geo.o: ${B2SRC}/modules/b2us_geo.F ${OBJDIR}/b2mod_switches.${MOD} ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2us_geo.F ${SRCDIR}/b25_links/
@@ -770,20 +822,20 @@ ${OBJDIR}/b2us_geo.o: ${B2SRC}/modules/b2us_geo.F ${OBJDIR}/b2mod_switches.${MOD
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_geo.o ${OBJDIR}/b2us_geo.f
 	@touch ${OBJDIR}/b2us_geo.${MOD}
 
-${OBJDIR}/b2us_map.o: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_version.${MOD}
+${OBJDIR}/b2us_map.o: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${MOD} ${OBJDIR}/b2mod_version.${MOD} ${OBJDIR}/b2us_debug.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/modules/b2us_map.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_map.F ${OBJDIR}/b2us_map.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2us_map.f
 	@touch ${OBJDIR}/b2us_map.${MOD}
 
-${OBJDIR}/b2xbzb.o: ${B2SRC}/b2aux/b2xbzb.F
+${OBJDIR}/b2xbzb.o: ${B2SRC}/b2aux/b2xbzb.F ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/b2aux/b2xbzb.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2xbzb.F ${OBJDIR}/b2xbzb.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2xbzb.o ${OBJDIR}/b2xbzb.f
 
-${OBJDIR}/b2xvsg.o: ${B2SRC}/b2aux/b2xvsg.F ${OBJDIR}/b2mod_types.${MOD}
+${OBJDIR}/b2xvsg.o: ${B2SRC}/b2aux/b2xvsg.F ${OBJDIR}/b2mod_geo2.${MOD} ${OBJDIR}/b2mod_types.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/b2aux/b2xvsg.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2xvsg.F ${OBJDIR}/b2xvsg.f
@@ -807,7 +859,7 @@ ${OBJDIR}/cfvers.o: ${B2SRC}/utility/cfvers.F ${B2SRC}/include/git_version_B25.h
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/cfvers.F ${OBJDIR}/cfvers.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/cfvers.o ${OBJDIR}/cfvers.f
 
-${OBJDIR}/cfwuin.o: ${B2SRC}/utility/cfwuin.F
+${OBJDIR}/cfwuin.o: ${B2SRC}/utility/cfwuin.F ${OBJDIR}/b2mod_ad.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/cfwuin.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/cfwuin.F ${OBJDIR}/cfwuin.f
@@ -837,7 +889,7 @@ ${OBJDIR}/intface.o: ${B2SRC}/utility/intface.F
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/intface.F ${OBJDIR}/intface.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/intface.o ${OBJDIR}/intface.f
 
-${OBJDIR}/intvertex.o: ${B2SRC}/utility/intvertex.F
+${OBJDIR}/intvertex.o: ${B2SRC}/utility/intvertex.F ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/intvertex.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/intvertex.F ${OBJDIR}/intvertex.f
@@ -855,7 +907,7 @@ ${OBJDIR}/machsfr.o: ${B2SRC}/utility/machsfr.F
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/machsfr.F ${OBJDIR}/machsfr.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/machsfr.o ${OBJDIR}/machsfr.f
 
-${OBJDIR}/my_out_us.o: ${B2SRC}/utility/my_out_us.F
+${OBJDIR}/my_out_us.o: ${B2SRC}/utility/my_out_us.F ${OBJDIR}/b2mod_ad.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
 	ln -sf ${B2SRC}/utility/my_out_us.F ${SRCDIR}/b25_links/
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/my_out_us.F ${OBJDIR}/my_out_us.f
@@ -1195,7 +1247,20 @@ ${OBJDIR}/b2mod_work.${MOD}: ${B2SRC}/modules/b2mod_work.F
 endif
 endif
 
+# Guard against a truncated/empty dependencies file (e.g. left behind by an
+# interrupted `make depend`, or by two concurrent Carre2 builds racing on the
+# same OBJDIR): if it isn't a genuine non-empty file, discard it so it looks
+# *missing* to GNU Make. The include stays unconditional so Make's normal
+# "remake missing included makefile" mechanism regenerates it via the
+# ${OBJDIR}/dependencies.${COMPILER} rule above before any other target is
+# considered, instead of silently building with an incomplete dependency
+# graph (which is what caused module-use edges such as KindDefinitions to
+# go missing and race with parallel compilation).
+$(shell [ -s ${OBJDIR}/dependencies.${COMPILER} ] || rm -f ${OBJDIR}/dependencies.${COMPILER})
 include ${OBJDIR}/dependencies.${COMPILER}
+ifeq ($(shell [ -e config/dependencies.local ] && echo yes || echo no ),yes)
+include config/dependencies.local
+endif
 
 echo:
 	@echo INCLUDE=${INCLUDE}
