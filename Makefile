@@ -652,7 +652,19 @@ ${OBJDIR}/b2us_map.${MOD}: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_map.F ${OBJDIR}/b2us_map.f
 	@rm -f ${OBJDIR}/b2us_map.${MOD}
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2us_map.f
-endif
+
+# The B2.5 modules above are built by their .${MOD} rule only. `make depend`
+# also emits ".o" prerequisites for their `use` statements (e.g. tradui.o:
+# b2mod_connectivity.o), so their .o files are mere aliases of the .${MOD}
+# targets: a separate .o recipe would rerun the same cpp+compile in parallel
+# with -jN and truncate the shared .f/.f90 file while it is being compiled.
+B2MODS_DUAL = b2mod_ad b2mod_b2cmfs b2mod_cellhelper b2mod_connectivity \
+	b2mod_constants b2mod_geo b2mod_geo2 b2mod_geo_corner b2mod_geometry \
+	b2mod_grid_mapping b2mod_indirect b2mod_ipmain b2mod_lwimai b2mod_lwmain \
+	b2mod_math b2mod_openmp b2mod_stack b2mod_switches b2mod_subsys \
+	b2mod_types b2mod_version b2mod_xerset b2us_debug b2us_geo b2us_map
+$(B2MODS_DUAL:%=${OBJDIR}/%.o): ${OBJDIR}/%.o: ${OBJDIR}/%.${MOD} ;
+else
 
 ${OBJDIR}/b2mod_ad.o: ${B2SRC}/modules/b2mod_ad.F ${OBJDIR}/b2mod_types.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
@@ -828,6 +840,7 @@ ${OBJDIR}/b2us_map.o: ${B2SRC}/modules/b2us_map.F ${OBJDIR}/b2mod_b2cmfs.${MOD} 
 	${CPP} ${DEFINES} -P -C ${INCLUDE} ${B2INCLUDE} ${SRCDIR}/b25_links/b2us_map.F ${OBJDIR}/b2us_map.f
 	$(COMPILE) $(INCLUDE) $(B2INCLUDE) -o ${OBJDIR}/b2us_map.o ${OBJDIR}/b2us_map.f
 	@touch ${OBJDIR}/b2us_map.${MOD}
+endif
 
 ${OBJDIR}/b2xbzb.o: ${B2SRC}/b2aux/b2xbzb.F ${OBJDIR}/b2us_map.${MOD}
 	@mkdir -p ${SRCDIR}/b25_links/
