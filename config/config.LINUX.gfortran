@@ -1,4 +1,4 @@
-CPP     = /usr/bin/cpp -traditional
+CPP     = /usr/bin/cpp -traditional -ffreestanding
 
 ifdef SOLPS_DEBUG
 FFLAGS  = -fbacktrace
