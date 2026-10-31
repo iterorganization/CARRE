@@ -976,11 +976,11 @@ ${OBJDIR}/xertst.o: ${B2SRC}/utility/xertst.F
 
 ${B2SRC}/include/git_version_B25.h:
 	@echo "      character*32 :: git_version_B25 =" > ${B2SRC}/include/git_version_new.h
-	@echo "     . '`git describe --dirty --always | cut -c 1-32`'" >> ${B2SRC}/include/git_version_new.h
+	@echo "     . '`git describe --tags --dirty --always | cut -c 1-32`'" >> ${B2SRC}/include/git_version_new.h
 	@echo "      character*32 :: git_version_ADAS =" >> ${B2SRC}/include/git_version_new.h
-	@echo "     . '`( cd $${SOLPSTOP}/modules/adas ; git describe --dirty --always | cut -c 1-32 )`'" >> ${B2SRC}/include/git_version_new.h
+	@echo "     . '`( cd $${SOLPSTOP}/modules/adas ; git describe --tags --dirty --always | cut -c 1-32 )`'" >> ${B2SRC}/include/git_version_new.h
 	@echo "      character*32 :: git_version_SOLPS =" >> ${B2SRC}/include/git_version_new.h
-	@echo "     . '`( cd $${SOLPSTOP} ; git describe --dirty --always | cut -c 1-32 )`'" >> ${B2SRC}/include/git_version_new.h
+	@echo "     . '`( cd $${SOLPSTOP} ; git describe --tags --dirty --always | cut -c 1-32 )`'" >> ${B2SRC}/include/git_version_new.h
 	@if cmp -s ${B2SRC}/include/git_version_new.h ${B2SRC}/include/git_version_B25.h; then rm ${B2SRC}/include/git_version_new.h; else mv ${B2SRC}/include/git_version_new.h ${B2SRC}/include/git_version_B25.h; fi
 
 ifdef ITM_ENVIRONMENT_LOADED
